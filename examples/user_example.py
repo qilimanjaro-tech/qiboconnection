@@ -23,6 +23,7 @@ def user_example() -> None:
 
     circuit = Circuit(1)
     circuit.add(gates.X(0))
+    circuit.add(gates.M(0))
 
     job_id = qibo_api.execute(circuit=circuit)
     result = qibo_api.get_result(job_id=job_id)

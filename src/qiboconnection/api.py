@@ -3,8 +3,10 @@ from abc import ABC
 from typing import Any, List, Optional, Union, cast
 from typeguard import typechecked
 from qibo.core.circuit import Circuit
+from qibo.abstractions.states import AbstractState
 from qiboconnection.devices.device import Device
 from qiboconnection.errors import ConnectionException, RemoteExecutionException
+from qiboconnection.job_result import JobResult
 from qiboconnection.typings.algorithm import ProgramDefinition
 from qiboconnection.typings.connection import ConnectionConfiguration
 from qiboconnection.connection import Connection
@@ -18,7 +20,7 @@ from qiboconnection.typings.device import (
 )
 from qiboconnection.devices.devices import Devices
 from qiboconnection.job import Job
-from qiboconnection.typings.job import JobResponse
+from qiboconnection.typings.job import JobResponse, JobStatus
 
 
 class API(ABC):
@@ -186,3 +188,34 @@ class API(ABC):
         job.id = response['job_id']
         self._jobs.append(job)
         return job.id
+
+    @typechecked
+    def get_result(self, job_id: int) -> Union[AbstractState, None]:
+        response, status_code = self._connection.send_get_auth_remote_api_call(
+            path=f'{self.JOBS_CALL_PATH}/{job_id}'
+        )
+        if status_code != 200:
+            raise RemoteExecutionException(
+                message=("Job could not be retrieved."), status_code=status_code
+            )
+
+        job_response = JobResponse(response)
+        status = (
+            job_response["status"]
+            if isinstance(job_response["status"], JobStatus)
+            else JobStatus(job_response["status"])
+        )
+        if status == JobStatus.pending:
+            logger.info(f"Your job is still pending. Job queue position: {job_response['queue_position']}")
+            return None
+        if status == JobStatus.running:
+            logger.info("Your job is still running.")
+            return None
+        if status == JobStatus.not_sent:
+            logger.info("Your job has not been sent.")
+            return None
+        if status == JobStatus.completed:
+            logger.info("Your job is completed.")
+            result = JobResult(http_response=job_response["result"]).data
+            return result if not isinstance(result, List) else result[0]
+        raise ValueError(f"Job status not supported: {status}")
