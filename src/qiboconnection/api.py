@@ -174,7 +174,6 @@ class API(ABC):
             device=cast(Device, self._selected_device),
         )
 
-        logger.debug(f'job request: {job.job_request}')
         logger.debug("Sending qibo circuit for a remote execution...")
         response, status_code = self._connection.send_post_auth_remote_api_call(
             path=self.CIRCUITS_CALL_PATH, data=job.job_request
@@ -184,6 +183,6 @@ class API(ABC):
                 message=("Circuit could not be executed."), status_code=status_code
             )
         logger.debug("Job circuit queued successfully.")
-        job.job_id(response['job_id'])
+        job.id = response['job_id']
         self._jobs.append(job)
         return job.id

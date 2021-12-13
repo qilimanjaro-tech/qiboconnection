@@ -67,8 +67,8 @@ class Job(ABC):
             }
         )
 
-    @property
-    def job_id(self, job_id: int) -> None:
+    @id.setter
+    def id(self, job_id: int) -> None:
         self._id = job_id
 
     def _get_job_description(self) -> str:
