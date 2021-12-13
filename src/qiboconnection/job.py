@@ -8,7 +8,11 @@ from qiboconnection.typings.job import JobRequest, JobResponse, JobStatus
 from qiboconnection.job_result import JobResult
 from qiboconnection.util import base64url_encode
 from typeguard import typechecked
+from qibo.core.circuit import Circuit
 import json
+import pickle
+import io
+import base64
 from qiboconnection.config import logger
 
 
@@ -18,19 +22,24 @@ class Job(ABC):
     @typechecked
     def __init__(
         self,
-        program: ProgramDefinition,
         user: User,
         device: Device,
+        program: Optional[ProgramDefinition] = None,
+        circuit: Optional[Circuit] = None,
         job_status: Optional[JobStatus] = JobStatus.not_sent,
         job_result: Optional[JobResult] = None,
         id: Optional[int] = 0,
     ):
         self._id = id
         self._program = program
+        self._circuit = circuit
         self._status: JobStatus = job_status
         self._user: User = user
         self._device: Device = device
         self._result: Union[JobResult, None] = job_result
+
+        if self._program is None and self._circuit is None:
+            raise ValueError("Job requires either a program or a circuit")
 
     @property
     def id(self) -> int:
@@ -54,9 +63,24 @@ class Job(ABC):
             {
                 "user_id": self._user.id,
                 "device_id": self._device.id,
-                "description": base64url_encode(json.dumps(self.algorithms)),
+                "description": self._get_job_description(),
             }
         )
+
+    @property
+    def job_id(self, job_id: int) -> None:
+        self._id = job_id
+
+    def _get_job_description(self) -> str:
+        if self._program is None and self._circuit is None:
+            raise ValueError("Job requires either a program or a circuit")
+
+        if self._program is not None:
+            return base64url_encode(json.dumps(self.algorithms))
+        if self._circuit is not None:
+            circuitBuffer = io.BytesIO()
+            pickle.dump(self._circuit, circuitBuffer)
+            return str(base64.urlsafe_b64encode(circuitBuffer.getvalue()), "utf-8")
 
     @property
     def result(self) -> Any:

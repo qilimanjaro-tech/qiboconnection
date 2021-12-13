@@ -2,6 +2,7 @@
 from abc import ABC
 from typing import Any, List, Optional, Union, cast
 from typeguard import typechecked
+from qibo.core.circuit import Circuit
 from qiboconnection.devices.device import Device
 from qiboconnection.errors import ConnectionException, RemoteExecutionException
 from qiboconnection.typings.algorithm import ProgramDefinition
@@ -26,6 +27,7 @@ class API(ABC):
     API_VERSION = "v1"
     API_PATH = f"/api/{API_VERSION}"
     JOBS_CALL_PATH = "/jobs"
+    CIRCUITS_CALL_PATH = "/circuits"
     DEVICES_CALL_PATH = "/devices"
     PING_CALL_PATH = "/status"
 
@@ -74,9 +76,9 @@ class API(ABC):
         if "calibration_details" in device_input:
             return True
         if (
-            "characteristics" in device_input
-            and (device_input["characteristics"]["type"] is DeviceType.QUANTUM)
-            or ((device_input["characteristics"]["type"] == DeviceType.QUANTUM.value))
+            "characteristics" in device_input and
+            (device_input["characteristics"]["type"] is DeviceType.QUANTUM) or
+            ((device_input["characteristics"]["type"] == DeviceType.QUANTUM.value))
         ):
             return True
         return False
@@ -127,7 +129,7 @@ class API(ABC):
         logger.info(f"Device {device_id} selected.")
 
     @typechecked
-    def execute(self, program: ProgramDefinition) -> Any:
+    def execute_program(self, program: ProgramDefinition) -> Any:
         """Send a remote experiment from the provided algorithm to be executed on the remote service API
 
         Args:
@@ -155,3 +157,33 @@ class API(ABC):
         self._jobs.append(job)
 
         return job.result
+
+    @typechecked
+    def execute(self, circuit: Circuit) -> int:
+        """Send a Qibo circuit to be executed on the remote service API
+
+        Args:
+            circuit (Circuit): a Qibo circuit
+
+        Returns:
+            int: Job id
+        """
+        job = Job(
+            circuit=circuit,
+            user=self._connection.user,
+            device=cast(Device, self._selected_device),
+        )
+
+        logger.debug(f'job request: {job.job_request}')
+        logger.debug("Sending qibo circuit for a remote execution...")
+        response, status_code = self._connection.send_post_auth_remote_api_call(
+            path=self.CIRCUITS_CALL_PATH, data=job.job_request
+        )
+        if status_code != 201:
+            raise RemoteExecutionException(
+                message=("Circuit could not be executed."), status_code=status_code
+            )
+        logger.debug("Job circuit queued successfully.")
+        job.job_id(response['job_id'])
+        self._jobs.append(job)
+        return job.id
