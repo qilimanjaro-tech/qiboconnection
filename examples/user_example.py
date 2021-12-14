@@ -17,7 +17,7 @@ def user_example() -> None:
     qibo_api = API()
 
     devices = qibo_api.list_devices()
-    print(devices)
+    # print(devices)
     qibo_api.select_device_id(device_id=1)
 
     circuit = Circuit(1)
