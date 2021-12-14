@@ -108,6 +108,7 @@ class Connection(ABC):
 
     @typechecked
     def send_post_auth_remote_api_call(self, path: str, data: Any) -> Tuple[Any, int]:
+        logger.debug(f"Calling: {self._remote_server_api_url}{path}")
         header = {"Authorization": "Bearer " + self._authorisation_access_token}
         response = requests.post(
             f"{self._remote_server_api_url}{path}", json=data.copy(), headers=header
@@ -151,6 +152,7 @@ class Connection(ABC):
             "scope": "user profile",
         }
 
+        logger.debug(f"Calling: {self._authorisation_server_api_call}")
         response: requests.Response = requests.post(
             self._authorisation_server_api_call, json=authorisation_request_payload
         )
