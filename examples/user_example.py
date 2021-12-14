@@ -3,7 +3,6 @@ from qibo.core.circuit import Circuit
 from qibo import gates
 from qiboconnection.api import API
 from qiboconnection.connection import ConnectionConfiguration
-import json
 import os
 
 
@@ -26,8 +25,10 @@ def user_example() -> None:
     circuit.add(gates.M(0))
 
     job_id = qibo_api.execute(circuit=circuit)
+    print(f'job id: {job_id}')
     result = qibo_api.get_result(job_id=job_id)
-    print(result)
+    if result is not None:
+        print(result)
 
 
 if __name__ == '__main__':
