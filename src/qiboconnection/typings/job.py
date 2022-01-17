@@ -7,6 +7,7 @@ class JobStatus(enum.Enum):
     pending = "pending"
     running = "running"
     completed = "completed"
+    error = "terminated_with_errors"
 
 
 class JobRequest(TypedDict):

@@ -214,6 +214,9 @@ class API(ABC):
         if status == JobStatus.not_sent:
             logger.info("Your job has not been sent.")
             return None
+        if status == JobStatus.error:
+            logger.info("Your job failed.")
+            return None
         if status == JobStatus.completed:
             logger.info("Your job is completed.")
             result = JobResult(http_response=job_response["result"]).data
