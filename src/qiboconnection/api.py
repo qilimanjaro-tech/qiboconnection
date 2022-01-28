@@ -124,11 +124,58 @@ class API(ABC):
         return self._devices
 
     @typechecked
-    def select_device_id(self, device_id: int) -> None:
+    def select_device_id(self, device_id: int, block_device: bool = True) -> None:
         if self._devices is None:
             raise ValueError("No devices collected. Please call 'list_devices' first.")
-        self._selected_device = self._devices.select_device(id=device_id)
-        logger.info(f"Device {device_id} selected.")
+        self._selected_device = self._devices.select_device(id=device_id, block_device=block_device)
+        self._send_blocked_device_message_to_slack(user_slack_id=self._connection.user_slack_id,
+                                                   device_name=self._selected_device.name)
+        logger.info(f"Device {self._selected_device.name} selected.")
+
+    @typechecked
+    def release_device(self, device_id: int) -> None:
+        if self._devices is None:
+            raise ValueError("No devices collected. Please call 'list_devices' first.")
+        released_device = self._devices.release_device(device_id=device_id)
+        self._send_released_device_message_to_slack(user_slack_id=self._connection.user_slack_id,
+                                                    device_name=released_device.name)
+
+    def _send_blocked_device_message_to_slack(self, user_slack_id: str, device_name: str) -> None:
+        # TODO: define this channel_id when registering a device
+        channel_id = 1
+
+        user = f'<@{user_slack_id}>' if user_slack_id != '' else f'{self._connection.username}'
+
+        message = {
+            "blocks": [
+                {
+                    "type": "section",
+                    "text": {
+                            "type": "mrkdwn",
+                            "text": f":large_yellow_circle: IN USE: Device {device_name} used by {user}"
+                    }
+                }
+            ]
+        }
+        self._connection.send_message(channel_id=channel_id, message=message)
+
+    def _send_released_device_message_to_slack(self, user_slack_id: str, device_name: str) -> None:
+        # TODO: define this channel_id when registering a device
+        channel_id = 1
+
+        user = f'User <@{user_slack_id}>' if user_slack_id != '' else f'{self._connection.username}'
+
+        message = {
+            "blocks": [
+                {
+                    "type": "section",
+                    "text": {
+                        "type": "mrkdwn",
+                        "text": f":large_green_circle: AVAILABLE: {user} released the device {device_name}"
+                    }
+                }
+            ]}
+        self._connection.send_message(channel_id=channel_id, message=message)
 
     @typechecked
     def execute_program(self, program: ProgramDefinition) -> Any:

@@ -15,12 +15,27 @@ class Device(ABC):
         self._device_id = device_input["device_id"]
         self._device_name = device_input["device_name"]
         self._status = self._create_device_status(status=device_input["status"])
+        self._available = True
 
         self._str = f"<Device: device_id={self._device_id}, device_name='{self._device_name}', status='{self._status.value}'>"
 
     @property
     def id(self) -> int:
         return self._device_id
+
+    @property
+    def name(self) -> int:
+        return self._device_name
+
+    @property
+    def availability(self) -> bool:
+        return self._available
+
+    def block_device(self) -> None:
+        self._available = False
+
+    def release_device(self) -> None:
+        self._available = True
 
     def __str__(self) -> str:
         """String representation of a Device
