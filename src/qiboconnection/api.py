@@ -128,8 +128,9 @@ class API(ABC):
         if self._devices is None:
             raise ValueError("No devices collected. Please call 'list_devices' first.")
         self._selected_device = self._devices.select_device(id=device_id, block_device=block_device)
-        self._send_blocked_device_message_to_slack(user_slack_id=self._connection.user_slack_id,
-                                                   device_name=self._selected_device.name)
+        if block_device:
+            self._send_blocked_device_message_to_slack(user_slack_id=self._connection.user_slack_id,
+                                                       device_name=self._selected_device.name)
         logger.info(f"Device {self._selected_device.name} selected.")
 
     @typechecked
