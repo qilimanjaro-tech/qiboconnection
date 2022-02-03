@@ -126,9 +126,22 @@ class Connection(ABC):
             api_key=configuration["api_key"],
         )
 
+    def update_device_status(self, device_id: int, status: str) -> Tuple[Any, int]:
+        return self.send_put_auth_remote_api_call(path=f'/devices/{device_id}',
+                                                  data={'status': status})
+
     def send_message(self, channel_id: int, message: dict) -> Tuple[Any, int]:
         return self.send_post_auth_remote_api_call(path=f'/messages?channel={channel_id}',
                                                    data=message)
+
+    @typechecked
+    def send_put_auth_remote_api_call(self, path: str, data: Any) -> Tuple[Any, int]:
+        logger.debug(f"Calling: {self._remote_server_api_url}{path}")
+        header = {"Authorization": "Bearer " + self._authorisation_access_token}
+        response = requests.put(
+            f"{self._remote_server_api_url}{path}", json=data.copy(), headers=header
+        )
+        return self._process_response(response)
 
     @typechecked
     def send_post_auth_remote_api_call(self, path: str, data: Any) -> Tuple[Any, int]:

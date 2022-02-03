@@ -3,7 +3,8 @@ from typing import Literal, TypedDict, Union
 
 
 class DeviceStatus(enum.Enum):
-    online = "online"
+    available = "available"
+    busy = "busy"
     offline = "offline"
 
 
@@ -14,6 +15,7 @@ class DeviceType(enum.Enum):
 
 class QuantumDeviceCharacteristicsInput(TypedDict):
     type: Literal[DeviceType.QUANTUM, "quantum"]
+    description: str
 
 
 class SimulatorDeviceCharacteristicsInput(TypedDict):
@@ -29,6 +31,7 @@ class DeviceInput(TypedDict):
     device_id: int
     device_name: str
     status: Union[str, DeviceStatus]
+    channel_id: int
 
 
 class CalibrationDetailsInput(TypedDict, total=False):

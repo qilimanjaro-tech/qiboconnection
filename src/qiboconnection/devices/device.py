@@ -3,6 +3,7 @@ from abc import ABC
 from typing import Union
 from typeguard import typechecked
 import json
+from qiboconnection.connection import Connection
 
 from qiboconnection.typings.device import DeviceInput, DeviceStatus
 
@@ -14,10 +15,11 @@ class Device(ABC):
     def __init__(self, device_input: DeviceInput):
         self._device_id = device_input["device_id"]
         self._device_name = device_input["device_name"]
-        self._status = self._create_device_status(status=device_input["status"])
-        self._available = True
+        self._status = self._set_device_status(status=device_input["status"])
+        self._channel_id = device_input["channel_id"]
 
-        self._str = f"<Device: device_id={self._device_id}, device_name='{self._device_name}', status='{self._status.value}'>"
+        self._str = (f"<Device: device_id={self._device_id}, device_name='{self._device_name}', " +
+                     f"status='{self._status.value}' channel_id={self._channel_id}>")
 
     @property
     def id(self) -> int:
@@ -27,15 +29,13 @@ class Device(ABC):
     def name(self) -> int:
         return self._device_name
 
-    @property
-    def availability(self) -> bool:
-        return self._available
+    def block_device(self, connection: Connection) -> None:
+        connection.update_device_status(device_id=self._device_id, status=DeviceStatus.busy.value)
+        self._status = self._set_device_status(status=DeviceStatus.busy)
 
-    def block_device(self) -> None:
-        self._available = False
-
-    def release_device(self) -> None:
-        self._available = True
+    def release_device(self, connection: Connection) -> None:
+        connection.update_device_status(device_id=self._device_id, status=DeviceStatus.available.value)
+        self._status = self._set_device_status(status=DeviceStatus.available)
 
     def __str__(self) -> str:
         """String representation of a Device
@@ -70,7 +70,7 @@ class Device(ABC):
         return json.dumps(self.__dict__(), indent=2)
 
     @typechecked
-    def _create_device_status(self, status: Union[str, DeviceStatus]) -> DeviceStatus:
+    def _set_device_status(self, status: Union[str, DeviceStatus]) -> DeviceStatus:
         if type(status) is str:
             return DeviceStatus(status)
         return status
