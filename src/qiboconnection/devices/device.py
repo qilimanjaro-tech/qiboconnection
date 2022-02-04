@@ -1,10 +1,11 @@
 # device.py
 from abc import ABC
 from typing import Union
+from requests import HTTPError
 from typeguard import typechecked
 import json
 from qiboconnection.connection import Connection
-
+from qiboconnection.config import logger
 from qiboconnection.typings.device import DeviceInput, DeviceStatus
 
 
@@ -30,8 +31,12 @@ class Device(ABC):
         return self._device_name
 
     def block_device(self, connection: Connection) -> None:
-        connection.update_device_status(device_id=self._device_id, status=DeviceStatus.busy.value)
-        self._status = self._set_device_status(status=DeviceStatus.busy)
+        try:
+            connection.update_device_status(device_id=self._device_id, status=DeviceStatus.busy.value)
+            self._status = self._set_device_status(status=DeviceStatus.busy)
+        except HTTPError as ex:
+            logger.error(f"Error blocking device {self._device_name}.")
+            raise ex
 
     def release_device(self, connection: Connection) -> None:
         connection.update_device_status(device_id=self._device_id, status=DeviceStatus.available.value)

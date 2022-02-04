@@ -1,6 +1,8 @@
 # api.py
 from abc import ABC
 from typing import Any, List, Optional, Union, cast
+from requests import HTTPError
+import json
 from typeguard import typechecked
 from qibo.core.circuit import Circuit
 from qibo.abstractions.states import AbstractState
@@ -127,10 +129,13 @@ class API(ABC):
     def select_device_id(self, device_id: int, block_device: bool = True) -> None:
         if self._devices is None:
             raise ValueError("No devices collected. Please call 'list_devices' first.")
-        self._selected_device = self._devices.select_device(connection=self._connection,
-                                                            id=device_id,
-                                                            block_device=block_device)
-        logger.info(f"Device {self._selected_device.name} selected.")
+        try:
+            self._selected_device = self._devices.select_device(connection=self._connection,
+                                                                id=device_id,
+                                                                block_device=block_device)
+            logger.info(f"Device {self._selected_device.name} selected.")
+        except HTTPError as ex:
+            logger.error(f"{json.loads(str(ex))['detail']}")
 
     @typechecked
     def release_device(self, device_id: int) -> None:
