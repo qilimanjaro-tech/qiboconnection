@@ -2,7 +2,9 @@
 from abc import ABC
 from typing import Optional, Union
 from typeguard import typechecked
-import json
+from qiboconnection.config import logger
+from qiboconnection.connection import Connection
+from qiboconnection.devices.device import Device
 
 from qiboconnection.devices.quantum_device import QuantumDevice
 from qiboconnection.devices.simulator_device import SimulatorDevice
@@ -67,10 +69,32 @@ class Devices(ABC):
             one_json += "\n"
         return one_json
 
-    def select_device(self, id: int) -> Union[QuantumDevice, SimulatorDevice]:
+    def select_device(self,
+                      connection: Connection,
+                      id: int,
+                      block_device: bool = True) -> Union[QuantumDevice, SimulatorDevice]:
+        device_found = self._find_device(id)
+        if block_device:
+            self._block_device(connection=connection, device=device_found)
+        return device_found
+
+    def _find_device(self, id: int) -> Union[QuantumDevice, SimulatorDevice]:
         device_found = [device for device in self._devices if device.id == id]
         if len(device_found) == 0:
             raise ValueError("Device not found")
         if len(device_found) > 1:
             raise ValueError(f"Device duplicated with same id:{id}")
         return device_found.pop()
+
+    def block_device(self, connection: Connection, device_id: int) -> None:
+        device_found = self._find_device(device_id)
+        self._block_device(connection=connection, device=device_found)
+
+    def _block_device(self, connection: Connection, device: Device) -> None:
+        device.block_device(connection=connection)
+        logger.info(f"Device {device.name} blocked.")
+
+    def release_device(self, connection: Connection, device_id: int) -> None:
+        device_found = self._find_device(device_id)
+        device_found.release_device(connection=connection)
+        logger.info(f"Device {device_found.name} released.")

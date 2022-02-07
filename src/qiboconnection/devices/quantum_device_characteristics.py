@@ -13,14 +13,15 @@ class QuantumDeviceCharacteristics(ABC):
     @typechecked
     def __init__(self, characteristics_input: QuantumDeviceCharacteristicsInput):
         if (
-            characteristics_input["type"] is not DeviceType.QUANTUM
-            and characteristics_input["type"] != DeviceType.QUANTUM.value
+            characteristics_input["type"] is not DeviceType.QUANTUM and
+            characteristics_input["type"] != DeviceType.QUANTUM.value
         ):
             raise TypeError("Characteristics Device not supported")
 
         self._type = self._create_device_type(device_type=characteristics_input["type"])
+        self._description = characteristics_input["description"]
 
-        self._str = f"<QuantumDeviceCharacteristics: type='{self._type.value}'>"
+        self._str = f"<QuantumDeviceCharacteristics: type='{self._type.value}' description='{self._description}'>"
 
     def __str__(self) -> str:
         """String representation of QuantumDeviceCharacteristics
