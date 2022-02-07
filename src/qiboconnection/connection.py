@@ -32,10 +32,30 @@ class Connection(ABC):
     ):
         self._audience_url = f"{AUDIENCE_URL}/api/v1"
         self._load_configuration(configuration, api_path)
+        self._user_slack_id: Union[str, None] = None
 
     @property
     def user(self) -> User:
         return self._user
+
+    @property
+    def username(self) -> str:
+        return self._user.username
+
+    @property
+    def user_slack_id(self) -> str:
+        if self._user_slack_id is None:
+            self._user_slack_id = self._retrieve_user_slack_id()
+        return self._user_slack_id
+
+    def _retrieve_user_slack_id(self) -> str:
+        user_response, response_status = self.send_get_auth_remote_api_call(
+            path=f'/users/{self._user.id}')
+        if response_status != 200:
+            raise ValueError(f'Error getting user: {response_status}')
+        if not 'slack_id' in user_response or user_response['slack_id'] is None:
+            return ''
+        return user_response['slack_id']
 
     def _set_api_calls(self, api_path: str):
         self._api_path = api_path
@@ -105,6 +125,23 @@ class Connection(ABC):
             username=configuration["username"],
             api_key=configuration["api_key"],
         )
+
+    def update_device_status(self, device_id: int, status: str) -> Tuple[Any, int]:
+        return self.send_put_auth_remote_api_call(path=f'/devices/{device_id}',
+                                                  data={'status': status})
+
+    def send_message(self, channel_id: int, message: dict) -> Tuple[Any, int]:
+        return self.send_post_auth_remote_api_call(path=f'/messages?channel={channel_id}',
+                                                   data=message)
+
+    @typechecked
+    def send_put_auth_remote_api_call(self, path: str, data: Any) -> Tuple[Any, int]:
+        logger.debug(f"Calling: {self._remote_server_api_url}{path}")
+        header = {"Authorization": "Bearer " + self._authorisation_access_token}
+        response = requests.put(
+            f"{self._remote_server_api_url}{path}", json=data.copy(), headers=header
+        )
+        return self._process_response(response)
 
     @typechecked
     def send_post_auth_remote_api_call(self, path: str, data: Any) -> Tuple[Any, int]:
