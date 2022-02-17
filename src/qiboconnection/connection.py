@@ -1,5 +1,6 @@
 # connection.py
 from abc import ABC
+from io import StringIO
 from json.decoder import JSONDecodeError
 from typing import Any, Optional, Tuple, Union
 from datetime import datetime, timezone
@@ -19,6 +20,7 @@ from qiboconnection.typings.connection import (
     ConnectionConfiguration,
     ConnectionEstablished,
 )
+
 
 
 class Connection(ABC):
@@ -134,6 +136,11 @@ class Connection(ABC):
         return self.send_post_auth_remote_api_call(path=f'/messages?channel={channel_id}',
                                                    data=message)
 
+    def send_file(self, channel_id: int, file: StringIO, filename: str) -> Tuple[Any, int]:
+        return self.send_post_auth_remote_api_call(path=f'/messages?channel={channel_id}',
+                                                   file=file,
+                                                   filename=filename)
+
     @typechecked
     def send_put_auth_remote_api_call(self, path: str, data: Any) -> Tuple[Any, int]:
         logger.debug(f"Calling: {self._remote_server_api_url}{path}")
@@ -149,6 +156,16 @@ class Connection(ABC):
         header = {"Authorization": "Bearer " + self._authorisation_access_token}
         response = requests.post(
             f"{self._remote_server_api_url}{path}", json=data.copy(), headers=header
+        )
+        return self._process_response(response)
+
+    @typechecked
+    def send_post_file_auth_remote_api_call(self, path: str, file: StringIO, filename: str) -> Tuple[Any, int]:
+        logger.debug(f"Calling: {self._remote_server_api_url}{path}")
+        header = {"Authorization": "Bearer " + self._authorisation_access_token}
+        packed_file = {'file': (filename, file)}
+        response = requests.post(
+            f"{self._remote_server_api_url}{path}", files=packed_file, headers=header
         )
         return self._process_response(response)
 
