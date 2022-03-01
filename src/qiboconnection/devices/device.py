@@ -27,7 +27,7 @@ class Device(ABC):
         return self._device_id
 
     @property
-    def name(self) -> int:
+    def name(self) -> str:
         return self._device_name
 
     def block_device(self, connection: Connection) -> None:
