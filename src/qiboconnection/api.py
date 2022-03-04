@@ -42,6 +42,7 @@ class API(ABC):
         )
         self._devices = None
         self._jobs: List[Job] = []
+        self._selected_device: Union[Device, None] = None
 
     @property
     def jobs(self) -> List[Job]:
@@ -65,7 +66,7 @@ class API(ABC):
         return response
 
     def _is_quantum_device_input(
-        self, device_input: Union[QuantumDeviceInput, SimulatorDeviceInput]
+            self, device_input: Union[QuantumDeviceInput, SimulatorDeviceInput]
     ) -> bool:
         """Determine if the given device_input is from a Quantum Device or not
 
@@ -80,15 +81,16 @@ class API(ABC):
         if "calibration_details" in device_input:
             return True
         if (
-            "characteristics" in device_input and
-            (device_input["characteristics"]["type"] is DeviceType.QUANTUM) or
-            ((device_input["characteristics"]["type"] == DeviceType.QUANTUM.value))
+                "characteristics" in device_input and
+                ((device_input["characteristics"]["type"] is DeviceType.QUANTUM) or
+                 (device_input["characteristics"]["type"] == DeviceType.QUANTUM.value))
         ):
             return True
         return False
 
+    @typechecked
     def _create_device(
-        self, device_input: Union[QuantumDeviceInput, SimulatorDeviceInput]
+            self, device_input: Union[QuantumDeviceInput, SimulatorDeviceInput]
     ) -> Union[QuantumDevice, SimulatorDevice]:
         """Creates a Device from a given device input.
 
@@ -109,7 +111,7 @@ class API(ABC):
         )
         if status_code != 200:
             raise RemoteExecutionException(
-                message=("Devices could not be retrieved."), status_code=status_code
+                message="Devices could not be retrieved.", status_code=status_code
             )
 
         # !!! TODO: handle all items, not only the returned on first call
@@ -117,7 +119,7 @@ class API(ABC):
             [
                 self._create_device(
                     device_input=cast(
-                        Union[QuantumDevice, SimulatorDevice], device_input
+                        Union[QuantumDeviceInput, SimulatorDeviceInput], device_input
                     )
                 )
                 for device_input in response["items"]
@@ -126,14 +128,42 @@ class API(ABC):
         return self._devices
 
     @typechecked
-    def select_device_id(self, device_id: int, block_device: bool = True) -> None:
+    def _add_or_update_single_device(self, device_id: int):
+        response, status_code = self._connection.send_get_auth_remote_api_call(
+            path=f"{self.DEVICES_CALL_PATH}/{device_id}")
+
+        if status_code != 200:
+            raise RemoteExecutionException(
+                message="Devices could not be retrieved.", status_code=status_code
+            )
+
+        new_device = self._create_device(
+            device_input=cast(
+                Union[QuantumDeviceInput, SimulatorDeviceInput],
+                response)
+        )
+
         if self._devices is None:
-            raise ValueError("No devices collected. Please call 'list_devices' first.")
+            self._devices = Devices([new_device])
+        else:
+            self._devices.add_or_update(new_device)
+
+    @typechecked
+    def select_device_id(self, device_id: int) -> None:
+        self._add_or_update_single_device(device_id=device_id)
         try:
-            self._selected_device = self._devices.select_device(connection=self._connection,
-                                                                id=device_id,
-                                                                block_device=block_device)
+            self._selected_device = self._devices.select_device(id=device_id)
             logger.info(f"Device {self._selected_device.name} selected.")
+        except HTTPError as ex:
+            logger.error(f"{json.loads(str(ex))['detail']}")
+
+    @typechecked
+    def block_device_id(self, device_id: int, block_device: bool = True) -> None:
+        self._add_or_update_single_device(device_id=device_id)
+        try:
+            self._devices.block_device(connection=self._connection,
+                                       id=device_id,
+                                       block_device=block_device)
         except HTTPError as ex:
             logger.error(f"{json.loads(str(ex))['detail']}")
 
@@ -149,7 +179,7 @@ class API(ABC):
         """Send a remote experiment from the provided algorithm to be executed on the remote service API
 
         Args:
-            algorithm (Algorithm): algorithm details conforming the experiment
+            program (ProgramDefinition): program details conforming the experiment
 
         Returns:
             Any: Result of the algorithm executed remotely
@@ -166,10 +196,10 @@ class API(ABC):
         )
         if status_code != 201:
             raise RemoteExecutionException(
-                message=("Experiment could not be executed."), status_code=status_code
+                message="Experiment could not be executed.", status_code=status_code
             )
         logger.debug(f"Experiment completed successfully.")
-        job.update_with_job_response(job_response=JobResponse(response))
+        job.update_with_job_response(job_response=JobResponse(**cast(dict, response)))
         self._jobs.append(job)
 
         return job.result
@@ -196,7 +226,7 @@ class API(ABC):
         )
         if status_code != 201:
             raise RemoteExecutionException(
-                message=("Circuit could not be executed."), status_code=status_code
+                message="Circuit could not be executed.", status_code=status_code
             )
         logger.debug("Job circuit queued successfully.")
         job.id = response['job_id']
@@ -210,10 +240,10 @@ class API(ABC):
         )
         if status_code != 200:
             raise RemoteExecutionException(
-                message=("Job could not be retrieved."), status_code=status_code
+                message="Job could not be retrieved.", status_code=status_code
             )
 
-        job_response = JobResponse(response)
+        job_response = JobResponse(**cast(dict, response))
         status = (
             job_response["status"]
             if isinstance(job_response["status"], JobStatus)

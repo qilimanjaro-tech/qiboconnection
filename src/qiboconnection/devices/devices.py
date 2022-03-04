@@ -44,6 +44,20 @@ class Devices(ABC):
     def add(self, device: Union[QuantumDevice, SimulatorDevice]) -> None:
         self._devices.append(device)
 
+    @typechecked
+    def _update(self, device: Union[QuantumDevice, SimulatorDevice]) -> bool:
+        for index, current_device in enumerate(self._devices):
+            if current_device.id == device.id:
+                self._devices[index] = device
+                return True
+        return False
+
+    @typechecked
+    def add_or_update(self, device: Union[QuantumDevice, SimulatorDevice]) -> None:
+        updated = self._update(device=device)
+        if not updated:
+            self.add(device=device)
+
     def __str__(self) -> str:
         """String representation of a List of Devices
 
@@ -69,13 +83,8 @@ class Devices(ABC):
             one_json += "\n"
         return one_json
 
-    def select_device(self,
-                      connection: Connection,
-                      id: int,
-                      block_device: bool = True) -> Union[QuantumDevice, SimulatorDevice]:
+    def select_device(self, id: int,) -> Union[QuantumDevice, SimulatorDevice]:
         device_found = self._find_device(id)
-        if block_device:
-            self._block_device(connection=connection, device=device_found)
         return device_found
 
     def _find_device(self, id: int) -> Union[QuantumDevice, SimulatorDevice]:
