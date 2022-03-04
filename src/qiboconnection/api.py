@@ -137,6 +137,7 @@ class API(ABC):
                 message="Devices could not be retrieved.", status_code=status_code
             )
 
+        logger.warning(f"Creating device with id {device_id} and returned info:\n {response}")
         new_device = self._create_device(
             device_input=cast(
                 Union[QuantumDeviceInput, SimulatorDeviceInput],
