@@ -27,7 +27,7 @@ class SimulatorDeviceCharacteristicsInput(TypedDict):
     ram: str
 
 
-class DeviceInput(TypedDict):
+class DeviceInput(TypedDict, total=False):
     device_id: int
     device_name: str
     status: Union[str, DeviceStatus]
