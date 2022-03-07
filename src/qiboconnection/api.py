@@ -158,12 +158,11 @@ class API(ABC):
             logger.error(f"{json.loads(str(ex))['detail']}")
 
     @typechecked
-    def block_device_id(self, device_id: int, block_device: bool = True) -> None:
+    def block_device_id(self, device_id: int) -> None:
         self._add_or_update_single_device(device_id=device_id)
         try:
             self._devices.block_device(connection=self._connection,
-                                       id=device_id,
-                                       block_device=block_device)
+                                       device_id=device_id)
         except HTTPError as ex:
             logger.error(f"{json.loads(str(ex))['detail']}")
 
