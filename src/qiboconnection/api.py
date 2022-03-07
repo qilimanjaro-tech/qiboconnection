@@ -88,7 +88,6 @@ class API(ABC):
             return True
         return False
 
-    @typechecked
     def _create_device(
             self, device_input: Union[QuantumDeviceInput, SimulatorDeviceInput]
     ) -> Union[QuantumDevice, SimulatorDevice]:
@@ -137,7 +136,6 @@ class API(ABC):
                 message="Devices could not be retrieved.", status_code=status_code
             )
 
-        logger.error(f"Creating device with id {device_id} and returned info:\n {response}")
         new_device = self._create_device(
             device_input=cast(
                 Union[QuantumDeviceInput, SimulatorDeviceInput],
