@@ -88,6 +88,7 @@ class API(ABC):
             return True
         return False
 
+    @typechecked
     def _create_device(
             self, device_input: Union[QuantumDeviceInput, SimulatorDeviceInput]
     ) -> Union[QuantumDevice, SimulatorDevice]:
