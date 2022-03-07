@@ -1,5 +1,5 @@
 import enum
-from typing import Literal, TypedDict, Union
+from typing import Literal, TypedDict, Union, Optional
 
 
 class DeviceStatus(enum.Enum):
@@ -32,6 +32,7 @@ class DeviceInput(TypedDict):
     device_name: str
     status: Union[str, DeviceStatus]
     channel_id: int
+    number_pending_jobs: Optional[int]
 
 
 class CalibrationDetailsInput(TypedDict, total=False):
