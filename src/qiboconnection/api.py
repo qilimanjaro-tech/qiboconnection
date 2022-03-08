@@ -15,6 +15,7 @@ from qiboconnection.connection import Connection
 from qiboconnection.config import logger
 from qiboconnection.devices.quantum_device import QuantumDevice
 from qiboconnection.devices.simulator_device import SimulatorDevice
+from qiboconnection.devices.offline_device import OfflineDevice
 from qiboconnection.typings.device import (
     DeviceType,
     QuantumDeviceInput,
@@ -22,6 +23,7 @@ from qiboconnection.typings.device import (
     OfflineDeviceInput
 )
 from qiboconnection.devices.devices import Devices
+from qiboconnection.typings.device import DeviceStatus
 from qiboconnection.job import Job
 from qiboconnection.typings.job import JobResponse, JobStatus
 
@@ -66,8 +68,9 @@ class API(ABC):
             raise ConnectionException("Error connecting to Qilimanjaro API")
         return response
 
+    @staticmethod
     def _is_quantum_device_input(
-            self, device_input: Union[QuantumDeviceInput, SimulatorDeviceInput]
+            device_input: Union[QuantumDeviceInput, SimulatorDeviceInput, OfflineDeviceInput]
     ) -> bool:
         """Determine if the given device_input is from a Quantum Device or not
 
@@ -89,19 +92,36 @@ class API(ABC):
             return True
         return False
 
+    @staticmethod
+    def _is_offline_device_input(
+            device_input: Union[QuantumDeviceInput, SimulatorDeviceInput, OfflineDeviceInput]
+    ) -> bool:
+        """Determine if the given device_input is from an Offline Device or not
+
+        Args:
+            device_input (Union[QuantumDeviceInput, SimulatorDeviceInput, OfflineDevice]): Device Input structure
+
+        Returns:
+            bool: True if the device is from an Offline Device
+        """
+        return (device_input['status'] == DeviceStatus.offline or
+                device_input['status'] == DeviceStatus.offline.value)
+
     @typechecked
     def _create_device(
             self, device_input: Union[QuantumDeviceInput, SimulatorDeviceInput, OfflineDeviceInput]
-    ) -> Union[QuantumDevice, SimulatorDevice]:
+    ) -> Union[QuantumDevice, SimulatorDevice, OfflineDevice]:
         """Creates a Device from a given device input.
 
         Args:
-            device_input (Union[QuantumDeviceInput, SimulatorDeviceInput]): Device Input structure
+            device_input (Union[QuantumDeviceInput, SimulatorDeviceInput, OfflineDeviceInput]): Device Input structure
 
         Returns:
-            Union[QuantumDevice, SimulatorDevice]: The constructed Device Object
+            Union[QuantumDevice, SimulatorDevice, OfflineDevice]: The constructed Device Object
         """
-        if self._is_quantum_device_input(device_input=device_input):
+        if self._is_offline_device_input(device_input=device_input):
+            return OfflineDevice(device_input=device_input)
+        elif self._is_quantum_device_input(device_input=device_input):
             return QuantumDevice(device_input=device_input)
         return SimulatorDevice(device_input=device_input)
 
@@ -120,7 +140,7 @@ class API(ABC):
             [
                 self._create_device(
                     device_input=cast(
-                        Union[QuantumDeviceInput, SimulatorDeviceInput, O], device_input
+                        Union[QuantumDeviceInput, SimulatorDeviceInput, OfflineDeviceInput], device_input
                     )
                 )
                 for device_input in response["items"]

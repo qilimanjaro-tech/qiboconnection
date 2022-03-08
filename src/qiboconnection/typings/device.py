@@ -27,13 +27,10 @@ class SimulatorDeviceCharacteristicsInput(TypedDict):
     ram: str
 
 
-class _BareDevice(TypedDict):
+class DeviceInput(TypedDict):
     device_id: int
     device_name: str
     status: Union[str, DeviceStatus]
-
-
-class DeviceInput(_BareDevice):
     channel_id: int
 
 
@@ -43,7 +40,7 @@ class CalibrationDetailsInput(TypedDict, total=False):
     frequency: int
 
 
-class OfflineDeviceInput(_BareDevice):
+class OfflineDeviceInput(DeviceInput):
     pass
 
 
