@@ -8,6 +8,7 @@ from qiboconnection.devices.device import Device
 
 from qiboconnection.devices.quantum_device import QuantumDevice
 from qiboconnection.devices.simulator_device import SimulatorDevice
+from qiboconnection.devices.offline_device import OfflineDevice
 
 
 class Devices(ABC):
@@ -20,7 +21,8 @@ class Devices(ABC):
             Union[
                 QuantumDevice,
                 SimulatorDevice,
-                list[Union[QuantumDevice, SimulatorDevice]],
+                OfflineDevice,
+                list[Union[QuantumDevice, SimulatorDevice, OfflineDevice]],
             ]
         ] = None,
     ):
