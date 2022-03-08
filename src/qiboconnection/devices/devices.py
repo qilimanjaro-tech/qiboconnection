@@ -29,7 +29,7 @@ class Devices(ABC):
         only_one_device_not_null = device is not None and not isinstance(device, list)
         more_than_one_device_not_null = device is not None and isinstance(device, list)
 
-        self._devices: list[Union[QuantumDevice, SimulatorDevice]] = []
+        self._devices: list[Union[QuantumDevice, SimulatorDevice, OfflineDevice]] = []
         if only_one_device_not_null:
             self._devices.append(device)
         if more_than_one_device_not_null:
@@ -37,17 +37,17 @@ class Devices(ABC):
 
     @typechecked
     def _create_list_of_devices(
-        self, list_devices: list[Union[QuantumDevice, SimulatorDevice]]
+        self, list_devices: list[Union[QuantumDevice, SimulatorDevice, OfflineDevice]]
     ):
         for device in list_devices:
             self._devices.append(device)
 
     @typechecked
-    def add(self, device: Union[QuantumDevice, SimulatorDevice]) -> None:
+    def add(self, device: Union[QuantumDevice, SimulatorDevice, OfflineDevice]) -> None:
         self._devices.append(device)
 
     @typechecked
-    def _update(self, device: Union[QuantumDevice, SimulatorDevice]) -> bool:
+    def _update(self, device: Union[QuantumDevice, SimulatorDevice, OfflineDevice]) -> bool:
         for index, current_device in enumerate(self._devices):
             if current_device.id == device.id:
                 self._devices[index] = device
@@ -55,7 +55,7 @@ class Devices(ABC):
         return False
 
     @typechecked
-    def add_or_update(self, device: Union[QuantumDevice, SimulatorDevice]) -> None:
+    def add_or_update(self, device: Union[QuantumDevice, SimulatorDevice, OfflineDevice]) -> None:
         updated = self._update(device=device)
         if not updated:
             self.add(device=device)
