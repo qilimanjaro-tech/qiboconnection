@@ -3,21 +3,29 @@ from .device import Device
 from typeguard import typechecked
 import json
 
-from qiboconnection.typings.device import OfflineDeviceInput
+from qiboconnection.typings.device import OnlineDeviceInput
 from .quantum_device_characteristics import QuantumDeviceCharacteristics
 from .quantum_device_calibration_details import CalibrationDetails
 
 
-class OfflineDevice(Device):
-    """Offline Device class"""
+class OnlineDevice(Device):
+    """Online Device class"""
 
     @typechecked
-    def __init__(self, device_input: OfflineDeviceInput):
+    def __init__(self, device_input: OnlineDeviceInput):
         super().__init__(device_input)
+        self._number_pending_jobs = None
 
-        self._str = (f"<Offline Device: device_id={self._device_id},"
+        if 'number_pending_jobs' in device_input:
+            self._number_pending_jobs = device_input['number_pending_jobs']
+            device_input.pop('number_pending_jobs')
+
+        self._str = (f"<Online Device: device_id={self._device_id},"
                      f" device_name='{self._device_name}',"
-                     f" status='{self._status.value}>")
+                     f" status='{self._status.value}")
+        if self._number_pending_jobs is not None:
+            self._str += f", number_pending_jobs={self._number_pending_jobs}"
+        self._str += '>'
 
     def __str__(self) -> str:
         """String representation of an OfflineDevice

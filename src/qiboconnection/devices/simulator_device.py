@@ -1,5 +1,5 @@
 # simulator_device.apy
-from .device import Device
+from .online_device import OnlineDevice
 from typeguard import typechecked
 import json
 
@@ -7,7 +7,7 @@ from qiboconnection.typings.device import SimulatorDeviceInput
 from .simulator_device_characteristics import SimulatorDeviceCharacteristics
 
 
-class SimulatorDevice(Device):
+class SimulatorDevice(OnlineDevice):
     """Simulator Device class"""
 
     @typechecked

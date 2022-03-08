@@ -160,7 +160,7 @@ class API(ABC):
 
         new_device = self._create_device(
             device_input=cast(
-                Union[QuantumDeviceInput, SimulatorDeviceInput],
+                Union[QuantumDeviceInput, SimulatorDeviceInput, OfflineDeviceInput],
                 response)
         )
 
