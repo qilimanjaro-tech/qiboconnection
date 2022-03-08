@@ -31,7 +31,7 @@ class DeviceInput(TypedDict):
     device_id: int
     device_name: str
     status: Union[str, DeviceStatus]
-    channel_id: Union[int, None]
+    channel_id: int
 
 
 class CalibrationDetailsInput(TypedDict, total=False):
