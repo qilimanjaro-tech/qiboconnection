@@ -27,12 +27,14 @@ class SimulatorDeviceCharacteristicsInput(TypedDict):
     ram: str
 
 
-class DeviceInput(TypedDict, total=False):
+class _BareDevice(TypedDict):
     device_id: int
     device_name: str
     status: Union[str, DeviceStatus]
+
+
+class DeviceInput(_BareDevice):
     channel_id: int
-    number_pending_jobs: Optional[int]
 
 
 class CalibrationDetailsInput(TypedDict, total=False):
@@ -41,11 +43,19 @@ class CalibrationDetailsInput(TypedDict, total=False):
     frequency: int
 
 
-class SimulatorDeviceInput(DeviceInput, total=False):
+class OfflineDeviceInput(_BareDevice):
+    pass
+
+
+class OnlineDeviceInput(DeviceInput, total=False):
+    number_pending_jobs: Optional[int]
+
+
+class SimulatorDeviceInput(OnlineDeviceInput, total=False):
     characteristics: SimulatorDeviceCharacteristicsInput
 
 
-class QuantumDeviceInput(DeviceInput, total=False):
+class QuantumDeviceInput(OnlineDeviceInput, total=False):
     last_calibration_time: str
     characteristics: QuantumDeviceCharacteristicsInput
     calibration_details: CalibrationDetailsInput

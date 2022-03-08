@@ -19,6 +19,7 @@ from qiboconnection.typings.device import (
     DeviceType,
     QuantumDeviceInput,
     SimulatorDeviceInput,
+    OfflineDeviceInput
 )
 from qiboconnection.devices.devices import Devices
 from qiboconnection.job import Job
@@ -90,7 +91,7 @@ class API(ABC):
 
     @typechecked
     def _create_device(
-            self, device_input: Union[QuantumDeviceInput, SimulatorDeviceInput]
+            self, device_input: Union[QuantumDeviceInput, SimulatorDeviceInput, OfflineDeviceInput]
     ) -> Union[QuantumDevice, SimulatorDevice]:
         """Creates a Device from a given device input.
 
@@ -119,7 +120,7 @@ class API(ABC):
             [
                 self._create_device(
                     device_input=cast(
-                        Union[QuantumDeviceInput, SimulatorDeviceInput], device_input
+                        Union[QuantumDeviceInput, SimulatorDeviceInput, O], device_input
                     )
                 )
                 for device_input in response["items"]
