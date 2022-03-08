@@ -4,8 +4,6 @@ from typeguard import typechecked
 import json
 
 from qiboconnection.typings.device import OnlineDeviceInput
-from .quantum_device_characteristics import QuantumDeviceCharacteristics
-from .quantum_device_calibration_details import CalibrationDetails
 
 
 class OnlineDevice(Device):
@@ -13,12 +11,13 @@ class OnlineDevice(Device):
 
     @typechecked
     def __init__(self, device_input: OnlineDeviceInput):
-        super().__init__(device_input)
         self._number_pending_jobs = None
 
         if 'number_pending_jobs' in device_input:
             self._number_pending_jobs = device_input['number_pending_jobs']
             device_input.pop('number_pending_jobs')
+
+        super().__init__(device_input)
 
         self._str = (f"<Online Device: device_id={self._device_id},"
                      f" device_name='{self._device_name}',"
