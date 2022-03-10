@@ -1,0 +1,193 @@
+Change Log
+==========
+
+0.0.1 (12/13/2021)
+------------------
+- Initial commit
+
+0.0.2 (12/13/2021)
+------------------
+- Update README.md
+
+0.0.3 (12/15/2021)
+------------------
+- Initial e2e (#1)
+
+- * chores: configure for the initial setup in local env
+
+- * chores: updated to the new future api
+
+- * chores: preparing a qibo circuit to send remotely
+
+- * test: new user example test
+
+- * chores: added job id setter
+
+- * feat: get job result from an id
+
+- * chores: updated example
+
+- * chores: add logging to call
+
+- * chores: tested full use-case
+
+0.0.4 (01/17/2022)
+------------------
+- Added support for new status 'terminated_with_errors' at jobstatus.error
+
+0.0.5 (01/18/2022)
+------------------
+- Changed JobStatus.error value from 'terminated_with_errors' to 'error'
+
+0.0.6 (01/28/2022)
+------------------
+- feat: sending slack messages when device is in use
+
+- Merge: d785ff4 bb7bec7
+0.0.7 (01/31/2022)
+------------------
+- Merge pull request #3 from qilimanjaro-tech/QIBO-89-celery-async-job-execution
+
+- Qibo 89 celery async job execution
+
+0.0.8 (02/02/2022)
+------------------
+- chores: only block device when is specified
+
+0.0.9 (02/03/2022)
+------------------
+- feat: using device status on remote DDBB
+
+0.1.0 (02/04/2022)
+------------------
+- chores: catch error and print it on output
+
+0.1.1 (02/07/2022)
+------------------
+- feat: sending slack messages when device is in use (#4) (#5)
+
+- * feat: sending slack messages when device is in use
+
+- * chores: only block device when is specified
+
+- * feat: using device status on remote DDBB
+
+- * chores: catch error and print it on output
+
+0.1.2 (02/07/2022)
+------------------
+- build: new version
+
+0.1.3 (02/17/2022)
+------------------
+- added function for sending files
+
+- Merge: 5ee0afc 201c799
+0.1.4 (02/17/2022)
+------------------
+- Merge branch 'main' into QIBO-93-send-slack-messages
+
+- # Conflicts:
+- #       src/qiboconnection/connection.py
+
+0.1.5 (02/18/2022)
+------------------
+- Added correct typecasting to connections' send_posst_file...'s file param: now it is Union(TextIOWrapper, TextIO). Both should expose valid methods
+
+0.1.6 (02/18/2022)
+------------------
+- device.name() was typecasted as int. NOW it is a str
+
+- Merge: 201c799 3546388
+0.1.7 (03/01/2022)
+------------------
+- Merge pull request #8 from qilimanjaro-tech/QIBO-93-send-slack-messages
+
+- Qibo 93 send slack messages
+
+0.1.8 (03/04/2022)
+------------------
+- Added functionality for blocking independently of selecting devices, and for being able to select and block without previously having listed
+
+0.1.9 (03/04/2022)
+------------------
+- TESTIND: added warnign with info
+
+0.2.0 (03/07/2022)
+------------------
+- Added debugg error logging
+
+0.2.1 (03/07/2022)
+------------------
+- Removed typecheckfor creating devices
+
+0.2.2 (03/07/2022)
+------------------
+- Added optional number_pending_jobs
+
+0.2.3 (03/07/2022)
+------------------
+- Added optional number_pending_jobs, made total=False
+
+0.2.4 (03/07/2022)
+------------------
+- Re-added typechecking
+
+0.2.5 (03/07/2022)
+------------------
+- Typo in block device: device id arg is called device_id instead of id
+
+0.2.6 (03/08/2022)
+------------------
+- Revised 103: listing online devices. Added class 'OfflineDeviceInput' that only requires the keys that exist in the database for creating a device object. api._create_devices() uses this class for casting to, in case no extra keys are passed
+
+0.2.7 (03/08/2022)
+------------------
+- Revised 103: added OfflineDeviceInput and OfflineDevice, and functions to check whether we should return one of those or not.
+
+0.2.8 (03/08/2022)
+------------------
+- Revised 103: added 'OnlineDevice' as an intermediate state for creating quantum and simulator devices. Helps us get rid of some variables that we may have in creation, as the number of queued jobs, that only affect to devices that are online. Allows us to keep the base Device class as one where everything is required, with no if clauses in its __init__
+
+0.2.9 (03/08/2022)
+------------------
+- Revised 103: fix typo, calling __init__ after popping items in Online Device
+
+0.3.0 (03/08/2022)
+------------------
+- Revised 103: added test logger.error
+
+0.3.1 (03/08/2022)
+------------------
+- Revised 103: DeviceInput lets channel_id be a None
+
+0.3.2 (03/08/2022)
+------------------
+- Revised 103: Added OfflineDevice possibility to Devices group object
+
+0.3.3 (03/08/2022)
+------------------
+- Revised 103: Added OfflineDevice possibility to Devices group object AND METHODS
+
+0.3.4 (03/08/2022)
+------------------
+- Revised 103: Tried to remove the None option of channel_id
+
+0.3.5 (03/08/2022)
+------------------
+- Revised 103: Undone change: channel_id is back a possibe None
+
+0.3.6 (03/10/2022)
+------------------
+- Revised 103: Removed test logger.error when listing devices
+
+0.3.7 (03/10/2022)
+------------------
+- Updated user examples with new functionalities
+
+- Merge: d52fd2e 2c4c57d
+0.3.8 (03/10/2022)
+------------------
+- Merge pull request #10 from qilimanjaro-tech/105-non-blocking-list-devices-add-block-devices
+
+- Added functionality for blocking independently of selecting devices, …
