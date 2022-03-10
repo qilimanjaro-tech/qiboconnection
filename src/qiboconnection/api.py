@@ -136,7 +136,6 @@ class API(ABC):
             )
 
         # !!! TODO: handle all items, not only the returned on first call
-        logger.error(f"{[device_input for device_input in response['items']]}")
         self._devices = Devices(
             [
                 self._create_device(
