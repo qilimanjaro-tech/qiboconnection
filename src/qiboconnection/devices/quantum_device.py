@@ -1,5 +1,5 @@
 # quantum_device.apy
-from .device import Device
+from .online_device import OnlineDevice
 from typeguard import typechecked
 import json
 
@@ -8,7 +8,7 @@ from .quantum_device_characteristics import QuantumDeviceCharacteristics
 from .quantum_device_calibration_details import CalibrationDetails
 
 
-class QuantumDevice(Device):
+class QuantumDevice(OnlineDevice):
     """Quantum Device class"""
 
     @typechecked

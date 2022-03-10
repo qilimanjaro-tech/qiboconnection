@@ -8,6 +8,7 @@ from qiboconnection.devices.device import Device
 
 from qiboconnection.devices.quantum_device import QuantumDevice
 from qiboconnection.devices.simulator_device import SimulatorDevice
+from qiboconnection.devices.offline_device import OfflineDevice
 
 
 class Devices(ABC):
@@ -20,14 +21,15 @@ class Devices(ABC):
             Union[
                 QuantumDevice,
                 SimulatorDevice,
-                list[Union[QuantumDevice, SimulatorDevice]],
+                OfflineDevice,
+                list[Union[QuantumDevice, SimulatorDevice, OfflineDevice]],
             ]
         ] = None,
     ):
         only_one_device_not_null = device is not None and not isinstance(device, list)
         more_than_one_device_not_null = device is not None and isinstance(device, list)
 
-        self._devices: list[Union[QuantumDevice, SimulatorDevice]] = []
+        self._devices: list[Union[QuantumDevice, SimulatorDevice, OfflineDevice]] = []
         if only_one_device_not_null:
             self._devices.append(device)
         if more_than_one_device_not_null:
@@ -35,14 +37,28 @@ class Devices(ABC):
 
     @typechecked
     def _create_list_of_devices(
-        self, list_devices: list[Union[QuantumDevice, SimulatorDevice]]
+        self, list_devices: list[Union[QuantumDevice, SimulatorDevice, OfflineDevice]]
     ):
         for device in list_devices:
             self._devices.append(device)
 
     @typechecked
-    def add(self, device: Union[QuantumDevice, SimulatorDevice]) -> None:
+    def add(self, device: Union[QuantumDevice, SimulatorDevice, OfflineDevice]) -> None:
         self._devices.append(device)
+
+    @typechecked
+    def _update(self, device: Union[QuantumDevice, SimulatorDevice, OfflineDevice]) -> bool:
+        for index, current_device in enumerate(self._devices):
+            if current_device.id == device.id:
+                self._devices[index] = device
+                return True
+        return False
+
+    @typechecked
+    def add_or_update(self, device: Union[QuantumDevice, SimulatorDevice, OfflineDevice]) -> None:
+        updated = self._update(device=device)
+        if not updated:
+            self.add(device=device)
 
     def __str__(self) -> str:
         """String representation of a List of Devices
@@ -69,13 +85,8 @@ class Devices(ABC):
             one_json += "\n"
         return one_json
 
-    def select_device(self,
-                      connection: Connection,
-                      id: int,
-                      block_device: bool = True) -> Union[QuantumDevice, SimulatorDevice]:
+    def select_device(self, id: int,) -> Union[QuantumDevice, SimulatorDevice]:
         device_found = self._find_device(id)
-        if block_device:
-            self._block_device(connection=connection, device=device_found)
         return device_found
 
     def _find_device(self, id: int) -> Union[QuantumDevice, SimulatorDevice]:

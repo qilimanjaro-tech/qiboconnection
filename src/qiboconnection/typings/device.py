@@ -1,5 +1,5 @@
 import enum
-from typing import Literal, TypedDict, Union
+from typing import Literal, TypedDict, Union, Optional
 
 
 class DeviceStatus(enum.Enum):
@@ -31,7 +31,7 @@ class DeviceInput(TypedDict):
     device_id: int
     device_name: str
     status: Union[str, DeviceStatus]
-    channel_id: int
+    channel_id: Union[int, None]
 
 
 class CalibrationDetailsInput(TypedDict, total=False):
@@ -40,11 +40,19 @@ class CalibrationDetailsInput(TypedDict, total=False):
     frequency: int
 
 
-class SimulatorDeviceInput(DeviceInput, total=False):
+class OfflineDeviceInput(DeviceInput):
+    pass
+
+
+class OnlineDeviceInput(DeviceInput, total=False):
+    number_pending_jobs: Optional[int]
+
+
+class SimulatorDeviceInput(OnlineDeviceInput, total=False):
     characteristics: SimulatorDeviceCharacteristicsInput
 
 
-class QuantumDeviceInput(DeviceInput, total=False):
+class QuantumDeviceInput(OnlineDeviceInput, total=False):
     last_calibration_time: str
     characteristics: QuantumDeviceCharacteristicsInput
     calibration_details: CalibrationDetailsInput
