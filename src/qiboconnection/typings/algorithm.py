@@ -1,59 +1,77 @@
-# algorithm.py
+""" Algorithm Typing """
 
+import enum
 from dataclasses import dataclass
 from typing import List, Optional
-import enum
 
 
 class AlgorithmType(enum.Enum):
+    """Type of algorithm
+
+    Args:
+        enum (str):name types of the initial values.
+        Supported values are: 'Gate-Based Circuit' and 'Annealing'
+    """
+
     GATE_BASED = "Gate-Based Circuit"
     ANNEALING = "Annealing"
 
 
 class InitialValue(enum.Enum):
+    """Initial Value
+
+    Args:
+        enum (str):name types of the initial values.
+        Supported values are: 'zero', 'one', and 'random'
+    """
+
     ZERO = "zero"
     ONE = "one"
     RANDOM = "random"
 
 
-class AlgorithmName(str, enum.Enum):
-    BELLSTATE = 'bell-state'
+class AlgorithmName(enum.Enum):
+    """Algorithm Name
+
+    Args:
+        enum (str): name of the algorithm.
+        Supported values are: 'bell-state'
+    """
+
+    BELLSTATE = "bell-state"
 
 
 @dataclass
 class AlgorithmOptions:
-    """ Algorithm Options data class
-    """
-    number_qubits: str
+    """Algorithm Options data class"""
+
+    number_qubits: int
     initial_value: Optional[InitialValue] = InitialValue.ZERO
 
     @property
-    def __dict__(self) -> dict:
-        return {
-            'number_qubits': self.number_qubits,
-            'initial_value': self.initial_value.value
-        }
+    def __dict__(self):
+        return {"number_qubits": self.number_qubits, "initial_value": self.initial_value.value}
 
 
 @dataclass
 class AlgorithmDefinition:
-    """ Algorithm data class
-    """
+    """Algorithm data class"""
+
     name: AlgorithmName
-    type: AlgorithmType
+    algorithm_type: AlgorithmType
     options: AlgorithmOptions
 
     @property
-    def __dict__(self) -> dict:
+    def __dict__(self):
         return {
-            'name': self.name.value,
-            'type': self.type.value,
-            'options': self.options.__dict__,
+            "name": self.name.value,
+            "type": self.algorithm_type.value,
+            "options": self.options.__dict__,
         }
 
 
 @dataclass
 class ProgramDefinition:
-    """ Program data class
-    """
+    """Program data class"""
+
     algorithms: List[AlgorithmDefinition]

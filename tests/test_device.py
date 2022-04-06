@@ -1,7 +1,9 @@
 """ Tests methods for Device """
 
-import pytest
 import json
+
+import pytest
+
 from qiboconnection.devices.device import Device
 from qiboconnection.devices.simulator_device import SimulatorDevice
 from qiboconnection.devices.simulator_device_characteristics import (
@@ -9,13 +11,14 @@ from qiboconnection.devices.simulator_device_characteristics import (
 )
 from qiboconnection.typings.device import (
     DeviceInput,
-    SimulatorDeviceInput,
     SimulatorDeviceCharacteristicsInput,
+    SimulatorDeviceInput,
 )
+
 from .data import (
     device_inputs,
-    simulator_device_inputs,
     simulator_device_characteristics_inputs,
+    simulator_device_inputs,
 )
 
 
@@ -31,7 +34,7 @@ def test_device_string_representation(device_input: DeviceInput):
 
     assert (
         device.__str__()
-        == f"<Device: device_id={device._device_id}, device_name='{device._device_name}', status='{device._status.value}'>"
+        == f"<Device: device_id={device._device_id}, device_name='{device._device_name}', status='{device._status.value}', channel_id=None>"
     )
 
 
@@ -43,7 +46,7 @@ def test_device_dict_representation(device_input: DeviceInput):
         "device_name": device._device_name,
         "status": device._status.value,
     }
-    assert device.__dict__() == expected_dict
+    assert device.__dict__ == expected_dict
 
 
 @pytest.mark.parametrize("device_input", device_inputs)
@@ -59,6 +62,7 @@ def test_device_json_representation(device_input: DeviceInput):
 
 @pytest.mark.parametrize("simulator_device_input", simulator_device_inputs)
 def test_simulator_device_constructor(simulator_device_input: SimulatorDeviceInput):
+    assert isinstance(simulator_device_input, SimulatorDeviceInput)
     device = SimulatorDevice(device_input=simulator_device_input)
     assert isinstance(device, SimulatorDevice)
 
@@ -74,8 +78,8 @@ def test_simulator_device_dict_representation(
         "status": device._status.value,
     }
     if device._characteristics:
-        expected_dict |= {"characteristics": device._characteristics.__dict__()}
-    assert device.__dict__() == expected_dict
+        expected_dict |= {"characteristics": device._characteristics.__dict__}
+    assert device.__dict__ == expected_dict
 
 
 @pytest.mark.parametrize("simulator_device_input", simulator_device_inputs)
@@ -89,31 +93,23 @@ def test_simulator_device_json_representation(
         "status": device._status.value,
     }
     if device._characteristics:
-        expected_dict |= {"characteristics": device._characteristics.__dict__()}
+        expected_dict |= {"characteristics": device._characteristics.__dict__}
     assert device.toJSON() == json.dumps(expected_dict, indent=2)
 
 
-@pytest.mark.parametrize(
-    "simulator_device_characteristics_input", simulator_device_characteristics_inputs
-)
+@pytest.mark.parametrize("simulator_device_characteristics_input", simulator_device_characteristics_inputs)
 def test_simulator_device_characteristics_constructor(
     simulator_device_characteristics_input: SimulatorDeviceCharacteristicsInput,
 ):
-    characteristics = SimulatorDeviceCharacteristics(
-        characteristics_input=simulator_device_characteristics_input
-    )
+    characteristics = SimulatorDeviceCharacteristics(characteristics_input=simulator_device_characteristics_input)
     assert isinstance(characteristics, SimulatorDeviceCharacteristics)
 
 
-@pytest.mark.parametrize(
-    "simulator_device_characteristics_input", simulator_device_characteristics_inputs
-)
+@pytest.mark.parametrize("simulator_device_characteristics_input", simulator_device_characteristics_inputs)
 def test_simulator_device_characteristics_json_representation(
     simulator_device_characteristics_input: SimulatorDeviceCharacteristicsInput,
 ):
-    characteristics = SimulatorDeviceCharacteristics(
-        characteristics_input=simulator_device_characteristics_input
-    )
+    characteristics = SimulatorDeviceCharacteristics(characteristics_input=simulator_device_characteristics_input)
     expected_dict = {
         "type": characteristics._type.value,
         "cpu": characteristics._cpu,

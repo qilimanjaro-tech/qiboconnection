@@ -1,39 +1,27 @@
-# job_result.py
+""" Job Result """
 
+
+import pickle  # nosec - temporary bandit ignore
 from dataclasses import dataclass
 from typing import List
 
 from qibo.abstractions.states import AbstractState
-from qiboconnection.util import base64url_decode
-from base64 import urlsafe_b64decode
-import numpy as np
-import io
-import pickle
+
+from qiboconnection.util import decode_results_from_circuit, decode_results_from_program
 
 
 @dataclass
 class JobResult:
     """Job Result class"""
 
+    job_id: int
     http_response: str
+    data: List[AbstractState] | AbstractState | None = None
 
-    def __init__(self, http_response: str) -> None:
+    def __post_init__(self) -> None:
         try:
-            decoded_results = self._decode_results_from_circuit(http_response)
-        except:
-            decoded_results = self._decode_results_from_program(http_response)
+            decoded_results = decode_results_from_circuit(self.http_response)
+        except (pickle.PickleError, TypeError):
+            decoded_results = decode_results_from_program(self.http_response)
 
         self.data = decoded_results
-
-    def _decode_results_from_program(self, http_response: str) -> List[AbstractState]:
-        decoded_results = base64url_decode(http_response)
-        return [
-            np.loads(urlsafe_b64decode(decoded_result))
-            for decoded_result in decoded_results
-        ]
-
-    def _decode_results_from_program(self, http_response: str) -> AbstractState:
-        decoded_result_str = urlsafe_b64decode(http_response)
-        result_bytes = io.BytesIO(decoded_result_str)
-        state: AbstractState = pickle.loads(result_bytes.getbuffer())
-        return state

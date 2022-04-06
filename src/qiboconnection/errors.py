@@ -1,21 +1,31 @@
+""" Handling Error Utility Functions """
+import json
 from typing import Union
 
 from requests.models import HTTPError, Response
-from qiboconnection.config import logger
 
-import json
+from qiboconnection.config import logger
 
 
 class RemoteExecutionException(Exception):
+    """Exception raised when calling remote server
+
+    Args:
+        Exception (Exception): Inherit from Exception
+    """
+
     def __init__(self, message: Union[dict, str], status_code: int):
         super().__init__(message)
         self.status_code = status_code
-        logger.error(f"RemoteExecutionException: {message}, {status_code}")
+        logger.error("RemoteExecutionException: %s, %i", message, status_code)
 
 
 class ConnectionException(Exception):
-    def __init__(self, message: str):
-        super().__init__(message)
+    """Exception raised when establishing the connection to a remote server
+
+    Args:
+        Exception (Exception): Inherit from Exception
+    """
 
 
 def custom_raise_for_status(response: Response):
@@ -35,18 +45,10 @@ def custom_raise_for_status(response: Response):
         reason = response.reason
 
     if 400 <= response.status_code < 500:
-        http_error_msg = "%s Client Error: %s for url: %s" % (
-            response.status_code,
-            reason,
-            response.url,
-        )
+        http_error_msg = f"{response.status_code} Client Error: {reason} for url: {response.url}"
 
     elif 500 <= response.status_code < 600:
-        http_error_msg = "%s Server Error: %s for url: %s" % (
-            response.status_code,
-            reason,
-            response.url,
-        )
+        http_error_msg = f"{response.status_code} Server Error: {reason} for url: {response.url}"
 
     if http_error_msg and response.text:
         try:
@@ -55,10 +57,10 @@ def custom_raise_for_status(response: Response):
                 json_text["detail"] += f" {http_error_msg}"
             logger.error(json.dumps(json_text, indent=2))
             raise HTTPError(json.dumps(json_text, indent=2), response=response)
-        except Exception:
+        except Exception as ex:
             json_text_str = str(response.text)
             logger.error(json_text_str)
-            raise HTTPError(json_text_str, response=response)
+            raise HTTPError(json_text_str, response=response) from ex
 
     if http_error_msg:
         raise HTTPError(http_error_msg, response=response)

@@ -1,15 +1,16 @@
 # Installation script for python
-from setuptools import setup, find_packages
 import os
 import re
+
+from setuptools import find_packages, setup
 
 PACKAGE = "qiboconnection"
 
 
 # Returns the library version
 def get_version():
-    """ Gets the version from the package's __init__ file
-    if there is some problem, let it happily fail """
+    """Gets the version from the package's __init__ file
+    if there is some problem, let it happily fail"""
     VERSIONFILE = os.path.join("src", PACKAGE, "__init__.py")
     initfile_lines = open(VERSIONFILE, "rt").readlines()
     VSRE = r"^__version__ = ['\"]([^'\"]*)['\"]"
@@ -20,7 +21,7 @@ def get_version():
 
 
 # Read in requirements
-requirements = open('requirements.txt').readlines()
+requirements = open("requirements.txt").readlines()
 requirements = [r.strip() for r in requirements]
 
 
@@ -47,12 +48,18 @@ setup(
     ],
     install_requires=requirements,
     extras_require={
-        "docs": ["sphinx", "sphinx_rtd_theme", "recommonmark",
-                 "sphinxcontrib-bibtex", "sphinx_markdown_tables",
-                 "nbsphinx", "IPython"],
+        "docs": [
+            "sphinx",
+            "sphinx_rtd_theme",
+            "recommonmark",
+            "sphinxcontrib-bibtex",
+            "sphinx_markdown_tables",
+            "nbsphinx",
+            "IPython",
+        ],
         "tests": ["pytest"],
     },
     python_requires=">=3.6.0",
     long_description=long_description,
-    long_description_content_type='text/markdown',
+    long_description_content_type="text/markdown",
 )

@@ -1,32 +1,34 @@
-# simulator_device_characteristics.py
-from abc import ABC
-from typing import Union
-from typeguard import typechecked
+"""Simulator Device Characteristics"""
 import json
 
+from typeguard import typechecked
+
+from qiboconnection.devices.device_characteristics_util import create_device_type
+from qiboconnection.devices.device_details import DeviceDetails
 from qiboconnection.typings.device import (
-    SimulatorDeviceCharacteristicsInput,
     DeviceType,
+    SimulatorDeviceCharacteristicsInput,
 )
 
 
-class SimulatorDeviceCharacteristics(ABC):
+class SimulatorDeviceCharacteristics(DeviceDetails):
     """Class representation of a Simulator Device Characteristics"""
 
     @typechecked
     def __init__(self, characteristics_input: SimulatorDeviceCharacteristicsInput):
+        super().__init__()
         if (
-            characteristics_input["type"] is not DeviceType.SIMULATOR
-            and characteristics_input["type"] != DeviceType.SIMULATOR.value
+            characteristics_input.type is not DeviceType.SIMULATOR
+            and characteristics_input.type != DeviceType.SIMULATOR.value
         ):
             raise TypeError("Characteristics Device not supported")
 
-        self._type = self._create_device_type(device_type=characteristics_input["type"])
-        self._cpu = characteristics_input["cpu"]
-        self._gpu = characteristics_input["gpu"]
-        self._os = characteristics_input["os"]
-        self._kernel = characteristics_input["kernel"]
-        self._ram = characteristics_input["ram"]
+        self._type = create_device_type(device_type=characteristics_input.type)
+        self._cpu = characteristics_input.cpu
+        self._gpu = characteristics_input.gpu
+        self._os = characteristics_input.os
+        self._kernel = characteristics_input.kernel
+        self._ram = characteristics_input.ram
 
         self._str = f"<SimulatorDeviceCharacteristics: type='{self._type.value}'"
         self._str += f" cpu='{self._cpu}'"
@@ -36,18 +38,8 @@ class SimulatorDeviceCharacteristics(ABC):
         self._str += f" ram='{self._ram}'"
         self._str += ">"
 
-    def __str__(self) -> str:
-        """String representation of SimulatorDeviceCharacteristics
-
-        Returns:
-            str: String representation SimulatorDeviceCharacteristics
-        """
-        return self._str
-
-    def __repr__(self) -> str:
-        return self._str
-
-    def __dict__(self) -> dict:
+    @property
+    def __dict__(self):
         """Dictionary representation of SimulatorDeviceCharacteristics
 
         Returns:
@@ -62,17 +54,11 @@ class SimulatorDeviceCharacteristics(ABC):
             "ram": self._ram,
         }
 
-    def toJSON(self) -> str:
+    def toJSON(self) -> str:  # pylint: disable=invalid-name
         """JSON representation of SimulatorDeviceCharacteristics
 
         Returns:
             str: JSON serialization of SimulatorDeviceCharacteristics object
         """
 
-        return json.dumps(self.__dict__(), indent=2)
-
-    @typechecked
-    def _create_device_type(self, device_type: Union[str, DeviceType]) -> DeviceType:
-        if type(device_type) is str:
-            return DeviceType(device_type)
-        return device_type
+        return json.dumps(self.__dict__, indent=2)
