@@ -3,3 +3,4 @@ typeguard==2.13.3
 types-requests==2.27.15
 numpy==1.22.3
 qibo==0.1.7
+pyyaml==6.0
