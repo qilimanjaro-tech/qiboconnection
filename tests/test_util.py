@@ -1,6 +1,7 @@
 """ Tests methods for util functions """
-from qiboconnection.util import base64url_encode, base64url_decode
 import json
+
+from qiboconnection.util import base64url_decode, base64url_encode
 
 
 def test_base64url_encode():

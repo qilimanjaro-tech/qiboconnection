@@ -1,22 +1,24 @@
-# quantum_device_calibration_details.py
-from abc import ABC
-from typeguard import typechecked
+""" Quantum Calibration Details """
 import json
 
+from typeguard import typechecked
+
+from qiboconnection.devices.device_details import DeviceDetails
 from qiboconnection.typings.device import CalibrationDetailsInput
 
 
-class CalibrationDetails(ABC):
+class CalibrationDetails(DeviceDetails):
     """Class representation of Quantum Calibration Details"""
 
     @typechecked
     def __init__(self, characteristics_input: CalibrationDetailsInput):
+        super().__init__()
 
-        self._elapsed_time = characteristics_input.get("elapsed_time")
-        self._t1 = characteristics_input.get("t1")
-        self._frequency = characteristics_input.get("frequency")
+        self._elapsed_time = characteristics_input.elapsed_time
+        self._t1 = characteristics_input.t1
+        self._frequency = characteristics_input.frequency
 
-        self._str = f"<CalibrationDetails:"
+        self._str = "<CalibrationDetails:"
         if self._elapsed_time:
             self._str += f" elapsed_time='{self._elapsed_time}'"
         if self._t1:
@@ -25,18 +27,8 @@ class CalibrationDetails(ABC):
             self._str += f" frequency='{self._frequency}'"
         self._str += ">"
 
-    def __str__(self) -> str:
-        """String representation of SimulatorDeviceCharacteristics
-
-        Returns:
-            str: String representation SimulatorDeviceCharacteristics
-        """
-        return self._str
-
-    def __repr__(self) -> str:
-        return self._str
-
-    def __dict__(self) -> dict:
+    @property
+    def __dict__(self):
         """Dictionary representation of SimulatorDeviceCharacteristics
 
         Returns:
@@ -52,11 +44,11 @@ class CalibrationDetails(ABC):
             calibration_dict |= {"frequency": self._frequency}
         return calibration_dict
 
-    def toJSON(self) -> str:
+    def toJSON(self) -> str:  # pylint: disable=invalid-name
         """JSON representation of SimulatorDeviceCharacteristics
 
         Returns:
             str: JSON serialization of SimulatorDeviceCharacteristics object
         """
 
-        return json.dumps(self.__dict__(), indent=2)
+        return json.dumps(self.__dict__, indent=2)

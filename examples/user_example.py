@@ -1,16 +1,17 @@
+import os
+from time import sleep
 
-from qibo.core.circuit import Circuit
 from qibo import gates
+from qibo.core.circuit import Circuit
+
 from qiboconnection.api import API
 from qiboconnection.connection import ConnectionConfiguration
-from time import sleep
-import os
 
 
 def user_example() -> None:
 
     # Connect using credentials
-    myconf = ConnectionConfiguration(user_id=1, username='my-user-name', api_key='abcdefg-hijk-lmno-pqrs-tuvwxyzABCDE')
+    myconf = ConnectionConfiguration(user_id=1, username="my-user-name", api_key="abcdefg-hijk-lmno-pqrs-tuvwxyzABCDE")
     qibo_api = API(configuration=myconf)
 
     # Connect if credentials are already saved in your environment
@@ -31,7 +32,7 @@ def user_example() -> None:
 
     # Issue an async remote execution of the circuit
     job_id = qibo_api.execute(circuit=circuit)
-    print(f'job id: {job_id}')
+    print(f"job id: {job_id}")
     sleep(1)
     result = qibo_api.get_result(job_id=job_id)
     if result is not None:
@@ -43,6 +44,6 @@ def user_example() -> None:
     qibo_api.release_device(device_id=1)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     print(f'QIBO_ENVIRONMENT={os.environ["QIBO_ENVIRONMENT"]}')
     user_example()

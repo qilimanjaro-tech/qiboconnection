@@ -1,40 +1,32 @@
-# quantum_device_characteristics.py
-from abc import ABC
-from typing import Union
-from typeguard import typechecked
+""" Quantum Device Characteristics """
 import json
 
-from qiboconnection.typings.device import QuantumDeviceCharacteristicsInput, DeviceType
+from typeguard import typechecked
+
+from qiboconnection.devices.device_characteristics_util import create_device_type
+from qiboconnection.devices.device_details import DeviceDetails
+from qiboconnection.typings.device import DeviceType, QuantumDeviceCharacteristicsInput
 
 
-class QuantumDeviceCharacteristics(ABC):
+class QuantumDeviceCharacteristics(DeviceDetails):
     """Class representation of a Quantum Device Characteristics"""
 
     @typechecked
     def __init__(self, characteristics_input: QuantumDeviceCharacteristicsInput):
+        super().__init__()
         if (
-            characteristics_input["type"] is not DeviceType.QUANTUM and
-            characteristics_input["type"] != DeviceType.QUANTUM.value
+            characteristics_input.type is not DeviceType.QUANTUM
+            and characteristics_input.type != DeviceType.QUANTUM.value
         ):
             raise TypeError("Characteristics Device not supported")
 
-        self._type = self._create_device_type(device_type=characteristics_input["type"])
-        self._description = characteristics_input["description"]
+        self._type = create_device_type(device_type=characteristics_input.type)
+        self._description = characteristics_input.description
 
         self._str = f"<QuantumDeviceCharacteristics: type='{self._type.value}' description='{self._description}'>"
 
-    def __str__(self) -> str:
-        """String representation of QuantumDeviceCharacteristics
-
-        Returns:
-            str: String representation QuantumDeviceCharacteristics
-        """
-        return self._str
-
-    def __repr__(self) -> str:
-        return self._str
-
-    def __dict__(self) -> dict:
+    @property
+    def __dict__(self):
         """Dictionary representation of QuantumDeviceCharacteristics
 
         Returns:
@@ -44,17 +36,11 @@ class QuantumDeviceCharacteristics(ABC):
             "type": self._type.value,
         }
 
-    def toJSON(self) -> str:
+    def toJSON(self) -> str:  # pylint: disable=invalid-name
         """JSON representation of QuantumDeviceCharacteristics
 
         Returns:
             str: JSON serialization of QuantumDeviceCharacteristics object
         """
 
-        return json.dumps(self.__dict__(), indent=2)
-
-    @typechecked
-    def _create_device_type(self, device_type: Union[str, DeviceType]) -> DeviceType:
-        if type(device_type) is str:
-            return DeviceType(device_type)
-        return device_type
+        return json.dumps(self.__dict__, indent=2)
