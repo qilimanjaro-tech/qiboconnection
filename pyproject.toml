@@ -93,5 +93,6 @@ mdformat = true
 
 [tool.pytest.ini_options]
 filterwarnings = [
-    "ignore:.*[qibo].* is :DeprecationWarning",
+    'ignore:.*[qibo].* is :DeprecationWarning',
+    'ignore:.*[distutils].*:DeprecationWarning',
 ]
