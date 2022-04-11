@@ -261,6 +261,28 @@ class API(ABC):
             return result[0] if isinstance(result, List) else result
         raise ValueError(f"Job status not supported: {status}")
 
+    ##############################
+    ##    PLATFORM FUNCTIONS    ##
+    ##############################
+
+    def create_platform(self) -> dict:
+        """Create a new Platform using a remote connection
+
+        Returns:
+            dict: returning platform with its unique identifier
+        """
+
+        return self._platform_manager.create_platform()
+
+    def list_platforms(self) -> List[dict]:
+        """List all platforms in the system
+
+        Returns:
+            List[dict]: List of platform dictionaries
+        """
+
+        return self._platform_manager.list_platforms()
+
     def create_platform_settings(self, platform_id: int, platform_settings: dict) -> dict:
         """Create a new Platform Settings associated to a Platform using a remote connection
 
@@ -273,4 +295,50 @@ class API(ABC):
         """
         return self._platform_manager.create_platform_settings(
             platform_id=platform_id, platform_settings=platform_settings
+        )
+
+    def read_platform_settings(self, platform_id: int, platform_settings_id: int) -> dict:
+        """Load a new Platform Settings using a remote connection
+
+        Args:
+            platform_id (int): Platform unique identifier
+            platform_settings_id (int): Platform Settings unique identifier
+
+        Returns:
+            dict: returning platform settings
+        """
+
+        return self._platform_manager.read_platform_settings(
+            platform_id=platform_id, platform_settings_id=platform_settings_id
+        )
+
+    def update_platform_settings(self, platform_id: int, platform_settings_id: int, platform_settings: dict) -> dict:
+        """Updates a new Platform Settings using a remote connection
+
+        Args:
+            platform_id (int): Platform unique identifier
+            platform_settings_id (int): Platform Settings unique identifier
+            platform_settings (dict): dictionary containing the data. It should be all platform settings data without the id
+
+        Returns:
+            dict: returning platform settings
+        """
+
+        return self._platform_manager.update_platform_settings(
+            platform_id=platform_id, platform_settings_id=platform_settings_id, platform_settings=platform_settings
+        )
+
+    def delete_platform_settings(self, platform_id: int, platform_settings_id: int) -> None:
+        """Deletes a Platform Settings using a remote connection
+
+        Args:
+            platform_id (int): Platform unique identifier
+            platform_settings_id (int): Platform Settings unique identifier
+
+        Returns:
+            dict: returning platform settings
+        """
+
+        self._platform_manager.delete_platform_settings(
+            platform_id=platform_id, platform_settings_id=platform_settings_id
         )
