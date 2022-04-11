@@ -48,7 +48,7 @@ jobs:
           python -m pip install .
       - name: Test with pytest core
         run: |
-          pytest --cov=qiboconnection --cov-report=xml tests/
+          pytest --cov=qiboconnection --cov-report=xml tests/unit/
       - name: "Upload coverage to Codecov"
         uses: codecov/codecov-action@v2
         with:
