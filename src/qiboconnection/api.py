@@ -16,6 +16,7 @@ from qiboconnection.devices.util import create_device
 from qiboconnection.errors import ConnectionException, RemoteExecutionException
 from qiboconnection.job import Job
 from qiboconnection.job_result import JobResult
+from qiboconnection.platform_manager import PlatformManager
 from qiboconnection.typings.algorithm import ProgramDefinition
 from qiboconnection.typings.connection import ConnectionConfiguration
 from qiboconnection.typings.device import (
@@ -42,6 +43,7 @@ class API(ABC):
         self._devices: Devices | None = None
         self._jobs: List[Job] = []
         self._selected_device: Device | None = None
+        self._platform_manager = PlatformManager()
 
     @property
     def jobs(self) -> List[Job]:
@@ -258,3 +260,17 @@ class API(ABC):
             result = JobResult(job_id=job_id, http_response=job_response.result).data
             return result[0] if isinstance(result, List) else result
         raise ValueError(f"Job status not supported: {status}")
+
+    def create_platform_settings(self, platform_id: int, platform_settings: dict) -> dict:
+        """Create a new Platform Settings associated to a Platform using a remote connection
+
+        Args:
+            platform_id (int): Platform unique identifier
+            platform_settings (dict): Platform Settings as a dictionary to be sent to the remote connection
+
+        Returns:
+            dict: returning platform settings with its unique identifier
+        """
+        return self._platform_manager.create_platform_settings(
+            platform_id=platform_id, platform_settings=platform_settings
+        )

@@ -39,7 +39,9 @@ def fixture_create_mocked_api_connection(mocked_connection_established: Connecti
         API: API mocked connection
     """
     with patch(
-        "qiboconnection.connection.load_config_file_to_disk", return_value=mocked_connection_established
+        "qiboconnection.connection.load_config_file_to_disk",
+        autospec=True,
+        return_value=mocked_connection_established,
     ) as mock_config:
         api = API()
         mock_config.assert_called()
