@@ -1,15 +1,20 @@
 """ Pytest configuration fixtures for each session """
 
 from dataclasses import asdict
+from typing import Tuple
 from unittest.mock import patch
 
 import pytest
 
 from qiboconnection.api import API
+from qiboconnection.models.platform import Platform
+from qiboconnection.models.platform_settings import PlatformSettings
 from qiboconnection.typings.connection import (
     ConnectionConfiguration,
     ConnectionEstablished,
 )
+
+from .data import platform_settings_sample
 
 
 @pytest.fixture(scope="session", name="mocked_connection_configuration")
@@ -46,3 +51,18 @@ def fixture_create_mocked_api_connection(mocked_connection_established: Connecti
         api = API()
         mock_config.assert_called()
         return api
+
+
+@pytest.fixture(scope="session", name="platform")
+def fixture_platform() -> dict:
+    """Create a platform as a fixture"""
+    return Platform().create()
+
+
+@pytest.fixture(scope="session", name="platform_id_settings_id")
+def fixture_platform_settings(platform: Platform) -> Tuple[int, int]:
+    """Create a new platform settings as a fixture"""
+    platform_settings = PlatformSettings().create(
+        platform_id=platform["id"], platform_settings=platform_settings_sample
+    )
+    return platform["id"], platform_settings["id"]
