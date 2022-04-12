@@ -59,8 +59,8 @@ platform_settings_updated_sample = {
 }
 
 platform_locations_sample = [
-    "/qiboconnection/src/qiboconnection/data/platform_1",
-    "/qiboconnection/src/qiboconnection/data/platform_2",
+    "/qiboconnection/src/qiboconnection/data/platform-schema_1",
+    "/qiboconnection/src/qiboconnection/data/platform-schema_2",
 ]
 
 platform_mocked_settings_sample = {

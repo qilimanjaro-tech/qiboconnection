@@ -16,14 +16,14 @@ def check_platform_settings_exists(fun):
 
     @wraps(fun)
     def decorated(*args, **kwargs):
-        if "platform_id" not in kwargs:
-            raise ValueError("platform_id must be specified")
-        platform_id = kwargs["platform_id"]
+        if "platform_schema_id" not in kwargs:
+            raise ValueError("platform_schema_id must be specified")
+        platform_schema_id = kwargs["platform_schema_id"]
         if "platform_settings_id" not in kwargs:
             raise ValueError("platform_settings_id must be specified")
         platform_settings_id = kwargs["platform_settings_id"]
         PlatformSettings().check_platform_settings_exists(
-            platform_id=platform_id, platform_settings_id=platform_settings_id
+            platform_schema_id=platform_schema_id, platform_settings_id=platform_settings_id
         )
         return fun(*args, **kwargs)
 

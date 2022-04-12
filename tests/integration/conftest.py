@@ -7,7 +7,7 @@ from unittest.mock import patch
 import pytest
 
 from qiboconnection.api import API
-from qiboconnection.models.platform import Platform
+from qiboconnection.models.platform_schema import PlatformSchema
 from qiboconnection.models.platform_settings import PlatformSettings
 from qiboconnection.typings.connection import (
     ConnectionConfiguration,
@@ -53,16 +53,16 @@ def fixture_create_mocked_api_connection(mocked_connection_established: Connecti
         return api
 
 
-@pytest.fixture(scope="session", name="platform")
+@pytest.fixture(scope="session", name="platform_schema")
 def fixture_platform() -> dict:
     """Create a platform as a fixture"""
-    return Platform().create()
+    return PlatformSchema().create()
 
 
-@pytest.fixture(scope="session", name="platform_id_settings_id")
-def fixture_platform_settings(platform: dict) -> Tuple[int, int]:
+@pytest.fixture(scope="session", name="platform_schema_id_settings_id")
+def fixture_platform_settings(platform_schema: dict) -> Tuple[int, int]:
     """Create a new platform settings as a fixture"""
     platform_settings = PlatformSettings().create(
-        platform_id=platform["id"], platform_settings=platform_settings_sample
+        platform_schema_id=platform_schema["id"], platform_settings=platform_settings_sample
     )
-    return platform["id"], platform_settings["id"]
+    return platform_schema["id"], platform_settings["id"]

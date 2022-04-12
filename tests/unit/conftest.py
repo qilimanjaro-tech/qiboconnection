@@ -8,7 +8,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from qiboconnection.api import API
-from qiboconnection.models.platform import Platform
+from qiboconnection.models.platform_schema import PlatformSchema
 from qiboconnection.models.platform_settings import PlatformSettings
 from qiboconnection.typings.connection import (
     ConnectionConfiguration,
@@ -54,25 +54,25 @@ def fixture_create_mocked_api_connection(mocked_connection_established: Connecti
         return api
 
 
-@pytest.fixture(scope="session", name="mocked_platform")
-@patch("qiboconnection.models.platform.Path.mkdir", autospec=True, return_value=None)
-@patch("qiboconnection.models.platform.Path.exists", autospec=True, return_value=True)
+@pytest.fixture(scope="session", name="mocked_platform_schema")
+@patch("qiboconnection.models.platform_schema.Path.mkdir", autospec=True, return_value=None)
+@patch("qiboconnection.models.platform_schema.Path.exists", autospec=True, return_value=True)
 def fixture_mocked_platform(mock_exists: MagicMock, mock_mkdir: MagicMock) -> dict:  # pylint: disable=unused-argument
     """Create a platform as a fixture"""
-    return Platform().create()
+    return PlatformSchema().create()
 
 
-@pytest.fixture(scope="session", name="mocked_platform_id_settings_id")
+@pytest.fixture(scope="session", name="mocked_platform_schema_id_settings_id")
 @patch("builtins.open", unittest.mock.mock_open())
 @patch("qiboconnection.models.model.yaml.dump", autospec=True, return_value=None)
-@patch("qiboconnection.models.platform.Path.iterdir", autospec=True, return_value=[])
+@patch("qiboconnection.models.platform_schema.Path.iterdir", autospec=True, return_value=[])
 def fixture_mocked_platform_settings(
     mock_iterdir: MagicMock,  # pylint: disable=unused-argument
     mock_dump: MagicMock,  # pylint: disable=unused-argument
-    mocked_platform: dict,
+    mocked_platform_schema: dict,
 ) -> Tuple[int, int]:
     """Create a new platform settings as a fixture"""
     platform_settings = PlatformSettings().create(
-        platform_id=mocked_platform["id"], platform_settings=platform_settings_sample
+        platform_schema_id=mocked_platform_schema["id"], platform_settings=platform_settings_sample
     )
-    return mocked_platform["id"], platform_settings["id"]
+    return mocked_platform_schema["id"], platform_settings["id"]

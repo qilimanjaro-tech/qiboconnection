@@ -265,43 +265,43 @@ class API(ABC):
     ##    PLATFORM FUNCTIONS    ##
     ##############################
 
-    def create_platform(self) -> dict:
-        """Create a new Platform using a remote connection
+    def create_platform_schema(self) -> dict:
+        """Create a new Platform schema using a remote connection
 
         Returns:
-            dict: returning platform with its unique identifier
+            dict: returning platform schema with its unique identifier
         """
 
-        return self._platform_manager.create_platform()
+        return self._platform_manager.create_platform_schema()
 
-    def list_platforms(self) -> List[dict]:
-        """List all platforms in the system
+    def list_platform_schemas(self) -> List[dict]:
+        """List all platform schemas in the system
 
         Returns:
-            List[dict]: List of platform dictionaries
+            List[dict]: List of platform schemas dictionaries
         """
 
-        return self._platform_manager.list_platforms()
+        return self._platform_manager.list_platform_schemas()
 
-    def create_platform_settings(self, platform_id: int, platform_settings: dict) -> dict:
+    def create_platform_settings(self, platform_schema_id: int, platform_settings: dict) -> dict:
         """Create a new Platform Settings associated to a Platform using a remote connection
 
         Args:
-            platform_id (int): Platform unique identifier
+            platform_schema_id (int): Platform unique identifier
             platform_settings (dict): Platform Settings as a dictionary to be sent to the remote connection
 
         Returns:
             dict: returning platform settings with its unique identifier
         """
         return self._platform_manager.create_platform_settings(
-            platform_id=platform_id, platform_settings=platform_settings
+            platform_schema_id=platform_schema_id, platform_settings=platform_settings
         )
 
-    def read_platform_settings(self, platform_id: int, platform_settings_id: int) -> dict:
+    def read_platform_settings(self, platform_schema_id: int, platform_settings_id: int) -> dict:
         """Load a new Platform Settings using a remote connection
 
         Args:
-            platform_id (int): Platform unique identifier
+            platform_schema_id (int): Platform unique identifier
             platform_settings_id (int): Platform Settings unique identifier
 
         Returns:
@@ -309,14 +309,16 @@ class API(ABC):
         """
 
         return self._platform_manager.read_platform_settings(
-            platform_id=platform_id, platform_settings_id=platform_settings_id
+            platform_schema_id=platform_schema_id, platform_settings_id=platform_settings_id
         )
 
-    def update_platform_settings(self, platform_id: int, platform_settings_id: int, platform_settings: dict) -> dict:
+    def update_platform_settings(
+        self, platform_schema_id: int, platform_settings_id: int, platform_settings: dict
+    ) -> dict:
         """Updates a new Platform Settings using a remote connection
 
         Args:
-            platform_id (int): Platform unique identifier
+            platform_schema_id (int): Platform unique identifier
             platform_settings_id (int): Platform Settings unique identifier
             platform_settings (dict): dictionary containing the data. It should be all platform settings data without the id
 
@@ -325,14 +327,16 @@ class API(ABC):
         """
 
         return self._platform_manager.update_platform_settings(
-            platform_id=platform_id, platform_settings_id=platform_settings_id, platform_settings=platform_settings
+            platform_schema_id=platform_schema_id,
+            platform_settings_id=platform_settings_id,
+            platform_settings=platform_settings,
         )
 
-    def delete_platform_settings(self, platform_id: int, platform_settings_id: int) -> None:
+    def delete_platform_settings(self, platform_schema_id: int, platform_settings_id: int) -> None:
         """Deletes a Platform Settings using a remote connection
 
         Args:
-            platform_id (int): Platform unique identifier
+            platform_schema_id (int): Platform unique identifier
             platform_settings_id (int): Platform Settings unique identifier
 
         Returns:
@@ -340,5 +344,5 @@ class API(ABC):
         """
 
         self._platform_manager.delete_platform_settings(
-            platform_id=platform_id, platform_settings_id=platform_settings_id
+            platform_schema_id=platform_schema_id, platform_settings_id=platform_settings_id
         )
