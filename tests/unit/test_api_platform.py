@@ -5,7 +5,6 @@ from typing import Tuple
 from unittest.mock import MagicMock, patch
 
 from qiboconnection.api import API
-from qiboconnection.models.platform import Platform
 
 from .data import (
     platform_locations_sample,
@@ -55,7 +54,7 @@ class TestAPIPlatformSettings:
     @patch("qiboconnection.models.platform.Path.iterdir", autospec=True, return_value=[])
     @patch("qiboconnection.models.platform.Path.exists", autospec=True, return_value=True)
     def test_create_platform_settings(
-        self, mock_exists: MagicMock, mock_iterdir: MagicMock, mocked_api: API, mocked_platform: Platform
+        self, mock_exists: MagicMock, mock_iterdir: MagicMock, mocked_api: API, mocked_platform: dict
     ):
         """test the creation of a new platform settings"""
         platform_settings = mocked_api.create_platform_settings(

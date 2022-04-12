@@ -69,7 +69,7 @@ def fixture_mocked_platform(mock_exists: MagicMock, mock_mkdir: MagicMock) -> di
 def fixture_mocked_platform_settings(
     mock_iterdir: MagicMock,  # pylint: disable=unused-argument
     mock_dump: MagicMock,  # pylint: disable=unused-argument
-    mocked_platform: Platform,
+    mocked_platform: dict,
 ) -> Tuple[int, int]:
     """Create a new platform settings as a fixture"""
     platform_settings = PlatformSettings().create(

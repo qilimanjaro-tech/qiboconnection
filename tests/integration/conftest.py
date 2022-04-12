@@ -60,7 +60,7 @@ def fixture_platform() -> dict:
 
 
 @pytest.fixture(scope="session", name="platform_id_settings_id")
-def fixture_platform_settings(platform: Platform) -> Tuple[int, int]:
+def fixture_platform_settings(platform: dict) -> Tuple[int, int]:
     """Create a new platform settings as a fixture"""
     platform_settings = PlatformSettings().create(
         platform_id=platform["id"], platform_settings=platform_settings_sample

@@ -6,13 +6,12 @@ from typing import Tuple
 import pytest
 
 from qiboconnection.api import API
-from qiboconnection.models.platform import Platform
 
 from .data import platform_settings_sample, platform_settings_updated_sample
 
 
 @pytest.fixture(name="temp_platform_id_settings_id")
-def fixture_temp_platform_settings(mocked_api: API, platform: Platform) -> Tuple[int, int]:
+def fixture_temp_platform_settings(mocked_api: API, platform: dict) -> Tuple[int, int]:
     """Create a new platform settings as a fixture"""
     platform_settings = mocked_api.create_platform_settings(
         platform_id=platform["id"], platform_settings=platform_settings_sample
@@ -38,7 +37,7 @@ class TestAPIPlatform:
 class TestAPIPlatformSettings:
     """Tests methods for API platform settings calls"""
 
-    def test_create_platform_settings(self, mocked_api: API, platform: Platform):
+    def test_create_platform_settings(self, mocked_api: API, platform: dict):
         """test the creation of a new platform settings"""
         platform_settings = mocked_api.create_platform_settings(
             platform_id=platform["id"], platform_settings=platform_settings_sample

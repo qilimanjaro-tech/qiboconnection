@@ -4,14 +4,13 @@ from typing import Tuple
 
 import pytest
 
-from qiboconnection.models.platform import Platform
 from qiboconnection.models.platform_settings import PlatformSettings
 
 from .data import platform_settings_sample, platform_settings_updated_sample
 
 
 @pytest.fixture(name="temp_platform_id_settings_id")
-def fixture_temp_platform_settings(platform: Platform) -> Tuple[int, int]:
+def fixture_temp_platform_settings(platform: dict) -> Tuple[int, int]:
     """Create a new platform settings as a fixture"""
     platform_settings = PlatformSettings().create(
         platform_id=platform["id"], platform_settings=platform_settings_sample
@@ -22,7 +21,7 @@ def fixture_temp_platform_settings(platform: Platform) -> Tuple[int, int]:
 class TestPlatformSettings:
     """Test platform settings platform"""
 
-    def test_create_platform_settings(self, platform: Platform):
+    def test_create_platform_settings(self, platform: dict):
         """test the creation of a new platform settings"""
         assert "id" in platform
         platform_settings = PlatformSettings().create(

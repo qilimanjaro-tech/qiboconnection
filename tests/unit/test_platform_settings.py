@@ -4,7 +4,6 @@ import unittest
 from typing import Tuple
 from unittest.mock import MagicMock, patch
 
-from qiboconnection.models.platform import Platform
 from qiboconnection.models.platform_settings import PlatformSettings
 
 from .data import (
@@ -24,7 +23,7 @@ class TestPlatformSettings:
         self,
         mock_iterdir: MagicMock,
         mock_dump: MagicMock,
-        mocked_platform: Platform,
+        mocked_platform: dict,
     ):
         """test the creation of a new platform settings"""
         assert "id" in mocked_platform
