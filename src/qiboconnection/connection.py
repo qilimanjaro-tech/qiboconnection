@@ -3,8 +3,9 @@ import json
 from abc import ABC
 from dataclasses import dataclass
 from datetime import datetime, timezone
+from functools import partial
 from io import TextIOWrapper
-from typing import Any, Optional, TextIO, Tuple, Union
+from typing import Any, Callable, Optional, TextIO, Tuple, Union
 
 import requests
 from typeguard import typechecked
@@ -28,6 +29,30 @@ from qiboconnection.util import (
 @dataclass
 class Connection(ABC):
     """Class to create a remote connection to a Qibo server"""
+
+    class CheckAccessTokenDefined:
+        """Property used to check that the access token is defined"""
+
+        def __init__(self, method: Callable):
+            self._method = method
+
+        def __get__(self, obj, objtype):
+            """Support instance methods."""
+            return partial(self.__call__, obj)
+
+        def __call__(self, ref: "Connection", *args, **kwargs):
+            """
+            Args:
+                method (Callable): Class method.
+
+            Raises:
+                AttributeError: If the access token is not defined.
+            """
+            if ref._authorisation_access_token is None:
+                raise AttributeError(
+                    "Authorisation access token not set. Please, register to Qilimanjaro API or load your configuration"
+                )
+            return self._method(ref, *args, **kwargs)
 
     @typechecked
     def __init__(
@@ -188,6 +213,7 @@ class Connection(ABC):
         )
 
     @typechecked
+    @CheckAccessTokenDefined
     def send_put_auth_remote_api_call(self, path: str, data: Any) -> Tuple[Any, int]:
         """HTTP PUT REST API authenticated call to remote server
 
@@ -204,6 +230,7 @@ class Connection(ABC):
         return process_response(response)
 
     @typechecked
+    @CheckAccessTokenDefined
     def send_post_auth_remote_api_call(self, path: str, data: Any) -> Tuple[Any, int]:
         """HTTP POST REST API authenticated call to remote server
 
@@ -220,6 +247,7 @@ class Connection(ABC):
         return process_response(response)
 
     @typechecked
+    @CheckAccessTokenDefined
     def send_post_file_auth_remote_api_call(
         self, path: str, file: Union[TextIOWrapper, TextIO], filename: str
     ) -> Tuple[Any, int]:
@@ -239,6 +267,7 @@ class Connection(ABC):
         return process_response(response)
 
     @typechecked
+    @CheckAccessTokenDefined
     def send_get_auth_remote_api_call(self, path: str) -> Tuple[Any, int]:
         """HTTP GET REST API authenticated call to remote server
 
