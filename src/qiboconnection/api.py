@@ -16,6 +16,7 @@ from qiboconnection.devices.util import create_device
 from qiboconnection.errors import ConnectionException, RemoteExecutionException
 from qiboconnection.job import Job
 from qiboconnection.job_result import JobResult
+from qiboconnection.live_plots import LivePlots
 from qiboconnection.typings.algorithm import ProgramDefinition
 from qiboconnection.typings.connection import ConnectionConfiguration
 from qiboconnection.typings.device import (
@@ -24,7 +25,7 @@ from qiboconnection.typings.device import (
     SimulatorDeviceInput,
 )
 from qiboconnection.typings.job import JobResponse, JobStatus
-
+from qiboconnection.typings.live_plot import LivePlotType
 
 class API(ABC):
     """Qilimanjaro Client API class to communicate with the Quantum Service"""
@@ -35,6 +36,7 @@ class API(ABC):
     CIRCUITS_CALL_PATH = "/circuits"
     DEVICES_CALL_PATH = "/devices"
     PING_CALL_PATH = "/status"
+    LIVE_PLOTTING_PATH = "/live-plotting"
 
     @typechecked
     def __init__(self, configuration: Optional[ConnectionConfiguration | None] = None):
@@ -42,6 +44,7 @@ class API(ABC):
         self._devices: Devices | None = None
         self._jobs: List[Job] = []
         self._selected_device: Device | None = None
+        self._live_plots: LivePlots = LivePlots()
 
     @property
     def jobs(self) -> List[Job]:
@@ -229,7 +232,7 @@ class API(ABC):
             job_id (int): Job identifier
 
         Raises:
-            RemoteExecutionException: Job could not be retrieved."
+            RemoteExecutionException: Job could not be retrieved.
             ValueError: Job status not supported
 
         Returns:
@@ -258,3 +261,27 @@ class API(ABC):
             result = JobResult(job_id=job_id, http_response=job_response.result).data
             return result[0] if isinstance(result, List) else result
         raise ValueError(f"Job status not supported: {status}")
+
+    @typechecked
+    def create_liveplot(self, plot_type: LivePlotType = LivePlotType.LINE):
+        """ Creates a LivePlot of *plot_type* type at which we will be able to send points to plot
+
+        Raises:
+            RemoteExecutionException: Live-plotting connection data could not be retrieved
+
+        Returns:
+            int: id of the just created plot
+        """
+        # Get info from PublicAPI
+        response, status_code = self._connection.send_get_auth_remote_api_call(path=f"{self.LIVE_PLOTTING_PATH}")
+        if status_code != 200:
+            raise RemoteExecutionException(message="Live-plotting connection data could not be retrieved.",
+                                           status_code=status_code)
+        plot_id, websocket_url = int(response["plot_id"]), str(response["websocket_url"])
+
+        self._live_plots.create_live_plot(plot_id=plot_id, websocket_url=websocket_url, plot_type=plot_type)
+        return response["plot_id"]
+
+    @typechecked
+    def send_plot_points(self, plot_id: int, x: list[float] | float, f: float, y: float | None = None):
+        return self._live_plots.send_data(plot_id=plot_id, x=x, y=y, f=f)
