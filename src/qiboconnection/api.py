@@ -43,7 +43,7 @@ class API(ABC):
         self._devices: Devices | None = None
         self._jobs: List[Job] = []
         self._selected_device: Device | None = None
-        self._platform_manager = PlatformManager()
+        self._platform_manager = PlatformManager(connection=self._connection)
 
     @property
     def jobs(self) -> List[Job]:
@@ -265,84 +265,214 @@ class API(ABC):
     ##    PLATFORM FUNCTIONS    ##
     ##############################
 
-    def create_platform_schema(self) -> dict:
-        """Create a new Platform schema using a remote connection
+    def load_all_platform_settings(self, platform_schema_settings_id: int) -> dict:
+        """Loads the complete platform settings including each component's settings
+
+        Args:
+            platform_schema_settings (dict): Platform schema Settings as a dictionary to be sent to the remote connection
 
         Returns:
-            dict: returning platform schema with its unique identifier
+            dict: returning the complete platform settings
         """
 
-        return self._platform_manager.create_platform_schema()
+        return self._platform_manager.load_all_platform_settings(
+            platform_schema_settings_id=platform_schema_settings_id
+        )
 
-    def list_platform_schemas(self) -> List[dict]:
-        """List all platform schemas in the system
+    def create_platform_schema_settings(self, platform_schema_settings: dict) -> dict:
+        """Create a new Platform schema settings using a remote connection
+
+        Args:
+            platform_schema_settings (dict): Platform schema Settings as a dictionary to be sent to the remote connection
+
+        Returns:
+            dict: returning platform schema settings with its unique identifier
+        """
+        return self._platform_manager.create_platform_schema_settings(platform_schema_settings=platform_schema_settings)
+
+    def load_platform_schema_settings(self, platform_schema_settings_id: int) -> dict:
+        """Load a Platform Schema Settings using a remote connection
+
+        Args:
+            platform_schema_settings_id (int): Platform unique identifier
+
+        Returns:
+            dict: returning platform schema _settings with its unique identifier
+        """
+        return self._platform_manager.read_platform_schema_settings(
+            platform_schema_settings_id=platform_schema_settings_id
+        )
+
+    def update_platform_schema_settings(self, platform_schema_settings_id: int, platform_schema_settings: dict) -> dict:
+        """Updates a Platform schema Settings using a remote connection
+
+        Args:
+            platform_schema_settings_id (int): Platform unique identifier
+            platform_schema_settings (dict): Platform schema Settings as a dictionary to be sent to the remote connection
+
+        Returns:
+            dict: returning platform schema settings with its unique identifier
+        """
+        return self._platform_manager.update_platform_schema_settings(
+            platform_schema_settings_id=platform_schema_settings_id, platform_schema_settings=platform_schema_settings
+        )
+
+    def delete_platform_schema_settings(self, platform_schema_settings_id: int) -> None:
+        """Deletes a Platform Schema Settings using a remote connection
+
+        Args:
+            platform_schema_settings_id (int): Platform unique identifier
+
+        """
+        return self._platform_manager.delete_platform_schema_settings(
+            platform_schema_settings_id=platform_schema_settings_id
+        )
+
+    def list_platform_schema_settings(self) -> List[dict]:
+        """List all platform schema settings in the system
 
         Returns:
             List[dict]: List of platform schemas dictionaries
         """
 
-        return self._platform_manager.list_platform_schemas()
+        return self._platform_manager.list_platform_schema_settings()
 
-    def create_platform_settings(self, platform_schema_id: int, platform_settings: dict) -> dict:
-        """Create a new Platform Settings associated to a Platform using a remote connection
-
-        Args:
-            platform_schema_id (int): Platform unique identifier
-            platform_settings (dict): Platform Settings as a dictionary to be sent to the remote connection
-
-        Returns:
-            dict: returning platform settings with its unique identifier
-        """
-        return self._platform_manager.create_platform_settings(
-            platform_schema_id=platform_schema_id, platform_settings=platform_settings
-        )
-
-    def read_platform_settings(self, platform_schema_id: int, platform_settings_id: int) -> dict:
-        """Load a new Platform Settings using a remote connection
+    def create_platform_buses_settings(self, platform_schema_settings_id: int, platform_buses_settings: dict) -> dict:
+        """Create a new Platform buses settings using a remote connection
 
         Args:
-            platform_schema_id (int): Platform unique identifier
-            platform_settings_id (int): Platform Settings unique identifier
+            platform_schema_settings_id (int): Platform schema settings unique identifier
+            platform_buses_settings (dict): Platform buses Settings as a dictionary to be sent to the remote connection
 
         Returns:
-            dict: returning platform settings
+            dict: returning platform buses settings with its unique identifier
         """
-
-        return self._platform_manager.read_platform_settings(
-            platform_schema_id=platform_schema_id, platform_settings_id=platform_settings_id
+        return self._platform_manager.create_platform_buses_settings(
+            platform_schema_settings_id=platform_schema_settings_id, platform_buses_settings=platform_buses_settings
         )
 
-    def update_platform_settings(
-        self, platform_schema_id: int, platform_settings_id: int, platform_settings: dict
+    def load_platform_buses_settings(self, platform_buses_settings_id: int) -> dict:
+        """Load a Platform Buses Settings using a remote connection
+
+        Args:
+            platform_buses_settings_id (int): Platform buses settings unique identifier
+
+        Returns:
+            dict: returning platform buses settings with its unique identifier
+        """
+        return self._platform_manager.read_platform_buses_settings(
+            platform_buses_settings_id=platform_buses_settings_id
+        )
+
+    def update_platform_buses_settings(self, platform_buses_settings_id: int, platform_buses_settings: dict) -> dict:
+        """Updates a Platform Buses Settings using a remote connection
+
+        Args:
+            platform_buses_settings_id (int): Platform buses settings unique identifier
+            platform_buses_settings (dict): Platform schema Settings as a dictionary to be sent to the remote connection
+
+        Returns:
+            dict: returning platform schema _settings with its unique identifier
+        """
+        return self._platform_manager.update_platform_buses_settings(
+            platform_buses_settings_id=platform_buses_settings_id, platform_buses_settings=platform_buses_settings
+        )
+
+    def delete_platform_buses_settings(self, platform_schema_settings_id: int, platform_buses_settings_id: int) -> None:
+        """Deletes a Platform Buses Settings using a remote connection
+
+        Args:
+            platform_schema_settings_id (int): Platform schema settings unique identifier
+            platform_buses_settings_id (int): Platform buses settings unique identifier
+
+        """
+        return self._platform_manager.delete_platform_buses_settings(
+            platform_schema_settings_id=platform_schema_settings_id,
+            platform_buses_settings_id=platform_buses_settings_id,
+        )
+
+    def create_platform_component_settings(
+        self,
+        platform_component_settings: dict,
+        platform_buses_settings_id: int | None = None,
+        platform_component_parent_settings_id: int | None = None,
     ) -> dict:
-        """Updates a new Platform Settings using a remote connection
+        """Create a new Platform component Settings associated to a Platform using a remote connection
 
         Args:
-            platform_schema_id (int): Platform unique identifier
-            platform_settings_id (int): Platform Settings unique identifier
-            platform_settings (dict): dictionary containing the data. It should be all platform settings data without the id
+            platform_component_settings (dict): Platform component Settings as a dictionary to be sent to
+                                                the remote connection
+            platform_buses_settings_id (int | None): Platform buses settings unique identifier only defined
+                                                     when the component parent is a bus component
+            platform_component_parent_settings_id (int | None): Platform Component Settings ID to to link the
+                                                         new platform component settings
+                                                         or None if it is not linked to any other platform
+                                                        component settings.
+        Returns:
+            dict: returning platform component settings with its unique identifier
+        """
+        return self._platform_manager.create_platform_component_settings(
+            platform_component_settings=platform_component_settings,
+            platform_buses_settings_id=platform_buses_settings_id,
+            platform_component_parent_settings_id=platform_component_parent_settings_id,
+        )
+
+    def load_platform_component_settings(self, platform_component_settings_id: int) -> dict:
+        """Load a new Platform component Settings using a remote connection
+
+        Args:
+            platform_component_settings_id (int): Platform component Settings unique identifier
+
+
+        Returns:
+            dict: returning platform component settings
+        """
+        return self._platform_manager.read_platform_component_settings(
+            platform_component_settings_id=platform_component_settings_id
+        )
+
+    def update_platform_component_settings(
+        self,
+        platform_component_settings_id: int,
+        platform_component_settings: dict,
+    ) -> dict:
+        """Updates a new Platform component Settings using a remote connection
+
+        Args:
+            platform_component_settings_id (int): Platform Settings unique identifier
+            platform_component_settings (dict): dictionary containing the data
 
         Returns:
             dict: returning platform settings
         """
 
-        return self._platform_manager.update_platform_settings(
-            platform_schema_id=platform_schema_id,
-            platform_settings_id=platform_settings_id,
-            platform_settings=platform_settings,
+        return self._platform_manager.update_platform_component_settings(
+            platform_component_settings_id=platform_component_settings_id,
+            platform_component_settings=platform_component_settings,
         )
 
-    def delete_platform_settings(self, platform_schema_id: int, platform_settings_id: int) -> None:
+    def delete_platform_component_settings(
+        self,
+        platform_component_settings_id: int,
+        platform_buses_settings_id: int | None = None,
+        platform_component_parent_settings_id: int | None = None,
+    ) -> None:
         """Deletes a Platform Settings using a remote connection
 
         Args:
-            platform_schema_id (int): Platform unique identifier
-            platform_settings_id (int): Platform Settings unique identifier
-
+            platform_component_settings_id (int): Platform component settings unique identifier
+            platform_buses_settings_id (int | None): Platform buses settings unique identifier only defined
+                                                     when the component parent is a bus component
+            platform_component_parent_settings_id (int | None): Platform Component Settings ID to to link the
+                                                         new platform component settings
+                                                         or None if it is not linked to any other platform
+                                                        component settings.
         Returns:
             dict: returning platform settings
         """
 
-        self._platform_manager.delete_platform_settings(
-            platform_schema_id=platform_schema_id, platform_settings_id=platform_settings_id
+        return self._platform_manager.delete_platform_component_settings(
+            platform_component_settings_id=platform_component_settings_id,
+            platform_buses_settings_id=platform_buses_settings_id,
+            platform_component_parent_settings_id=platform_component_parent_settings_id,
         )

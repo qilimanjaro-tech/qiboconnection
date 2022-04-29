@@ -4,6 +4,7 @@ import json
 import os
 import pickle  # nosec - temporary bandit ignore
 from base64 import urlsafe_b64decode, urlsafe_b64encode
+from dataclasses import dataclass, field
 from json.decoder import JSONDecodeError
 from typing import Any, List, Tuple
 
@@ -110,17 +111,73 @@ def decode_results_from_circuit(http_response: str) -> AbstractState:
     return pickle.loads(result_bytes.getbuffer())  # nosec - temporary bandit ignore
 
 
-def process_response(response: requests.Response) -> Tuple[Any, int]:
+def process_response(response: requests.Response, valid_status_codes: List[int] | None = None) -> Tuple[Any, int]:
     """Process an Http Response to check for errors
 
     Args:
         response (requests.Response): Http Response
+        valid_status_codes (List[int]) -> List of valid status codes
 
     Returns:
         Tuple[Any, int]: Data from the Response, and status code
     """
-    custom_raise_for_status(response)
+    custom_raise_for_status(response=response, valid_status_codes=valid_status_codes)
     try:
         return response.json(), response.status_code
     except JSONDecodeError:
         return response.text, response.status_code
+
+
+@dataclass
+class HttpPaginatedLinks:
+    """Links structure for paginated data from an Http response"""
+
+    first: str
+    prev: str
+    next: str
+    last: str
+
+
+@dataclass
+class HttpPaginatedData:
+    """Paginated data as a structure from an Http response"""
+
+    items: List[dict] = field(default_factory=list)
+    total: int = field(init=False)
+    per_page: int = field(init=False)
+    _self: str = field(init=False)
+    links: HttpPaginatedLinks = field(init=False)
+
+    def __init__(self, data: dict):
+        self.items = data["items"]
+        self.total = data["total"]
+        self.per_page = data["per_page"]
+        self._self = data["self"]
+        self.links = data["links"]
+
+    @property
+    def self(self) -> str:
+        """returns self string"""
+        return self._self
+
+
+def get_last_and_next_page_number_from_links(self_link: str, next_link: str) -> Tuple[int, int]:
+    """returns the last and next page number from paginated data links"""
+    return (
+        int(_find_word_between_two_words(sentence=self_link, first_word="?page=", second_word="&per_page")),
+        int(_find_word_between_two_words(sentence=next_link, first_word="?page=", second_word="&per_page")),
+    )
+
+
+def _find_word_between_two_words(sentence: str, first_word: str, second_word: str) -> str:
+    """find the string between two words in a given sentence
+
+    Args:
+        sentence (str): a given sentence
+        first_word (str): first word to start the search
+        second_word (str):last word to end the search
+
+    Returns:
+        str: the word found
+    """
+    return (sentence.split(first_word))[1].split(second_word)[0]

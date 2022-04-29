@@ -1,6 +1,6 @@
 """ Handling Error Utility Functions """
 import json
-from typing import Union
+from typing import List, Union
 
 from requests.models import HTTPError, Response
 
@@ -28,7 +28,7 @@ class ConnectionException(Exception):
     """
 
 
-def custom_raise_for_status(response: Response):
+def custom_raise_for_status(response: Response, valid_status_codes: List[int] | None = None):
     """Raises :class:`HTTPError`, if one occurred."""
 
     http_error_msg = ""
@@ -47,8 +47,11 @@ def custom_raise_for_status(response: Response):
     if 400 <= response.status_code < 500:
         http_error_msg = f"{response.status_code} Client Error: {reason} for url: {response.url}"
 
-    elif 500 <= response.status_code < 600:
+    if 500 <= response.status_code < 600:
         http_error_msg = f"{response.status_code} Server Error: {reason} for url: {response.url}"
+
+    if valid_status_codes is not None and response.status_code not in valid_status_codes:
+        http_error_msg = f"{response.status_code} Client Error: {reason} for url: {response.url}"
 
     if http_error_msg and response.text:
         try:

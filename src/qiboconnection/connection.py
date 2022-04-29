@@ -227,7 +227,7 @@ class Connection(ABC):
         logger.debug("Calling: %s%s", self._remote_server_api_url, path)
         header = {"Authorization": f"Bearer {self._authorisation_access_token}"}
         response = requests.put(f"{self._remote_server_api_url}{path}", json=data.copy(), headers=header)
-        return process_response(response)
+        return process_response(response=response, valid_status_codes=[200, 201])
 
     @typechecked
     @CheckAccessTokenDefined
@@ -244,7 +244,7 @@ class Connection(ABC):
         logger.debug("Calling: %s%s", self._remote_server_api_url, path)
         header = {"Authorization": f"Bearer {self._authorisation_access_token}"}
         response = requests.post(f"{self._remote_server_api_url}{path}", json=data.copy(), headers=header)
-        return process_response(response)
+        return process_response(response=response, valid_status_codes=[200, 201])
 
     @typechecked
     @CheckAccessTokenDefined
@@ -264,7 +264,7 @@ class Connection(ABC):
         header = {"Authorization": f"Bearer {self._authorisation_access_token}"}
         packed_file = {"file": (filename, file)}
         response = requests.post(f"{self._remote_server_api_url}{path}", files=packed_file, headers=header)
-        return process_response(response)
+        return process_response(response=response, valid_status_codes=[200, 201])
 
     @typechecked
     @CheckAccessTokenDefined
@@ -280,7 +280,23 @@ class Connection(ABC):
         logger.debug("Calling: %s%s", self._remote_server_api_url, path)
         header = {"Authorization": f"Bearer {self._authorisation_access_token}"}
         response = requests.get(f"{self._remote_server_api_url}{path}", headers=header)
-        return process_response(response)
+        return process_response(response=response, valid_status_codes=[200])
+
+    @typechecked
+    @CheckAccessTokenDefined
+    def send_delete_auth_remote_api_call(self, path: str) -> Tuple[Any, int]:
+        """HTTP DELETE REST API authenticated call to remote server
+
+        Args:
+            path (str): path to add to the remote server api url
+
+        Returns:
+            Tuple[Any, int]: Http response
+        """
+        logger.debug("Calling: %s%s", self._remote_server_api_url, path)
+        header = {"Authorization": f"Bearer {self._authorisation_access_token}"}
+        response = requests.delete(f"{self._remote_server_api_url}{path}", headers=header)
+        return process_response(response=response, valid_status_codes=[204])
 
     @typechecked
     def send_get_remote_call(self, path: str) -> Tuple[Any, int]:
@@ -294,7 +310,7 @@ class Connection(ABC):
         """
         logger.debug("Calling: %s%s", self._remote_server_api_url, path)
         response = requests.get(f"{self._remote_server_base_url}{path}")
-        return process_response(response)
+        return process_response(response=response, valid_status_codes=[200])
 
     def _request_authorisation_access_token(self) -> str:
         assertion_payload: AssertionPayload = {
