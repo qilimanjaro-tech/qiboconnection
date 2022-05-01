@@ -153,7 +153,7 @@ class HttpPaginatedData:
         self.total = data["total"]
         self.per_page = data["per_page"]
         self._self = data["self"]
-        self.links = data["links"]
+        self.links = HttpPaginatedLinks(**data["links"])
 
     @property
     def self(self) -> str:

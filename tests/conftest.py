@@ -1,21 +1,17 @@
 """ Pytest configuration fixtures for each session """
 
-import unittest
+
 from dataclasses import asdict
-from typing import Tuple
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 import pytest
 
 from qiboconnection.api import API
-from qiboconnection.models.platform_schema import PlatformSchema
-from qiboconnection.models.platform_settings import PlatformSettings
+from qiboconnection.connection import Connection
 from qiboconnection.typings.connection import (
     ConnectionConfiguration,
     ConnectionEstablished,
 )
-
-from .data import platform_settings_sample
 
 
 @pytest.fixture(scope="session", name="mocked_connection_configuration")
@@ -37,6 +33,23 @@ def fixture_create_mocked_connection_established(
     )
 
 
+@pytest.fixture(scope="session", name="mocked_connection")
+def fixture_create_mocked_connection(mocked_connection_established: ConnectionEstablished) -> Connection:
+    """Create a mocked connection
+
+    Returns:
+        Connection: mocked connection
+    """
+    with patch(
+        "qiboconnection.connection.load_config_file_to_disk",
+        autospec=True,
+        return_value=mocked_connection_established,
+    ) as mock_config:
+        connection = Connection(api_path="/mocked")
+        mock_config.assert_called()
+        return connection
+
+
 @pytest.fixture(scope="session", name="mocked_api")
 def fixture_create_mocked_api_connection(mocked_connection_established: ConnectionEstablished) -> API:
     """Create a mocked api connection
@@ -52,27 +65,3 @@ def fixture_create_mocked_api_connection(mocked_connection_established: Connecti
         api = API()
         mock_config.assert_called()
         return api
-
-
-@pytest.fixture(scope="session", name="mocked_platform_schema")
-@patch("qiboconnection.models.platform_schema.Path.mkdir", autospec=True, return_value=None)
-@patch("qiboconnection.models.platform_schema.Path.exists", autospec=True, return_value=True)
-def fixture_mocked_platform(mock_exists: MagicMock, mock_mkdir: MagicMock) -> dict:  # pylint: disable=unused-argument
-    """Create a platform as a fixture"""
-    return PlatformSchema().create()
-
-
-@pytest.fixture(scope="session", name="mocked_platform_schema_id_settings_id")
-@patch("builtins.open", unittest.mock.mock_open())
-@patch("qiboconnection.models.model.yaml.dump", autospec=True, return_value=None)
-@patch("qiboconnection.models.platform_schema.Path.iterdir", autospec=True, return_value=[])
-def fixture_mocked_platform_settings(
-    mock_iterdir: MagicMock,  # pylint: disable=unused-argument
-    mock_dump: MagicMock,  # pylint: disable=unused-argument
-    mocked_platform_schema: dict,
-) -> Tuple[int, int]:
-    """Create a new platform settings as a fixture"""
-    platform_settings = PlatformSettings().create(
-        platform_schema_id=mocked_platform_schema["id"], platform_settings=platform_settings_sample
-    )
-    return mocked_platform_schema["id"], platform_settings["id"]

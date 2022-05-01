@@ -2,7 +2,8 @@
 
 from abc import ABC
 from dataclasses import dataclass, field
-from typing import List, cast
+from functools import partial
+from typing import Callable, List, cast
 
 from qiboconnection.connection import Connection
 from qiboconnection.util import (
@@ -19,6 +20,34 @@ class Model(ABC):
 
     connection: Connection
     collection_name: str = field(init=False)  # to be defined in the inheritance hierarchy
+    _base_path: str = field(init=False)
+
+    class SetBasePath:
+        """Property used to check if both platform_buses_settings_id and platform_component_parent_settings_id
+        are correctly defined and sets the path to call the remote API"""
+
+        def __init__(self, method: Callable):
+            self._method = method
+
+        def __get__(self, obj, objtype):
+            """Support instance methods."""
+            return partial(self.__call__, obj)
+
+        def __call__(self, ref: "Model", *args, **kwargs):
+            """
+            Args:
+                method (Callable): Class method.
+
+            Raises:
+                AttributeError: If the instrument is not connected.
+            """
+
+            if "model_id" not in kwargs and "path" not in kwargs:
+                raise AttributeError("Either 'model_id' or 'path' MUST be defined.")
+
+            ref._base_path = kwargs["path"] if "path" in kwargs else ref.collection_name
+
+            return self._method(ref, *args, **kwargs)
 
     def create(self, data: dict, path: str | None = None) -> dict:
         """Creates a new data model by calling a remote API
@@ -32,22 +61,22 @@ class Model(ABC):
         )
         return cast(dict, response)
 
-    def read(self, model_id: int | None = None, path: str | None = None) -> dict:
+    @SetBasePath
+    def read(self, model_id: int | None = None, path: str | None = None) -> dict:  # pylint: disable= unused-argument
         """Gets the object with the given model_id by calling a remote API
         Args:
             model_id (int): model identifier
         Returns:
             dict: data in a dictionary format
         """
-        if model_id is None and path is None:
-            raise AttributeError("Either 'model_id' or 'path' MUST be defined.")
 
-        response, _ = self.connection.send_get_auth_remote_api_call(
-            path=path if path is not None else f"{self.collection_name}/{model_id}"
-        )
+        response, _ = self.connection.send_get_auth_remote_api_call(path=f"{self._base_path}/{model_id}")
         return cast(dict, response)
 
-    def update(self, data: dict, model_id: int | None = None, path: str | None = None) -> dict:
+    @SetBasePath
+    def update(
+        self, data: dict, model_id: int | None = None, path: str | None = None  # pylint: disable= unused-argument
+    ) -> dict:
         """Updates the specified object with the given data by calling a remote API
 
         Args:
@@ -56,26 +85,19 @@ class Model(ABC):
         Returns:
             dict: returning the updated dictionary data
         """
-        if model_id is None and path is None:
-            raise AttributeError("Either 'model_id' or 'path' MUST be defined.")
 
-        response, _ = self.connection.send_put_auth_remote_api_call(
-            path=path if path is not None else f"{self.collection_name}/{model_id}", data=data
-        )
+        response, _ = self.connection.send_put_auth_remote_api_call(path=f"{self._base_path}/{model_id}", data=data)
         return cast(dict, response)
 
-    def delete(self, model_id: int | None = None, path: str | None = None) -> None:
+    @SetBasePath
+    def delete(self, model_id: int | None = None, path: str | None = None) -> None:  # pylint: disable= unused-argument
         """Deletes the object with the given model_id by calling a remote gateway
 
         Args:
             model_id (int): model identifier
         """
-        if model_id is None and path is None:
-            raise AttributeError("Either 'model_id' or 'path' MUST be defined.")
 
-        self.connection.send_delete_auth_remote_api_call(
-            path=path if path is not None else f"{self.collection_name}/{model_id}"
-        )
+        self.connection.send_delete_auth_remote_api_call(path=f"{self._base_path}/{model_id}")
 
     def list_elements(self) -> List[dict]:
         """List all elements by calling a remote API
@@ -86,7 +108,7 @@ class Model(ABC):
         response, _ = self.connection.send_get_auth_remote_api_call(path=self.collection_name)
         paginated_data = HttpPaginatedData(data=response)
 
-        return self._get_all_elements(accumulated_items=paginated_data.items, paginated_data=paginated_data)
+        return self._get_all_elements(accumulated_items=[], paginated_data=paginated_data)
 
     def _get_all_elements(self, accumulated_items: List[dict], paginated_data: HttpPaginatedData) -> List[dict]:
         """Get all elements from a paginated Http response querying the API until there is no elements left
@@ -110,4 +132,4 @@ class Model(ABC):
             path=f"{self.collection_name}?page={next_page}&per_page{paginated_data.per_page}"
         )
         paginated_data = HttpPaginatedData(data=response)
-        return self._get_all_elements(accumulated_items=paginated_data.items, paginated_data=paginated_data)
+        return self._get_all_elements(accumulated_items=accumulated_items, paginated_data=paginated_data)

@@ -1,9 +1,10 @@
 """ Platform Settings operations """
 
 from dataclasses import dataclass
-from typing import List
 
 from qiboconnection.models.model import Model
+
+ALL_SETTINGS_PATH = "complete-settings"
 
 
 @dataclass
@@ -12,14 +13,15 @@ class PlatformSettings(Model):
 
     collection_name = "platform_settings"
 
-    def create(self, data: dict, path: str | None = None) -> dict:
-        raise NotImplementedError
+    def read_all_settings(self, platform_settings_id: int) -> dict:
+        """Loads the complete platform settings including each component's settings
 
-    def update(self, data: dict, model_id: int | None = None, path: str | None = None) -> dict:
-        raise NotImplementedError
+        Args:
+            platform_settings (dict): Platform Settings as a dictionary to be sent to the remote connection
 
-    def delete(self, model_id: int | None = None, path: str | None = None) -> None:
-        raise NotImplementedError
-
-    def list_elements(self) -> List[dict]:
-        raise NotImplementedError
+        Returns:
+            dict: returning the complete platform settings
+        """
+        return super().read(
+            path=f"{self.collection_name}/{platform_settings_id}/{ALL_SETTINGS_PATH}",
+        )

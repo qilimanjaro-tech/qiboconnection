@@ -15,7 +15,7 @@ class PlatformComponentSettings(Model):
     _path: str = field(init=False)
 
     class SetPath:
-        """Property used to check if both platform_buses_settings_id and platform_component_parent_settings_id
+        """Property used to check if both platform_bus_settings_id and platform_component_parent_settings_id
         are correctly defined and sets the path to call the remote API"""
 
         def __init__(self, method: Callable):
@@ -33,39 +33,39 @@ class PlatformComponentSettings(Model):
             Raises:
                 AttributeError: If the instrument is not connected.
             """
-            if "platform_buses_settings_id" not in kwargs or "platform_component_parent_settings_id" not in kwargs:
+            if "platform_bus_settings_id" not in kwargs and "platform_component_parent_settings_id" not in kwargs:
                 raise AttributeError(
-                    "Either 'platform_buses_settings_id' or 'platform_component_parent_settings_id' MUST be defined."
+                    "Either 'platform_bus_settings_id' or 'platform_component_parent_settings_id' MUST be defined."
                 )
 
-            platform_buses_settings_id, platform_component_parent_settings_id = (
-                kwargs["platform_buses_settings_id"],
-                kwargs["platform_component_parent_settings_id"],
-            )
-
-            if platform_buses_settings_id is None and platform_component_parent_settings_id is None:
+            if (
+                "platform_bus_settings_id" in kwargs
+                and "platform_component_parent_settings_id" in kwargs
+                and kwargs["platform_bus_settings_id"] is not None
+                and kwargs["platform_component_parent_settings_id"] is not None
+            ):
                 raise AttributeError(
-                    "Either 'platform_buses_settings_id' or 'platform_component_parent_settings_id' MUST be defined."
-                )
-            if platform_buses_settings_id is not None and platform_component_parent_settings_id is not None:
-                raise AttributeError(
-                    "Both 'platform_buses_settings_id' and 'platform_component_parent_settings_id' are defined. "
+                    "Both 'platform_bus_settings_id' and 'platform_component_parent_settings_id' are defined. "
                     + "Just ONE of them MUST be defined."
                 )
             ref._path = f"{ref.collection_name}"
-            if "platform_component_settings_id" in kwargs:
-                ref._path += f"/{kwargs['platform_component_settings_id']}"
-            if platform_buses_settings_id is not None:
-                ref._path += f"?platform_buses_settings_id={platform_buses_settings_id}"
-            if platform_component_parent_settings_id is not None:
-                ref._path += f"?platform_component_parent_settings_id={platform_component_parent_settings_id}"
+            if "platform_bus_settings_id" in kwargs and kwargs["platform_bus_settings_id"] is not None:
+                ref._path += f"?platform_bus_settings_id={kwargs['platform_bus_settings_id']}"
+            if (
+                "platform_component_parent_settings_id" in kwargs
+                and kwargs["platform_component_parent_settings_id"] is not None
+            ):
+                ref._path += f"?platform_component_parent_settings_id={kwargs['platform_component_parent_settings_id']}"
             return self._method(ref, *args, **kwargs)
+
+    def create(self, data: dict, path: str | None = None) -> dict:
+        raise NotImplementedError("Use 'create_settings' instead.")
 
     @SetPath
     def create_settings(
         self,
         platform_component_settings: dict,
-        platform_buses_settings_id: int | None = None,  # pylint: disable=unused-argument
+        platform_bus_settings_id: int | None = None,  # pylint: disable=unused-argument
         platform_component_parent_settings_id: int | None = None,  # pylint: disable=unused-argument
     ) -> dict:
         """Create a new Platform component Settings associated to a Platform using a remote connection
@@ -73,7 +73,7 @@ class PlatformComponentSettings(Model):
         Args:
             platform_component_settings (dict): Platform component Settings as a dictionary to be sent to
                                                 the remote connection
-            platform_buses_settings_id (int | None): Platform buses settings unique identifier only defined
+            platform_bus_settings_id (int | None): Platform bus settings unique identifier only defined
                                                      when the component parent is a bus component
             platform_component_parent_settings_id (int | None): Platform Component Settings ID to to link the
                                                          new platform component settings
@@ -85,27 +85,6 @@ class PlatformComponentSettings(Model):
         """
 
         return super().create(data=platform_component_settings, path=self._path)
-
-    @SetPath
-    def delete_settings(
-        self,
-        platform_component_settings_id: int,  # pylint: disable=unused-argument
-        platform_buses_settings_id: int | None = None,  # pylint: disable=unused-argument
-        platform_component_parent_settings_id: int | None = None,  # pylint: disable=unused-argument
-    ) -> None:
-        """Deletes a Platform buses Settings using a remote connection
-
-        Args:
-            platform_component_settings_id (int): Platform component settings unique identifier
-            platform_buses_settings_id (int | None): Platform buses settings unique identifier only defined
-                                                     when the component parent is a bus component
-            platform_component_parent_settings_id (int | None): Platform Component Settings ID to to link the
-                                                         new platform component settings
-                                                         or None if it is not linked to any other platform
-                                                        component settings.
-
-        """
-        super().delete(path=self._path)
 
     def list_elements(self) -> List[dict]:
         raise NotImplementedError

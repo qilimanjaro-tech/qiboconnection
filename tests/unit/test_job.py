@@ -19,7 +19,7 @@ from qiboconnection.typings.algorithm import (
 from qiboconnection.typings.job import JobRequest, JobResponse, JobStatus
 from qiboconnection.user import User
 
-from .data import simulator_device_inputs
+from ..data import simulator_device_inputs
 
 
 @pytest.fixture(name="algorithm_definition")

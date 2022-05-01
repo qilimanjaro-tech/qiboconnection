@@ -15,7 +15,7 @@ from qiboconnection.typings.device import (
     SimulatorDeviceInput,
 )
 
-from .data import (
+from ..data import (
     device_inputs,
     simulator_device_characteristics_inputs,
     simulator_device_inputs,
