@@ -25,7 +25,7 @@ from qiboconnection.typings.device import (
     SimulatorDeviceInput,
 )
 from qiboconnection.typings.job import JobResponse, JobStatus
-from qiboconnection.typings.live_plot import LivePlotType
+from qiboconnection.typings.live_plot import LivePlotType, PlottingResponse
 
 class API(ABC):
     """Qilimanjaro Client API class to communicate with the Quantum Service"""
@@ -277,11 +277,22 @@ class API(ABC):
         if status_code != 200:
             raise RemoteExecutionException(message="Live-plotting connection data could not be retrieved.",
                                            status_code=status_code)
-        plot_id, websocket_url = int(response["plot_id"]), str(response["websocket_url"])
-
-        self._live_plots.create_live_plot(plot_id=plot_id, websocket_url=websocket_url, plot_type=plot_type)
+        plotting_response = PlottingResponse(**response)
+        self._live_plots.create_live_plot(
+            plot_id=plotting_response.plot_id, websocket_url=plotting_response.websocket_url, plot_type=plot_type)
         return response["plot_id"]
 
     @typechecked
-    def send_plot_points(self, plot_id: int, x: list[float] | float, f: float, y: float | None = None):
+    def send_plot_points(self, plot_id: int, x: list[float] | float, f: list[float] | float,
+                         y: Optional[list[float] | float] = None):
+        """ Sends point(s) to a specific plot.
+        Args:
+            plot_id: Id of the plot to send points to
+            x: x coord of the point to send info to
+            y: y coord of the point to send info to
+            f: f value evaluated at x(,y)
+
+        Returns:
+            None
+        """
         return self._live_plots.send_data(plot_id=plot_id, x=x, y=y, f=f)

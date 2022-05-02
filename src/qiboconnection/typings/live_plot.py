@@ -23,6 +23,17 @@ class UnitPoint(TypedDict):
     f: float
 
 
+@dataclass
+class PlottingResponse(ABC):
+    """Class for typecasting the PlottingService responses for requesting the creation of new plots."""
+    websocket_url: str
+    plot_id: int
+
+    def to_dict(self):
+        """Casts the info of the class as a dict."""
+        return {'websocket_url': self.websocket_url, 'plot_id': self.plot_id}
+
+
 class LivePlotPoints(ABC):
     """Information about the points we intend to plot in each message we sent over the live-plotting ws."""
 

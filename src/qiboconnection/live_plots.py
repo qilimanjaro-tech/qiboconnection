@@ -1,9 +1,8 @@
 """ LivePlots class """
 from abc import ABC
 from dataclasses import dataclass, field
-from .live_plot import LivePlot
-
-from qiboconnection.typings.live_plot import LivePlotType, LivePlotPoints, LivePlotPacket
+from qiboconnection.live_plot import LivePlot
+from qiboconnection.typings.live_plot import LivePlotType, LivePlotPacket
 
 from typing import Callable
 from functools import partial
