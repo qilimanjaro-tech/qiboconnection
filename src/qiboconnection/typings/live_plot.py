@@ -12,8 +12,8 @@ class LivePlotType(Enum):
     """
     Class for type
     """
-    LINE = "line"
-    SCATTER3D = "scatter3d"
+    LINES = "LINES"
+    SCATTER3D = "SCATTER3D"
 
 
 class UnitPoint(TypedDict):

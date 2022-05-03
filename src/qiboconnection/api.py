@@ -263,7 +263,7 @@ class API(ABC):
         raise ValueError(f"Job status not supported: {status}")
 
     @typechecked
-    def create_liveplot(self, plot_type: LivePlotType = LivePlotType.LINE):
+    def create_liveplot(self, plot_type: LivePlotType = LivePlotType.LINES):
         """ Creates a LivePlot of *plot_type* type at which we will be able to send points to plot
 
         Raises:
@@ -273,7 +273,8 @@ class API(ABC):
             int: id of the just created plot
         """
         # Get info from PublicAPI
-        response, status_code = self._connection.send_post_auth_remote_api_call(path=f"{self.LIVE_PLOTTING_PATH}", data={})
+        response, status_code = self._connection.send_post_auth_remote_api_call(
+            path=f"{self.LIVE_PLOTTING_PATH}", data={})
         if status_code != 200:
             raise RemoteExecutionException(message="Live-plotting connection data could not be retrieved.",
                                            status_code=status_code)
