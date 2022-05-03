@@ -273,7 +273,7 @@ class API(ABC):
             int: id of the just created plot
         """
         # Get info from PublicAPI
-        response, status_code = self._connection.send_get_auth_remote_api_call(path=f"{self.LIVE_PLOTTING_PATH}")
+        response, status_code = self._connection.send_post_auth_remote_api_call(path=f"{self.LIVE_PLOTTING_PATH}", data={})
         if status_code != 200:
             raise RemoteExecutionException(message="Live-plotting connection data could not be retrieved.",
                                            status_code=status_code)

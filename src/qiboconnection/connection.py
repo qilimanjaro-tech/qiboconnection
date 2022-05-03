@@ -293,4 +293,4 @@ class Connection(ABC):
 
         access_token_response: AccessTokenResponse = response.json()
         logger.debug("Connection successfully established.")
-        return access_token_response.accessToken
+        return access_token_response['accessToken']
