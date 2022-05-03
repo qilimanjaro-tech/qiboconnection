@@ -13,6 +13,7 @@ from qibo.abstractions.states import AbstractState
 
 from qiboconnection.errors import custom_raise_for_status
 from qiboconnection.typings.connection import ConnectionEstablished
+from dataclasses import asdict
 
 QIBO_CONFIG_DIR = "qibo_configuration"
 QIBO_CONFIG_FILE = ".user_configuration.json"
@@ -59,7 +60,7 @@ def write_config_file_to_disk(config_data: ConnectionEstablished) -> None:
     os.chdir(QIBO_CONFIG_DIR)
 
     with open(QIBO_CONFIG_FILE, "w", encoding="utf-8") as config_file:
-        json.dump(obj=vars(config_data), fp=config_file, indent=2)
+        json.dump(obj=asdict(config_data), fp=config_file, indent=2)
     os.chdir("..")
 
 
