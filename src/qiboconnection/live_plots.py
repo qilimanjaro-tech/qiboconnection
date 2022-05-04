@@ -40,14 +40,14 @@ class LivePlots(ABC):
                 ValueError: Line plots accept exactly x and f values.
                 ValueError: Scatter3D plots accept exactly x, y and f values.
             """
-            if "live_plot" not in kwargs or "data_point" not in kwargs:
-                raise AttributeError("live_plot and data_point are required.")
-            live_plot, data_point = kwargs.get("live_plot"), kwargs.get("data_point")
-            if (live_plot.plot_type == LivePlotType.LINE.value
-                    and (data_point.y is not None or data_point.x is None or data_point.f is None)):
+            if "live_plot" not in kwargs or "data_packet" not in kwargs:
+                raise AttributeError("live_plot and point info are required.")
+            live_plot, data_packet = kwargs.get("live_plot"), kwargs.get("data_packet")
+            if (live_plot.plot_type == LivePlotType.LINES.value
+                    and (data_packet.y is not None or data_packet.x is None or data_packet.f is None)):
                 raise ValueError("Line plots accept exactly x and f values.")
             if (live_plot.plot_type == LivePlotType.SCATTER3D.value
-                    and (data_point.x is None or data_point.y is None or data_point.f is None)):
+                    and (data_packet.x is None or data_packet.y is None or data_packet.f is None)):
                 raise ValueError("Scatter3D plots accept exactly x, y and f values.")
 
     def send_data(self, plot_id: int, x: list[float] | float, f: float, y: float | None = None):
