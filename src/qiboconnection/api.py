@@ -282,7 +282,7 @@ class API(ABC):
         plotting_response = PlottingResponse.from_response(**response)
         self._live_plots.create_live_plot(
             plot_id=plotting_response.plot_id, websocket_url=plotting_response.websocket_url, plot_type=plot_type)
-        return response["plot_id"]
+        return PlottingResponse.plot_id
 
     @typechecked
     def send_plot_points(self, plot_id: int, x: list[float] | float, f: list[float] | float,
