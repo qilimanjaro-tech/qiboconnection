@@ -27,6 +27,7 @@ from qiboconnection.typings.device import (
 from qiboconnection.typings.job import JobResponse, JobStatus
 from qiboconnection.typings.live_plot import LivePlotType, PlottingResponse
 
+
 class API(ABC):
     """Qilimanjaro Client API class to communicate with the Quantum Service"""
 
@@ -278,7 +279,7 @@ class API(ABC):
         if status_code != 200:
             raise RemoteExecutionException(message="Live-plotting connection data could not be retrieved.",
                                            status_code=status_code)
-        plotting_response = PlottingResponse(**response)
+        plotting_response = PlottingResponse.from_response(**response)
         self._live_plots.create_live_plot(
             plot_id=plotting_response.plot_id, websocket_url=plotting_response.websocket_url, plot_type=plot_type)
         return response["plot_id"]
