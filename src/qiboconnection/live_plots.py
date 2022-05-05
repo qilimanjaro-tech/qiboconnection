@@ -50,11 +50,14 @@ class LivePlots(ABC):
                     and (data_packet.x is None or data_packet.y is None or data_packet.f is None)):
                 raise ValueError("Scatter3D plots accept exactly x, y and f values.")
 
+            return self._method(*args, **kwargs)
+
     def send_data(self, plot_id: int, x: list[float] | float, y: list[float] | float, z: Optional[list[float] | float]):
         live_plot = self._get_live_plot(plot_id=plot_id)
-        data_packet = LivePlotPacket.build_packet(plot_id=plot_id, plot_type=live_plot.plot_type, x=x, y=y, z=z)
+        data_packet = LivePlotPacket.build_packet(plot_id=live_plot.plot_id, plot_type=live_plot.plot_type,
+                                                  x=x, y=y, z=z)
         self._send_data(live_plot=live_plot, data_packet=data_packet)
 
     @CheckDataAndPlotTypeCompatibility
     def _send_data(self, live_plot: LivePlot, data_packet: LivePlotPacket):
-        live_plot.send_data(data=data_packet)
+        return live_plot.send_data(data=data_packet)
