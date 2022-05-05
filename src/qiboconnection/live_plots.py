@@ -14,9 +14,10 @@ class LivePlots(ABC):
 
     _live_plots: dict = field(default_factory=dict)
 
-    def create_live_plot(self, plot_id: int, plot_type: LivePlotType, websocket_url: str, ):
+    def create_live_plot(self, plot_id: int, plot_type: LivePlotType.value, websocket_url: str, ):
         """Creates a new LivePlot with the provided information and appends it to the internal _live_plots dict"""
-        self._live_plots[plot_id] = LivePlot(plot_id=plot_id, plot_type=plot_type, websocket_url=websocket_url)
+        parsed_plot_type = LivePlotType[plot_type]
+        self._live_plots[plot_id] = LivePlot(plot_id=plot_id, plot_type=parsed_plot_type, websocket_url=websocket_url)
 
     def _get_live_plot(self, plot_id) -> LivePlot:
         return self._live_plots[plot_id]
@@ -43,10 +44,10 @@ class LivePlots(ABC):
             if "live_plot" not in kwargs or "data_packet" not in kwargs:
                 raise AttributeError("live_plot and point info are required.")
             live_plot, data_packet = kwargs.get("live_plot"), kwargs.get("data_packet")
-            if (live_plot.plot_type == LivePlotType.LINES.value
+            if (live_plot.plot_type == LivePlotType.LINES
                     and (data_packet.y is not None or data_packet.x is None or data_packet.f is None)):
                 raise ValueError("Line plots accept exactly x and f values.")
-            if (live_plot.plot_type == LivePlotType.SCATTER3D.value
+            if (live_plot.plot_type == LivePlotType.SCATTER3D
                     and (data_packet.x is None or data_packet.y is None or data_packet.f is None)):
                 raise ValueError("Scatter3D plots accept exactly x, y and f values.")
 
