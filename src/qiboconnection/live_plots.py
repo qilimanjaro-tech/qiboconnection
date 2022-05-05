@@ -46,10 +46,10 @@ class LivePlots(ABC):
             data_packet: LivePlotPacket = kwargs.get("data_packet")
             if (live_plot.plot_type == LivePlotType.LINES
                     and (data_packet.data.z is not None or data_packet.data.x is None or data_packet.data.y is None)):
-                raise ValueError("Line plots accept exactly x and f values.")
+                raise ValueError("LINES plots accept exactly x and y values.")
             if (live_plot.plot_type == LivePlotType.SCATTER3D
                     and (data_packet.data.x is None or data_packet.data.y is None or data_packet.data.z is None)):
-                raise ValueError("Scatter3D plots accept exactly x, y and f values.")
+                raise ValueError("SCATTER3D plots accept exactly x, y and z values.")
 
             return self._method(*args, **kwargs)
 
