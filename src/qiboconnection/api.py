@@ -264,7 +264,8 @@ class API(ABC):
         raise ValueError(f"Job status not supported: {status}")
 
     @typechecked
-    def create_liveplot(self, plot_type: Literal[LivePlotType.LINES, LivePlotType.SCATTER3D] = str(LivePlotType.LINES)):
+    def create_liveplot(
+            self, plot_type: Literal[LivePlotType.LINES, LivePlotType.SCATTER3D] = LivePlotType.LINES.value):
         """ Creates a LivePlot of *plot_type* type at which we will be able to send points to plot
 
         Raises:
