@@ -64,13 +64,13 @@ class LivePlotPoints(ABC):
     def _parse_to_points(self, x: float | list[float], y: float | list[float], z: Optional[float | list[float]]):
         if all((isinstance(arg, float) or arg is None) for arg in [x, y, z]):
             point = UnitPoint(x=x, y=y, z=None)
-            if y is not None:
+            if z is not None:
                 point['z'] = z
             self._points.append(point)
         elif all((isinstance(arg, list) or arg is None) for arg in [x, y, z]):
             for i, _ in enumerate(x):
                 point = UnitPoint(x=x[i], y=y[i], z=None)
-                if y is not None:
+                if z is not None:
                     point['z'] = z[i]
                 self._points.append(point)
         else:
