@@ -42,12 +42,13 @@ class LivePlots(ABC):
             """
             if "live_plot" not in kwargs or "data_packet" not in kwargs:
                 raise AttributeError("live_plot and point info are required.")
-            live_plot, data_packet = kwargs.get("live_plot"), kwargs.get("data_packet")
+            live_plot: LivePlot = kwargs.get("live_plot")
+            data_packet: LivePlotPacket = kwargs.get("data_packet")
             if (live_plot.plot_type == LivePlotType.LINES
-                    and (data_packet.y is not None or data_packet.x is None or data_packet.f is None)):
+                    and (data_packet.data.z is not None or data_packet.data.x is None or data_packet.data.y is None)):
                 raise ValueError("Line plots accept exactly x and f values.")
             if (live_plot.plot_type == LivePlotType.SCATTER3D
-                    and (data_packet.x is None or data_packet.y is None or data_packet.f is None)):
+                    and (data_packet.data.x is None or data_packet.data.y is None or data_packet.data.z is None)):
                 raise ValueError("Scatter3D plots accept exactly x, y and f values.")
 
             return self._method(*args, **kwargs)

@@ -8,7 +8,7 @@ from typing import TypedDict, Optional
 import json
 
 
-class LivePlotType(Enum, str):
+class LivePlotType(str, Enum):
     """
     Class for type
     """
@@ -48,6 +48,18 @@ class LivePlotPoints(ABC):
         self._z = z
         self._points: list[UnitPoint] = []
         self._parse_to_points(x=x, y=y, z=z)
+
+    @property
+    def x(self):
+        return self._x
+
+    @property
+    def y(self):
+        return self._y
+
+    @property
+    def z(self):
+        return self._z
 
     def _parse_to_points(self, x: float | list[float], y: float | list[float], z: Optional[float | list[float]]):
         if all((isinstance(arg, float) or arg is None) for arg in [x, y, z]):
