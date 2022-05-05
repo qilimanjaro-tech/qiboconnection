@@ -14,10 +14,9 @@ class LivePlots(ABC):
 
     _live_plots: dict = field(default_factory=dict)
 
-    def create_live_plot(self, plot_id: int, plot_type: LivePlotType.value, websocket_url: str, ):
+    def create_live_plot(self, plot_id: int, plot_type: LivePlotType.mro(), websocket_url: str, ):
         """Creates a new LivePlot with the provided information and appends it to the internal _live_plots dict"""
-        parsed_plot_type = LivePlotType[plot_type]
-        self._live_plots[plot_id] = LivePlot(plot_id=plot_id, plot_type=parsed_plot_type, websocket_url=websocket_url)
+        self._live_plots[plot_id] = LivePlot(plot_id=plot_id, plot_type=plot_type, websocket_url=websocket_url)
 
     def _get_live_plot(self, plot_id) -> LivePlot:
         return self._live_plots[plot_id]

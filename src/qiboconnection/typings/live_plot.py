@@ -8,7 +8,7 @@ from typing import TypedDict, Optional
 import json
 
 
-class LivePlotType(Enum):
+class LivePlotType(Enum, str):
     """
     Class for type
     """
