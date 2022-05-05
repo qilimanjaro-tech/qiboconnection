@@ -1,11 +1,11 @@
 """ LivePlots class """
 from abc import ABC
 from dataclasses import dataclass, field
-from qiboconnection.live_plot import LivePlot
-from qiboconnection.typings.live_plot import LivePlotType, LivePlotPacket
-
 from typing import Callable, Optional
 from functools import partial
+
+from qiboconnection.live_plot import LivePlot
+from qiboconnection.typings.live_plot import LivePlotType, LivePlotPacket
 
 
 @dataclass
@@ -14,7 +14,7 @@ class LivePlots(ABC):
 
     _live_plots: dict = field(default_factory=dict)
 
-    def create_live_plot(self, plot_id: int, plot_type: LivePlotType.mro(), websocket_url: str, ):
+    def create_live_plot(self, plot_id: int, plot_type: LivePlotType, websocket_url: str):
         """Creates a new LivePlot with the provided information and appends it to the internal _live_plots dict"""
         self._live_plots[plot_id] = LivePlot(plot_id=plot_id, plot_type=plot_type, websocket_url=websocket_url)
 

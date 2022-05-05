@@ -1,7 +1,7 @@
 """ Qilimanjaro Client API to communicate with the Qilimanajaro Global Quantum Services """
 import json
 from abc import ABC
-from typing import Any, List, Optional, Union, cast
+from typing import Any, List, Optional, Union, Literal, cast
 
 from qibo.abstractions.states import AbstractState
 from qibo.core.circuit import Circuit
@@ -264,7 +264,7 @@ class API(ABC):
         raise ValueError(f"Job status not supported: {status}")
 
     @typechecked
-    def create_liveplot(self, plot_type: LivePlotType = LivePlotType.LINES):
+    def create_liveplot(self, plot_type: Literal[LivePlotType.LINES, LivePlotType.SCATTER3D] = str(LivePlotType.LINES)):
         """ Creates a LivePlot of *plot_type* type at which we will be able to send points to plot
 
         Raises:
@@ -281,7 +281,8 @@ class API(ABC):
                                            status_code=status_code)
         plotting_response = PlottingResponse.from_response(**response)
         self._live_plots.create_live_plot(
-            plot_id=plotting_response.plot_id, websocket_url=plotting_response.websocket_url, plot_type=plot_type)
+            plot_id=plotting_response.plot_id, websocket_url=plotting_response.websocket_url,
+            plot_type=LivePlotType[plot_type])
         return plotting_response.plot_id
 
     @typechecked
