@@ -4,7 +4,7 @@ from dataclasses import dataclass, field
 from qiboconnection.live_plot import LivePlot
 from qiboconnection.typings.live_plot import LivePlotType, LivePlotPacket
 
-from typing import Callable
+from typing import Callable, Optional
 from functools import partial
 
 
@@ -50,9 +50,9 @@ class LivePlots(ABC):
                     and (data_packet.x is None or data_packet.y is None or data_packet.f is None)):
                 raise ValueError("Scatter3D plots accept exactly x, y and f values.")
 
-    def send_data(self, plot_id: int, x: list[float] | float, f: float, y: float | None = None):
+    def send_data(self, plot_id: int, x: list[float] | float, y: list[float] | float, z: Optional[list[float] | float]):
         live_plot = self._get_live_plot(plot_id=plot_id)
-        data_packet = LivePlotPacket.build_packet(plot_id=plot_id, plot_type=live_plot.plot_type, x=x, y=y, f=f)
+        data_packet = LivePlotPacket.build_packet(plot_id=plot_id, plot_type=live_plot.plot_type, x=x, y=y, z=z)
         self._send_data(live_plot=live_plot, data_packet=data_packet)
 
     @CheckDataAndPlotTypeCompatibility

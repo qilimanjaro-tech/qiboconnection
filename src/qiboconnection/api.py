@@ -285,16 +285,16 @@ class API(ABC):
         return plotting_response.plot_id
 
     @typechecked
-    def send_plot_points(self, plot_id: int, x: list[float] | float, f: list[float] | float,
-                         y: Optional[list[float] | float] = None):
+    def send_plot_points(self, plot_id: int, x: list[float] | float, y: list[float] | float,
+                         z: Optional[list[float] | float] = None):
         """ Sends point(s) to a specific plot.
         Args:
             plot_id: Id of the plot to send points to
             x: x coord of the point to send info to
             y: y coord of the point to send info to
-            f: f value evaluated at x(,y)
+            z: z coord of the point to send info to
 
         Returns:
             None
         """
-        return self._live_plots.send_data(plot_id=plot_id, x=x, y=y, f=f)
+        return self._live_plots.send_data(plot_id=plot_id, x=x, y=y, z=z)

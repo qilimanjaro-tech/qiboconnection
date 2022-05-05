@@ -19,8 +19,8 @@ class LivePlotType(Enum):
 class UnitPoint(TypedDict):
     """ Basic point"""
     x: float
-    y: Optional[float]
-    f: float
+    y: float
+    z: Optional[float]
 
 
 @dataclass
@@ -42,24 +42,24 @@ class PlottingResponse(ABC):
 class LivePlotPoints(ABC):
     """Information about the points we intend to plot in each message we sent over the live-plotting ws."""
 
-    def __init__(self, x: float | list[float], f: float | list[float], y: Optional[float | list[float]] = None):
+    def __init__(self, x: float | list[float], y: float | list[float], z: Optional[float | list[float]] = None):
         self._x = x
         self._y = y
-        self._f = f
+        self._z = z
         self._points: list[UnitPoint] = []
-        self._parse_to_points(x=x, y=y, f=f)
+        self._parse_to_points(x=x, y=y, z=z)
 
-    def _parse_to_points(self, x: float | list[float], y: Optional[float | list[float]], f: float | list[float]):
-        if all((isinstance(arg, float) or arg is None) for arg in [x, y, f]):
-            point = UnitPoint(x=x, f=f, y=None)
+    def _parse_to_points(self, x: float | list[float], y: float | list[float], z: Optional[float | list[float]]):
+        if all((isinstance(arg, float) or arg is None) for arg in [x, y, z]):
+            point = UnitPoint(x=x, y=y, z=None)
             if y is not None:
-                point['y'] = y
+                point['z'] = z
             self._points.append(point)
-        elif all((isinstance(arg, list) or arg is None) for arg in [x, y, f]):
+        elif all((isinstance(arg, list) or arg is None) for arg in [x, y, z]):
             for i, _ in enumerate(x):
-                point = UnitPoint(x=x[i], f=f[i], y=None)
+                point = UnitPoint(x=x[i], y=y[i], z=None)
                 if y is not None:
-                    point['y'] = y[i]
+                    point['z'] = z[i]
                 self._points.append(point)
         else:
             raise ValueError("Arguments provided must be of the same type: floats or lists")
@@ -78,9 +78,9 @@ class LivePlotPacket(ABC):
 
     @classmethod
     def build_packet(cls, plot_id: int, plot_type: LivePlotType,
-                     x: list[float] | float, f: float, y: float | None = None):
+                     x: list[float] | float, y: list[float] | float, z: Optional[list[float] | float]):
         """Convenience constructor"""
-        return cls(plot_id=plot_id, plot_type=plot_type, data=LivePlotPoints(x=x, y=y, f=f))
+        return cls(plot_id=plot_id, plot_type=plot_type, data=LivePlotPoints(x=x, y=y, z=z))
 
     def to_dict(self) -> dict:
         """
