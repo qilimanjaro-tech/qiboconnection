@@ -1,11 +1,11 @@
 """ LivePlots class """
 from abc import ABC
 from dataclasses import dataclass, field
-from typing import Callable, Optional
 from functools import partial
+from typing import Callable, Optional
 
 from qiboconnection.live_plot import LivePlot
-from qiboconnection.typings.live_plot import LivePlotType, LivePlotPacket
+from qiboconnection.typings.live_plot import LivePlotPacket, LivePlotType
 
 
 @dataclass
@@ -18,7 +18,12 @@ class LivePlots(ABC):
         """Creates a new LivePlot with the provided information and appends it to the internal _live_plots dict"""
         self._live_plots[plot_id] = LivePlot(plot_id=plot_id, plot_type=plot_type, websocket_url=websocket_url)
 
-    def _get_live_plot(self, plot_id) -> LivePlot:
+    def _get_live_plot(self, plot_id: int) -> LivePlot:
+        """
+        Internal getter that returns the liveplot instance associatied to the provided plot_id
+        Args:
+            plot_id: id of the plot to be retrieved.
+        """
         return self._live_plots[plot_id]
 
     class CheckDataAndPlotTypeCompatibility:
@@ -44,19 +49,31 @@ class LivePlots(ABC):
                 raise AttributeError("live_plot and point info are required.")
             live_plot: LivePlot = kwargs.get("live_plot")
             data_packet: LivePlotPacket = kwargs.get("data_packet")
-            if (live_plot.plot_type == LivePlotType.LINES
-                    and (data_packet.data.z is not None or data_packet.data.x is None or data_packet.data.y is None)):
+            if live_plot.plot_type == LivePlotType.LINES and (
+                data_packet.data.z is not None or data_packet.data.x is None or data_packet.data.y is None
+            ):
                 raise ValueError("LINES plots accept exactly x and y values.")
-            if (live_plot.plot_type == LivePlotType.SCATTER3D
-                    and (data_packet.data.x is None or data_packet.data.y is None or data_packet.data.z is None)):
+            if live_plot.plot_type == LivePlotType.SCATTER3D and (
+                data_packet.data.x is None or data_packet.data.y is None or data_packet.data.z is None
+            ):
                 raise ValueError("SCATTER3D plots accept exactly x, y and z values.")
 
             return self._method(*args, **kwargs)
 
     def send_data(self, plot_id: int, x: list[float] | float, y: list[float] | float, z: Optional[list[float] | float]):
+        """
+        Send the data corresponding to one or more points over the ws connection associated to the plot represented by
+        the provided plot_id
+        Args:
+            plot_id: id of the plot to send points to
+            x: x value of the point(s) to be drawn
+            y: y value of the point(s) to be drawn
+            z: z value of the point(s) to be drawn
+        """
         live_plot = self._get_live_plot(plot_id=plot_id)
-        data_packet = LivePlotPacket.build_packet(plot_id=live_plot.plot_id, plot_type=live_plot.plot_type,
-                                                  x=x, y=y, z=z)
+        data_packet = LivePlotPacket.build_packet(
+            plot_id=live_plot.plot_id, plot_type=live_plot.plot_type, x=x, y=y, z=z
+        )
         self._send_data(live_plot=live_plot, data_packet=data_packet)
 
     @CheckDataAndPlotTypeCompatibility

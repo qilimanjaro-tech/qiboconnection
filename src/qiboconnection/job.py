@@ -83,6 +83,11 @@ class Job(ABC):
 
     @job_id.setter
     def job_id(self, job_id: int) -> None:
+        """
+        Modifies internal Job identifier, accessed via job_id property
+        Args:
+            job_id: new job_id value
+        """
         self.id = job_id
 
     def _get_job_description(self) -> str:

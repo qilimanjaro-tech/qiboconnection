@@ -1,23 +1,23 @@
 """ Live Plot Typing """
-from enum import Enum
+import json
 from abc import ABC
 from dataclasses import dataclass
-
-from typing import TypedDict, Optional
-
-import json
+from enum import Enum
+from typing import Optional, TypedDict, cast
 
 
 class LivePlotType(str, Enum):
     """
     Class for type
     """
+
     LINES = "LINES"
     SCATTER3D = "SCATTER3D"
 
 
 class UnitPoint(TypedDict):
-    """ Basic point"""
+    """Basic point"""
+
     x: float
     y: float
     z: Optional[float]
@@ -26,6 +26,7 @@ class UnitPoint(TypedDict):
 @dataclass
 class PlottingResponse(ABC):
     """Class for typecasting the PlottingService responses for requesting the creation of new plots."""
+
     websocket_url: str
     plot_id: int
 
@@ -36,7 +37,7 @@ class PlottingResponse(ABC):
 
     def to_dict(self):
         """Casts the info of the class as a dict."""
-        return {'websocket_url': self.websocket_url, 'plot_id': self.plot_id}
+        return {"websocket_url": self.websocket_url, "plot_id": self.plot_id}
 
 
 class LivePlotPoints(ABC):
@@ -51,27 +52,41 @@ class LivePlotPoints(ABC):
 
     @property
     def x(self):
+        """x getter."""
         return self._x
 
     @property
     def y(self):
+        """y getter."""
         return self._y
 
     @property
     def z(self):
+        """z getter."""
         return self._z
 
-    def _parse_to_points(self, x: float | list[float], y: float | list[float], z: Optional[float | list[float]]):
+    def _parse_to_points(self, x: float | list[float], y: float | list[float], z: Optional[float | list[float]] = None):
+        """
+        Gets a point or a list of points for x, y, and z and parses them to a list of dicts each containing ONE value
+         for each of x, y, z.
+        Args:
+            x: x value of the point(s) to draw
+            y: y value of the point(s) to draw
+            z: z value of the point(s) to draw
+        Raises:
+            ValueError: Arguments provided must be of the same type: floats or lists
+        """
         if all((isinstance(arg, float) or arg is None) for arg in [x, y, z]):
-            point = UnitPoint(x=x, y=y, z=None)
+            point = UnitPoint(x=cast(float, x), y=cast(float, y), z=None)
             if z is not None:
-                point['z'] = z
+                point["z"] = cast(float, z)
             self._points.append(point)
         elif all((isinstance(arg, list) or arg is None) for arg in [x, y, z]):
+            x, y = cast(list, x), cast(list, y)
             for i, _ in enumerate(x):
                 point = UnitPoint(x=x[i], y=y[i], z=None)
                 if z is not None:
-                    point['z'] = z[i]
+                    point["z"] = cast(list, z)[i]
                 self._points.append(point)
         else:
             raise ValueError("Arguments provided must be of the same type: floats or lists")
@@ -84,13 +99,20 @@ class LivePlotPoints(ABC):
 @dataclass
 class LivePlotPacket(ABC):
     """Packet with the needed information for sending in each message we want to throw over the live-plotting ws."""
+
     plot_id: int
     plot_type: LivePlotType
     data: LivePlotPoints
 
     @classmethod
-    def build_packet(cls, plot_id: int, plot_type: LivePlotType,
-                     x: list[float] | float, y: list[float] | float, z: Optional[list[float] | float]):
+    def build_packet(
+        cls,
+        plot_id: int,
+        plot_type: LivePlotType,
+        x: list[float] | float,
+        y: list[float] | float,
+        z: Optional[list[float] | float],
+    ):
         """Convenience constructor"""
         return cls(plot_id=plot_id, plot_type=plot_type, data=LivePlotPoints(x=x, y=y, z=z))
 
@@ -98,9 +120,7 @@ class LivePlotPacket(ABC):
         """
         Serializes the information of the class to a dict ready to be sent via ws.
         """
-        return {'plot_id': self.plot_id,
-                'plot_type': self.plot_type.value,
-                'data': self.data.to_scatter()}
+        return {"plot_id": self.plot_id, "plot_type": self.plot_type.value, "data": self.data.to_scatter()}
 
     def to_json(self) -> str:
         """

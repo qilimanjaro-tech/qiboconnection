@@ -1,7 +1,7 @@
 """ Qilimanjaro Client API to communicate with the Qilimanajaro Global Quantum Services """
 import json
 from abc import ABC
-from typing import Any, List, Optional, Union, Literal, cast
+from typing import Any, List, Optional, Union, cast
 
 from qibo.abstractions.states import AbstractState
 from qibo.core.circuit import Circuit
@@ -264,9 +264,8 @@ class API(ABC):
         raise ValueError(f"Job status not supported: {status}")
 
     @typechecked
-    def create_liveplot(
-            self, plot_type: Literal[LivePlotType.LINES, LivePlotType.SCATTER3D] = LivePlotType.LINES.value):
-        """ Creates a LivePlot of *plot_type* type at which we will be able to send points to plot
+    def create_liveplot(self, plot_type: str = LivePlotType.LINES.value):
+        """Creates a LivePlot of *plot_type* type at which we will be able to send points to plot
 
         Raises:
             RemoteExecutionException: Live-plotting connection data could not be retrieved
@@ -276,20 +275,25 @@ class API(ABC):
         """
         # Get info from PublicAPI
         response, status_code = self._connection.send_post_auth_remote_api_call(
-            path=f"{self.LIVE_PLOTTING_PATH}", data={})
+            path=f"{self.LIVE_PLOTTING_PATH}", data={}
+        )
         if status_code != 200:
-            raise RemoteExecutionException(message="Live-plotting connection data could not be retrieved.",
-                                           status_code=status_code)
+            raise RemoteExecutionException(
+                message="Live-plotting connection data could not be retrieved.", status_code=status_code
+            )
         plotting_response = PlottingResponse.from_response(**response)
         self._live_plots.create_live_plot(
-            plot_id=plotting_response.plot_id, websocket_url=plotting_response.websocket_url,
-            plot_type=LivePlotType[plot_type])
+            plot_id=plotting_response.plot_id,
+            websocket_url=plotting_response.websocket_url,
+            plot_type=LivePlotType(plot_type),
+        )
         return plotting_response.plot_id
 
     @typechecked
-    def send_plot_points(self, plot_id: int, x: list[float] | float, y: list[float] | float,
-                         z: Optional[list[float] | float] = None):
-        """ Sends point(s) to a specific plot.
+    def send_plot_points(
+        self, plot_id: int, x: list[float] | float, y: list[float] | float, z: Optional[list[float] | float] = None
+    ):
+        """Sends point(s) to a specific plot.
         Args:
             plot_id: Id of the plot to send points to
             x: x coord of the point to send info to

@@ -4,6 +4,7 @@ import json
 import os
 import pickle  # nosec - temporary bandit ignore
 from base64 import urlsafe_b64decode, urlsafe_b64encode
+from dataclasses import asdict
 from json.decoder import JSONDecodeError
 from typing import Any, List, Tuple
 
@@ -13,7 +14,6 @@ from qibo.abstractions.states import AbstractState
 
 from qiboconnection.errors import custom_raise_for_status
 from qiboconnection.typings.connection import ConnectionEstablished
-from dataclasses import asdict
 
 QIBO_CONFIG_DIR = "qibo_configuration"
 QIBO_CONFIG_FILE = ".user_configuration.json"

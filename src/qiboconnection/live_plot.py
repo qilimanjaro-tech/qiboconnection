@@ -1,9 +1,11 @@
 """ LivePlot class """
 from abc import ABC
 from ssl import SSLError
-from websocket import create_connection, WebSocketException, WebSocket
 from typing import Optional
-from qiboconnection.typings.live_plot import LivePlotType, LivePlotPacket
+
+from websocket import WebSocket, WebSocketException, create_connection
+
+from qiboconnection.typings.live_plot import LivePlotPacket, LivePlotType
 
 
 class LivePlot(ABC):
@@ -38,7 +40,19 @@ class LivePlot(ABC):
             return self._send_data_over_connection(data=data)
 
     def _send_data_over_connection(self, data: LivePlotPacket):
+        """
+        Sends data over connection if self._connection is available.
+        Args:
+            data: data to be sent.
+        Raises:
+            ValueError: Connection is not opened.
+        """
+        if self._connection is None:
+            raise ValueError("Connection is not opened.")
         return self._connection.send(data.to_json())
 
     def _open_connection(self):
+        """
+        Creates connection using self._websocket_url and saves it to self._connection.
+        """
         self._connection = create_connection(url=self._websocket_url)
