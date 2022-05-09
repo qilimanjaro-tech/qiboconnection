@@ -57,7 +57,7 @@ def is_quantum_device_input(device_input: dict) -> bool:
     Returns:
         bool: True if the device is from a Quantum Device
     """
-    return not {"last_calibration_time", "characteristics", "calibration_details"}.isdisjoint(device_input)
+    return not {"last_calibration_time", "calibration_details"}.isdisjoint(device_input)
 
 
 @typechecked
