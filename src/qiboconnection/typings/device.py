@@ -1,6 +1,6 @@
 """ Device Typing """
 import enum
-from dataclasses import dataclass
+from dataclasses import InitVar, dataclass, field
 from typing import Literal, Optional
 
 
@@ -131,5 +131,19 @@ class QuantumDeviceInput(OnlineDeviceInput):
     """
 
     last_calibration_time: Optional[str] = ""
-    characteristics: Optional[QuantumDeviceCharacteristicsInput | None] = None
-    calibration_details: Optional[CalibrationDetailsInput | None] = None
+    characteristics: InitVar[Optional[dict | None]] = None
+    calibration_details: InitVar[Optional[dict | None]] = None
+
+    def __post_init__(self, characteristics, calibration_details):
+        self._characteristics = QuantumDeviceCharacteristicsInput(**characteristics)
+        self._calibration_details = CalibrationDetailsInput(**calibration_details)
+
+    @property
+    def q_characteristics(self):
+        """Characteristics getter"""
+        return self._characteristics
+
+    @property
+    def q_calibration_details(self):
+        """Calibration details getter"""
+        return self._calibration_details

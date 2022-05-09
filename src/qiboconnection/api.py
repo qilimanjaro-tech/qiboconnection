@@ -19,11 +19,6 @@ from qiboconnection.job_result import JobResult
 from qiboconnection.live_plots import LivePlots
 from qiboconnection.typings.algorithm import ProgramDefinition
 from qiboconnection.typings.connection import ConnectionConfiguration
-from qiboconnection.typings.device import (
-    OfflineDeviceInput,
-    QuantumDeviceInput,
-    SimulatorDeviceInput,
-)
 from qiboconnection.typings.job import JobResponse, JobStatus
 from qiboconnection.typings.live_plot import LivePlotType, PlottingResponse
 
