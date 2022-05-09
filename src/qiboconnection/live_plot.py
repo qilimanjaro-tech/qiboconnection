@@ -12,7 +12,7 @@ class LivePlot(ABC):
     """Job class to manage the job experiment to be remotely sent"""
 
     def __init__(self, plot_id: int, plot_type: LivePlotType, websocket_url: str):
-
+        """Default constructor. _connection is left as None until it is tried to use"""
         self._plot_id: int = plot_id
         self._plot_type: LivePlotType = plot_type
         self._websocket_url: str = websocket_url
@@ -35,7 +35,7 @@ class LivePlot(ABC):
         """
         try:
             return self._send_data_over_connection(data=data)
-        except (AttributeError, SSLError, WebSocketException):
+        except (AttributeError, ValueError, SSLError, WebSocketException):
             self._open_connection()
             return self._send_data_over_connection(data=data)
 

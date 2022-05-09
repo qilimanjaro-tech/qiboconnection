@@ -94,7 +94,7 @@ class API(ABC):
         self._devices = Devices(
             [
                 create_device(
-                    device_input=cast(Union[QuantumDeviceInput, SimulatorDeviceInput, OfflineDeviceInput], device_input)
+                    device_input=cast(QuantumDeviceInput | SimulatorDeviceInput | OfflineDeviceInput, device_input)
                 )
                 for device_input in response["items"]
             ]
