@@ -119,7 +119,15 @@ class SimulatorDeviceInput(OnlineDeviceInput):
         OnlineDeviceInput (OnlineDeviceInput): Inherits from OnlineDeviceInput
     """
 
-    characteristics: Optional[SimulatorDeviceCharacteristicsInput | None] = None
+    characteristics: InitVar[dict | None] = None
+
+    def __post_init__(self, characteristics):
+        self._characteristics = SimulatorDeviceCharacteristicsInput(**characteristics)
+
+    @property
+    def s_characteristics(self):
+        """Characteristics getter"""
+        return self._characteristics
 
 
 @dataclass
@@ -130,9 +138,9 @@ class QuantumDeviceInput(OnlineDeviceInput):
         OnlineDeviceInput (OnlineDeviceInput): Inherits from OnlineDeviceInput
     """
 
-    last_calibration_time: Optional[str] = ""
-    characteristics: InitVar[Optional[dict | None]] = None
-    calibration_details: InitVar[Optional[dict | None]] = None
+    last_calibration_time: str | None = ""
+    characteristics: InitVar[dict | None] = None
+    calibration_details: InitVar[dict | None] = None
 
     def __post_init__(self, characteristics, calibration_details):
         self._characteristics = QuantumDeviceCharacteristicsInput(**characteristics)
