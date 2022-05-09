@@ -43,7 +43,7 @@ class QuantumDeviceCharacteristicsInput:
     """
 
     type: Literal[DeviceType.QUANTUM, "quantum"]
-    description: str
+    description: str | None = None
 
 
 @dataclass
@@ -61,11 +61,11 @@ class SimulatorDeviceCharacteristicsInput:
     """
 
     type: Literal[DeviceType.SIMULATOR, "simulator"]
-    cpu: str
-    gpu: str
-    os: str  # pylint: disable=invalid-name
-    kernel: str
-    ram: str
+    cpu: str | None = None
+    gpu: str | None = None
+    os: str | None = None  # pylint: disable=invalid-name
+    kernel: str | None = None
+    ram: str | None = None
 
 
 @dataclass
@@ -89,14 +89,14 @@ class CalibrationDetailsInput:
     """Calibration Details Input
 
     Attributes:
-        elapsed_time (int): elapsed time
-        t1 (int): last calibrated t1 time
-        frequency (int): last calibrated frequency
+        elapsed_time (int | None): elapsed time
+        t1 (int | None): last calibrated t1 time
+        frequency (int | None): last calibrated frequency
     """
 
-    elapsed_time: Optional[int]
-    t1: Optional[int]  # pylint: disable=invalid-name
-    frequency: Optional[int]
+    elapsed_time: int | None = None
+    t1: int | None = None  # pylint: disable=invalid-name
+    frequency: int | None = None
 
 
 @dataclass
