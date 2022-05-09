@@ -1,6 +1,7 @@
 """ Qilimanjaro Client API to communicate with the Qilimanajaro Global Quantum Services """
 import json
 from abc import ABC
+from dataclasses import asdict
 from typing import Any, List, Optional, Union, cast
 
 from qibo.abstractions.states import AbstractState
@@ -202,7 +203,7 @@ class API(ABC):
 
         logger.debug("Sending qibo circuit for a remote execution...")
         response, status_code = self._connection.send_post_auth_remote_api_call(
-            path=self.CIRCUITS_CALL_PATH, data=job.job_request
+            path=self.CIRCUITS_CALL_PATH, data=asdict(job.job_request)
         )
         if status_code != 201:
             raise RemoteExecutionException(message="Circuit could not be executed.", status_code=status_code)
