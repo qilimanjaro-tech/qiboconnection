@@ -4,6 +4,7 @@ from abc import ABC
 from dataclasses import asdict
 from typing import Any, List, Optional, Union, cast
 
+from numpy import ndarray
 from qibo.abstractions.states import AbstractState
 from qibo.core.circuit import Circuit
 from requests import HTTPError
@@ -213,7 +214,7 @@ class API(ABC):
         return job.id
 
     @typechecked
-    def get_result(self, job_id: int) -> Union[AbstractState, None]:
+    def get_result(self, job_id: int) -> Union[AbstractState, ndarray, None]:
         """Get a Job result from a remote execution
 
         Args:
