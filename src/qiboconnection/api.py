@@ -91,14 +91,7 @@ class API(ABC):
             raise RemoteExecutionException(message="Devices could not be retrieved.", status_code=status_code)
 
         # !!! TODO: handle all items, not only the returned on first call
-        self._devices = Devices(
-            [
-                create_device(
-                    device_input=cast(QuantumDeviceInput | SimulatorDeviceInput | OfflineDeviceInput, device_input)
-                )
-                for device_input in response["items"]
-            ]
-        )
+        self._devices = Devices([create_device(device_input=device_input) for device_input in response["items"]])
         return self._devices
 
     @typechecked
@@ -110,9 +103,7 @@ class API(ABC):
         if status_code != 200:
             raise RemoteExecutionException(message="Devices could not be retrieved.", status_code=status_code)
 
-        new_device = create_device(
-            device_input=cast(Union[QuantumDeviceInput, SimulatorDeviceInput, OfflineDeviceInput], response)
-        )
+        new_device = create_device(device_input=response)
 
         if self._devices is None:
             self._devices = Devices([new_device])
