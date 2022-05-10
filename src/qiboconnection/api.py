@@ -21,6 +21,7 @@ from qiboconnection.job_result import JobResult
 from qiboconnection.live_plots import LivePlots
 from qiboconnection.typings.algorithm import ProgramDefinition
 from qiboconnection.typings.connection import ConnectionConfiguration
+from qiboconnection.typings.experiment import Experiment
 from qiboconnection.typings.job import JobResponse, JobStatus
 from qiboconnection.typings.live_plot import LivePlotType, PlottingResponse
 
@@ -187,17 +188,26 @@ class API(ABC):
         return job.result
 
     @typechecked
-    def execute(self, circuit: Circuit) -> int:
-        """Send a Qibo circuit to be executed on the remote service API
+    def execute(self, circuit: Circuit | None = None, experiment: Experiment | None = None, nshots: int = 10) -> int:
+        """Send a Qibo circuit to be executed on the remote service API. User should define either a *circuit* or an
+        *experiment*. If both are provided, the function will fail.
 
         Args:
-            circuit (Circuit): a Qibo circuit
+            circuit (Circuit): a Qibo circuit to execute
+            experiment (Experiment): an Experiment description
+            nshots (int): number of times the execution is to be done.
 
         Returns:
             int: Job id
+        Raises:
+            ValueError: Both circuit and experiment were provided, but execute() only takes at most of them.
+            ValueError: Neither of experiment or circuit were provided, but execute() only takes at least one of them.
         """
+
         job = Job(
             circuit=circuit,
+            experiment=experiment,
+            nshots=nshots,
             user=self._connection.user,
             device=cast(Device, self._selected_device),
         )

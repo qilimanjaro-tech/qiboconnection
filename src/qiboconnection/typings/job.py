@@ -4,6 +4,19 @@ from abc import ABC
 from dataclasses import dataclass
 
 
+class JobType(enum.Enum):
+    """Job Type
+
+    Args:
+        enum (str): Accepted values are:
+            * "circuit"
+            * "experiment"
+    """
+
+    CIRCUIT = "circuit"
+    EXPERIMENT = "experiment"
+
+
 class JobStatus(enum.Enum):
     """Job Status
 
@@ -30,11 +43,14 @@ class JobRequest(ABC):
     Attributes:
         user_id (int): User identifier
         device_id (int): Device identifier
+        number_shots (int): number of times the job is to be executed
         description (str): Description of the job
+
     """
 
     user_id: int
     device_id: int
+    number_shots: int
     description: str
 
 
@@ -51,5 +67,5 @@ class JobResponse(JobRequest):
 
     job_id: int
     queue_position: int
-    status: str | JobStatus
     result: str
+    status: str | JobStatus

@@ -113,11 +113,7 @@ class OnlineDeviceInput(DeviceInput):
 
 @dataclass
 class SimulatorDeviceInput(OnlineDeviceInput):
-    """Simulator Device Input
-
-    Args:
-        OnlineDeviceInput (OnlineDeviceInput): Inherits from OnlineDeviceInput
-    """
+    """Simulator Device Input"""
 
     characteristics: InitVar[dict | None] = None
 
@@ -132,11 +128,7 @@ class SimulatorDeviceInput(OnlineDeviceInput):
 
 @dataclass
 class QuantumDeviceInput(OnlineDeviceInput):
-    """Quantum Device Input
-
-    Args:
-        OnlineDeviceInput (OnlineDeviceInput): Inherits from OnlineDeviceInput
-    """
+    """Quantum Device Input"""
 
     last_calibration_time: str | None = ""
     characteristics: InitVar[dict | None] = None
