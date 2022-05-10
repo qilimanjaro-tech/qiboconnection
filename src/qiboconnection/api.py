@@ -148,7 +148,8 @@ class API(ABC):
                 logger.error(json.loads(str(ex))["detail"])
         linebreak = "\n"
         logger.info(
-            f"Selected devices{linebreak}:{linebreak.join([f' -{device.name}' for device in self._selected_devices])}"
+            f"Selected devices:{f'{linebreak} -'}"
+            f"{linebreak.join([f' -{device.name}' for device in self._selected_devices])}"
         )
 
     @typechecked
