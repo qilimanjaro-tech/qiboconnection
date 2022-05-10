@@ -36,23 +36,7 @@ class JobStatus(enum.Enum):
     ERROR = "error"
 
 
-@dataclass
-class JobRESTBase(ABC):
-    """
-    BaseClass for building JobRequest and JobResponse
-    Attributes:
-        user_id (int): User identifier
-        device_id (int): Device identifier
-        description (str): Description of the job
-    """
-
-    user_id: int
-    device_id: int
-    description: str
-
-
-@dataclass
-class JobRequest(JobRESTBase):
+class JobRequest(ABC):
     """Job Request
 
     Attributes:
@@ -62,11 +46,14 @@ class JobRequest(JobRESTBase):
         number_shots (int): number of times the job is to be executed
     """
 
+    user_id: int
+    device_id: int
+    description: str
     number_shots: int
 
 
 @dataclass
-class JobResponse(JobRESTBase):
+class JobResponse(JobRequest):
     """Job Response
 
     Attributes:
