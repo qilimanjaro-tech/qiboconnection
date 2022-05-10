@@ -129,7 +129,6 @@ class API(ABC):
         except HTTPError as ex:
             logger.error(json.loads(str(ex))["detail"])
 
-    @typechecked
     def select_device_ids(self, device_ids: List[int]) -> None:
         """Select a device from a given identifier
 
@@ -147,7 +146,9 @@ class API(ABC):
             except HTTPError as ex:
                 logger.error(json.loads(str(ex))["detail"])
         linebreak = "\n"
-        logger.info(f"Selected devices:{linebreak.join([f' -{device.name}' for device in self._selected_devices])}")
+        logger.info(
+            f"Selected devices{linebreak}:{linebreak.join([f' -{device.name}' for device in self._selected_devices])}"
+        )
 
     @typechecked
     def block_device_id(self, device_id: int) -> None:
