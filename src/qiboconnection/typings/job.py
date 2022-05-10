@@ -36,6 +36,7 @@ class JobStatus(enum.Enum):
     ERROR = "error"
 
 
+@dataclass
 class JobRequest(ABC):
     """Job Request
 
