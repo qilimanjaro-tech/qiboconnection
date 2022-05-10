@@ -76,6 +76,7 @@ class JobResponse(JobRESTBase):
         job_id (int): Job identifier
         queue_position (int): Job queue position
         status (str | JobStatus): Status of the job
+        job_type (str | JobType): Status of the job
         result (str): Job result
     """
 
@@ -83,3 +84,4 @@ class JobResponse(JobRESTBase):
     queue_position: int
     result: str
     status: str | JobStatus
+    job_type: str | JobType
