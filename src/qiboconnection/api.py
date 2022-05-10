@@ -210,7 +210,6 @@ class API(ABC):
     #
     #     return job.result
 
-    @typechecked
     def execute(
         self,
         circuit: Circuit | None = None,
