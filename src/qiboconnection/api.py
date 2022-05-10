@@ -129,6 +129,7 @@ class API(ABC):
         except HTTPError as ex:
             logger.error(json.loads(str(ex))["detail"])
 
+    @typechecked
     def select_device_ids(self, device_ids: List[int]) -> None:
         """Select a device from a given identifier
 
@@ -210,12 +211,13 @@ class API(ABC):
     #
     #     return job.result
 
+    @typechecked
     def execute(
         self,
         circuit: Circuit | None = None,
         experiment: Experiment | None = None,
         nshots: int = 10,
-        device_ids=List[int] | None,
+        device_ids: List[int] | None = None,
     ) -> List[int]:
         """Send a Qibo circuit to be executed on the remote service API. User should define either a *circuit* or an
         *experiment*. If both are provided, the function will fail.
