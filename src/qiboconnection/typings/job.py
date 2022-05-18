@@ -47,8 +47,6 @@ class JobRequest(ABC):
         number_shots (int): number of times the job is to be executed
     """
 
-    user_id: int
-    device_id: int
     description: str
     number_shots: int
 
@@ -68,6 +66,8 @@ class JobResponse(JobRequest):
         result (str): Job result
     """
 
+    user_id: int
+    device_id: int
     job_id: int
     queue_position: int
     result: str

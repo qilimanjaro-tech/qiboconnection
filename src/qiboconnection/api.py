@@ -19,6 +19,7 @@ from qiboconnection.devices.quantum_device import QuantumDevice
 from qiboconnection.devices.simulator_device import SimulatorDevice
 from qiboconnection.devices.util import create_device
 from qiboconnection.errors import ConnectionException, RemoteExecutionException
+from qiboconnection.execution import Execution
 from qiboconnection.job import Job
 from qiboconnection.job_result import JobResult
 from qiboconnection.live_plots import LivePlots
@@ -44,6 +45,7 @@ class API(ABC):
     def __init__(self, configuration: Optional[ConnectionConfiguration | None] = None):
         self._connection = Connection(configuration=configuration, api_path=self.API_PATH)
         self._devices: Devices | None = None
+        self._executions: List[Execution] = []
         self._jobs: List[Job] = []
         self._selected_devices: List[Device] | None = None
         self._live_plots: LivePlots = LivePlots()
@@ -63,6 +65,24 @@ class API(ABC):
 
         Returns:
             Job: last Job launched
+        """
+        return self._jobs[-1]
+
+    @property
+    def executions(self) -> List[Job]:
+        """List all executions launched to the API
+
+        Returns:
+            List[Job]: List of Executions launched
+        """
+        return self._jobs
+
+    @property
+    def last_execution(self) -> Job:
+        """Returns the last execution launched
+
+        Returns:
+            Job: last Execution launched
         """
         return self._jobs[-1]
 
@@ -148,8 +168,7 @@ class API(ABC):
                 logger.error(json.loads(str(ex))["detail"])
         linebreak = "\n"
         logger.info(
-            f"Selected devices:{f'{linebreak} -'}"
-            f"{linebreak.join([f' -{device.name}' for device in self._selected_devices])}"
+            f"Selected devices:{linebreak} -{linebreak.join([f' -{device.name}' for device in self._selected_devices])}"
         )
 
     @typechecked
@@ -215,20 +234,20 @@ class API(ABC):
     @typechecked
     def execute(
         self,
-        circuit: Circuit | None = None,
-        experiment: Experiment | None = None,
+        circuits: List[Circuit] | Circuit | None = None,
+        experiments: List[Experiment] | Experiment | None = None,
         nshots: int = 10,
         device_ids: List[int] | None = None,
     ) -> List[int]:
-        """Send a Qibo circuit to be executed on the remote service API. User should define either a *circuit* or an
-        *experiment*. If both are provided, the function will fail.
+        """Send a Qibo circuit to be executed on the remote service API. User should define either a **circuit** or an
+        **experiment**. If both are provided, the function will fail.
 
         Args:
-            circuit (Circuit): a Qibo circuit to execute
-            experiment (Experiment): an Experiment description
+            circuits (Circuit): a Qibo circuit to execute
+            experiments (Experiment): an Experiment description
             nshots (int): number of times the execution is to be done.
             device_ids (List[int]): list of devices where the execution should be performed. If set, any device set
-             using API.select_device_id() will not be used. This will not update the selecte
+             using API.select_device_id() will not be used. This will not update the selected.
 
         Returns:
             List[int]: list of job ids
@@ -251,32 +270,33 @@ class API(ABC):
                 List[Device | QuantumDevice | SimulatorDevice | OfflineDevice], self._selected_devices
             )
 
-        jobs = [
-            Job(
-                circuit=circuit,
-                experiment=experiment,
-                nshots=nshots,
+        jobs = _check_input_and_generate_execution_joblist(nshots=nshots, circuits=circuits, experiments=experiments)
+        executions = [
+            Execution(
                 user=self._connection.user,
                 device=cast(Device, device),
+                jobs=jobs,
             )
             for device in selected_devices
         ]
 
-        job_ids = []
-        logger.debug("Sending qibo circuits for a remote execution...")
-        for job in jobs:
+        execution_ids = []
+        logger.debug("Sending qibo executions to selected_devices...")
+        for execution in executions:
             response, status_code = self._connection.send_post_auth_remote_api_call(
-                path=self.CIRCUITS_CALL_PATH, data=asdict(job.job_request)
+                path=self.CIRCUITS_CALL_PATH, data=asdict(execution.execution_request)
             )
             if status_code != 201:
                 raise RemoteExecutionException(
-                    message=f"Circuit {job.job_id} could not be executed.", status_code=status_code
+                    message=f"Execution {execution.execution_id} could not be queued.", status_code=status_code
                 )
-            logger.debug("Job circuit queued successfully.")
-            job.id = response["job_id"]
-            self._jobs.append(job)
-            job_ids.append(job.id)
-        return job_ids
+            logger.debug("Execution queued successfully.")
+            execution.id = response["execution_id"]
+            for local_job, response_job in zip(execution.jobs, response["jobs"]):
+                local_job.id = response_job["job_id"]
+            self._executions.append(execution)
+            execution_ids.append(execution.id)
+        return execution_ids
 
     @typechecked
     def get_results(self, job_ids: List[int]) -> List[AbstractState | ndarray | None]:
@@ -374,3 +394,33 @@ class API(ABC):
             None
         """
         return self._live_plots.send_data(plot_id=plot_id, x=x, y=y, z=z)
+
+
+@typechecked
+def _check_input_and_generate_execution_joblist(
+    nshots: int,
+    circuits: List[Circuit] | Circuit | None,
+    experiments: List[Experiment] | Experiment | None,
+):
+    """Given the information needed for each job to be created, it takes that and create the list with job instances"""
+
+    # Ensure exactly one of them is provided
+    if {circuits, experiments} == {None}:
+        raise ValueError("At least one of *circuits*, *experiments* must be not None")
+    if {circuits, experiments}.isdisjoint({None}):
+        raise ValueError("You cannot provide both *circuits* and *experiments*.")
+
+    # Pass them to a list if they are not
+    if isinstance(circuits, Circuit):
+        circuits = [circuits]
+    if isinstance(experiments, Experiment):
+        experiments = [experiments]
+
+    # Build a list of jobs from their information
+    jobs: List[Job] = []
+    if isinstance(circuits, list):
+        jobs.extend(Job(circuit=circuit, experiment=None, nshots=nshots) for circuit in circuits)
+    if isinstance(experiments, list):
+        jobs.extend(Job(circuit=None, experiment=experiment, nshots=nshots) for experiment in experiments)
+
+    return jobs

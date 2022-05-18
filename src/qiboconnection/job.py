@@ -23,8 +23,6 @@ from qiboconnection.util import base64url_encode
 class Job(ABC):
     """Job class to manage the job experiment to be remotely sent"""
 
-    user: User
-    device: Device
     program: ProgramDefinition | None = field(default=None)
     circuit: Circuit | None = None
     experiment: Experiment | None = None
@@ -38,24 +36,6 @@ class Job(ABC):
             raise ValueError("Both circuit and experiment were provided, but execute() only takes at most of them.")
         if {self.experiment, self.circuit} == {None}:
             raise ValueError("Neither of experiment or circuit were provided,")
-
-    @property
-    def user_id(self) -> int:
-        """User identifier
-
-        Returns:
-            int: User identifier
-        """
-        return self.user.user_id
-
-    @property
-    def device_id(self) -> int:
-        """Device identifier
-
-        Returns:
-            int: Device identifier
-        """
-        return self.device.id
 
     @property
     def algorithms(self) -> List[dict]:
@@ -76,8 +56,6 @@ class Job(ABC):
             JobRequest: Job Request object
         """
         return JobRequest(
-            user_id=self.user.user_id,
-            device_id=self.device.id,
             number_shots=self.nshots,
             description=self._get_job_description(),
         )
@@ -136,26 +114,26 @@ class Job(ABC):
             raise ValueError("Job result still not completed")
         return self.job_result.data
 
-    @typechecked
-    def update_with_job_response(self, job_response: JobResponse) -> None:
-        """Updates the current job with the given job response
-
-        Args:
-            job_response (JobResponse): Job response
-
-        Raises:
-            ValueError: Job response does not belong to the user.
-            ValueError: Job response does not belong to the device.
-        """
-        if self.user.user_id != job_response.user_id:
-            raise ValueError("Job response does not belong to the user.")
-        if self.device.id != job_response.device_id:
-            raise ValueError("Job response does not belong to the device.")
-        self.job_id = job_response.job_id
-        self.job_status = (
-            job_response.status if isinstance(job_response.status, JobStatus) else JobStatus(job_response.status)
-        )
-        self.job_result = JobResult(job_id=self.id, http_response=job_response.result)
+    # @typechecked
+    # def update_with_job_response(self, job_response: JobResponse) -> None:
+    #     """Updates the current job with the given job response
+    #
+    #     Args:
+    #         job_response (JobResponse): Job response
+    #
+    #     Raises:
+    #         ValueError: Job response does not belong to the user.
+    #         ValueError: Job response does not belong to the device.
+    #     """
+    #     if self.user.user_id != job_response.user_id:
+    #         raise ValueError("Job response does not belong to the user.")
+    #     if self.device.id != job_response.device_id:
+    #         raise ValueError("Job response does not belong to the device.")
+    #     self.job_id = job_response.job_id
+    #     self.job_status = (
+    #         job_response.status if isinstance(job_response.status, JobStatus) else JobStatus(job_response.status)
+    #     )
+    #     self.job_result = JobResult(job_id=self.id, http_response=job_response.result)
 
 
 def _jsonify_dict_and_base64_encode(object_to_encode: dict):
