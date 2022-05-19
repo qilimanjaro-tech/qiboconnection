@@ -1,7 +1,7 @@
 """ Live Plot Typing """
 import json
 from abc import ABC
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from enum import Enum
 from typing import Optional, TypedDict, cast
 
@@ -38,6 +38,16 @@ class PlottingResponse(ABC):
     def to_dict(self):
         """Casts the info of the class as a dict."""
         return {"websocket_url": self.websocket_url, "plot_id": self.plot_id}
+
+
+@dataclass
+class LivePlotLabels(ABC):
+    """Class for holding different labels for the plots: title, axis names, etc."""
+
+    title: str | None = None
+    x_label: str | None = None
+    y_label: str | None = None
+    z_label: str | None = None
 
 
 class LivePlotPoints(ABC):
@@ -103,24 +113,31 @@ class LivePlotPacket(ABC):
     plot_id: int
     plot_type: LivePlotType
     data: LivePlotPoints
+    labels: LivePlotLabels
 
     @classmethod
     def build_packet(
         cls,
         plot_id: int,
         plot_type: LivePlotType,
+        labels: LivePlotLabels,
         x: list[float] | float,
         y: list[float] | float,
         z: Optional[list[float] | float],
     ):
         """Convenience constructor"""
-        return cls(plot_id=plot_id, plot_type=plot_type, data=LivePlotPoints(x=x, y=y, z=z))
+        return cls(plot_id=plot_id, plot_type=plot_type, labels=labels, data=LivePlotPoints(x=x, y=y, z=z))
 
     def to_dict(self) -> dict:
         """
         Serializes the information of the class to a dict ready to be sent via ws.
         """
-        return {"plot_id": self.plot_id, "plot_type": self.plot_type.value, "data": self.data.to_scatter()}
+        return {
+            "plot_id": self.plot_id,
+            "plot_type": self.plot_type.value,
+            "labels": asdict(self.labels),
+            "data": self.data.to_scatter(),
+        }
 
     def to_json(self) -> str:
         """
