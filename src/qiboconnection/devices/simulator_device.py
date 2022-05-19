@@ -14,8 +14,8 @@ class SimulatorDevice(OnlineDevice):
     @typechecked
     def __init__(self, device_input: SimulatorDeviceInput):
         self._characteristics = (
-            SimulatorDeviceCharacteristics(device_input.characteristics)
-            if device_input.characteristics is not None
+            SimulatorDeviceCharacteristics(device_input.s_characteristics)
+            if device_input.s_characteristics is not None
             else None
         )
 

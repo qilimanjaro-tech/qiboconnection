@@ -118,11 +118,13 @@ def test_job_request(program_definition: ProgramDefinition, user: User, simulato
         device=cast(Device, simulator_device),
         job_status=job_status,
         id=23,
+        nshots=10,
     )
     expected_job_request = JobRequest(
         user_id=user.user_id,
         device_id=simulator_device.id,
         description="W3sibmFtZSI6ICJiZWxsLXN0YXRlIiwgInR5cGUiOiAiR2F0ZS1CYXNlZCBDaXJjdWl0IiwgIm9wdGlvbnMiOiB7Im51bWJlcl9xdWJpdHMiOiAyLCAiaW5pdGlhbF92YWx1ZSI6ICJ6ZXJvIn19XQ==",
+        number_shots=10,
     )
     assert isinstance(job, Job)
     assert job.job_request == expected_job_request

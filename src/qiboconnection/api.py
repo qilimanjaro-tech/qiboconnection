@@ -1,8 +1,10 @@
 """ Qilimanjaro Client API to communicate with the Qilimanajaro Global Quantum Services """
 import json
 from abc import ABC
+from dataclasses import asdict
 from typing import Any, List, Optional, Union, cast
 
+from numpy import ndarray
 from qibo.abstractions.states import AbstractState
 from qibo.core.circuit import Circuit
 from requests import HTTPError
@@ -12,18 +14,23 @@ from qiboconnection.config import logger
 from qiboconnection.connection import Connection
 from qiboconnection.devices.device import Device
 from qiboconnection.devices.devices import Devices
+from qiboconnection.devices.offline_device import OfflineDevice
+from qiboconnection.devices.quantum_device import QuantumDevice
+from qiboconnection.devices.simulator_device import SimulatorDevice
 from qiboconnection.devices.util import create_device
 from qiboconnection.errors import ConnectionException, RemoteExecutionException
 from qiboconnection.job import Job
 from qiboconnection.job_result import JobResult
+from qiboconnection.live_plots import LivePlots
 from qiboconnection.typings.algorithm import ProgramDefinition
 from qiboconnection.typings.connection import ConnectionConfiguration
-from qiboconnection.typings.device import (
-    OfflineDeviceInput,
-    QuantumDeviceInput,
-    SimulatorDeviceInput,
-)
+from qiboconnection.typings.experiment import Experiment
 from qiboconnection.typings.job import JobResponse, JobStatus
+from qiboconnection.typings.live_plot import (
+    LivePlotLabels,
+    LivePlotType,
+    PlottingResponse,
+)
 
 
 class API(ABC):
@@ -35,13 +42,15 @@ class API(ABC):
     CIRCUITS_CALL_PATH = "/circuits"
     DEVICES_CALL_PATH = "/devices"
     PING_CALL_PATH = "/status"
+    LIVE_PLOTTING_PATH = "/live-plotting"
 
     @typechecked
     def __init__(self, configuration: Optional[ConnectionConfiguration | None] = None):
         self._connection = Connection(configuration=configuration, api_path=self.API_PATH)
         self._devices: Devices | None = None
         self._jobs: List[Job] = []
-        self._selected_device: Device | None = None
+        self._selected_devices: List[Device] | None = None
+        self._live_plots: LivePlots = LivePlots()
 
     @property
     def jobs(self) -> List[Job]:
@@ -87,14 +96,7 @@ class API(ABC):
             raise RemoteExecutionException(message="Devices could not be retrieved.", status_code=status_code)
 
         # !!! TODO: handle all items, not only the returned on first call
-        self._devices = Devices(
-            [
-                create_device(
-                    device_input=cast(Union[QuantumDeviceInput, SimulatorDeviceInput, OfflineDeviceInput], device_input)
-                )
-                for device_input in response["items"]
-            ]
-        )
+        self._devices = Devices([create_device(device_input=device_input) for device_input in response["items"]])
         return self._devices
 
     @typechecked
@@ -106,9 +108,7 @@ class API(ABC):
         if status_code != 200:
             raise RemoteExecutionException(message="Devices could not be retrieved.", status_code=status_code)
 
-        new_device = create_device(
-            device_input=cast(Union[QuantumDeviceInput, SimulatorDeviceInput, OfflineDeviceInput], response)
-        )
+        new_device = create_device(device_input=response)
 
         if self._devices is None:
             self._devices = Devices([new_device])
@@ -127,12 +127,34 @@ class API(ABC):
         """
         self._add_or_update_single_device(device_id=device_id)
         try:
-            if self._devices is None:
-                raise ValueError("No devices collected. Please call 'list_devices' first.")
-            self._selected_device = self._devices.select_device(device_id=device_id)
-            logger.info("Device %s selected.", self._selected_device.name)
+            selected_device = self._devices.select_device(device_id=device_id)
+            self._selected_devices = [selected_device]
+            logger.info("Device %s selected.", selected_device.name)
         except HTTPError as ex:
             logger.error(json.loads(str(ex))["detail"])
+
+    @typechecked
+    def select_device_ids(self, device_ids: List[int]) -> None:
+        """Select a device from a given identifier
+
+        Args:
+            device_ids (int): List of device identifiers
+
+        Raises:
+            ValueError: No devices collected. Please call 'list_devices' first.
+        """
+        self._selected_devices = []
+        for device_id in device_ids:
+            self._add_or_update_single_device(device_id=device_id)
+            try:
+                self._selected_devices.append(self._devices.select_device(device_id=device_id))
+            except HTTPError as ex:
+                logger.error(json.loads(str(ex))["detail"])
+        linebreak = "\n"
+        logger.info(
+            f"Selected devices:{f'{linebreak} -'}"
+            f"{linebreak.join([f' -{device.name}' for device in self._selected_devices])}"
+        )
 
     @typechecked
     def block_device_id(self, device_id: int) -> None:
@@ -166,75 +188,131 @@ class API(ABC):
             raise ValueError("No devices collected. Please call 'list_devices' first.")
         self._devices.release_device(connection=self._connection, device_id=device_id)
 
+    # @typechecked
+    # def execute_program(self, program: ProgramDefinition) -> Any:
+    #     """Send a remote experiment from the provided algorithm to be executed on the remote service API
+    #
+    #     Args:
+    #         program (ProgramDefinition): program details conforming the experiment
+    #
+    #     Returns:
+    #         Any: Result of the algorithm executed remotely
+    #     """
+    #     job = Job(
+    #         program=program,
+    #         user=self._connection.user,
+    #         device=cast(Device, self._selected_device),
+    #     )
+    #
+    #     logger.debug("Sending experiment for a remote execution...")
+    #     response, status_code = self._connection.send_post_auth_remote_api_call(
+    #         path=self.JOBS_CALL_PATH, data=job.job_request
+    #     )
+    #     if status_code != 201:
+    #         raise RemoteExecutionException(message="Experiment could not be executed.", status_code=status_code)
+    #     logger.debug("Experiment completed successfully.")
+    #     job.update_with_job_response(job_response=JobResponse(**cast(dict, response)))
+    #     self._jobs.append(job)
+    #
+    #     return job.result
+
     @typechecked
-    def execute_program(self, program: ProgramDefinition) -> Any:
-        """Send a remote experiment from the provided algorithm to be executed on the remote service API
+    def execute(
+        self,
+        circuit: Circuit | None = None,
+        experiment: Experiment | None = None,
+        nshots: int = 10,
+        device_ids: List[int] | None = None,
+    ) -> List[int]:
+        """Send a Qibo circuit to be executed on the remote service API. User should define either a *circuit* or an
+        *experiment*. If both are provided, the function will fail.
 
         Args:
-            program (ProgramDefinition): program details conforming the experiment
+            circuit (Circuit): a Qibo circuit to execute
+            experiment (Experiment): an Experiment description
+            nshots (int): number of times the execution is to be done.
+            device_ids (List[int]): list of devices where the execution should be performed. If set, any device set
+             using API.select_device_id() will not be used. This will not update the selecte
 
         Returns:
-            Any: Result of the algorithm executed remotely
+            List[int]: list of job ids
+        Raises:
+            ValueError: Both circuit and experiment were provided, but execute() only takes at most of them.
+            ValueError: Neither of experiment or circuit were provided, but execute() only takes at least one of them.
         """
-        job = Job(
-            program=program,
-            user=self._connection.user,
-            device=cast(Device, self._selected_device),
-        )
 
-        logger.debug("Sending experiment for a remote execution...")
-        response, status_code = self._connection.send_post_auth_remote_api_call(
-            path=self.JOBS_CALL_PATH, data=job.job_request
-        )
-        if status_code != 201:
-            raise RemoteExecutionException(message="Experiment could not be executed.", status_code=status_code)
-        logger.debug("Experiment completed successfully.")
-        job.update_with_job_response(job_response=JobResponse(**cast(dict, response)))
-        self._jobs.append(job)
+        # Ensure provided selected_devices are valid. If not provided, use the ones selected by API.select_device_id.
+        selected_devices: List[Device | QuantumDevice | SimulatorDevice | OfflineDevice] = []
+        if device_ids is not None:
+            for device_id in device_ids:
+                try:
+                    self._add_or_update_single_device(device_id=device_id)
+                    selected_devices.append(self._devices.select_device(device_id=device_id))
+                except HTTPError as ex:
+                    logger.error(json.loads(str(ex))["detail"])
+        else:
+            selected_devices = cast(
+                List[Device | QuantumDevice | SimulatorDevice | OfflineDevice], self._selected_devices
+            )
 
-        return job.result
+        jobs = [
+            Job(
+                circuit=circuit,
+                experiment=experiment,
+                nshots=nshots,
+                user=self._connection.user,
+                device=cast(Device, device),
+            )
+            for device in selected_devices
+        ]
+
+        job_ids = []
+        logger.debug("Sending qibo circuits for a remote execution...")
+        for job in jobs:
+            response, status_code = self._connection.send_post_auth_remote_api_call(
+                path=self.CIRCUITS_CALL_PATH, data=asdict(job.job_request)
+            )
+            if status_code != 201:
+                raise RemoteExecutionException(
+                    message=f"Circuit {job.job_id} could not be executed.", status_code=status_code
+                )
+            logger.debug("Job circuit queued successfully.")
+            job.id = response["job_id"]
+            self._jobs.append(job)
+            job_ids.append(job.id)
+        return job_ids
 
     @typechecked
-    def execute(self, circuit: Circuit) -> int:
-        """Send a Qibo circuit to be executed on the remote service API
+    def get_results(self, job_ids: List[int]) -> List[AbstractState | ndarray | None]:
+        """Get a Job result from a remote execution
 
         Args:
-            circuit (Circuit): a Qibo circuit
+            job_ids (List[int]): List of Job identifiers
+
+        Raises:
+            RemoteExecutionException: Job could not be retrieved.
+            ValueError: Job status not supported
 
         Returns:
-            int: Job id
+            Union[AbstractState, None]: The Job result as an Abstract State or None when it is not executed yet.
         """
-        job = Job(
-            circuit=circuit,
-            user=self._connection.user,
-            device=cast(Device, self._selected_device),
-        )
-
-        logger.debug("Sending qibo circuit for a remote execution...")
-        response, status_code = self._connection.send_post_auth_remote_api_call(
-            path=self.CIRCUITS_CALL_PATH, data=job.job_request
-        )
-        if status_code != 201:
-            raise RemoteExecutionException(message="Circuit could not be executed.", status_code=status_code)
-        logger.debug("Job circuit queued successfully.")
-        job.id = response["job_id"]
-        self._jobs.append(job)
-        return job.id
+        return [self.get_result(job_id) for job_id in job_ids]
 
     @typechecked
-    def get_result(self, job_id: int) -> Union[AbstractState, None]:
+    def get_result(self, job_id: int) -> AbstractState | ndarray | None:
         """Get a Job result from a remote execution
 
         Args:
             job_id (int): Job identifier
 
         Raises:
-            RemoteExecutionException: Job could not be retrieved."
+            RemoteExecutionException: Job could not be retrieved.
             ValueError: Job status not supported
 
         Returns:
             Union[AbstractState, None]: The Job result as an Abstract State or None when it is not executed yet.
         """
+
         response, status_code = self._connection.send_get_auth_remote_api_call(path=f"{self.JOBS_CALL_PATH}/{job_id}")
         if status_code != 200:
             raise RemoteExecutionException(message="Job could not be retrieved.", status_code=status_code)
@@ -242,19 +320,69 @@ class API(ABC):
         job_response = JobResponse(**cast(dict, response))
         status = job_response.status if isinstance(job_response.status, JobStatus) else JobStatus(job_response.status)
         if status == JobStatus.PENDING:
-            logger.info("Your job is still pending. Job queue position: %s", job_response.queue_position)
+            logger.warning("Your job is still pending. Job queue position: %s", job_response.queue_position)
             return None
         if status == JobStatus.RUNNING:
-            logger.info("Your job is still running.")
+            logger.warning("Your job is still running.")
             return None
         if status == JobStatus.NOT_SENT:
-            logger.info("Your job has not been sent.")
+            logger.warning("Your job has not been sent.")
             return None
         if status == JobStatus.ERROR:
-            logger.info("Your job failed.")
+            logger.error("Your job failed.")
             return None
         if status == JobStatus.COMPLETED:
-            logger.info("Your job is completed.")
-            result = JobResult(job_id=job_id, http_response=job_response.result).data
-            return result[0] if isinstance(result, List) else result
+            logger.warning("Your job is completed.")
+            raw_result = JobResult(job_id=job_id, http_response=job_response.result).data
+            return raw_result[0] if isinstance(raw_result, List) else raw_result
         raise ValueError(f"Job status not supported: {status}")
+
+    @typechecked
+    def create_liveplot(
+        self,
+        plot_type: str = LivePlotType.LINES.value,
+        title: str | None = None,
+        x_label: str | None = None,
+        y_label: str | None = None,
+        z_label: str | None = None,
+    ):
+        """Creates a LivePlot of *plot_type* type at which we will be able to send points to plot
+
+        Raises:
+            RemoteExecutionException: Live-plotting connection data could not be retrieved
+
+        Returns:
+            int: id of the just created plot
+        """
+        # Get info from PublicAPI
+        response, status_code = self._connection.send_post_auth_remote_api_call(
+            path=f"{self.LIVE_PLOTTING_PATH}", data={}
+        )
+        if status_code != 200:
+            raise RemoteExecutionException(
+                message="Live-plotting connection data could not be retrieved.", status_code=status_code
+            )
+        plotting_response = PlottingResponse.from_response(**response)
+        self._live_plots.create_live_plot(
+            plot_id=plotting_response.plot_id,
+            websocket_url=plotting_response.websocket_url,
+            plot_type=LivePlotType(plot_type),
+            labels=LivePlotLabels(title=title, x_label=x_label, y_label=y_label, z_label=z_label),
+        )
+        return plotting_response.plot_id
+
+    @typechecked
+    def send_plot_points(
+        self, plot_id: int, x: list[float] | float, y: list[float] | float, z: Optional[list[float] | float] = None
+    ):
+        """Sends point(s) to a specific plot.
+        Args:
+            plot_id: Id of the plot to send points to
+            x: x coord of the point to send info to
+            y: y coord of the point to send info to
+            z: z coord of the point to send info to
+
+        Returns:
+            None
+        """
+        return self._live_plots.send_data(plot_id=plot_id, x=x, y=y, z=z)

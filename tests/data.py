@@ -30,6 +30,13 @@ simulator_device_inputs = [
         device_name="radagast-simulator",
         status="available",
         channel_id=None,
-        characteristics=simulator_device_characteristics_inputs[0],
+        characteristics={
+            "type": "simulator",
+            "cpu": "Intel Core i9-9900K @ 16x 5GHz",
+            "gpu": "NVIDIA GeForce RTX 3090",
+            "os": "Ubuntu 20.04 focal",
+            "kernel": "x86_64 Linux 5.4.0-80-generic",
+            "ram": "64185MiB",
+        },
     )
 ]
