@@ -417,9 +417,9 @@ def _check_input_and_generate_execution_joblist(
     """Given the information needed for each job to be created, it takes that and create the list with job instances"""
 
     # Ensure exactly one of them is provided
-    if {circuits, experiments} == {None}:
+    if all(execution is None for execution in (circuits, experiments)):
         raise ValueError("At least one of *circuits*, *experiments* must be not None")
-    if {circuits, experiments}.isdisjoint({None}):
+    if all(execution is not None for execution in (circuits, experiments)):
         raise ValueError("You cannot provide both *circuits* and *experiments*.")
 
     # Pass them to a list if they are not
