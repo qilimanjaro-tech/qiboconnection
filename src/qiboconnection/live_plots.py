@@ -5,7 +5,11 @@ from functools import partial
 from typing import Callable, Optional
 
 from qiboconnection.live_plot import LivePlot
-from qiboconnection.typings.live_plot import LivePlotPacket, LivePlotType
+from qiboconnection.typings.live_plot import (
+    LivePlotLabels,
+    LivePlotPacket,
+    LivePlotType,
+)
 
 
 @dataclass
@@ -14,9 +18,11 @@ class LivePlots(ABC):
 
     _live_plots: dict = field(default_factory=dict)
 
-    def create_live_plot(self, plot_id: int, plot_type: LivePlotType, websocket_url: str):
+    def create_live_plot(self, plot_id: int, plot_type: LivePlotType, websocket_url: str, labels: LivePlotLabels):
         """Creates a new LivePlot with the provided information and appends it to the internal _live_plots dict"""
-        self._live_plots[plot_id] = LivePlot(plot_id=plot_id, plot_type=plot_type, websocket_url=websocket_url)
+        self._live_plots[plot_id] = LivePlot(
+            plot_id=plot_id, plot_type=plot_type, websocket_url=websocket_url, labels=labels
+        )
 
     def _get_live_plot(self, plot_id: int) -> LivePlot:
         """
@@ -72,7 +78,7 @@ class LivePlots(ABC):
         """
         live_plot = self._get_live_plot(plot_id=plot_id)
         data_packet = LivePlotPacket.build_packet(
-            plot_id=live_plot.plot_id, plot_type=live_plot.plot_type, x=x, y=y, z=z
+            plot_id=live_plot.plot_id, plot_type=live_plot.plot_type, x=x, y=y, z=z, labels=live_plot.labels
         )
         self._send_data(live_plot=live_plot, data_packet=data_packet)
 

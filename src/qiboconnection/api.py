@@ -27,7 +27,11 @@ from qiboconnection.typings.algorithm import ProgramDefinition
 from qiboconnection.typings.connection import ConnectionConfiguration
 from qiboconnection.typings.experiment import Experiment
 from qiboconnection.typings.job import JobResponse, JobStatus
-from qiboconnection.typings.live_plot import LivePlotType, PlottingResponse
+from qiboconnection.typings.live_plot import (
+    LivePlotLabels,
+    LivePlotType,
+    PlottingResponse,
+)
 
 
 class API(ABC):
@@ -336,25 +340,32 @@ class API(ABC):
         job_response = JobResponse(**cast(dict, response))
         status = job_response.status if isinstance(job_response.status, JobStatus) else JobStatus(job_response.status)
         if status == JobStatus.PENDING:
-            logger.info("Your job is still pending. Job queue position: %s", job_response.queue_position)
+            logger.warning("Your job is still pending. Job queue position: %s", job_response.queue_position)
             return None
         if status == JobStatus.RUNNING:
-            logger.info("Your job is still running.")
+            logger.warning("Your job is still running.")
             return None
         if status == JobStatus.NOT_SENT:
-            logger.info("Your job has not been sent.")
+            logger.warning("Your job has not been sent.")
             return None
         if status == JobStatus.ERROR:
-            logger.info("Your job failed.")
+            logger.error("Your job failed.")
             return None
         if status == JobStatus.COMPLETED:
-            logger.info("Your job is completed.")
+            logger.warning("Your job is completed.")
             raw_result = JobResult(job_id=job_id, http_response=job_response.result).data
             return raw_result[0] if isinstance(raw_result, List) else raw_result
         raise ValueError(f"Job status not supported: {status}")
 
     @typechecked
-    def create_liveplot(self, plot_type: str = LivePlotType.LINES.value):
+    def create_liveplot(
+        self,
+        plot_type: str = LivePlotType.LINES.value,
+        title: str | None = None,
+        x_label: str | None = None,
+        y_label: str | None = None,
+        z_label: str | None = None,
+    ):
         """Creates a LivePlot of *plot_type* type at which we will be able to send points to plot
 
         Raises:
@@ -376,6 +387,7 @@ class API(ABC):
             plot_id=plotting_response.plot_id,
             websocket_url=plotting_response.websocket_url,
             plot_type=LivePlotType(plot_type),
+            labels=LivePlotLabels(title=title, x_label=x_label, y_label=y_label, z_label=z_label),
         )
         return plotting_response.plot_id
 

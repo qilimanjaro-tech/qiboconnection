@@ -1,20 +1,26 @@
 """ LivePlot class """
 from abc import ABC
+from dataclasses import asdict
 from ssl import SSLError
 from typing import Optional
 
 from websocket import WebSocket, WebSocketException, create_connection
 
-from qiboconnection.typings.live_plot import LivePlotPacket, LivePlotType
+from qiboconnection.typings.live_plot import (
+    LivePlotLabels,
+    LivePlotPacket,
+    LivePlotType,
+)
 
 
 class LivePlot(ABC):
     """Job class to manage the job experiment to be remotely sent"""
 
-    def __init__(self, plot_id: int, plot_type: LivePlotType, websocket_url: str):
+    def __init__(self, plot_id: int, plot_type: LivePlotType, websocket_url: str, labels: LivePlotLabels):
         """Default constructor. _connection is left as None until it is tried to use"""
         self._plot_id: int = plot_id
         self._plot_type: LivePlotType = plot_type
+        self._labels: LivePlotLabels = labels
         self._websocket_url: str = websocket_url
         self._connection: Optional[WebSocket] = None
 
@@ -27,6 +33,11 @@ class LivePlot(ABC):
     def plot_type(self) -> LivePlotType:
         """Gets the plot_type."""
         return self._plot_type
+
+    @property
+    def labels(self) -> LivePlotLabels:
+        """Gets the plot_type."""
+        return self._labels
 
     def send_data(self, data: LivePlotPacket):
         """Sends a LivePlotPacket over the websocket connection.
