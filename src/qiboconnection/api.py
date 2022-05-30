@@ -25,6 +25,7 @@ from qiboconnection.job_result import JobResult
 from qiboconnection.live_plots import LivePlots
 from qiboconnection.typings.algorithm import ProgramDefinition
 from qiboconnection.typings.connection import ConnectionConfiguration
+from qiboconnection.typings.execution import ExecutionResponse
 from qiboconnection.typings.experiment import Experiment
 from qiboconnection.typings.job import JobResponse, JobStatus
 from qiboconnection.typings.live_plot import (
@@ -40,6 +41,7 @@ class API(ABC):
     API_VERSION = "v1"
     API_PATH = f"/api/{API_VERSION}"
     JOBS_CALL_PATH = "/jobs"
+    EXECUTIONS_CALL_PATH = "/execution"
     CIRCUITS_CALL_PATH = "/circuits"
     DEVICES_CALL_PATH = "/devices"
     PING_CALL_PATH = "/status"
@@ -303,11 +305,11 @@ class API(ABC):
         return execution_ids
 
     @typechecked
-    def get_results(self, job_ids: List[int]) -> List[AbstractState | ndarray | None]:
+    def get_results(self, execution_ids: List[int]) -> List[AbstractState | ndarray | None]:
         """Get a Job result from a remote execution
 
         Args:
-            job_ids (List[int]): List of Job identifiers
+            execution_ids (List[int]): List of Execution identifiers
 
         Raises:
             RemoteExecutionException: Job could not be retrieved.
@@ -316,14 +318,14 @@ class API(ABC):
         Returns:
             Union[AbstractState, None]: The Job result as an Abstract State or None when it is not executed yet.
         """
-        return [self.get_result(job_id) for job_id in job_ids]
+        return [self.get_result(execution_id=execution_id) for execution_id in execution_ids]
 
     @typechecked
-    def get_result(self, job_id: int) -> AbstractState | ndarray | None:
+    def get_result(self, execution_id: int) -> AbstractState | ndarray | None:
         """Get a Job result from a remote execution
 
         Args:
-            job_id (int): Job identifier
+            execution_id (int): Execution identifier
 
         Raises:
             RemoteExecutionException: Job could not be retrieved.
@@ -333,29 +335,16 @@ class API(ABC):
             Union[AbstractState, None]: The Job result as an Abstract State or None when it is not executed yet.
         """
 
-        response, status_code = self._connection.send_get_auth_remote_api_call(path=f"{self.JOBS_CALL_PATH}/{job_id}")
+        response, status_code = self._connection.send_get_auth_remote_api_call(
+            path=f"{self.EXECUTIONS_CALL_PATH}/{execution_id}"
+        )
         if status_code != 200:
-            raise RemoteExecutionException(message="Job could not be retrieved.", status_code=status_code)
+            raise RemoteExecutionException(message="Execution could not be retrieved.", status_code=status_code)
 
-        job_response = JobResponse(**cast(dict, response))
-        status = job_response.status if isinstance(job_response.status, JobStatus) else JobStatus(job_response.status)
-        if status == JobStatus.PENDING:
-            logger.warning("Your job is still pending. Job queue position: %s", job_response.queue_position)
-            return None
-        if status == JobStatus.RUNNING:
-            logger.warning("Your job is still running.")
-            return None
-        if status == JobStatus.NOT_SENT:
-            logger.warning("Your job has not been sent.")
-            return None
-        if status == JobStatus.ERROR:
-            logger.error("Your job failed.")
-            return None
-        if status == JobStatus.COMPLETED:
-            logger.warning("Your job is completed.")
-            raw_result = JobResult(job_id=job_id, http_response=job_response.result).data
-            return raw_result[0] if isinstance(raw_result, List) else raw_result
-        raise ValueError(f"Job status not supported: {status}")
+        execution_response = ExecutionResponse(**cast(dict, response))
+        execution_response.log_status()
+
+        return execution_response.results
 
     @typechecked
     def create_liveplot(

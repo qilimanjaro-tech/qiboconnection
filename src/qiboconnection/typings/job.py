@@ -4,7 +4,7 @@ from abc import ABC
 from dataclasses import dataclass
 
 
-class JobType(enum.Enum):
+class JobType(str, enum.Enum):
     """Job Type
 
     Args:
@@ -17,7 +17,7 @@ class JobType(enum.Enum):
     EXPERIMENT = "experiment"
 
 
-class JobStatus(enum.Enum):
+class JobStatus(str, enum.Enum):
     """Job Status
 
     Args:
