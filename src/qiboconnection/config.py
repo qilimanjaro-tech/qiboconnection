@@ -56,8 +56,9 @@ class Environment:
         if environment_type not in [
             EnvironmentType.LOCAL,
             EnvironmentType.STAGING,
+            EnvironmentType.DEVELOPMENT,
         ]:
-            raise ValueError("Environment Type MUST be 'local', 'staging' or 'production'")
+            raise ValueError("Environment Type MUST be 'local', 'staging' or 'development'")
         if environment_type == EnvironmentType.LOCAL:
             self._environment_type = EnvironmentType.LOCAL
             self.quantum_service_url = QUANTUM_SERVICE_URL["local"]
