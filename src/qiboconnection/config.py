@@ -30,7 +30,8 @@ logger.addHandler(CustomHandler())
 QUANTUM_SERVICE_URL = {
     "local": "http://localhost:8080",
     "docker_local": "http://nginx:8080",
-    "staging": "https://qilimanjaro.ddns.net:8080",
+    "staging": "https://qilimanjaroqaas.ddns.net:8080",
+    "development": "https://qilimanjarodev.ddns.net:8080",
 }
 
 
@@ -45,6 +46,7 @@ class EnvironmentType(enum.Enum):
 
     LOCAL = "local"
     STAGING = "staging"
+    DEVELOPMENT = "development"
 
 
 class Environment:
@@ -64,6 +66,10 @@ class Environment:
             self._environment_type = EnvironmentType.STAGING
             self.quantum_service_url = QUANTUM_SERVICE_URL["staging"]
             self._audience_url = QUANTUM_SERVICE_URL["staging"]
+        if environment_type == EnvironmentType.DEVELOPMENT:
+            self._environment_type = EnvironmentType.DEVELOPMENT
+            self.quantum_service_url = QUANTUM_SERVICE_URL["development"]
+            self._audience_url = QUANTUM_SERVICE_URL["development"]
 
     @property
     def qibo_quantum_service_url(self) -> str:
@@ -86,7 +92,7 @@ class Environment:
     @property
     def environment_type(
         self,
-    ) -> Union[Literal[EnvironmentType.LOCAL], Literal[EnvironmentType.STAGING]]:
+    ) -> Union[Literal[EnvironmentType.LOCAL], Literal[EnvironmentType.STAGING], Literal[EnvironmentType.DEVELOPMENT]]:
         """Returns the environment_type
 
         Returns:
