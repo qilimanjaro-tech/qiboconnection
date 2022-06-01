@@ -339,7 +339,12 @@ class Connection(ABC):
         return access_token_response.accessToken
 
     @typechecked
-    def select_environment(self, environment_input: EnvironmentType):
+    def select_environment(
+        self,
+        environment_input: Union[
+            Literal[EnvironmentType.DEVELOPMENT], Literal[EnvironmentType.LOCAL], Literal[EnvironmentType.STAGING]
+        ],
+    ):
         """
         Change the defined environment **during execution** to another one, updating all uses of the
         environment-depending variables related to which public api we are pointing to, without the need to reload the
