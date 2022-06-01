@@ -2,7 +2,7 @@
 import json
 from abc import ABC
 from dataclasses import asdict
-from typing import Any, List, Optional, Union, cast
+from typing import List, Literal, Optional, Union, cast
 
 from numpy import ndarray
 from qibo.abstractions.states import AbstractState
@@ -10,7 +10,7 @@ from qibo.core.circuit import Circuit
 from requests import HTTPError
 from typeguard import typechecked
 
-from qiboconnection.config import logger
+from qiboconnection.config import EnvironmentType, logger
 from qiboconnection.connection import Connection
 from qiboconnection.devices.device import Device
 from qiboconnection.devices.devices import Devices
@@ -22,7 +22,6 @@ from qiboconnection.errors import ConnectionException, RemoteExecutionException
 from qiboconnection.job import Job
 from qiboconnection.job_result import JobResult
 from qiboconnection.live_plots import LivePlots
-from qiboconnection.typings.algorithm import ProgramDefinition
 from qiboconnection.typings.connection import ConnectionConfiguration
 from qiboconnection.typings.experiment import Experiment
 from qiboconnection.typings.job import JobResponse, JobStatus
@@ -51,6 +50,20 @@ class API(ABC):
         self._jobs: List[Job] = []
         self._selected_devices: List[Device] | None = None
         self._live_plots: LivePlots = LivePlots()
+
+    @typechecked
+    def select_environment(
+        self,
+        environment_input: Union[
+            Literal[EnvironmentType.LOCAL], Literal[EnvironmentType.STAGING], Literal[EnvironmentType.DEVELOPMENT]
+        ],
+    ):
+        """
+        Change the defined environment to another one. By default, it is 'staging'.
+        Args:
+            environment_input: str representing the environment to change to.
+        """
+        self._connection.select_environment(environment_input=environment_input)
 
     @property
     def jobs(self) -> List[Job]:

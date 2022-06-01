@@ -4,12 +4,18 @@ from abc import ABC
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from io import TextIOWrapper
-from typing import Any, Optional, TextIO, Tuple, Union
+from typing import Any, Literal, Optional, TextIO, Tuple, Union
 
 import requests
 from typeguard import typechecked
 
-from qiboconnection.config import AUDIENCE_URL, QQS_URL, logger
+from qiboconnection.config import (
+    AUDIENCE_URL,
+    QQS_URL,
+    Environment,
+    EnvironmentType,
+    logger,
+)
 from qiboconnection.errors import ConnectionException
 from qiboconnection.typings.auth_config import AccessTokenResponse, AssertionPayload
 from qiboconnection.typings.connection import (
@@ -331,3 +337,23 @@ class Connection(ABC):
         access_token_response: AccessTokenResponse = AccessTokenResponse(**response.json())
         logger.debug("Connection successfully established.")
         return access_token_response.accessToken
+
+    @typechecked
+    def select_environment(
+        self,
+        environment_input: Union[
+            Literal[EnvironmentType.LOCAL], Literal[EnvironmentType.STAGING], Literal[EnvironmentType.DEVELOPMENT]
+        ],
+    ):
+        """
+        Change the defined environment **during execution** to another one, updating all uses of the
+        environment-depending variables related to which public api we are pointing to, without the need to reload the
+        config submodule.
+        The default environment is 'staging'.
+        Args:
+            environment_input: str representing the environment to change to.
+        """
+        environment = Environment(environment_type=EnvironmentType(environment_input))
+        self._audience_url = f"{environment.audience_url}/api/v1"
+        self._remote_server_api_url = f"{environment.qibo_quantum_service_url}{self._api_path}"
+        self._remote_server_base_url = f"{environment.qibo_quantum_service_url}"
