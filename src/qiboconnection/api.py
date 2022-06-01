@@ -47,13 +47,8 @@ class API(ABC):
     def __init__(
         self,
         configuration: Optional[ConnectionConfiguration] = None,
-        environment: Optional[
-            Union[
-                Literal[EnvironmentType.LOCAL], Literal[EnvironmentType.STAGING], Literal[EnvironmentType.DEVELOPMENT]
-            ]
-        ] = None,
     ):
-        self._connection = Connection(configuration=configuration, environment=environment, api_path=self.API_PATH)
+        self._connection = Connection(configuration=configuration, api_path=self.API_PATH)
         self._devices: Devices | None = None
         self._jobs: List[Job] = []
         self._selected_devices: List[Device] | None = None
