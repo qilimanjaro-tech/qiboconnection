@@ -35,7 +35,7 @@ QUANTUM_SERVICE_URL = {
 }
 
 
-class EnvironmentType(enum.Enum):
+class EnvironmentType(str, enum.Enum):
     """Environment Type
 
     Args:

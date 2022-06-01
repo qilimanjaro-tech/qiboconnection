@@ -52,12 +52,7 @@ class API(ABC):
         self._live_plots: LivePlots = LivePlots()
 
     @typechecked
-    def select_environment(
-        self,
-        environment_input: Union[
-            Literal[EnvironmentType.LOCAL], Literal[EnvironmentType.STAGING], Literal[EnvironmentType.DEVELOPMENT]
-        ],
-    ):
+    def select_environment(self, environment_input: EnvironmentType):
         """
         Change the defined environment to another one. By default, it is 'staging'.
         Args:
