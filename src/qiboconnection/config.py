@@ -102,7 +102,5 @@ class Environment:
         return self._environment_type
 
 
-environment = Environment(environment_type=EnvironmentType(os.environ.get("QIBO_ENVIRONMENT", "staging")))
-QQS_URL = environment.qibo_quantum_service_url
-AUDIENCE_URL = environment.audience_url
-logger.debug("Qibo Quantum Service API SERVER URL: %s", QQS_URL)
+def get_environment() -> Environment:
+    return Environment(environment_type=EnvironmentType(os.environ.get("QIBO_ENVIRONMENT", "staging")))

@@ -44,26 +44,20 @@ class API(ABC):
     LIVE_PLOTTING_PATH = "/live-plotting"
 
     @typechecked
-    def __init__(self, configuration: Optional[ConnectionConfiguration | None] = None):
-        self._connection = Connection(configuration=configuration, api_path=self.API_PATH)
+    def __init__(
+        self,
+        configuration: Optional[ConnectionConfiguration] = None,
+        environment: Optional[
+            Union[
+                Literal[EnvironmentType.LOCAL], Literal[EnvironmentType.STAGING], Literal[EnvironmentType.DEVELOPMENT]
+            ]
+        ] = None,
+    ):
+        self._connection = Connection(configuration=configuration, environment=environment, api_path=self.API_PATH)
         self._devices: Devices | None = None
         self._jobs: List[Job] = []
         self._selected_devices: List[Device] | None = None
         self._live_plots: LivePlots = LivePlots()
-
-    @typechecked
-    def select_environment(
-        self,
-        environment_input: Union[
-            Literal[EnvironmentType.DEVELOPMENT], Literal[EnvironmentType.LOCAL], Literal[EnvironmentType.STAGING]
-        ],
-    ):
-        """
-        Change the defined environment to another one. By default, it is 'staging'.
-        Args:
-            environment_input: str representing the environment to change to.
-        """
-        self._connection.select_environment(environment_input=environment_input)
 
     @property
     def jobs(self) -> List[Job]:
