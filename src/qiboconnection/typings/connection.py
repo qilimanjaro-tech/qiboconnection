@@ -5,7 +5,22 @@ from dataclasses import dataclass
 
 
 @dataclass
-class ConnectionConfiguration(ABC):
+class _ConnectionConfigurationDefaultBase(ABC):
+    """Internal class for the default-value attributes of ConnectionConfiguration"""
+
+    user_id: int | None
+
+
+@dataclass
+class _ConnectionConfigurationBase(ABC):
+    """Internal class for the non-default-value attributes of ConnectionConfiguration"""
+
+    username: str
+    api_key: str
+
+
+@dataclass
+class ConnectionConfiguration(_ConnectionConfigurationDefaultBase, _ConnectionConfigurationBase):
     """Connection Configuration
 
     Attributes:
@@ -13,10 +28,6 @@ class ConnectionConfiguration(ABC):
         username (str): The user name
         api_key (str): The API key associated to the user
     """
-
-    user_id: int
-    username: str
-    api_key: str
 
 
 @dataclass
