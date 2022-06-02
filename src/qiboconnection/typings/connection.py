@@ -8,7 +8,7 @@ from dataclasses import dataclass
 class _ConnectionConfigurationDefaultBase(ABC):
     """Internal class for the default-value attributes of ConnectionConfiguration"""
 
-    user_id: int | None = None
+    user_id: int = 0
 
 
 @dataclass
