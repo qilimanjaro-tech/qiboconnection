@@ -8,7 +8,7 @@ from dataclasses import dataclass
 class _ConnectionConfigurationDefaultBase(ABC):
     """Internal class for the default-value attributes of ConnectionConfiguration"""
 
-    user_id: int | None
+    user_id: int | None = None
 
 
 @dataclass
@@ -31,13 +31,18 @@ class ConnectionConfiguration(_ConnectionConfigurationDefaultBase, _ConnectionCo
 
 
 @dataclass
-class ConnectionEstablished(ConnectionConfiguration):
+class _ConnectionEstablishedBase(ABC):
+    """Internal class for the non-default-value attributes of ConnectionEstablished"""
+
+    authorisation_access_token: str
+    api_path: str
+
+
+@dataclass
+class ConnectionEstablished(ConnectionConfiguration, _ConnectionEstablishedBase):
     """Connection Established
 
     Attributes:
         authorisation_access_token (str): access token associated
         api_path (str): API path to use the token
     """
-
-    authorisation_access_token: str
-    api_path: str
