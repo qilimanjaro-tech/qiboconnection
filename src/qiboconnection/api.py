@@ -2,7 +2,7 @@
 import json
 from abc import ABC
 from dataclasses import asdict
-from typing import Any, List, Optional, Union, cast
+from typing import List, Literal, Optional, Union, cast
 
 from numpy import ndarray
 from qibo.abstractions.states import AbstractState
@@ -10,7 +10,7 @@ from qibo.core.circuit import Circuit
 from requests import HTTPError
 from typeguard import typechecked
 
-from qiboconnection.config import logger
+from qiboconnection.config import EnvironmentType, logger
 from qiboconnection.connection import Connection
 from qiboconnection.devices.device import Device
 from qiboconnection.devices.devices import Devices
@@ -23,7 +23,6 @@ from qiboconnection.execution import Execution
 from qiboconnection.job import Job
 from qiboconnection.job_result import JobResult
 from qiboconnection.live_plots import LivePlots
-from qiboconnection.typings.algorithm import ProgramDefinition
 from qiboconnection.typings.connection import ConnectionConfiguration
 from qiboconnection.typings.execution import ExecutionResponse
 from qiboconnection.typings.experiment import Experiment
@@ -48,7 +47,10 @@ class API(ABC):
     LIVE_PLOTTING_PATH = "/live-plotting"
 
     @typechecked
-    def __init__(self, configuration: Optional[ConnectionConfiguration | None] = None):
+    def __init__(
+        self,
+        configuration: Optional[ConnectionConfiguration] = None,
+    ):
         self._connection = Connection(configuration=configuration, api_path=self.API_PATH)
         self._devices: Devices | None = None
         self._executions: List[Execution] = []

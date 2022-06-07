@@ -4,12 +4,13 @@ from abc import ABC
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from io import TextIOWrapper
-from typing import Any, Optional, TextIO, Tuple, Union
+from typing import Any, Literal, Optional, TextIO, Tuple, Union
 
+import jwt
 import requests
 from typeguard import typechecked
 
-from qiboconnection.config import AUDIENCE_URL, QQS_URL, logger
+from qiboconnection.config import get_environment, logger
 from qiboconnection.errors import ConnectionException
 from qiboconnection.typings.auth_config import AccessTokenResponse, AssertionPayload
 from qiboconnection.typings.connection import (
@@ -35,12 +36,13 @@ class Connection(ABC):
         configuration: Optional[ConnectionConfiguration | None] = None,
         api_path: Optional[str] = None,
     ):
+        self._environment = get_environment()
         self._api_path = api_path
         self._remote_server_api_url: str | None = None
         self._remote_server_base_url: str | None = None
         self._authorisation_server_api_call: str | None = None
         self._user_slack_id: Union[str, None] = None
-        self._audience_url = f"{AUDIENCE_URL}/api/v1"
+        self._audience_url = f"{self._environment.audience_url}/api/v1"
         self._user: User | None = None
         self._authorisation_access_token: str | None = None
         self._load_configuration(configuration, api_path)
@@ -68,6 +70,31 @@ class Connection(ABC):
         return self._user.username
 
     @property
+    def _user_id(self) -> int | None:
+        """Gets user name
+
+        Returns:
+            str: user name associated to the connection
+        """
+        if self._user is None:
+            raise ValueError("user not defined")
+        return self._user.user_id
+
+    @_user_id.setter
+    def _user_id(self, new_id) -> None:
+        """Sets user name
+
+        Returns:
+            None
+        """
+        if self._user is None:
+            raise ValueError("user not defined")
+        self._user.user_id = new_id
+
+    def _load_user_id_from_token(self, access_token):
+        self._user_id = jwt.decode(access_token, options={"verify_signature": False})["user_id"]
+
+    @property
     def user_slack_id(self) -> str:
         """Gets user slack id
 
@@ -85,7 +112,7 @@ class Connection(ABC):
         """
         if self._user is None:
             raise ValueError("user not defined")
-        user_response, response_status = self.send_get_auth_remote_api_call(path=f"/users/{self._user.user_id}")
+        user_response, response_status = self.send_get_auth_remote_api_call(path=f"/users/{self._user_id}")
         if response_status != 200:
             raise ValueError(f"Error getting user: {response_status}")
         if "slack_id" not in user_response or user_response["slack_id"] is None:
@@ -102,8 +129,8 @@ class Connection(ABC):
 
         """
         self._api_path = api_path
-        self._remote_server_api_url = f"{QQS_URL}{api_path}"
-        self._remote_server_base_url = f"{QQS_URL}"
+        self._remote_server_api_url = f"{self._environment.qibo_quantum_service_url}{api_path}"
+        self._remote_server_base_url = f"{self._environment.qibo_quantum_service_url}"
         self._authorisation_server_api_call = f"{self._remote_server_api_url}/authorisation-tokens"
 
     def _store_configuration(self) -> None:
@@ -141,6 +168,7 @@ class Connection(ABC):
             raise ConnectionException("No api path provided.")
         self._set_api_calls(api_path=api_path)
         self._register_configuration_and_request_authorisation_access_token(input_configuration)
+        self._load_user_id_from_token(access_token=self._authorisation_access_token)
         self._store_configuration()
 
     def _register_configuration_and_request_authorisation_access_token(self, configuration: ConnectionConfiguration):
@@ -330,4 +358,5 @@ class Connection(ABC):
 
         access_token_response: AccessTokenResponse = AccessTokenResponse(**response.json())
         logger.debug("Connection successfully established.")
+
         return access_token_response.accessToken

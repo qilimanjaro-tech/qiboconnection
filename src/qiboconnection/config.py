@@ -6,8 +6,8 @@ from typing import Literal, Union
 
 from qiboconnection import __version__
 
-# Logging level from 0 (all) to 4 (errors) (see https://docs.python.org/3/library/logging.html#logging-levels)
-QIBO_CLIENT_LOG_LEVEL = int(os.environ.get("QIBO_CLIENT_LOG_LEVEL", 1))
+# Logging level from 0 (NOT SET) to 50 (critical) (see https://docs.python.org/3/library/logging.html#logging-levels)
+QIBO_CLIENT_LOG_LEVEL = int(os.environ.get("QIBO_CLIENT_LOG_LEVEL", 20))
 
 # Configuration for logging mechanism
 
@@ -30,11 +30,12 @@ logger.addHandler(CustomHandler())
 QUANTUM_SERVICE_URL = {
     "local": "http://localhost:8080",
     "docker_local": "http://nginx:8080",
-    "staging": "https://qilimanjaro.ddns.net:8080",
+    "staging": "https://qilimanjaroqaas.ddns.net:8080",
+    "development": "https://qilimanjarodev.ddns.net:8080",
 }
 
 
-class EnvironmentType(enum.Enum):
+class EnvironmentType(str, enum.Enum):
     """Environment Type
 
     Args:
@@ -45,6 +46,7 @@ class EnvironmentType(enum.Enum):
 
     LOCAL = "local"
     STAGING = "staging"
+    DEVELOPMENT = "development"
 
 
 class Environment:
@@ -54,8 +56,9 @@ class Environment:
         if environment_type not in [
             EnvironmentType.LOCAL,
             EnvironmentType.STAGING,
+            EnvironmentType.DEVELOPMENT,
         ]:
-            raise ValueError("Environment Type MUST be 'local', 'staging' or 'production'")
+            raise ValueError("Environment Type MUST be 'local', 'staging' or 'development'")
         if environment_type == EnvironmentType.LOCAL:
             self._environment_type = EnvironmentType.LOCAL
             self.quantum_service_url = QUANTUM_SERVICE_URL["local"]
@@ -64,6 +67,10 @@ class Environment:
             self._environment_type = EnvironmentType.STAGING
             self.quantum_service_url = QUANTUM_SERVICE_URL["staging"]
             self._audience_url = QUANTUM_SERVICE_URL["staging"]
+        if environment_type == EnvironmentType.DEVELOPMENT:
+            self._environment_type = EnvironmentType.DEVELOPMENT
+            self.quantum_service_url = QUANTUM_SERVICE_URL["development"]
+            self._audience_url = QUANTUM_SERVICE_URL["development"]
 
     @property
     def qibo_quantum_service_url(self) -> str:
@@ -86,7 +93,7 @@ class Environment:
     @property
     def environment_type(
         self,
-    ) -> Union[Literal[EnvironmentType.LOCAL], Literal[EnvironmentType.STAGING]]:
+    ) -> Union[Literal[EnvironmentType.LOCAL], Literal[EnvironmentType.STAGING], Literal[EnvironmentType.DEVELOPMENT]]:
         """Returns the environment_type
 
         Returns:
@@ -95,7 +102,5 @@ class Environment:
         return self._environment_type
 
 
-environment = Environment(environment_type=EnvironmentType(os.environ.get("QIBO_ENVIRONMENT", "staging")))
-QQS_URL = environment.qibo_quantum_service_url
-AUDIENCE_URL = environment.audience_url
-logger.debug("Qibo Quantum Service API SERVER URL: %s", QQS_URL)
+def get_environment() -> Environment:
+    return Environment(environment_type=EnvironmentType(os.environ.get("QIBO_ENVIRONMENT", "staging")))
