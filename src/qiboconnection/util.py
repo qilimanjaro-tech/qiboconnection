@@ -15,7 +15,7 @@ from qibo.abstractions.states import AbstractState
 from qiboconnection.errors import custom_raise_for_status
 from qiboconnection.typings.connection import ConnectionEstablished
 
-QIBO_CONFIG_DIR = "qibo_configuration"
+QIBO_CONFIG_DIR = ".qibo_configuration"
 QIBO_CONFIG_FILE = ".user_configuration.json"
 
 
