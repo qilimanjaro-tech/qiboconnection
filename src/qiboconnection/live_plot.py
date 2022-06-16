@@ -7,6 +7,7 @@ from typing import Optional
 from websocket import WebSocket, WebSocketException, create_connection
 
 from qiboconnection.typings.live_plot import (
+    LivePlotAxis,
     LivePlotLabels,
     LivePlotPacket,
     LivePlotType,
@@ -16,11 +17,14 @@ from qiboconnection.typings.live_plot import (
 class LivePlot(ABC):
     """Job class to manage the job experiment to be remotely sent"""
 
-    def __init__(self, plot_id: int, plot_type: LivePlotType, websocket_url: str, labels: LivePlotLabels):
+    def __init__(
+        self, plot_id: int, plot_type: LivePlotType, websocket_url: str, labels: LivePlotLabels, axis: LivePlotAxis
+    ):
         """Default constructor. _connection is left as None until it is tried to use"""
         self._plot_id: int = plot_id
         self._plot_type: LivePlotType = plot_type
         self._labels: LivePlotLabels = labels
+        self._axis: LivePlotAxis = axis
         self._websocket_url: str = websocket_url
         self._connection: Optional[WebSocket] = None
 
@@ -38,6 +42,11 @@ class LivePlot(ABC):
     def labels(self) -> LivePlotLabels:
         """Gets the plot_type."""
         return self._labels
+
+    @property
+    def axis(self) -> LivePlotAxis:
+        """Gets the plot_type."""
+        return self._axis
 
     def send_data(self, data: LivePlotPacket):
         """Sends a LivePlotPacket over the websocket connection.

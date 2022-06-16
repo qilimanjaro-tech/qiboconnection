@@ -4,6 +4,7 @@ from abc import ABC
 from dataclasses import asdict
 from typing import List, Literal, Optional, Union, cast
 
+import numpy as np
 from numpy import ndarray
 from qibo.abstractions.states import AbstractState
 from qibo.core.circuit import Circuit
@@ -26,6 +27,7 @@ from qiboconnection.typings.connection import ConnectionConfiguration
 from qiboconnection.typings.experiment import Experiment
 from qiboconnection.typings.job import JobResponse, JobStatus
 from qiboconnection.typings.live_plot import (
+    LivePlotAxis,
     LivePlotLabels,
     LivePlotType,
     PlottingResponse,
@@ -347,8 +349,18 @@ class API(ABC):
         x_label: str | None = None,
         y_label: str | None = None,
         z_label: str | None = None,
+        x_axis: np.ndarray | List | None = None,
+        y_axis: np.ndarray | List | None = None,
     ):
-        """Creates a LivePlot of *plot_type* type at which we will be able to send points to plot
+        """Creates a LivePlot of *plot_type* type at which we will be able to send points to plot.
+
+        Attributes:
+            plot_type: LivePlotType
+            title:
+            x_label:
+            y_label:
+            z_label:
+
 
         Raises:
             RemoteExecutionException: Live-plotting connection data could not be retrieved
@@ -370,6 +382,7 @@ class API(ABC):
             websocket_url=plotting_response.websocket_url,
             plot_type=LivePlotType(plot_type),
             labels=LivePlotLabels(title=title, x_label=x_label, y_label=y_label, z_label=z_label),
+            axis=LivePlotAxis(x_axis=x_axis, y_axis=y_axis),
         )
         return plotting_response.plot_id
 
