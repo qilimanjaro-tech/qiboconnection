@@ -203,6 +203,7 @@ class LivePlotPacket(ABC):
                     idy = int(np.where(np.array(axis.y_axis) == y)[0][0])
 
                 return {**kwargs, "idx": idx, "idy": idy}
+            return kwargs
 
     @classmethod
     @ParseDataIfNeeded
