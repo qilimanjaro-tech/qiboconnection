@@ -156,7 +156,7 @@ class LivePlotPacket(ABC):
     axis: LivePlotAxis
 
     class ParseDataIfNeeded:
-        """Function decorator used to check if the points desired to add to a live-plot are compatible with that."""
+        """Function decorator used to add extra kwargs to the provided points before sending them."""
 
         def __init__(self, method: Callable):
             self._method = method
@@ -174,8 +174,6 @@ class LivePlotPacket(ABC):
                 ValueError: Line plots accept exactly x and f values.
                 ValueError: Scatter3D plots accept exactly x, y and f values.
             """
-            if "live_plot" not in kwargs or "data_packet" not in kwargs:
-                raise AttributeError("live_plot and point info are required.")
             axis: LivePlotAxis = kwargs.get("axis")
             plot_type: LivePlotAxis = kwargs.get("plot_type")
             x: List[float] | float = kwargs.get("x")
