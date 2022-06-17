@@ -17,7 +17,7 @@ class LivePlotType(str, Enum):
     LINES = "LINES"
     SCATTER = "SCATTER"
     SCATTER3D = "SCATTER3D"
-    SURFACE = "SURFACE"
+    HEATMAP = "HEATMAP"
 
 
 class UnitPoint(TypedDict):
@@ -181,7 +181,7 @@ class LivePlotPacket(ABC):
             idx = None
             idy = None
 
-            if plot_type == LivePlotType.SURFACE:
+            if plot_type == LivePlotType.HEATMAP:
                 if isinstance(x, list):
                     idx = [np.where(np.array(axis.x_axis) == i)[0][0] for i in x]
                     idy = [np.where(np.array(axis.y_axis) == i)[0][0] for i in y]
