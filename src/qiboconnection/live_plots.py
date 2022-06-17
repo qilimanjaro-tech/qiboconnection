@@ -73,15 +73,15 @@ class LivePlots(ABC):
             ):
                 raise ValueError("SCATTER3D plots accept exactly x, y and z values.")
 
-            if live_plot.plot_type == LivePlotType.SURFACE and (
+            if live_plot.plot_type == LivePlotType.HEATMAP and (
                 data_packet.data.x is None or data_packet.data.y is None or data_packet.data.z is None
             ):
-                raise ValueError("SURFACE plots accept exactly x, y and z values.")
+                raise ValueError("HEATMAP plots accept exactly x, y and z values.")
 
-            if live_plot.plot_type == LivePlotType.SURFACE and (
+            if live_plot.plot_type == LivePlotType.HEATMAP and (
                 live_plot.axis.x_axis is None or live_plot.axis.y_axis is None
             ):
-                raise ValueError("SURFACE plots need to have axis provided on live-plot creation.")
+                raise ValueError("HEATMAP plots need to have axis provided on live-plot creation.")
 
             return self._method(*args, **kwargs)
 
