@@ -156,7 +156,8 @@ class LivePlotPacket(ABC):
     axis: LivePlotAxis
 
     class ParseDataIfNeeded:
-        """Function decorator used to add extra kwargs to the provided points before sending them."""
+        """Function decorator used to add extra kwargs to the provided points before sending them, and to downcast
+        provided data into json-serializable datatypes."""
 
         def __init__(self, method: Callable):
             self._method = method
@@ -176,18 +177,22 @@ class LivePlotPacket(ABC):
             """
             axis: LivePlotAxis = kwargs.get("axis")
             plot_type: LivePlotAxis = kwargs.get("plot_type")
-            x: List[float] | float = kwargs.get("x")
-            y: List[float] | float = kwargs.get("y")
+            x: np.ndarray | List[float] | float = kwargs.get("x")
+            y: np.ndarray | List[float] | float = kwargs.get("y")
             idx = None
             idy = None
 
             if plot_type == LivePlotType.HEATMAP:
-                if isinstance(x, list):
-                    idx = [np.where(np.array(axis.x_axis) == i)[0][0] for i in x]
-                    idy = [np.where(np.array(axis.y_axis) == i)[0][0] for i in y]
-                if isinstance(x, float):
-                    idx = np.where(np.array(axis.x_axis) == x)[0][0]
-                    idy = np.where(np.array(axis.y_axis) == y)[0][0]
+                if isinstance(x, np.ndarray):
+                    x = x.tolist()
+                if isinstance(y, np.ndarray):
+                    y = y.tolist()
+                if isinstance(x, list) and isinstance(y, list):
+                    idx = [int(np.where(np.array(axis.x_axis) == i)[0][0]) for i in x]
+                    idy = [int(np.where(np.array(axis.y_axis) == i)[0][0]) for i in y]
+                if isinstance(x, float) and isinstance(y, float):
+                    idx = int(np.where(np.array(axis.x_axis) == x)[0][0])
+                    idy = int(np.where(np.array(axis.y_axis) == y)[0][0])
 
             kwargs = {**kwargs, "idx": idx, "idy": idy}
 
