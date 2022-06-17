@@ -72,9 +72,9 @@ class LivePlotPoints(ABC):
         self,
         x: float | list[float],
         y: float | list[float],
-        z: Optional[float | list[float]] = None,
-        idx: Optional[int | list[int]] = None,
-        idy: Optional[int | list[int]] = None,
+        z: float | list[float] | None = None,
+        idx: int | list[int] | None = None,
+        idy: int | list[int] | None = None,
     ):
         self._x = x
         self._y = y
@@ -170,23 +170,31 @@ class LivePlotPacket(ABC):
             """
             Args:
                 method (Callable): Class method.
-            Raises:
-                AttributeError: live_plot and data_point are required.
-                ValueError: Line plots accept exactly x and f values.
-                ValueError: Scatter3D plots accept exactly x, y and f values.
             """
-            axis: LivePlotAxis = kwargs.get("axis")
-            plot_type: LivePlotAxis = kwargs.get("plot_type")
-            x: np.ndarray | List[float] | float = kwargs.get("x")
-            y: np.ndarray | List[float] | float = kwargs.get("y")
-            idx = None
-            idy = None
 
+            downcasted_kwargs = self._downcast_ndarrays_to_lists(**kwargs)
+            extended_kwargs = self._add_index_args_for_heatmaps(**downcasted_kwargs)
+
+            return self._method(*args, **extended_kwargs)
+
+        def _downcast_ndarrays_to_lists(self, **kwargs):
+            """Downcasts all provided numpy arrays to lists"""
+            for key, value in kwargs.items():
+                if isinstance(value, np.ndarray):
+                    kwargs[key] = value.tolist()
+
+            return kwargs
+
+        def _add_index_args_for_heatmaps(self, **kwargs):
+            plot_type: LivePlotAxis = kwargs.get("plot_type")
             if plot_type == LivePlotType.HEATMAP:
-                if isinstance(x, np.ndarray):
-                    x = x.tolist()
-                if isinstance(y, np.ndarray):
-                    y = y.tolist()
+                axis: LivePlotAxis = kwargs.get("axis")
+
+                x: List[float] | float = kwargs.get("x")
+                y: List[float] | float = kwargs.get("y")
+                idx = None
+                idy = None
+
                 if isinstance(x, list) and isinstance(y, list):
                     idx = [int(np.where(np.array(axis.x_axis) == i)[0][0]) for i in x]
                     idy = [int(np.where(np.array(axis.y_axis) == i)[0][0]) for i in y]
@@ -194,9 +202,7 @@ class LivePlotPacket(ABC):
                     idx = int(np.where(np.array(axis.x_axis) == x)[0][0])
                     idy = int(np.where(np.array(axis.y_axis) == y)[0][0])
 
-            kwargs = {**kwargs, "idx": idx, "idy": idy}
-
-            return self._method(*args, **kwargs)
+                return {**kwargs, "idx": idx, "idy": idy}
 
     @classmethod
     @ParseDataIfNeeded
@@ -206,11 +212,11 @@ class LivePlotPacket(ABC):
         plot_type: LivePlotType,
         labels: LivePlotLabels,
         axis: LivePlotAxis,
-        x: list[float] | float,
-        y: list[float] | float,
-        z: Optional[list[float] | float],
-        idx: Optional[list[int] | int] = None,
-        idy: Optional[list[int] | int] = None,
+        x: np.ndarray | list[float] | float,
+        y: np.ndarray | list[float] | float,
+        z: np.ndarray | list[float] | float | None,
+        idx: np.ndarray | list[int] | int | None = None,
+        idy: np.ndarray | list[int] | int | None = None,
     ):
         """Convenience constructor"""
         return cls(
