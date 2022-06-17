@@ -122,9 +122,9 @@ class LivePlotPoints(ABC):
             if z is not None:
                 point["z"] = cast(float, z)
             if idx is not None:
-                point["z"] = cast(int, idx)
+                point["idx"] = cast(int, idx)
             if idy is not None:
-                point["z"] = cast(int, idy)
+                point["idy"] = cast(int, idy)
             self._points.append(point)
         elif all((isinstance(arg, list) or arg is None) for arg in [x, y, z]):
             x, y = cast(list, x), cast(list, y)
@@ -133,9 +133,9 @@ class LivePlotPoints(ABC):
                 if z is not None:
                     point["z"] = cast(list, z)[i]
                 if idx is not None:
-                    point["z"] = cast(list, idx)[i]
+                    point["idx"] = cast(list, idx)[i]
                 if idy is not None:
-                    point["z"] = cast(list, idy)[i]
+                    point["idy"] = cast(list, idy)[i]
                 self._points.append(point)
         else:
             raise ValueError("Arguments provided must be of the same type: floats or lists")
