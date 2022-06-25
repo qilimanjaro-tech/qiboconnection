@@ -1,5 +1,5 @@
-src
-===
+qiboconnection
+==============
 
 .. toctree::
    :maxdepth: 4
