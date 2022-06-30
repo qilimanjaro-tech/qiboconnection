@@ -64,7 +64,7 @@ class JobResponse(JobRequest):
         job_id (int): Job identifier
         queue_position (int): Job queue position
         status (str | JobStatus): Status of the job
-        job_type (str | JobType): Status of the job
+        job_type (str | JobType): Type of the job
         result (str): Job result
     """
 
