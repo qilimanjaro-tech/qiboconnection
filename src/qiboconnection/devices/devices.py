@@ -38,6 +38,11 @@ class Devices(ABC):
 
     @typechecked
     def _create_list_of_devices(self, list_devices: list[Union[QuantumDevice, SimulatorDevice, OfflineDevice]]):
+        """Appends each of the devices to self._devices
+
+        Args:
+            list_devices: devices to be appended
+        """
         for device in list_devices:
             self._devices.append(device)
 
@@ -52,6 +57,15 @@ class Devices(ABC):
 
     @typechecked
     def _update(self, device: Union[QuantumDevice, SimulatorDevice, OfflineDevice]) -> bool:
+        """
+        Checks if inner list of devices contains a device with the same id as the input device. If there is one, it
+        replaces it with the new device.
+        Args:
+            device: Device with new information
+
+        Returns:
+            bool: True if one device has been updated. False otherwise.
+        """
         for index, current_device in enumerate(self._devices):
             if current_device.id == device.id:
                 self._devices[index] = device
@@ -116,6 +130,14 @@ class Devices(ABC):
         return self._find_device(device_id)
 
     def _find_device(self, device_id: int) -> Union[QuantumDevice, SimulatorDevice, OfflineDevice]:
+        """
+
+        Args:
+            device_id:
+
+        Returns:
+
+        """
         device_found = [device for device in self._devices if device.id == device_id]
         if not device_found:
             raise ValueError("Device not found")
@@ -124,7 +146,7 @@ class Devices(ABC):
         return device_found.pop()
 
     def block_device(self, connection: Connection, device_id: int) -> None:
-        """Blocks a device to avoid besing used by others
+        """Blocks a device to avoid it being used by others
 
         Args:
             connection (Connection): Qibo remote connection
