@@ -7,7 +7,6 @@ def test_job_result_creation():
     job_result = JobResult(
         job_id=1,
         http_response="WzAuMSwgMC4xLCAwLjEsIDAuMSwgMC4xXQ==",
-        data=[0.1, 0.1, 0.1, 0.1, 0.1],
     )
     assert isinstance(job_result, JobResult)
     assert job_result.job_id == 1
