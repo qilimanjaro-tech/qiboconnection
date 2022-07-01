@@ -88,9 +88,9 @@ class LivePlots(ABC):
     def send_data(
         self,
         plot_id: int,
-        x: np.ndarray | list[float] | float,
-        y: np.ndarray | list[float] | float,
-        z: np.ndarray | list[float] | float | None,
+        x: np.ndarray | list[float | int] | float | int,
+        y: np.ndarray | list[float | int] | float | int,
+        z: np.ndarray | list[float | int] | float | int | None,
     ):
         """
         Send the data corresponding to one or more points over the ws connection associated to the plot represented by

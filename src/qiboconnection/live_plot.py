@@ -1,6 +1,5 @@
 """ LivePlot class """
 from abc import ABC
-from dataclasses import asdict
 from ssl import SSLError
 from typing import Optional
 

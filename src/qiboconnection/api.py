@@ -390,9 +390,9 @@ class API(ABC):
     def send_plot_points(
         self,
         plot_id: int,
-        x: np.ndarray | list[float] | float,
-        y: np.ndarray | list[float] | float,
-        z: np.ndarray | list[float] | float | None = None,
+        x: np.ndarray | list[float | int] | float | int,
+        y: np.ndarray | list[float | int] | float | int,
+        z: np.ndarray | list[float | int] | float | int | None = None,
     ):
         """Sends point(s) to a specific plot.
         Args:
