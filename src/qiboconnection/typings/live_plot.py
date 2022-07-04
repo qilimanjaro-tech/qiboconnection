@@ -70,9 +70,9 @@ class LivePlotPoints(ABC):
 
     def __init__(
         self,
-        x: float | list[float],
-        y: float | list[float],
-        z: float | list[float] | None = None,
+        x: int | float | list[int | float],
+        y: int | float | list[int | float],
+        z: int | float | list[int | float] | None = None,
         idx: int | list[int] | None = None,
         idy: int | list[int] | None = None,
     ):
@@ -101,9 +101,9 @@ class LivePlotPoints(ABC):
 
     def _parse_to_points(
         self,
-        x: float | list[float],
-        y: float | list[float],
-        z: Optional[float | list[float]] = None,
+        x: int | float | list[int | float],
+        y: int | float | list[int | float],
+        z: Optional[float | list[int | float]] = None,
         idx: Optional[int | list[int]] = None,
         idy: Optional[int | list[int]] = None,
     ):
@@ -117,7 +117,7 @@ class LivePlotPoints(ABC):
         Raises:
             ValueError: Arguments provided must be of the same type: floats or lists
         """
-        if all((isinstance(arg, float) or arg is None) for arg in [x, y, z]):
+        if all(isinstance(arg, int | float | None) for arg in [x, y, z]):
             point = UnitPoint(x=cast(float, x), y=cast(float, y), z=None, idx=None, idy=None)
             if z is not None:
                 point["z"] = cast(float, z)
@@ -126,7 +126,7 @@ class LivePlotPoints(ABC):
             if idy is not None:
                 point["idy"] = cast(int, idy)
             self._points.append(point)
-        elif all((isinstance(arg, list) or arg is None) for arg in [x, y, z]):
+        elif all(isinstance(arg, list | None) for arg in [x, y, z]):
             x, y = cast(list, x), cast(list, y)
             for i, _ in enumerate(x):
                 point = UnitPoint(x=x[i], y=y[i], z=None, idx=None, idy=None)
@@ -143,6 +143,19 @@ class LivePlotPoints(ABC):
     def to_scatter(self):
         """Returns the points in the shape of [{x:x0, y:y0, f:f0}, {x:x1, y:y1, f:f1}, ...]"""
         return self._points
+
+    def __eq__(self, other):
+        if isinstance(other, LivePlotPoints):
+            return all(
+                [
+                    self.x == other.x,
+                    self.y == other.y,
+                    self.z == other.z,
+                    self._idx == other._idx,
+                    self._idy == other._idy,
+                ]
+            )
+        return False
 
 
 @dataclass
@@ -190,17 +203,17 @@ class LivePlotPacket(ABC):
             if plot_type == LivePlotType.HEATMAP:
                 axis: LivePlotAxis = kwargs.get("axis")
 
-                x: List[float] | float = kwargs.get("x")
-                y: List[float] | float = kwargs.get("y")
+                x: List[float | int] | float | int = kwargs.get("x")
+                y: List[float | int] | float | int = kwargs.get("y")
                 idx = None
                 idy = None
 
                 if isinstance(x, list) and isinstance(y, list):
-                    idx = [int(np.where(np.array(axis.x_axis) == i)[0][0]) for i in x]
-                    idy = [int(np.where(np.array(axis.y_axis) == i)[0][0]) for i in y]
-                if isinstance(x, float) and isinstance(y, float):
-                    idx = int(np.where(np.array(axis.x_axis) == x)[0][0])
-                    idy = int(np.where(np.array(axis.y_axis) == y)[0][0])
+                    idx = [int(np.where(np.unique(axis.x_axis) == i)[0][0]) for i in x]
+                    idy = [int(np.where(np.unique(axis.y_axis) == i)[0][0]) for i in y]
+                if (isinstance(x, float) or isinstance(x, int)) and (isinstance(y, float) or isinstance(x, int)):
+                    idx = int(np.where(np.unique(axis.x_axis) == x)[0][0])
+                    idy = int(np.where(np.unique(axis.y_axis) == y)[0][0])
 
                 return {**kwargs, "idx": idx, "idy": idy}
             return kwargs
@@ -213,9 +226,9 @@ class LivePlotPacket(ABC):
         plot_type: LivePlotType,
         labels: LivePlotLabels,
         axis: LivePlotAxis,
-        x: np.ndarray | list[float] | float,
-        y: np.ndarray | list[float] | float,
-        z: np.ndarray | list[float] | float | None,
+        x: np.ndarray | list[float | int] | float | int,
+        y: np.ndarray | list[float | int] | float | int,
+        z: np.ndarray | list[float | int] | float | int | None,
         idx: np.ndarray | list[int] | int | None = None,
         idy: np.ndarray | list[int] | int | None = None,
     ):

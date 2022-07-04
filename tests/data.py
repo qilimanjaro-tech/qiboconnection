@@ -7,6 +7,7 @@ from qiboconnection.typings.device import (
     SimulatorDeviceCharacteristicsInput,
     SimulatorDeviceInput,
 )
+from qiboconnection.typings.live_plot import UnitPoint
 
 device_inputs = [
     DeviceInput(device_id=1, device_name="one_device", status="available", channel_id=None),
@@ -39,4 +40,13 @@ simulator_device_inputs = [
             "ram": "64185MiB",
         },
     )
+]
+
+unit_plot_point = [UnitPoint(x=0, y=0, z=None, idx=None, idy=None)]
+
+heatmap_unit_plot_points = [
+    UnitPoint(x=0, y=0, z=0, idx=0, idy=0),
+    UnitPoint(x=0, y=1, z=1, idx=0, idy=1),
+    UnitPoint(x=1, y=0, z=2, idx=1, idy=0),
+    UnitPoint(x=1, y=1, z=3, idx=1, idy=1),
 ]
