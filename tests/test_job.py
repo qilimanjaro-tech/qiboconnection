@@ -78,29 +78,6 @@ def fixture_simulator_device() -> SimulatorDevice:
     return SimulatorDevice(device_input=simulator_device_inputs[0])
 
 
-def test_job_creation_with_program(circuit: Circuit, user: User, simulator_device: SimulatorDevice):
-    """Test job creation
-
-    Args:
-        circuit (Circuit): Circuit
-        user (User): User
-        simulator_device (SimulatorDevice): SimulatorDevice
-    """
-
-    job_id = 23
-    job_status = JobStatus.COMPLETED
-    job_result = JobResult(job_id=job_id, http_response="WzAuMSwgMC4xLCAwLjEsIDAuMSwgMC4xXQ==")
-    job = Job(
-        circuit=circuit,
-        user=user,
-        device=cast(Device, simulator_device),
-        job_status=job_status,
-        job_result=job_result,
-        id=job_id,
-    )
-    assert isinstance(job, Job)
-
-
 def test_job_creation(circuit: Circuit, user: User, simulator_device: SimulatorDevice):
     """Test job creation
 
@@ -138,6 +115,11 @@ def test_job_creation_default_values(circuit: Circuit, user: User, simulator_dev
     assert job.job_status == JobStatus.NOT_SENT
     assert job.job_result is None
     assert job.job_id == 0
+    assert job.job_type == JobType.CIRCUIT
+    with pytest.raises(Exception) as e_info:
+        job.result()
+    assert e_info.type == ValueError
+    assert e_info.value.args[0] == "Job result still not completed"
 
 
 def test_job_request(circuit: Circuit, user: User, simulator_device: SimulatorDevice):
