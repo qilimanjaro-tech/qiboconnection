@@ -33,7 +33,7 @@ def fixture_response_500():
 
 
 def test_remote_execution_exception():
-    with pytest.raises(Exception) as e_info:
+    with pytest.raises(RemoteExecutionException) as e_info:
         raise RemoteExecutionException("DEMO", status_code=500)
     assert e_info.type == RemoteExecutionException
     assert e_info.value.args[0] == "DEMO"
@@ -41,20 +41,20 @@ def test_remote_execution_exception():
 
 
 def test_connection_exception():
-    with pytest.raises(Exception) as e_info:
+    with pytest.raises(ConnectionException) as e_info:
         raise ConnectionException
     assert e_info.type == ConnectionException
 
 
 def test_custom_raise_for_status_400(response_400: Response):
-    with pytest.raises(Exception) as e_info:
+    with pytest.raises(HTTPError) as e_info:
         custom_raise_for_status(response_400)
     assert e_info.type == HTTPError
     assert e_info.value.response == response_400
 
 
 def test_custom_raise_for_status_500(response_500: Response):
-    with pytest.raises(Exception) as e_info:
+    with pytest.raises(HTTPError) as e_info:
         custom_raise_for_status(response_500)
     assert e_info.type == HTTPError
     assert e_info.value.response == response_500

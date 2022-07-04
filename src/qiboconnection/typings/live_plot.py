@@ -4,9 +4,10 @@ from abc import ABC
 from dataclasses import asdict, dataclass
 from enum import Enum
 from functools import partial
-from typing import Callable, List, Optional, TypedDict, cast
+from typing import Callable, List, TypedDict, cast
 
 import numpy as np
+import numpy.typing as npt
 
 
 class LivePlotType(str, Enum):
@@ -25,9 +26,9 @@ class UnitPoint(TypedDict):
 
     x: float
     y: float
-    z: Optional[float]
-    idx: Optional[int]
-    idy: Optional[int]
+    z: float | None
+    idx: int | None
+    idy: int | None
 
 
 @dataclass
@@ -61,8 +62,8 @@ class LivePlotLabels(ABC):
 class LivePlotAxis(ABC):
     """Class for holding different axis marks for the plots"""
 
-    x_axis: np.ndarray | List | None = None
-    y_axis: np.ndarray | List | None = None
+    x_axis: npt.NDArray | List | None = None
+    y_axis: npt.NDArray | List | None = None
 
 
 class LivePlotPoints(ABC):
@@ -70,11 +71,11 @@ class LivePlotPoints(ABC):
 
     def __init__(
         self,
-        x: int | float | list[int | float],
-        y: int | float | list[int | float],
-        z: int | float | list[int | float] | None = None,
-        idx: int | list[int] | None = None,
-        idy: int | list[int] | None = None,
+        x: int | float | list[int] | list[float] | npt.NDArray[np.int_ | np.float_],
+        y: int | float | list[int] | list[float] | npt.NDArray[np.int_ | np.float_],
+        z: int | float | list[int] | list[float] | npt.NDArray[np.int_ | np.float_] | None = None,
+        idx: int | list[int] | npt.NDArray[np.int_] | None = None,
+        idy: int | list[int] | npt.NDArray[np.int_] | None = None,
     ):
         self._x = x
         self._y = y
@@ -101,11 +102,11 @@ class LivePlotPoints(ABC):
 
     def _parse_to_points(
         self,
-        x: int | float | list[int | float],
-        y: int | float | list[int | float],
-        z: Optional[float | list[int | float]] = None,
-        idx: Optional[int | list[int]] = None,
-        idy: Optional[int | list[int]] = None,
+        x: int | float | list[int] | list[float] | npt.NDArray[np.int_ | np.float_],
+        y: int | float | list[int] | list[float] | npt.NDArray[np.int_ | np.float_],
+        z: int | float | list[int] | list[float] | npt.NDArray[np.int_ | np.float_] | None = None,
+        idx: int | list[int] | npt.NDArray[np.int_] | None = None,
+        idy: int | list[int] | npt.NDArray[np.int_] | None = None,
     ):
         """
         Gets a point or a list of points for x, y, and z and parses them to a list of dicts each containing ONE value
@@ -126,7 +127,7 @@ class LivePlotPoints(ABC):
             if idy is not None:
                 point["idy"] = cast(int, idy)
             self._points.append(point)
-        elif all(isinstance(arg, list | None) for arg in [x, y, z]):
+        elif all(isinstance(arg, np.ndarray | list | None) for arg in [x, y, z]):
             x, y = cast(list, x), cast(list, y)
             for i, _ in enumerate(x):
                 point = UnitPoint(x=x[i], y=y[i], z=None, idx=None, idy=None)
@@ -226,11 +227,11 @@ class LivePlotPacket(ABC):
         plot_type: LivePlotType,
         labels: LivePlotLabels,
         axis: LivePlotAxis,
-        x: np.ndarray | list[float | int] | float | int,
-        y: np.ndarray | list[float | int] | float | int,
-        z: np.ndarray | list[float | int] | float | int | None,
-        idx: np.ndarray | list[int] | int | None = None,
-        idy: np.ndarray | list[int] | int | None = None,
+        x: npt.NDArray[np.float_ | np.int_] | list[float] | list[int] | float | int,
+        y: npt.NDArray[np.float_ | np.int_] | list[float] | list[int] | float | int,
+        z: npt.NDArray[np.float_ | np.int_] | list[float] | list[int] | float | int | None,
+        idx: npt.NDArray[np.int_] | list[int] | int | None = None,
+        idy: npt.NDArray[np.int_] | list[int] | int | None = None,
     ):
         """Convenience constructor"""
         return cls(

@@ -5,7 +5,7 @@ from dataclasses import asdict
 from typing import List, Literal, Optional, Union, cast
 
 import numpy as np
-from numpy import ndarray
+import numpy.typing as npt
 from qibo.abstractions.states import AbstractState
 from qibo.core.circuit import Circuit
 from requests import HTTPError
@@ -116,8 +116,10 @@ class API(ABC):
 
         if self._devices is None:
             self._devices = Devices([new_device])
-        else:
+        elif isinstance(self._devices, Devices):
             self._devices.add_or_update(new_device)
+        else:
+            raise ValueError("Unexpected object in Devices.")
 
     @typechecked
     def select_device_id(self, device_id: int) -> None:
@@ -126,10 +128,10 @@ class API(ABC):
         Args:
             device_id (int): Device identifier
 
-        Raises:
-            ValueError: No devices collected. Please call 'list_devices' first.
         """
         self._add_or_update_single_device(device_id=device_id)
+        if self._devices is None:
+            raise ValueError("Devices object was not created after updating.")
         try:
             selected_device = self._devices.select_device(device_id=device_id)
             self._selected_devices = [selected_device]
@@ -150,6 +152,8 @@ class API(ABC):
         self._selected_devices = []
         for device_id in device_ids:
             self._add_or_update_single_device(device_id=device_id)
+            if self._devices is None:
+                raise ValueError("Devices object was not created after updating.")
             try:
                 self._selected_devices.append(self._devices.select_device(device_id=device_id))
             except HTTPError as ex:
@@ -251,6 +255,8 @@ class API(ABC):
             for device_id in device_ids:
                 try:
                     self._add_or_update_single_device(device_id=device_id)
+                    if self._devices is None:
+                        raise ValueError("Devices object was not created after updating.")
                     selected_devices.append(self._devices.select_device(device_id=device_id))
                 except HTTPError as ex:
                     logger.error(json.loads(str(ex))["detail"])
@@ -287,7 +293,7 @@ class API(ABC):
         return job_ids
 
     @typechecked
-    def get_results(self, job_ids: List[int]) -> List[AbstractState | ndarray | None]:
+    def get_results(self, job_ids: List[int]) -> List[AbstractState | npt.NDArray | None]:
         """Get a Job result from a remote execution
 
         Args:
@@ -303,7 +309,7 @@ class API(ABC):
         return [self.get_result(job_id) for job_id in job_ids]
 
     @typechecked
-    def get_result(self, job_id: int) -> AbstractState | ndarray | None:
+    def get_result(self, job_id: int) -> AbstractState | npt.NDArray | None:
         """Get a Job result from a remote execution
 
         Args:
@@ -349,8 +355,8 @@ class API(ABC):
         x_label: str | None = None,
         y_label: str | None = None,
         z_label: str | None = None,
-        x_axis: np.ndarray | List | None = None,
-        y_axis: np.ndarray | List | None = None,
+        x_axis: npt.NDArray[np.int_] | List[int] | None = None,
+        y_axis: npt.NDArray[np.int_] | List[int] | None = None,
     ):
         """Creates a LivePlot of *plot_type* type at which we will be able to send points to plot.
 
@@ -390,9 +396,9 @@ class API(ABC):
     def send_plot_points(
         self,
         plot_id: int,
-        x: np.ndarray | list[float | int] | float | int,
-        y: np.ndarray | list[float | int] | float | int,
-        z: np.ndarray | list[float | int] | float | int | None = None,
+        x: npt.NDArray[np.float_ | np.int_] | list[float] | list[int] | float | int,
+        y: npt.NDArray[np.float_ | np.int_] | list[float] | list[int] | float | int,
+        z: npt.NDArray[np.float_ | np.int_] | list[float] | list[int] | float | int | None = None,
     ):
         """Sends point(s) to a specific plot.
         Args:

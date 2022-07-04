@@ -131,6 +131,7 @@ def test_job_request(circuit: Circuit, user: User, simulator_device: SimulatorDe
         simulator_device (SimulatorDevice): SimulatorDevice
     """
     job_status = JobStatus.COMPLETED
+    user_id = user.user_id
     job = Job(
         circuit=circuit,
         user=user,
@@ -140,7 +141,7 @@ def test_job_request(circuit: Circuit, user: User, simulator_device: SimulatorDe
         nshots=10,
     )
     expected_job_request = JobRequest(
-        user_id=user.user_id,
+        user_id=user_id,
         device_id=simulator_device.id,
         description="Ly8gR2VuZXJhdGVkIGJ5IFFJQk8gMC4xLjcKT1BFTlFBU00gMi4wOwppbmNsdWRlICJxZWxpYjEuaW5jIjsKcXJlZyBxWzFdOwpjcmVnIHJlZ2lzdGVyMFsxXTsKaCBxWzBdOwptZWFzdXJlIHFbMF0gLT4gcmVnaXN0ZXIwWzBdOw==",
         number_shots=10,
@@ -158,6 +159,7 @@ def test_update_with_job_response(circuit: Circuit, user: User, simulator_device
         simulator_device (SimulatorDevice): SimulatorDevice
     """
 
+    user_id = user.user_id
     job_status = JobStatus.PENDING
     job = Job(
         circuit=circuit,
@@ -167,7 +169,7 @@ def test_update_with_job_response(circuit: Circuit, user: User, simulator_device
         id=23,
     )
     job_response = JobResponse(
-        user_id=user.user_id,
+        user_id=user_id,
         number_shots=10,
         job_type=JobType.CIRCUIT,
         device_id=simulator_device.id,

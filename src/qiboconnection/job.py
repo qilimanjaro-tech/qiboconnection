@@ -40,7 +40,7 @@ class Job(ABC):
             raise ValueError("Neither of experiment or circuit were provided,")
 
     @property
-    def user_id(self) -> int:
+    def user_id(self) -> int | None:
         """User identifier
 
         Returns:

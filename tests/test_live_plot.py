@@ -81,11 +81,12 @@ def fixture_heatmap_plot_axis() -> LivePlotAxis:
 
 @pytest.fixture(name="heatmap_plot_points")
 def fixture_heatmap_plot_points() -> LivePlotPoints:
-    x = [point["x"] for point in heatmap_unit_plot_points]
-    y = [point["y"] for point in heatmap_unit_plot_points]
-    z = [point["z"] for point in heatmap_unit_plot_points]
-    idx = [point["idx"] for point in heatmap_unit_plot_points]
-    idy = [point["idy"] for point in heatmap_unit_plot_points]
+    assert all([None not in point.values() for point in heatmap_unit_plot_points])
+    x = [int(point["x"]) for point in heatmap_unit_plot_points]  # type: ignore
+    y = [int(point["y"]) for point in heatmap_unit_plot_points]  # type: ignore
+    z = [int(point["z"]) for point in heatmap_unit_plot_points]  # type: ignore
+    idx = [int(point["idx"]) for point in heatmap_unit_plot_points]  # type: ignore
+    idy = [int(point["idy"]) for point in heatmap_unit_plot_points]  # type: ignore
 
     return LivePlotPoints(x=x, y=y, z=z, idx=idx, idy=idy)
 

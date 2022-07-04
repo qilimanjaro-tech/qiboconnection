@@ -5,6 +5,7 @@ from functools import partial
 from typing import Callable, Optional
 
 import numpy as np
+import numpy.typing as npt
 
 from qiboconnection.live_plot import LivePlot
 from qiboconnection.typings.live_plot import (
@@ -88,9 +89,9 @@ class LivePlots(ABC):
     def send_data(
         self,
         plot_id: int,
-        x: np.ndarray | list[float | int] | float | int,
-        y: np.ndarray | list[float | int] | float | int,
-        z: np.ndarray | list[float | int] | float | int | None,
+        x: npt.NDArray[np.float_ | np.int_] | list[float] | list[int] | float | int,
+        y: npt.NDArray[np.float_ | np.int_] | list[float] | list[int] | float | int,
+        z: npt.NDArray[np.float_ | np.int_] | list[float] | list[int] | float | int | None,
     ):
         """
         Send the data corresponding to one or more points over the ws connection associated to the plot represented by
