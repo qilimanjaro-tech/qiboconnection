@@ -15,6 +15,7 @@ from qiboconnection.typings.live_plot import (
     LivePlotPacket,
     LivePlotPoints,
     LivePlotType,
+    PlottingResponse,
 )
 from qiboconnection.user import User
 
@@ -22,17 +23,17 @@ from .data import heatmap_unit_plot_points, unit_plot_point
 
 
 @pytest.fixture(name="live_plot_type")
-def fixture_live_plot_type() -> LivePlotType:
+def fixture_plot_type():
     return LivePlotType.LINES
 
 
 @pytest.fixture(name="live_plot_labels")
-def fixture_live_plot_labels() -> LivePlotLabels:
+def fixture_plot_labels():
     return LivePlotLabels()
 
 
 @pytest.fixture(name="live_plot_axis")
-def fixture_live_plot_axis() -> LivePlotAxis:
+def fixture_plot_axis():
     return LivePlotAxis()
 
 
@@ -129,3 +130,28 @@ def test_heatmap_data_packet(
             "data": heatmap_plot_points.to_scatter(),
         }
     )
+
+
+def test_plotting_response_constructor():
+    plotting_response = PlottingResponse(websocket_url="server/demo-url", plot_id=1)
+
+    assert isinstance(plotting_response, PlottingResponse)
+    assert plotting_response.plot_id == 1
+    assert plotting_response.websocket_url == "server/demo-url"
+
+
+def test_plotting_response_from_response():
+    plotting_response_input = {"websocket_url": "server/demo-url", "plot_id": "1"}
+    plotting_response = PlottingResponse.from_response(**plotting_response_input)
+
+    assert isinstance(plotting_response, PlottingResponse)
+    assert plotting_response.plot_id == int(plotting_response_input["plot_id"])
+    assert plotting_response.websocket_url == str(plotting_response_input["websocket_url"])
+
+
+def test_plotting_response_to_dict():
+    plotting_response_dict = PlottingResponse(websocket_url="server/demo-url", plot_id=1).to_dict()
+
+    assert isinstance(plotting_response_dict, dict)
+    assert plotting_response_dict["plot_id"] == 1
+    assert plotting_response_dict["websocket_url"] == "server/demo-url"
