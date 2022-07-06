@@ -4,6 +4,8 @@
 from qiboconnection.typings.device import (
     DeviceInput,
     DeviceStatus,
+    QuantumDeviceCharacteristicsInput,
+    QuantumDeviceInput,
     SimulatorDeviceCharacteristicsInput,
     SimulatorDeviceInput,
 )
@@ -39,6 +41,20 @@ simulator_device_inputs = [
             "kernel": "x86_64 Linux 5.4.0-80-generic",
             "ram": "64185MiB",
         },
+    )
+]
+
+
+quantum_device_characteristics_inputs = [QuantumDeviceCharacteristicsInput(type="quantum", description="Cluster")]
+quantum_device_inputs = [
+    QuantumDeviceInput(
+        device_id=1,
+        device_name="galadriel-cluster",
+        status="available",
+        last_calibration_time="0",
+        channel_id=None,
+        characteristics={"type": "quantum", "description": "Cluster"},
+        calibration_details={"t1": 10, "frequency": 988},
     )
 ]
 
