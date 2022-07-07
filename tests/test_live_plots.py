@@ -1,4 +1,4 @@
-""" Tests methods for live_plot """
+""" Tests methods for LivePlots """
 
 import json
 from dataclasses import asdict

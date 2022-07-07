@@ -1,10 +1,10 @@
-""" Tests methods for live_plot """
-
+""" Tests methods for LivePlot """
 
 import json
 from dataclasses import asdict
 from typing import cast
 
+import numpy as np
 import pytest
 import websocket
 
@@ -60,11 +60,33 @@ def fixture_live_plot_points() -> LivePlotPoints:
     return LivePlotPoints(x=unit_plot_point[0]["x"], y=unit_plot_point[0]["y"])
 
 
-def test_live_plot_points(live_plot_points: LivePlotPoints):
+def test_live_plot_points_constructor(live_plot_points: LivePlotPoints):
 
+    assert isinstance(live_plot_points, LivePlotPoints)
     assert live_plot_points.x == unit_plot_point[0]["x"]
     assert live_plot_points.y == unit_plot_point[0]["y"]
     assert live_plot_points.to_scatter() == [unit_plot_point[0]]
+
+
+def test_live_plot_points_equality(live_plot_points: LivePlotPoints):
+
+    live_plot_points_1 = LivePlotPoints(x=0, y=0)
+    live_plot_points_2 = LivePlotPoints(x=0, y=0)
+    assert live_plot_points_1 == live_plot_points_2
+
+    live_plot_points_3 = LivePlotPoints(x=0, y=0, z=0)
+    assert live_plot_points_1 != live_plot_points_3
+
+    live_plot_points_4 = "ThisIsNotALivePointsObject"
+    assert live_plot_points_1 != live_plot_points_4
+
+
+def test_live_plot_points_raises_value_error_for_mixed_array_like_with_number_like_input():
+
+    with pytest.raises(ValueError) as e_info:
+        _ = LivePlotPoints(x=0, y=[0])
+
+    assert e_info.value.args[0] == "Arguments provided must be of the same type: floats or lists"
 
 
 @pytest.fixture(name="heatmap_plot_type")
@@ -130,6 +152,72 @@ def test_heatmap_data_packet(
             "data": heatmap_plot_points.to_scatter(),
         }
     )
+
+
+def test_heatmap_data_packet_with_numpy_arrays(
+    heatmap_plot_type: LivePlotType,
+    live_plot_labels: LivePlotLabels,
+    heatmap_plot_axis: LivePlotAxis,
+    heatmap_plot_points: LivePlotPoints,
+):
+
+    plot_id = 1
+    live_plot_packet = LivePlotPacket.build_packet(
+        plot_id=plot_id,
+        plot_type=heatmap_plot_type,
+        labels=live_plot_labels,
+        axis=heatmap_plot_axis,
+        x=np.array([point["x"] for point in heatmap_unit_plot_points]),
+        y=np.array([point["y"] for point in heatmap_unit_plot_points]),
+        z=np.array([point["z"] for point in heatmap_unit_plot_points]),
+    )
+
+    assert live_plot_packet.to_json() == json.dumps(
+        {
+            "plot_id": plot_id,
+            "plot_type": heatmap_plot_type.value,
+            "labels": asdict(live_plot_labels),
+            "data": heatmap_plot_points.to_scatter(),
+        }
+    )
+
+
+def test_heatmap_data_packet_parsing_with_point_single_values(
+    heatmap_plot_type: LivePlotType,
+    live_plot_labels: LivePlotLabels,
+    heatmap_plot_axis: LivePlotAxis,
+    heatmap_plot_points: LivePlotPoints,
+):
+
+    plot_id = 1
+    live_plot_packets = [
+        LivePlotPacket.build_packet(
+            plot_id=plot_id,
+            plot_type=heatmap_plot_type,
+            labels=live_plot_labels,
+            axis=heatmap_plot_axis,
+            x=point["x"],
+            y=point["y"],
+            z=point["z"],
+        )
+        for point in heatmap_unit_plot_points
+    ]
+
+    for index, live_plot_packet in enumerate(live_plot_packets):
+        assert live_plot_packet.to_json() == json.dumps(
+            {
+                "plot_id": plot_id,
+                "plot_type": heatmap_plot_type.value,
+                "labels": asdict(live_plot_labels),
+                "data": LivePlotPoints(
+                    x=heatmap_plot_points.x[index],
+                    y=heatmap_plot_points.y[index],
+                    z=heatmap_plot_points.z[index],
+                    idx=heatmap_plot_points._idx[index],  # type: ignore
+                    idy=heatmap_plot_points._idy[index],  # type: ignore
+                ).to_scatter(),
+            }
+        )
 
 
 def test_plotting_response_constructor():

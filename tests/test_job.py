@@ -1,7 +1,8 @@
-""" Tests methods for job """
+""" Tests methods for Job """
 
 from typing import cast
 
+import joblib.externals.loky.backend.reduction
 import pytest
 from qibo import gates
 from qibo.models.circuit import Circuit
@@ -118,16 +119,38 @@ def test_job_creation_default_values(circuit: Circuit, user: User, simulator_dev
     assert job.job_id == 0
     assert job.job_type == JobType.CIRCUIT
     assert job.user_id == user.user_id
+    assert job.device_id == simulator_device.id
     with pytest.raises(ValueError) as e_info:
         job.result()
     assert e_info.value.args[0] == "Job result still not completed"
+    with pytest.raises(ValueError) as e_info:
+        _ = job.algorithms
+    assert e_info.value.args[0] == "Job does not contains an algorithm Program"
+
+
+def test_jobs_job_type_raises_value_error(circuit: Circuit, user: User, simulator_device: SimulatorDevice):
+    """test job.job_type raises value error when unable to determine type
+
+    Args:
+        circuit (Circuit): circuit
+        user (User): User
+        simulator_device (SimulatorDevice): SimulatorDevice
+    """
+
+    job = Job(circuit=circuit, user=user, device=cast(Device, simulator_device))
+    job.circuit = None
+
+    with pytest.raises(ValueError) as e_info:
+        _ = job.job_type
+
+    assert e_info.value.args[0] == "Could not determine JobType"
 
 
 def test_job_creation_experiment(circuit: Circuit, user: User, simulator_device: SimulatorDevice):
     """test job creation using an experiment instead of a circuit
 
     Args:
-        circuit (Circuit): ProgramDefinition
+        circuit (Circuit): circuit
         user (User): User
         simulator_device (SimulatorDevice): SimulatorDevice
     """
@@ -204,6 +227,59 @@ def test_job_request(circuit: Circuit, user: User, simulator_device: SimulatorDe
     assert job.job_request == expected_job_request
 
 
+def test_job_request_raises_value_error_if_not_circuit_or_experiment(
+    circuit: Circuit, user: User, simulator_device: SimulatorDevice
+):
+    """test job raises proper exceptions when trying to build request with none of circuit, experiment
+
+    Args:
+        circuit (Circuit): Circuit
+        user (User): User
+        simulator_device (SimulatorDevice): SimulatorDevice
+    """
+    job = Job(
+        circuit=circuit,
+        user=user,
+        device=cast(Device, simulator_device),
+        job_status=JobStatus.COMPLETED,
+        id=23,
+        nshots=10,
+    )
+    job.circuit = None
+    with pytest.raises(ValueError) as e_info:
+        _ = job.job_request
+    assert e_info.value.args[0] == "Job requires either a program or a circuit"
+
+
+def test_job_request_raises_value_error_if_several_of_circuit_and_experiment(
+    circuit: Circuit, user: User, simulator_device: SimulatorDevice
+):
+    """test job raises proper exceptions when trying to build request with more than one of circuit, experiment
+
+    Args:
+        circuit (Circuit): Circuit
+        user (User): User
+        simulator_device (SimulatorDevice): SimulatorDevice
+    """
+    job = Job(
+        experiment=Experiment(
+            platform_name="Platform",
+            parameter_name="Parameter",
+            parameter_range=(1.0,),
+            circuit=circuit,
+        ),
+        user=user,
+        device=cast(Device, simulator_device),
+        job_status=JobStatus.COMPLETED,
+        id=23,
+        nshots=10,
+    )
+    job.circuit = circuit
+    with pytest.raises(ValueError) as e_info:
+        _ = job.job_request
+    assert e_info.value.args[0] == "Job cannot allow to have both circuit and experiment"
+
+
 def test_update_with_job_response(circuit: Circuit, user: User, simulator_device: SimulatorDevice):
     """test update with job response
 
@@ -235,6 +311,58 @@ def test_update_with_job_response(circuit: Circuit, user: User, simulator_device
     )
     job.update_with_job_response(job_response=job_response)
     assert job.result == [0.1, 0.1, 0.1, 0.1, 0.1]
+
+
+def test_update_with_job_response_raises_error_when_updating_incorrect_job(
+    circuit: Circuit, user: User, simulator_device: SimulatorDevice
+):
+    """test update with job response of different user or from different device raises ValueError
+
+    Args:
+        circuit (Circuit): Circuit
+        user (User): User
+        simulator_device (SimulatorDevice): SimulatorDevice
+    """
+
+    user_id = user.user_id
+    job_status = JobStatus.PENDING
+    job = Job(
+        circuit=circuit,
+        user=user,
+        device=cast(Device, simulator_device),
+        job_status=job_status,
+        id=23,
+    )
+
+    job_response_different_user = JobResponse(
+        user_id=user_id + 1,
+        number_shots=10,
+        job_type=JobType.CIRCUIT,
+        device_id=simulator_device.id,
+        description="",
+        job_id=job.id,
+        queue_position=0,
+        status=JobStatus.COMPLETED,
+        result="WzAuMSwgMC4xLCAwLjEsIDAuMSwgMC4xXQ==",
+    )
+    with pytest.raises(ValueError) as e_info:
+        job.update_with_job_response(job_response=job_response_different_user)
+    assert e_info.value.args[0] == "Job response does not belong to the user."
+
+    job_response_different_device = JobResponse(
+        user_id=user_id,
+        number_shots=10,
+        job_type=JobType.CIRCUIT,
+        device_id=simulator_device.id + 1,
+        description="",
+        job_id=job.id,
+        queue_position=0,
+        status=JobStatus.COMPLETED,
+        result="WzAuMSwgMC4xLCAwLjEsIDAuMSwgMC4xXQ==",
+    )
+    with pytest.raises(ValueError) as e_info:
+        job.update_with_job_response(job_response=job_response_different_device)
+    assert e_info.value.args[0] == "Job response does not belong to the device."
 
 
 # def test_job_creation_with_program(program_definition: ProgramDefinition, user: User, simulator_device: SimulatorDevice):

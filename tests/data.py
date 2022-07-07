@@ -4,6 +4,7 @@
 from qiboconnection.typings.device import (
     DeviceInput,
     DeviceStatus,
+    OfflineDeviceInput,
     QuantumDeviceCharacteristicsInput,
     QuantumDeviceInput,
     SimulatorDeviceCharacteristicsInput,
@@ -15,6 +16,13 @@ device_inputs = [
     DeviceInput(device_id=1, device_name="one_device", status="available", channel_id=None),
     DeviceInput(device_id=2, device_name="second_device", status=DeviceStatus.AVAILABLE, channel_id=None),
 ]
+
+
+offline_device_inputs = [
+    OfflineDeviceInput(device_id=1, device_name="one_device", status="offline", channel_id=None),
+    OfflineDeviceInput(device_id=2, device_name="second_device", status=DeviceStatus.OFFLINE, channel_id=None),
+]
+
 
 simulator_device_characteristics_inputs = [
     SimulatorDeviceCharacteristicsInput(
@@ -54,7 +62,7 @@ quantum_device_inputs = [
         last_calibration_time="0",
         channel_id=None,
         characteristics={"type": "quantum", "description": "Cluster"},
-        calibration_details={"t1": 10, "frequency": 988},
+        calibration_details={"t1": 10, "frequency": 988, "elapsed_time": 10},
     )
 ]
 

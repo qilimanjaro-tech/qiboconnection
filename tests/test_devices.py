@@ -1,4 +1,4 @@
-""" Tests methods for Device """
+""" Tests methods for Devices """
 
 import json
 
@@ -31,12 +31,14 @@ from .data import (
 
 
 def test_devices_constructor():
+    """Test Devices class constructor"""
     devices = Devices()
     assert isinstance(devices, Devices)
 
 
 @pytest.mark.parametrize("simulator_device_input", simulator_device_inputs)
 def test_devices_constructor_with_single_device(simulator_device_input: SimulatorDeviceInput):
+    """Test Devices class constructor providing a single device"""
     simulator_device = SimulatorDevice(device_input=simulator_device_input)
     devices = Devices(device=simulator_device)
     assert isinstance(devices, Devices)
@@ -44,6 +46,7 @@ def test_devices_constructor_with_single_device(simulator_device_input: Simulato
 
 @pytest.mark.parametrize("simulator_device_input", simulator_device_inputs)
 def test_devices_constructor_with_device_list(simulator_device_input: SimulatorDeviceInput):
+    """Test Devices class constructor providing a list of devices"""
     simulator_device_list = [SimulatorDevice(device_input=simulator_device_input)]
     devices = Devices(device=simulator_device_list)
     assert isinstance(devices, Devices)
@@ -51,6 +54,7 @@ def test_devices_constructor_with_device_list(simulator_device_input: SimulatorD
 
 @pytest.mark.parametrize("simulator_device_input", simulator_device_inputs)
 def test_devices_json(simulator_device_input: SimulatorDeviceInput):
+    """Test Devices().toJSON() method"""
     simulator_device = SimulatorDevice(device_input=simulator_device_input)
     devices = Devices(device=simulator_device)
     assert devices.toJSON() == f"{simulator_device.toJSON()}\n"
@@ -58,6 +62,7 @@ def test_devices_json(simulator_device_input: SimulatorDeviceInput):
 
 @pytest.mark.parametrize("simulator_device_input", simulator_device_inputs)
 def test_devices_str(simulator_device_input: SimulatorDeviceInput):
+    """Test Devices().__str__() method"""
     simulator_device = SimulatorDevice(device_input=simulator_device_input)
     devices = Devices(device=simulator_device)
     assert str(devices) == f"<Devices[1]:\n{simulator_device.toJSON()}\n"
@@ -65,6 +70,8 @@ def test_devices_str(simulator_device_input: SimulatorDeviceInput):
 
 @pytest.mark.parametrize("simulator_device_input", simulator_device_inputs)
 def test_devices_update_device(simulator_device_input: SimulatorDeviceInput):
+    """Test Devices().add_or_update() method with a not-preexisting device (add) and with a preexisting device
+    (update)"""
     simulator_device = SimulatorDevice(device_input=simulator_device_input)
     devices = Devices()
     # ADDS
@@ -77,6 +84,7 @@ def test_devices_update_device(simulator_device_input: SimulatorDeviceInput):
 
 @pytest.mark.parametrize("simulator_device_input", simulator_device_inputs)
 def test_devices_select_device(simulator_device_input: SimulatorDeviceInput):
+    """Test Devices().select_device() method"""
     simulator_device = SimulatorDevice(device_input=simulator_device_input)
     devices = Devices(simulator_device)
     selected_device = devices.select_device(device_id=1)
@@ -85,6 +93,7 @@ def test_devices_select_device(simulator_device_input: SimulatorDeviceInput):
 
 @pytest.mark.parametrize("simulator_device_input", simulator_device_inputs)
 def test_devices_select_device_raises_value_error_for_nonexistent_devices(simulator_device_input: SimulatorDeviceInput):
+    """Test Devices().select_device() method providing it an id of a non-existing device."""
     devices = Devices()
     with pytest.raises(ValueError) as e_info:
         _ = devices.select_device(device_id=1)
@@ -93,6 +102,7 @@ def test_devices_select_device_raises_value_error_for_nonexistent_devices(simula
 
 @pytest.mark.parametrize("simulator_device_input", simulator_device_inputs)
 def test_devices_select_device_raises_value_error_for_duplicated(simulator_device_input: SimulatorDeviceInput):
+    """Test Devices.select_device() method providing it an id of a duplicated device."""
     simulator_device = SimulatorDevice(device_input=simulator_device_input)
     devices = Devices([simulator_device, simulator_device])
     with pytest.raises(ValueError) as e_info:

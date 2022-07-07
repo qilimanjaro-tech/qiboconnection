@@ -1,4 +1,5 @@
 """ Tests methods for job result """
+
 from qiboconnection.job_result import JobResult
 
 
