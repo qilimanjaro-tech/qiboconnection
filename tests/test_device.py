@@ -19,8 +19,14 @@ from qiboconnection.devices.simulator_device import SimulatorDevice
 from qiboconnection.devices.simulator_device_characteristics import (
     SimulatorDeviceCharacteristics,
 )
+from qiboconnection.devices.util import (
+    create_device,
+    is_offline_device_input,
+    is_quantum_device_input,
+)
 from qiboconnection.typings.device import (
     DeviceInput,
+    DeviceStatus,
     SimulatorDeviceCharacteristicsInput,
     SimulatorDeviceInput,
 )
@@ -180,6 +186,80 @@ def test_quantum_device_characteristics_json_representation(
 
 @pytest.mark.parametrize("device_input", device_inputs)
 def test_offline_device_constructor(device_input: DeviceInput):
-    offline_device_input = OfflineDeviceInput(**device_input.__dict__)
+    offline_device_input_dict = device_input.__dict__.copy()
+    offline_device_input_dict["status"] = DeviceStatus.OFFLINE.value
+
+    offline_device_input = OfflineDeviceInput(**offline_device_input_dict)
     device = OfflineDevice(device_input=offline_device_input)
     assert isinstance(device, OfflineDevice)
+
+
+@pytest.mark.parametrize("device_input", device_inputs)
+def test_is_offline_device_input(device_input: DeviceInput):
+    device_input_dict = device_input.__dict__.copy()
+    device_input_dict["status"] = DeviceStatus.OFFLINE.value
+
+    offline_device_input = OfflineDeviceInput(**device_input_dict)
+    assert is_offline_device_input(device_input=offline_device_input.__dict__)
+
+
+@pytest.mark.parametrize("device_input", device_inputs)
+def test_is_offline_device_input_rises_valueerror(device_input: DeviceInput):
+    device_input_dict = device_input.__dict__.copy()
+    device_input_dict["status"] = None
+
+    offline_device_input = OfflineDeviceInput(**device_input_dict)
+    with pytest.raises(ValueError) as e_info:
+        _ = is_offline_device_input(device_input=offline_device_input.__dict__)
+
+    assert e_info.value.args[0] == "'status' missing in device_input keys"
+
+
+@pytest.mark.parametrize("quantum_device_input", quantum_device_inputs)
+def test_is_quantum_device_input(quantum_device_input: QuantumDeviceInput):
+    assert is_quantum_device_input(device_input=quantum_device_input.__dict__)
+
+
+@pytest.mark.parametrize("device_input", device_inputs)
+def test_create_offline_device(device_input: DeviceInput):
+    device_input_dict = device_input.__dict__.copy()
+    device_input_dict["status"] = DeviceStatus.OFFLINE.value
+
+    offline_device_input = OfflineDeviceInput(**device_input_dict)
+    device = create_device(device_input=offline_device_input.__dict__)
+    assert isinstance(device, OfflineDevice)
+
+
+@pytest.mark.parametrize("simulator_device_input", simulator_device_inputs)
+def test_create_simulator_device(simulator_device_input: SimulatorDeviceInput):
+    """Test whether the utils function create_device() decides to properly create a simulator device when it meets
+    a dictionary that has the properties of a simulator."""
+    stripped_down_simulator_device_input = simulator_device_input.__dict__.copy()
+
+    stripped_down_simulator_device_input["characteristics"] = stripped_down_simulator_device_input[
+        "_characteristics"
+    ].__dict__
+    del stripped_down_simulator_device_input["_characteristics"]
+
+    device = create_device(device_input=stripped_down_simulator_device_input)
+    assert isinstance(device, SimulatorDevice)
+
+
+@pytest.mark.parametrize("quantum_device_input", quantum_device_inputs)
+def test_create_quantum_device(quantum_device_input: QuantumDeviceInput):
+    """Test whether the utils function create_device() decides to properly create a quantum devices when it meets
+    a dictionary that has the properties of a quantum device."""
+    stripped_down_quantum_device_input = quantum_device_input.__dict__.copy()
+
+    stripped_down_quantum_device_input["characteristics"] = stripped_down_quantum_device_input[
+        "_characteristics"
+    ].__dict__
+    del stripped_down_quantum_device_input["_characteristics"]
+
+    stripped_down_quantum_device_input["calibration_details"] = stripped_down_quantum_device_input[
+        "_calibration_details"
+    ].__dict__
+    del stripped_down_quantum_device_input["_calibration_details"]
+
+    device = create_device(device_input=stripped_down_quantum_device_input)
+    assert isinstance(device, QuantumDevice)

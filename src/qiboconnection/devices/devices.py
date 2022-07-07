@@ -18,14 +18,11 @@ class Devices(ABC):
     @typechecked
     def __init__(
         self,
-        device: Optional[
-            Union[
-                QuantumDevice,
-                SimulatorDevice,
-                OfflineDevice,
-                List[Union[QuantumDevice, SimulatorDevice, OfflineDevice]],
-            ]
-        ] = None,
+        device: QuantumDevice
+        | SimulatorDevice
+        | OfflineDevice
+        | List[QuantumDevice | SimulatorDevice | OfflineDevice]
+        | None = None,
     ):
         only_one_device_not_null = device is not None and not isinstance(device, list)
         more_than_one_device_not_null = device is not None and isinstance(device, list)

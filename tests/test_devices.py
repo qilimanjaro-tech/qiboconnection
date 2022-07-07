@@ -67,6 +67,10 @@ def test_devices_str(simulator_device_input: SimulatorDeviceInput):
 def test_devices_update_device(simulator_device_input: SimulatorDeviceInput):
     simulator_device = SimulatorDevice(device_input=simulator_device_input)
     devices = Devices()
+    # ADDS
+    devices.add_or_update(simulator_device)
+    assert devices.to_dict() == [dict(simulator_device.__dict__.items())]
+    # UPDATES
     devices.add_or_update(simulator_device)
     assert devices.to_dict() == [dict(simulator_device.__dict__.items())]
 
@@ -77,6 +81,23 @@ def test_devices_select_device(simulator_device_input: SimulatorDeviceInput):
     devices = Devices(simulator_device)
     selected_device = devices.select_device(device_id=1)
     assert selected_device.toJSON() == simulator_device.toJSON()
+
+
+@pytest.mark.parametrize("simulator_device_input", simulator_device_inputs)
+def test_devices_select_device_raises_value_error_for_nonexistent_devices(simulator_device_input: SimulatorDeviceInput):
+    devices = Devices()
+    with pytest.raises(ValueError) as e_info:
+        _ = devices.select_device(device_id=1)
+    assert e_info.value.args[0] == "Device not found"
+
+
+@pytest.mark.parametrize("simulator_device_input", simulator_device_inputs)
+def test_devices_select_device_raises_value_error_for_duplicated(simulator_device_input: SimulatorDeviceInput):
+    simulator_device = SimulatorDevice(device_input=simulator_device_input)
+    devices = Devices([simulator_device, simulator_device])
+    with pytest.raises(ValueError) as e_info:
+        _ = devices.select_device(device_id=1)
+    assert e_info.value.args[0] == "Device duplicated with same id:1"
 
 
 #

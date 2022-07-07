@@ -18,6 +18,7 @@ from qiboconnection.typings.algorithm import (
     InitialValue,
     ProgramDefinition,
 )
+from qiboconnection.typings.experiment import Experiment
 from qiboconnection.typings.job import JobRequest, JobResponse, JobStatus, JobType
 from qiboconnection.user import User
 
@@ -116,10 +117,63 @@ def test_job_creation_default_values(circuit: Circuit, user: User, simulator_dev
     assert job.job_result is None
     assert job.job_id == 0
     assert job.job_type == JobType.CIRCUIT
-    with pytest.raises(Exception) as e_info:
+    assert job.user_id == user.user_id
+    with pytest.raises(ValueError) as e_info:
         job.result()
-    assert e_info.type == ValueError
     assert e_info.value.args[0] == "Job result still not completed"
+
+
+def test_job_creation_experiment(circuit: Circuit, user: User, simulator_device: SimulatorDevice):
+    """test job creation using an experiment instead of a circuit
+
+    Args:
+        circuit (Circuit): ProgramDefinition
+        user (User): User
+        simulator_device (SimulatorDevice): SimulatorDevice
+    """
+
+    experiment = Experiment(
+        platform_name="Plattform", parameter_name="Parameter", parameter_range=(1.0,), circuit=circuit
+    )
+    job = Job(experiment=experiment, user=user, device=cast(Device, simulator_device))
+    assert job.job_type == JobType.EXPERIMENT
+
+
+def test_job_creation_experiment_raises_value_error_when_both_circuit_and_experiment_are_defined(
+    circuit: Circuit, user: User, simulator_device: SimulatorDevice
+):
+    """test job creation using both experiment and circuit at the same time
+
+    Args:
+        circuit (Circuit): ProgramDefinition
+        user (User): User
+        simulator_device (SimulatorDevice): SimulatorDevice
+    """
+
+    experiment = Experiment(
+        platform_name="Plattform", parameter_name="Parameter", parameter_range=(1.0,), circuit=circuit
+    )
+
+    with pytest.raises(ValueError) as e_info:
+        _ = Job(experiment=experiment, circuit=circuit, user=user, device=cast(Device, simulator_device))
+    assert (
+        e_info.value.args[0] == "Both circuit and experiment were provided, but execute() only takes at most of them."
+    )
+
+
+def test_job_creation_experiment_raises_value_error_when_neither_of_circuit_and_experiment_are_defined(
+    circuit: Circuit, user: User, simulator_device: SimulatorDevice
+):
+    """test job creation using neither experiment nor circuit
+
+    Args:
+        circuit (Circuit): ProgramDefinition
+        user (User): User
+        simulator_device (SimulatorDevice): SimulatorDevice
+    """
+    with pytest.raises(ValueError) as e_info:
+        _ = Job(experiment=None, circuit=None, user=user, device=cast(Device, simulator_device))
+    assert e_info.value.args[0] == "Neither of experiment or circuit were provided,"
 
 
 def test_job_request(circuit: Circuit, user: User, simulator_device: SimulatorDevice):

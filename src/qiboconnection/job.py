@@ -36,7 +36,7 @@ class Job(ABC):
     def __post_init__(self):
         if self.experiment is not None and self.circuit is not None:
             raise ValueError("Both circuit and experiment were provided, but execute() only takes at most of them.")
-        if {self.experiment, self.circuit} == {None}:
+        if self.experiment is None and self.circuit is None:
             raise ValueError("Neither of experiment or circuit were provided,")
 
     @property

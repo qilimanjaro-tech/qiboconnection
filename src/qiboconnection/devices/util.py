@@ -39,7 +39,7 @@ def is_offline_device_input(device_input: dict) -> bool:
     Returns:
         bool: True if the device is from an Offline Device
     """
-    if "status" not in device_input:
+    if "status" not in device_input or device_input["status"] is None:
         raise ValueError("'status' missing in device_input keys")
     return device_input["status"] in [
         DeviceStatus.OFFLINE,

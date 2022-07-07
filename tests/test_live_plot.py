@@ -51,7 +51,7 @@ def test_live_plot(live_plot_type: LivePlotType, live_plot_labels: LivePlotLabel
 
     assert live_plot.plot_id == plot_id
     assert live_plot.plot_type == live_plot_type
-    assert live_plot_labels == live_plot_labels
+    assert live_plot.labels == live_plot_labels
     assert live_plot.axis == live_plot_axis
 
 
