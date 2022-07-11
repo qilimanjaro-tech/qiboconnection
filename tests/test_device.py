@@ -231,7 +231,7 @@ def test_is_offline_device_input(offline_device_input: OfflineDeviceInput):
 @pytest.mark.parametrize("offline_device_input", offline_device_inputs)
 def test_is_offline_device_input_rises_value_error_if_no_status(offline_device_input: OfflineDeviceInput):
     """Tests is_offline_device() utility function rises error when provided an OnlineDevice-like input data"""
-    offline_device_input.status = None
+    offline_device_input.status = None  # type: ignore
 
     with pytest.raises(ValueError) as e_info:
         _ = is_offline_device_input(device_input=offline_device_input.__dict__)

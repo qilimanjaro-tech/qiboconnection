@@ -2,7 +2,6 @@
 
 from typing import cast
 
-import joblib.externals.loky.backend.reduction
 import pytest
 from qibo import gates
 from qibo.models.circuit import Circuit
@@ -335,7 +334,7 @@ def test_update_with_job_response_raises_error_when_updating_incorrect_job(
     )
 
     job_response_different_user = JobResponse(
-        user_id=user_id + 1,
+        user_id=user_id + 1 if user_id is not None else 1,
         number_shots=10,
         job_type=JobType.CIRCUIT,
         device_id=simulator_device.id,

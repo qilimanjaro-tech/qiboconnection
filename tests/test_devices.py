@@ -1,6 +1,7 @@
 """ Tests methods for Devices """
 
 import json
+from typing import List
 
 import pytest
 
@@ -39,7 +40,7 @@ def test_devices_constructor():
 @pytest.mark.parametrize("simulator_device_input", simulator_device_inputs)
 def test_devices_constructor_with_single_device(simulator_device_input: SimulatorDeviceInput):
     """Test Devices class constructor providing a single device"""
-    simulator_device = SimulatorDevice(device_input=simulator_device_input)
+    simulator_device: Device = SimulatorDevice(device_input=simulator_device_input)
     devices = Devices(device=simulator_device)
     assert isinstance(devices, Devices)
 
@@ -47,7 +48,7 @@ def test_devices_constructor_with_single_device(simulator_device_input: Simulato
 @pytest.mark.parametrize("simulator_device_input", simulator_device_inputs)
 def test_devices_constructor_with_device_list(simulator_device_input: SimulatorDeviceInput):
     """Test Devices class constructor providing a list of devices"""
-    simulator_device_list = [SimulatorDevice(device_input=simulator_device_input)]
+    simulator_device_list: List[Device] = [SimulatorDevice(device_input=simulator_device_input)]
     devices = Devices(device=simulator_device_list)
     assert isinstance(devices, Devices)
 
