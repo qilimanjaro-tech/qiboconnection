@@ -362,10 +362,12 @@ class API(ABC):
 
         Attributes:
             plot_type: LivePlotType
-            title:
-            x_label:
-            y_label:
-            z_label:
+            title: title for the plot
+            x_label: title for the x label
+            y_label: title for the y label
+            z_label: title for the z label
+            x_axis: range of values for the x_axis
+            y_axis: range of values for the y_axis
 
 
         Raises:
