@@ -91,3 +91,8 @@ flake8 = [
 
 [tool.nbqa.md]
 mdformat = true
+
+[tool.pytest.ini_options]
+filterwarnings = [
+    'ignore::DeprecationWarning',
+]
