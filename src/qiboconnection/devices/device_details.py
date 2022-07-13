@@ -19,4 +19,9 @@ class DeviceDetails(ABC):
         return self._str
 
     def __repr__(self) -> str:
+        """String representation of DeviceDetails
+
+        Returns:
+            str: String representationDeviceDetails
+        """
         return self._str

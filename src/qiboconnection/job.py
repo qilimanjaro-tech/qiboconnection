@@ -4,8 +4,8 @@ import io
 import json
 import pickle  # nosec - temporary bandit ignore
 from abc import ABC
-from dataclasses import dataclass
-from typing import Any, List
+from dataclasses import asdict, dataclass, field
+from typing import Any, List, cast
 
 from qibo.models.circuit import Circuit
 from typeguard import typechecked
@@ -13,7 +13,8 @@ from typeguard import typechecked
 from qiboconnection.devices.device import Device
 from qiboconnection.job_result import JobResult
 from qiboconnection.typings.algorithm import ProgramDefinition
-from qiboconnection.typings.job import JobRequest, JobResponse, JobStatus
+from qiboconnection.typings.experiment import Experiment
+from qiboconnection.typings.job import JobRequest, JobResponse, JobStatus, JobType
 from qiboconnection.user import User
 from qiboconnection.util import base64url_encode
 
@@ -24,18 +25,22 @@ class Job(ABC):
 
     user: User
     device: Device
-    program: ProgramDefinition | None = None
+    program: ProgramDefinition | None = field(default=None)
     circuit: Circuit | None = None
+    experiment: Experiment | None = None
+    nshots: int = 10
     job_status: JobStatus = JobStatus.NOT_SENT
     job_result: JobResult | None = None
     id: int = 0  # pylint: disable=invalid-name
 
     def __post_init__(self):
-        if self.program is None and self.circuit is None:
-            raise ValueError("Job requires either a program or a circuit")
+        if self.experiment is not None and self.circuit is not None:
+            raise ValueError("Both circuit and experiment were provided, but execute() only takes at most of them.")
+        if self.experiment is None and self.circuit is None:
+            raise ValueError("Neither of experiment or circuit were provided,")
 
     @property
-    def user_id(self) -> int:
+    def user_id(self) -> int | None:
         """User identifier
 
         Returns:
@@ -70,7 +75,12 @@ class Job(ABC):
         Returns:
             JobRequest: Job Request object
         """
-        return JobRequest(user_id=self.user.user_id, device_id=self.device.id, description=self._get_job_description())
+        return JobRequest(
+            user_id=self.user.user_id,
+            device_id=self.device.id,
+            number_shots=self.nshots,
+            description=self._get_job_description(),
+        )
 
     @property
     def job_id(self) -> int:
@@ -83,19 +93,34 @@ class Job(ABC):
 
     @job_id.setter
     def job_id(self, job_id: int) -> None:
+        """
+        Modifies internal Job identifier, accessed via job_id property
+        Args:
+            job_id: new job_id value
+        """
         self.id = job_id
 
+    @property
+    def job_type(self):
+        """Get the type of the job, checking whether the user has defined circuit or experiment."""
+        if self.experiment is None and self.circuit is not None:
+            return JobType.CIRCUIT
+        if self.experiment is not None and self.circuit is None:
+            return JobType.EXPERIMENT
+        raise ValueError("Could not determine JobType")
+
     def _get_job_description(self) -> str:
-        if self.program is None and self.circuit is None:
+        if self.experiment is None and self.circuit is None:
             raise ValueError("Job requires either a program or a circuit")
+        if self.experiment is not None and self.circuit is not None:
+            raise ValueError("Job cannot allow to have both circuit and experiment")
 
-        if self.program is not None:
-            return base64url_encode(json.dumps(self.algorithms))
+        if self.experiment is not None:
+            return _jsonify_dict_and_base64_encode(object_to_encode=asdict(self.experiment))
+        if self.circuit is not None:
+            return _jsonify_str_and_base64_encode(object_to_encode=self.circuit.to_qasm())
 
-        # self.circuit is not None
-        circuit_buffer = io.BytesIO()
-        pickle.dump(self.circuit, circuit_buffer)
-        return str(base64.urlsafe_b64encode(circuit_buffer.getvalue()), "utf-8")
+        raise ValueError("Something failed.")
 
     @property
     def result(self) -> Any:
@@ -131,3 +156,15 @@ class Job(ABC):
             job_response.status if isinstance(job_response.status, JobStatus) else JobStatus(job_response.status)
         )
         self.job_result = JobResult(job_id=self.id, http_response=job_response.result)
+
+
+def _jsonify_dict_and_base64_encode(object_to_encode: dict):
+    """
+    Jsonifies a given dict, encodes it to bytes assuming utf-8, and encodes that byte obj to an url-save base64 str
+    """
+    return str(base64.urlsafe_b64encode(json.dumps(object_to_encode).encode("utf-8")), "utf-8")
+
+
+def _jsonify_str_and_base64_encode(object_to_encode: str):
+    """Encodes a given string to bytes assuming utf-8, and encodes that byte-array to a nurl-save base64 str"""
+    return str(base64.urlsafe_b64encode(object_to_encode.encode("utf-8")), "utf-8")

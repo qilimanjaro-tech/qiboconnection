@@ -14,14 +14,14 @@ class QuantumDevice(OnlineDevice):
     @typechecked
     def __init__(self, device_input: QuantumDeviceInput):
         self._characteristics = (
-            QuantumDeviceCharacteristics(device_input.characteristics)
-            if device_input.characteristics is not None
+            QuantumDeviceCharacteristics(device_input.q_characteristics)
+            if device_input.q_characteristics is not None
             else None
         )
         self._last_calibration_time = device_input.last_calibration_time
         self._calibration_details = (
-            CalibrationDetails(device_input.calibration_details)
-            if device_input.calibration_details is not None
+            CalibrationDetails(device_input.q_calibration_details)
+            if device_input.q_calibration_details is not None
             else None
         )
 

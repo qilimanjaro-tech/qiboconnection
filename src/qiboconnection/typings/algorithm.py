@@ -50,6 +50,11 @@ class AlgorithmOptions:
 
     @property
     def __dict__(self):
+        """
+        Build class dict.
+        Returns:
+            dict: representation of the class
+        """
         return {"number_qubits": self.number_qubits, "initial_value": self.initial_value.value}
 
 
@@ -63,6 +68,11 @@ class AlgorithmDefinition:
 
     @property
     def __dict__(self):
+        """
+        Build class dict.
+        Returns:
+            dict: representation of the class
+        """
         return {
             "name": self.name.value,
             "type": self.algorithm_type.value,

@@ -129,3 +129,6 @@ dmypy.json
 .pyre/
 
 qibo_configuration
+.qibo_configuratio
+.qibo_configuration
+_build
