@@ -4,7 +4,7 @@ from abc import ABC
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from io import TextIOWrapper
-from typing import Any, Literal, Optional, TextIO, Tuple, Union
+from typing import Any, Optional, TextIO, Tuple, Union
 
 import jwt
 import requests

@@ -2,7 +2,7 @@
 import json
 from abc import ABC
 from dataclasses import asdict
-from typing import List, Literal, Optional, Union, cast
+from typing import List, Optional, cast
 
 import numpy as np
 import numpy.typing as npt
@@ -11,7 +11,7 @@ from qibo.core.circuit import Circuit
 from requests import HTTPError
 from typeguard import typechecked
 
-from qiboconnection.config import EnvironmentType, logger
+from qiboconnection.config import logger
 from qiboconnection.connection import Connection
 from qiboconnection.devices.device import Device
 from qiboconnection.devices.devices import Devices
@@ -138,6 +138,7 @@ class API(ABC):
             logger.info("Device %s selected.", selected_device.name)
         except HTTPError as ex:
             logger.error(json.loads(str(ex))["detail"])
+            raise ex
 
     @typechecked
     def select_device_ids(self, device_ids: List[int]) -> None:
@@ -158,11 +159,12 @@ class API(ABC):
                 self._selected_devices.append(self._devices.select_device(device_id=device_id))
             except HTTPError as ex:
                 logger.error(json.loads(str(ex))["detail"])
+                raise ex
         linebreak = "\n"
-        logger.info(
-            f"Selected devices:{f'{linebreak} -'}"
-            f"{linebreak.join([f' -{device.name}' for device in self._selected_devices])}"
+        text = (
+            f"Selected devices:{linebreak} -{linebreak.join([f' -{device.name}' for device in self._selected_devices])}"
         )
+        logger.info(text)
 
     @typechecked
     def block_device_id(self, device_id: int) -> None:
@@ -181,6 +183,7 @@ class API(ABC):
             self._devices.block_device(connection=self._connection, device_id=device_id)
         except HTTPError as ex:
             logger.error(json.loads(str(ex))["detail"])
+            raise ex
 
     @typechecked
     def release_device(self, device_id: int) -> None:
@@ -260,6 +263,7 @@ class API(ABC):
                     selected_devices.append(self._devices.select_device(device_id=device_id))
                 except HTTPError as ex:
                     logger.error(json.loads(str(ex))["detail"])
+                    raise ex
         else:
             selected_devices = cast(
                 List[Device | QuantumDevice | SimulatorDevice | OfflineDevice], self._selected_devices
