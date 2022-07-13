@@ -3,7 +3,6 @@ import pytest
 from qiboconnection.api import API
 
 
-def test_api_constructor():
+def test_api_constructor(mocked_api: API):
     """Test API class constructor"""
-    api = API()
-    assert isinstance(api, API)
+    assert isinstance(mocked_api, API)
