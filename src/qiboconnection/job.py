@@ -36,11 +36,11 @@ class Job(ABC):
     def __post_init__(self):
         if self.experiment is not None and self.circuit is not None:
             raise ValueError("Both circuit and experiment were provided, but execute() only takes at most of them.")
-        if {self.experiment, self.circuit} == {None}:
+        if self.experiment is None and self.circuit is None:
             raise ValueError("Neither of experiment or circuit were provided,")
 
     @property
-    def user_id(self) -> int:
+    def user_id(self) -> int | None:
         """User identifier
 
         Returns:
@@ -102,15 +102,15 @@ class Job(ABC):
 
     @property
     def job_type(self):
-        """Get the type of the job, checking wheter the user has defined circuit or experiment."""
+        """Get the type of the job, checking whether the user has defined circuit or experiment."""
         if self.experiment is None and self.circuit is not None:
             return JobType.CIRCUIT
         if self.experiment is not None and self.circuit is None:
             return JobType.EXPERIMENT
-        return ValueError("Could not determine JobType")
+        raise ValueError("Could not determine JobType")
 
     def _get_job_description(self) -> str:
-        if {self.experiment, self.circuit} == {None}:
+        if self.experiment is None and self.circuit is None:
             raise ValueError("Job requires either a program or a circuit")
         if self.experiment is not None and self.circuit is not None:
             raise ValueError("Job cannot allow to have both circuit and experiment")
@@ -120,7 +120,7 @@ class Job(ABC):
         if self.circuit is not None:
             return _jsonify_str_and_base64_encode(object_to_encode=self.circuit.to_qasm())
 
-        raise ValueError("Something happened building the job description")
+        raise ValueError("Something failed.")
 
     @property
     def result(self) -> Any:

@@ -128,5 +128,7 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+qibo_configuration
+.qibo_configuratio
 .qibo_configuration
 _build

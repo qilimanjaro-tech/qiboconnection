@@ -17,7 +17,7 @@ class JobResult:
 
     job_id: int
     http_response: str
-    data: List[AbstractState] | AbstractState | ndarray | None = field(init=False)
+    data: List[AbstractState] | AbstractState | ndarray | List[int | float] | None = field(init=False)
 
     def __post_init__(self) -> None:
         """

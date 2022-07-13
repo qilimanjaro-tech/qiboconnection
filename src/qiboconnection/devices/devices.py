@@ -1,14 +1,12 @@
 """ Devices class """
 from abc import ABC
-from typing import List, Optional, Union
+from typing import List
 
 from typeguard import typechecked
 
 from qiboconnection.config import logger
 from qiboconnection.connection import Connection
-from qiboconnection.devices.offline_device import OfflineDevice
-from qiboconnection.devices.quantum_device import QuantumDevice
-from qiboconnection.devices.simulator_device import SimulatorDevice
+from qiboconnection.devices.device import Device
 from qiboconnection.devices.util import block_device
 
 
@@ -18,40 +16,47 @@ class Devices(ABC):
     @typechecked
     def __init__(
         self,
-        device: Optional[
-            Union[
-                QuantumDevice,
-                SimulatorDevice,
-                OfflineDevice,
-                List[Union[QuantumDevice, SimulatorDevice, OfflineDevice]],
-            ]
-        ] = None,
+        device: Device | List[Device] | None = None,
     ):
         only_one_device_not_null = device is not None and not isinstance(device, list)
         more_than_one_device_not_null = device is not None and isinstance(device, list)
 
-        self._devices: list[Union[QuantumDevice, SimulatorDevice, OfflineDevice]] = []
+        self._devices: List[Device] = []
         if only_one_device_not_null:
             self.add(device=device)  # type: ignore
         if more_than_one_device_not_null:
             self._create_list_of_devices(list_devices=device)  # type: ignore
 
     @typechecked
-    def _create_list_of_devices(self, list_devices: list[Union[QuantumDevice, SimulatorDevice, OfflineDevice]]):
+    def _create_list_of_devices(self, list_devices: List[Device]):
+        """Appends each of the devices to self._devices
+
+        Args:
+            list_devices: devices to be appended
+        """
         for device in list_devices:
             self._devices.append(device)
 
     @typechecked
-    def add(self, device: Union[QuantumDevice, SimulatorDevice, OfflineDevice]) -> None:
+    def add(self, device: Device) -> None:
         """Adds a new Device
 
         Args:
-            device (Union[QuantumDevice, SimulatorDevice, OfflineDevice]): any Device supported type
+            device (Device): any Device supported type
         """
         self._devices.append(device)
 
     @typechecked
-    def _update(self, device: Union[QuantumDevice, SimulatorDevice, OfflineDevice]) -> bool:
+    def _update(self, device: Device) -> bool:
+        """
+        Checks if inner list of devices contains a device with the same id as the input device. If there is one, it
+        replaces it with the new device.
+        Args:
+            device: Device with new information
+
+        Returns:
+            bool: True if one device has been updated. False otherwise.
+        """
         for index, current_device in enumerate(self._devices):
             if current_device.id == device.id:
                 self._devices[index] = device
@@ -59,11 +64,11 @@ class Devices(ABC):
         return False
 
     @typechecked
-    def add_or_update(self, device: Union[QuantumDevice, SimulatorDevice, OfflineDevice]) -> None:
+    def add_or_update(self, device: Device) -> None:
         """Adds a new Device or updates an existing one
 
         Args:
-            device (Union[QuantumDevice, SimulatorDevice, OfflineDevice]): any Device supported type
+            device (Device): any Device supported type
         """
         updated = self._update(device=device)
         if not updated:
@@ -87,7 +92,7 @@ class Devices(ABC):
         Returns:
             list[dict]: a list of Devices converted into a dictionary
         """
-        return [dict(device.__dict__().items()) for device in self._devices]
+        return [dict(device.__dict__.items()) for device in self._devices]
 
     def toJSON(self) -> str:  # pylint: disable=invalid-name
         """returns a JSON string representation of the devices
@@ -104,7 +109,7 @@ class Devices(ABC):
     def select_device(
         self,
         device_id: int,
-    ) -> Union[QuantumDevice, SimulatorDevice, OfflineDevice]:
+    ) -> Device:
         """Finds the specific device and returns it
 
         Args:
@@ -115,7 +120,15 @@ class Devices(ABC):
         """
         return self._find_device(device_id)
 
-    def _find_device(self, device_id: int) -> Union[QuantumDevice, SimulatorDevice, OfflineDevice]:
+    def _find_device(self, device_id: int) -> Device:
+        """
+
+        Args:
+            device_id:
+
+        Returns:
+
+        """
         device_found = [device for device in self._devices if device.id == device_id]
         if not device_found:
             raise ValueError("Device not found")
@@ -124,7 +137,7 @@ class Devices(ABC):
         return device_found.pop()
 
     def block_device(self, connection: Connection, device_id: int) -> None:
-        """Blocks a device to avoid besing used by others
+        """Blocks a device to avoid it being used by others
 
         Args:
             connection (Connection): Qibo remote connection

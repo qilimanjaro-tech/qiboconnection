@@ -9,6 +9,9 @@ from qiboconnection.connection import ConnectionConfiguration
 
 
 def user_example() -> None:
+    """
+    Example code that a user could run for executing a circuit remotely.
+    """
 
     # Connect using credentials
     myconf = ConnectionConfiguration(user_id=1, username="my-user-name", api_key="abcdefg-hijk-lmno-pqrs-tuvwxyzABCDE")
@@ -31,10 +34,10 @@ def user_example() -> None:
     circuit.add(gates.M(0))
 
     # Issue an async remote execution of the circuit
-    job_id = qibo_api.execute(circuit=circuit)
-    print(f"job id: {job_id}")
+    job_ids = qibo_api.execute(circuit=circuit)
+    print(f"job id: {job_ids}")
     sleep(1)
-    result = qibo_api.get_result(job_id=job_id)
+    result = qibo_api.get_results(job_ids=job_ids)
     if result is not None:
         print(result)
 

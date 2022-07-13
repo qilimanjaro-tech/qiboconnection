@@ -47,7 +47,7 @@ class JobRequest(ABC):
         number_shots (int): number of times the job is to be executed
     """
 
-    user_id: int
+    user_id: int | None
     device_id: int
     description: str
     number_shots: int
@@ -64,7 +64,7 @@ class JobResponse(JobRequest):
         job_id (int): Job identifier
         queue_position (int): Job queue position
         status (str | JobStatus): Status of the job
-        job_type (str | JobType): Status of the job
+        job_type (str | JobType): Type of the job
         result (str): Job result
     """
 

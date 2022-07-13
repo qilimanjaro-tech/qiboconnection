@@ -43,12 +43,3 @@ class CalibrationDetails(DeviceDetails):
         if self._frequency:
             calibration_dict |= {"frequency": self._frequency}
         return calibration_dict
-
-    def toJSON(self) -> str:  # pylint: disable=invalid-name
-        """JSON representation of SimulatorDeviceCharacteristics
-
-        Returns:
-            str: JSON serialization of SimulatorDeviceCharacteristics object
-        """
-
-        return json.dumps(self.__dict__, indent=2)

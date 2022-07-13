@@ -4,7 +4,8 @@ from abc import ABC
 from dataclasses import asdict
 from typing import List, Literal, Optional, Union, cast
 
-from numpy import ndarray
+import numpy as np
+import numpy.typing as npt
 from qibo.abstractions.states import AbstractState
 from qibo.core.circuit import Circuit
 from requests import HTTPError
@@ -26,6 +27,7 @@ from qiboconnection.typings.connection import ConnectionConfiguration
 from qiboconnection.typings.experiment import Experiment
 from qiboconnection.typings.job import JobResponse, JobStatus
 from qiboconnection.typings.live_plot import (
+    LivePlotAxis,
     LivePlotLabels,
     LivePlotType,
     PlottingResponse,
@@ -114,8 +116,10 @@ class API(ABC):
 
         if self._devices is None:
             self._devices = Devices([new_device])
-        else:
+        elif isinstance(self._devices, Devices):
             self._devices.add_or_update(new_device)
+        else:
+            raise ValueError("Unexpected object in Devices.")
 
     @typechecked
     def select_device_id(self, device_id: int) -> None:
@@ -124,10 +128,10 @@ class API(ABC):
         Args:
             device_id (int): Device identifier
 
-        Raises:
-            ValueError: No devices collected. Please call 'list_devices' first.
         """
         self._add_or_update_single_device(device_id=device_id)
+        if self._devices is None:
+            raise ValueError("Devices object was not created after updating.")
         try:
             selected_device = self._devices.select_device(device_id=device_id)
             self._selected_devices = [selected_device]
@@ -148,6 +152,8 @@ class API(ABC):
         self._selected_devices = []
         for device_id in device_ids:
             self._add_or_update_single_device(device_id=device_id)
+            if self._devices is None:
+                raise ValueError("Devices object was not created after updating.")
             try:
                 self._selected_devices.append(self._devices.select_device(device_id=device_id))
             except HTTPError as ex:
@@ -249,6 +255,8 @@ class API(ABC):
             for device_id in device_ids:
                 try:
                     self._add_or_update_single_device(device_id=device_id)
+                    if self._devices is None:
+                        raise ValueError("Devices object was not created after updating.")
                     selected_devices.append(self._devices.select_device(device_id=device_id))
                 except HTTPError as ex:
                     logger.error(json.loads(str(ex))["detail"])
@@ -285,7 +293,7 @@ class API(ABC):
         return job_ids
 
     @typechecked
-    def get_results(self, job_ids: List[int]) -> List[AbstractState | ndarray | None]:
+    def get_results(self, job_ids: List[int]) -> List[AbstractState | npt.NDArray | None]:
         """Get a Job result from a remote execution
 
         Args:
@@ -301,7 +309,7 @@ class API(ABC):
         return [self.get_result(job_id) for job_id in job_ids]
 
     @typechecked
-    def get_result(self, job_id: int) -> AbstractState | ndarray | None:
+    def get_result(self, job_id: int) -> AbstractState | npt.NDArray | None:
         """Get a Job result from a remote execution
 
         Args:
@@ -347,8 +355,20 @@ class API(ABC):
         x_label: str | None = None,
         y_label: str | None = None,
         z_label: str | None = None,
+        x_axis: npt.NDArray[np.int_] | List[int] | None = None,
+        y_axis: npt.NDArray[np.int_] | List[int] | None = None,
     ):
-        """Creates a LivePlot of *plot_type* type at which we will be able to send points to plot
+        """Creates a LivePlot of *plot_type* type at which we will be able to send points to plot.
+
+        Attributes:
+            plot_type: LivePlotType
+            title: title for the plot
+            x_label: title for the x label
+            y_label: title for the y label
+            z_label: title for the z label
+            x_axis: range of values for the x_axis
+            y_axis: range of values for the y_axis
+
 
         Raises:
             RemoteExecutionException: Live-plotting connection data could not be retrieved
@@ -370,12 +390,17 @@ class API(ABC):
             websocket_url=plotting_response.websocket_url,
             plot_type=LivePlotType(plot_type),
             labels=LivePlotLabels(title=title, x_label=x_label, y_label=y_label, z_label=z_label),
+            axis=LivePlotAxis(x_axis=x_axis, y_axis=y_axis),
         )
         return plotting_response.plot_id
 
     @typechecked
     def send_plot_points(
-        self, plot_id: int, x: list[float] | float, y: list[float] | float, z: Optional[list[float] | float] = None
+        self,
+        plot_id: int,
+        x: npt.NDArray[np.float_ | np.int_] | list[float] | list[int] | float | int,
+        y: npt.NDArray[np.float_ | np.int_] | list[float] | list[int] | float | int,
+        z: npt.NDArray[np.float_ | np.int_] | list[float] | list[int] | float | int | None = None,
     ):
         """Sends point(s) to a specific plot.
         Args:
