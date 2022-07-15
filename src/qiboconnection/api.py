@@ -128,7 +128,8 @@ class API(ABC):
             self._devices = Devices([new_device])
         elif isinstance(self._devices, Devices):
             self._devices.add_or_update(new_device)
-        else:
+
+        if self._devices is None:
             raise ValueError("Unexpected object in API._devices.")
 
     @typechecked
@@ -140,6 +141,7 @@ class API(ABC):
 
         """
         self._add_or_update_single_device(device_id=device_id)
+        self._devices = cast(Devices, self._devices)
         try:
             selected_device = self._devices.select_device(device_id=device_id)
             self._selected_devices = [selected_device]
@@ -158,6 +160,7 @@ class API(ABC):
         self._selected_devices = []
         for device_id in device_ids:
             self._add_or_update_single_device(device_id=device_id)
+            self._devices = cast(Devices, self._devices)
             try:
                 self._selected_devices.append(self._devices.select_device(device_id=device_id))
             except HTTPError as ex:
@@ -177,6 +180,7 @@ class API(ABC):
             device_id (int): Device identifier
         """
         self._add_or_update_single_device(device_id=device_id)
+        self._devices = cast(Devices, self._devices)
         try:
             self._devices.block_device(connection=self._connection, device_id=device_id)
         except HTTPError as ex:
@@ -191,6 +195,7 @@ class API(ABC):
             device_id (int): Device identifier
         """
         self._add_or_update_single_device(device_id=device_id)
+        self._devices = cast(Devices, self._devices)
         try:
             self._devices.release_device(connection=self._connection, device_id=device_id)
         except HTTPError as ex:
@@ -256,6 +261,7 @@ class API(ABC):
             for device_id in device_ids:
                 try:
                     self._add_or_update_single_device(device_id=device_id)
+                    self._devices = cast(Devices, self._devices)
                     selected_devices.append(self._devices.select_device(device_id=device_id))
                 except HTTPError as ex:
                     logger.error(json.loads(str(ex))["detail"])
