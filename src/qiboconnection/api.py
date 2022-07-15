@@ -105,6 +105,16 @@ class API(ABC):
 
     @typechecked
     def _add_or_update_single_device(self, device_id: int):
+        """Requests the info of a specific device to the public api and updates its entry in _devices or creates a new
+        device if it does not already exist.
+
+        Args:
+            device_id: id of the device which info is to be retrieved from api
+
+        Raises:
+            RemoteExecutionException: Devices could not be retrieved
+            ValueError: Unexpected object in API._devices.
+        """
         response, status_code = self._connection.send_get_auth_remote_api_call(
             path=f"{self.DEVICES_CALL_PATH}/{device_id}"
         )
@@ -119,7 +129,7 @@ class API(ABC):
         elif isinstance(self._devices, Devices):
             self._devices.add_or_update(new_device)
         else:
-            raise ValueError("Unexpected object in Devices.")
+            raise ValueError("Unexpected object in API._devices.")
 
     @typechecked
     def select_device_id(self, device_id: int) -> None:
@@ -130,8 +140,6 @@ class API(ABC):
 
         """
         self._add_or_update_single_device(device_id=device_id)
-        if self._devices is None:
-            raise ValueError("Devices object was not created after updating.")
         try:
             selected_device = self._devices.select_device(device_id=device_id)
             self._selected_devices = [selected_device]
@@ -146,15 +154,10 @@ class API(ABC):
 
         Args:
             device_ids (int): List of device identifiers
-
-        Raises:
-            ValueError: No devices collected. Please call 'list_devices' first.
         """
         self._selected_devices = []
         for device_id in device_ids:
             self._add_or_update_single_device(device_id=device_id)
-            if self._devices is None:
-                raise ValueError("Devices object was not created after updating.")
             try:
                 self._selected_devices.append(self._devices.select_device(device_id=device_id))
             except HTTPError as ex:
@@ -172,14 +175,9 @@ class API(ABC):
 
         Args:
             device_id (int): Device identifier
-
-        Raises:
-            ValueError: No devices collected. Please call 'list_devices' first.
         """
         self._add_or_update_single_device(device_id=device_id)
         try:
-            if self._devices is None:
-                raise ValueError("No devices collected. Please call 'list_devices' first.")
             self._devices.block_device(connection=self._connection, device_id=device_id)
         except HTTPError as ex:
             logger.error(json.loads(str(ex))["detail"])
@@ -191,13 +189,13 @@ class API(ABC):
 
         Args:
             device_id (int): Device identifier
-
-        Raises:
-            ValueError: No devices collected. Please call 'list_devices' first.
         """
-        if self._devices is None:
-            raise ValueError("No devices collected. Please call 'list_devices' first.")
-        self._devices.release_device(connection=self._connection, device_id=device_id)
+        self._add_or_update_single_device(device_id=device_id)
+        try:
+            self._devices.release_device(connection=self._connection, device_id=device_id)
+        except HTTPError as ex:
+            logger.error(json.loads(str(ex))["detail"])
+            raise ex
 
     # @typechecked
     # def execute_program(self, program: ProgramDefinition) -> Any:
@@ -258,8 +256,6 @@ class API(ABC):
             for device_id in device_ids:
                 try:
                     self._add_or_update_single_device(device_id=device_id)
-                    if self._devices is None:
-                        raise ValueError("Devices object was not created after updating.")
                     selected_devices.append(self._devices.select_device(device_id=device_id))
                 except HTTPError as ex:
                     logger.error(json.loads(str(ex))["detail"])
