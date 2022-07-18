@@ -104,12 +104,15 @@ class API(ABC):
         return self._devices
 
     @typechecked
-    def _add_or_update_single_device(self, device_id: int):
+    def _add_or_update_single_device(self, device_id: int) -> Devices:
         """Requests the info of a specific device to the public api and updates its entry in _devices or creates a new
-        device if it does not already exist.
+        device if it does not already exist. It *modifies* the internal `_devices` list *and returns* the modified list.
 
         Args:
             device_id: id of the device which info is to be retrieved from api
+
+        Returns:
+            Devices: modified (or created) devices object
 
         Raises:
             RemoteExecutionException: Devices could not be retrieved
@@ -126,11 +129,11 @@ class API(ABC):
 
         if self._devices is None:
             self._devices = Devices([new_device])
-        elif isinstance(self._devices, Devices):
+            return self._devices
+        if isinstance(self._devices, Devices):
             self._devices.add_or_update(new_device)
-
-        if self._devices is None:
-            raise ValueError("Unexpected object in API._devices.")
+            return self._devices
+        raise ValueError("Unexpected object in API._devices.")
 
     @typechecked
     def select_device_id(self, device_id: int) -> None:
@@ -140,8 +143,7 @@ class API(ABC):
             device_id (int): Device identifier
 
         """
-        self._add_or_update_single_device(device_id=device_id)
-        self._devices = cast(Devices, self._devices)
+        self._devices = self._add_or_update_single_device(device_id=device_id)
         try:
             selected_device = self._devices.select_device(device_id=device_id)
             self._selected_devices = [selected_device]
@@ -159,8 +161,7 @@ class API(ABC):
         """
         self._selected_devices = []
         for device_id in device_ids:
-            self._add_or_update_single_device(device_id=device_id)
-            self._devices = cast(Devices, self._devices)
+            self._devices = self._add_or_update_single_device(device_id=device_id)
             try:
                 self._selected_devices.append(self._devices.select_device(device_id=device_id))
             except HTTPError as ex:
@@ -179,8 +180,7 @@ class API(ABC):
         Args:
             device_id (int): Device identifier
         """
-        self._add_or_update_single_device(device_id=device_id)
-        self._devices = cast(Devices, self._devices)
+        self._devices = self._add_or_update_single_device(device_id=device_id)
         try:
             self._devices.block_device(connection=self._connection, device_id=device_id)
         except HTTPError as ex:
@@ -194,8 +194,7 @@ class API(ABC):
         Args:
             device_id (int): Device identifier
         """
-        self._add_or_update_single_device(device_id=device_id)
-        self._devices = cast(Devices, self._devices)
+        self._devices = self._add_or_update_single_device(device_id=device_id)
         try:
             self._devices.release_device(connection=self._connection, device_id=device_id)
         except HTTPError as ex:
@@ -260,8 +259,7 @@ class API(ABC):
         if device_ids is not None:
             for device_id in device_ids:
                 try:
-                    self._add_or_update_single_device(device_id=device_id)
-                    self._devices = cast(Devices, self._devices)
+                    self._devices = self._add_or_update_single_device(device_id=device_id)
                     selected_devices.append(self._devices.select_device(device_id=device_id))
                 except HTTPError as ex:
                     logger.error(json.loads(str(ex))["detail"])
