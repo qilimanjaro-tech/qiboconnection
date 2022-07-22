@@ -27,7 +27,7 @@ class Job(ABC):
     device: Device
     program: ProgramDefinition | None = field(default=None)
     circuit: Circuit | None = None
-    experiment: Experiment | None = None
+    experiment: dict | None = None
     nshots: int = 10
     job_status: JobStatus = JobStatus.NOT_SENT
     job_result: JobResult | None = None
@@ -116,7 +116,7 @@ class Job(ABC):
             raise ValueError("Job cannot allow to have both circuit and experiment")
 
         if self.experiment is not None:
-            return _jsonify_dict_and_base64_encode(object_to_encode=asdict(self.experiment))
+            return _jsonify_dict_and_base64_encode(object_to_encode=self.experiment)
         if self.circuit is not None:
             return _jsonify_str_and_base64_encode(object_to_encode=self.circuit.to_qasm())
 

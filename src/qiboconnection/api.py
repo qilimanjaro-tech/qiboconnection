@@ -233,7 +233,7 @@ class API(ABC):
     def execute(
         self,
         circuit: Circuit | None = None,
-        experiment: Experiment | None = None,
+        experiment: dict | None = None,
         nshots: int = 10,
         device_ids: List[int] | None = None,
     ) -> List[int]:
@@ -242,7 +242,7 @@ class API(ABC):
 
         Args:
             circuit (Circuit): a Qibo circuit to execute
-            experiment (Experiment): an Experiment description
+            experiment (dict): an Experiment description, result of Qililab's Experiment().to_dict() function.
             nshots (int): number of times the execution is to be done.
             device_ids (List[int]): list of devices where the execution should be performed. If set, any device set
              using API.select_device_id() will not be used. This will not update the selecte
