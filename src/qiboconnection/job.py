@@ -79,6 +79,7 @@ class Job(ABC):
             user_id=self.user.user_id,
             device_id=self.device.id,
             number_shots=self.nshots,
+            job_type=self.job_type.value,
             description=self._get_job_description(),
         )
 
