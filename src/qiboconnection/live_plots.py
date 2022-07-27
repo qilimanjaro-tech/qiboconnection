@@ -2,7 +2,7 @@
 from abc import ABC
 from dataclasses import dataclass, field
 from functools import partial
-from typing import Callable, Optional
+from typing import Callable
 
 import numpy as np
 import numpy.typing as npt
@@ -70,7 +70,7 @@ class LivePlots(ABC):
                 raise AttributeError("live_plot and point info are required.")
             live_plot: LivePlot = kwargs.get("live_plot")
             data_packet: LivePlotPacket = kwargs.get("data_packet")
-            if (live_plot.plot_type == LivePlotType.LINES or live_plot.plot_type == LivePlotType.SCATTER) and (
+            if live_plot.plot_type in (LivePlotType.LINES, LivePlotType.SCATTER) and (
                 data_packet.data.z is not None or data_packet.data.x is None or data_packet.data.y is None
             ):
                 raise ValueError("LINES and SCATTER plots accept exactly x and y values.")

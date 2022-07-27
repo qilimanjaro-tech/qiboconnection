@@ -1,11 +1,9 @@
 """ Job class """
 import base64
-import io
 import json
-import pickle  # nosec - temporary bandit ignore
 from abc import ABC
-from dataclasses import asdict, dataclass, field
-from typing import Any, List, cast
+from dataclasses import dataclass, field
+from typing import Any, List
 
 from qibo.models.circuit import Circuit
 from typeguard import typechecked
@@ -15,7 +13,6 @@ from qiboconnection.job_result import JobResult
 from qiboconnection.typings.algorithm import ProgramDefinition
 from qiboconnection.typings.job import JobRequest, JobResponse, JobStatus, JobType
 from qiboconnection.user import User
-from qiboconnection.util import base64url_encode
 
 
 @dataclass

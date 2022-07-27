@@ -1,7 +1,5 @@
 """ Job Result """
 
-
-import pickle  # nosec - temporary bandit ignore
 from abc import ABC
 from dataclasses import dataclass, field
 from typing import List

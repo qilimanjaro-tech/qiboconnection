@@ -212,7 +212,7 @@ class LivePlotPacket(ABC):
                 if isinstance(x, list) and isinstance(y, list):
                     idx = [int(np.where(np.unique(axis.x_axis) == i)[0][0]) for i in x]
                     idy = [int(np.where(np.unique(axis.y_axis) == i)[0][0]) for i in y]
-                if (isinstance(x, float) or isinstance(x, int)) and (isinstance(y, float) or isinstance(x, int)):
+                if isinstance(x, (float, int)) and isinstance(y, (float, int)):
                     idx = int(np.where(np.unique(axis.x_axis) == x)[0][0])
                     idy = int(np.where(np.unique(axis.y_axis) == y)[0][0])
 
