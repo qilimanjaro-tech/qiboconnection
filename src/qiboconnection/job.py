@@ -156,7 +156,7 @@ class Job(ABC):
         self.job_status = (
             job_response.status if isinstance(job_response.status, JobStatus) else JobStatus(job_response.status)
         )
-        self.job_result = JobResult(job_id=self.id, http_response=job_response.result)
+        self.job_result = JobResult(job_id=self.id, job_type=job_response.job_type, http_response=job_response.result)
 
 
 def _jsonify_dict_and_base64_encode(object_to_encode: dict):

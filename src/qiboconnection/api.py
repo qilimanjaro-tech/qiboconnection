@@ -347,7 +347,9 @@ class API(ABC):
             return None
         if status == JobStatus.COMPLETED:
             logger.warning("Your job is completed.")
-            raw_result = JobResult(job_id=job_id, http_response=job_response.result).data
+            raw_result = JobResult(
+                job_id=job_id, job_type=job_response.job_type, http_response=job_response.result
+            ).data
             return raw_result[0] if isinstance(raw_result, List) else raw_result
         raise ValueError(f"Job status not supported: {status}")
 

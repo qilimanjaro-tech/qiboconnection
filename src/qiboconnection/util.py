@@ -10,6 +10,7 @@ from typing import Any, List, Tuple
 
 import numpy as np
 import requests
+from numpy import typing as npt
 from qibo.abstractions.states import AbstractState
 
 from qiboconnection.errors import custom_raise_for_status
@@ -97,7 +98,7 @@ def decode_results_from_program(http_response: str) -> List[AbstractState | floa
     return [np.load(urlsafe_b64decode(decoded_result)) for decoded_result in decoded_results]
 
 
-def decode_results_from_circuit(http_response: str) -> AbstractState:
+def decode_results_from_circuit(http_response: str) -> AbstractState | npt.NDArray:
     """Decode the results from the Qibo circuit execution
 
     Args:
@@ -105,6 +106,21 @@ def decode_results_from_circuit(http_response: str) -> AbstractState:
 
     Returns:
         List[AbstractState]: a Qibo AbstractState
+    """
+    decoded_result_str = urlsafe_b64decode(http_response)
+    result_bytes = io.BytesIO(decoded_result_str)
+    return pickle.loads(result_bytes.getbuffer())  # nosec - temporary bandit ignore
+
+
+def decode_results_from_experiment(http_response: str) -> npt.NDArray:
+    """Decode the results from the Qibo circuit execution
+
+    Args:
+        http_response (str): the execution results as an Http Response
+
+    Returns:
+        List[AbstractState]: a Qibo AbstractState
+        npt.NDArray: an array of [i, q, Amp, Phase]
     """
     decoded_result_str = urlsafe_b64decode(http_response)
     result_bytes = io.BytesIO(decoded_result_str)
