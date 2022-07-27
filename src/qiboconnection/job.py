@@ -13,7 +13,6 @@ from typeguard import typechecked
 from qiboconnection.devices.device import Device
 from qiboconnection.job_result import JobResult
 from qiboconnection.typings.algorithm import ProgramDefinition
-from qiboconnection.typings.experiment import Experiment
 from qiboconnection.typings.job import JobRequest, JobResponse, JobStatus, JobType
 from qiboconnection.user import User
 from qiboconnection.util import base64url_encode
@@ -79,7 +78,7 @@ class Job(ABC):
             user_id=self.user.user_id,
             device_id=self.device.id,
             number_shots=self.nshots,
-            job_type=self.job_type.value,
+            job_type=self.job_type,
             description=self._get_job_description(),
         )
 

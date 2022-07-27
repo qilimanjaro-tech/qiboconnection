@@ -38,3 +38,6 @@ class JobResult(ABC):
         if self.job_type == JobType.EXPERIMENT:
             self.data = decode_results_from_experiment(self.http_response)
             return
+        if self.job_type == JobType.PROGRAM:
+            self.data = decode_results_from_program(self.http_response)
+            return

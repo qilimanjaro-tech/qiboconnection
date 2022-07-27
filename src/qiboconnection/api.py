@@ -24,7 +24,6 @@ from qiboconnection.job import Job
 from qiboconnection.job_result import JobResult
 from qiboconnection.live_plots import LivePlots
 from qiboconnection.typings.connection import ConnectionConfiguration
-from qiboconnection.typings.experiment import Experiment
 from qiboconnection.typings.job import JobResponse, JobStatus
 from qiboconnection.typings.live_plot import (
     LivePlotAxis,

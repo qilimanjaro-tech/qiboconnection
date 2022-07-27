@@ -14,6 +14,7 @@ class JobType(str, enum.Enum):
     """
 
     CIRCUIT = "circuit"
+    PROGRAM = "program"
     EXPERIMENT = "experiment"
 
 
