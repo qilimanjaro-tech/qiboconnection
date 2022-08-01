@@ -1,4 +1,5 @@
 """ Utility functions """
+import binascii
 import io
 import json
 import os
@@ -98,8 +99,21 @@ def decode_results_from_program(http_response: str) -> List[AbstractState | floa
     return [np.load(urlsafe_b64decode(decoded_result)) for decoded_result in decoded_results]
 
 
-def decode_results_from_circuit(http_response: str) -> AbstractState | npt.NDArray:
-    """Decode the results from the Qibo circuit execution
+def _decode_jsonified_results(http_response: str) -> dict:
+    """Decodes results that have been jsonified and base64 encoded."""
+    return json.loads(urlsafe_b64decode(http_response))
+
+
+def _decode_pickled_results(http_response: str) -> Any:
+    """Decodes results that have been pickled and base64 encoded."""
+    decoded_result_str = urlsafe_b64decode(http_response)
+    result_bytes = io.BytesIO(decoded_result_str)
+    return pickle.loads(result_bytes.getbuffer())  # nosec - temporary bandit ignore
+
+
+def decode_results_from_circuit(http_response: str) -> AbstractState | dict:
+    """Decode the results from the circuit execution. Ideally we should always expect dictionaries here, but for qibo we
+    are still serializing `AbstractState`s that must be pickled.
 
     Args:
         http_response (str): the execution results as an Http Response
@@ -107,24 +121,22 @@ def decode_results_from_circuit(http_response: str) -> AbstractState | npt.NDArr
     Returns:
         List[AbstractState]: a Qibo AbstractState
     """
-    decoded_result_str = urlsafe_b64decode(http_response)
-    result_bytes = io.BytesIO(decoded_result_str)
-    return pickle.loads(result_bytes.getbuffer())  # nosec - temporary bandit ignore
+    try:
+        return _decode_jsonified_results(http_response)
+    except (binascii.Error, UnicodeDecodeError, JSONDecodeError):
+        return _decode_pickled_results(http_response)
 
 
-def decode_results_from_experiment(http_response: str) -> npt.NDArray:
-    """Decode the results from the Qibo circuit execution
+def decode_results_from_experiment(http_response: str) -> dict:
+    """Decode the results from the Qililab experiment execution
 
     Args:
         http_response (str): the execution results as an Http Response
 
     Returns:
-        List[AbstractState]: a Qibo AbstractState
-        npt.NDArray: an array of [i, q, Amp, Phase]
+        dict: object containing a serialized representation of a qililab Results object
     """
-    decoded_result_str = urlsafe_b64decode(http_response)
-    result_bytes = io.BytesIO(decoded_result_str)
-    return pickle.loads(result_bytes.getbuffer())  # nosec - temporary bandit ignore
+    return _decode_jsonified_results(http_response)
 
 
 def process_response(response: requests.Response) -> Tuple[Any, int]:
