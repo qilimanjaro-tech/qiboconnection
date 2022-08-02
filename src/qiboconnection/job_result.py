@@ -11,7 +11,6 @@ from qiboconnection.typings.job import JobType
 from qiboconnection.util import (
     decode_results_from_circuit,
     decode_results_from_experiment,
-    decode_results_from_program,
 )
 
 
@@ -22,7 +21,9 @@ class JobResult(ABC):
     job_id: int
     http_response: str
     job_type: str | JobType
-    data: List[AbstractState] | AbstractState | npt.NDArray | List[int] | List[float] | None = field(init=False)
+    data: List[AbstractState] | AbstractState | npt.NDArray | List[int] | List[float] | dict | List[
+        dict
+    ] | None = field(init=False)
 
     def __post_init__(self) -> None:
         """
@@ -37,5 +38,4 @@ class JobResult(ABC):
             self.data = decode_results_from_experiment(self.http_response)
             return
         if self.job_type == JobType.PROGRAM:
-            self.data = decode_results_from_program(self.http_response)
-            return
+            raise ValueError("Job type not supported.")
