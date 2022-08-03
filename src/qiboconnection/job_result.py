@@ -38,4 +38,4 @@ class JobResult(ABC):
             self.data = decode_results_from_experiment(self.http_response)
             return
         if self.job_type == JobType.PROGRAM:
-            raise ValueError("Job type not supported.")
+            raise ValueError(f"Job type {JobType.PROGRAM} not supported.")
