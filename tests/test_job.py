@@ -91,7 +91,7 @@ def test_job_creation(circuit: Circuit, user: User, simulator_device: SimulatorD
     job_id = 23
     job_status = JobStatus.COMPLETED
     job_result = JobResult(
-        job_id=job_id, http_response="WzAuMSwgMC4xLCAwLjEsIDAuMSwgMC4xXQ==", job_type=JobType.PROGRAM
+        job_id=job_id, http_response="WzAuMSwgMC4xLCAwLjEsIDAuMSwgMC4xXQ==", job_type=JobType.CIRCUIT
     )
     job = Job(
         circuit=circuit,
