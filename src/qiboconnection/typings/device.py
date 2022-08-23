@@ -1,6 +1,6 @@
 """ Device Typing """
 import enum
-from dataclasses import InitVar, dataclass, field
+from dataclasses import InitVar, dataclass
 from typing import Literal, Optional
 
 

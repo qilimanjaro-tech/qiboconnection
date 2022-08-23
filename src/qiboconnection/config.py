@@ -103,4 +103,8 @@ class Environment:
 
 
 def get_environment() -> Environment:
-    return Environment(environment_type=EnvironmentType(os.environ.get("QIBO_ENVIRONMENT", "staging")))
+    """Return environment corresponding to QIBOCONNECTION_ENVIRONMENT env variable
+
+    Returns:
+        Environment: environment"""
+    return Environment(environment_type=EnvironmentType(os.environ.get("QIBOCONNECTION_ENVIRONMENT", "staging")))

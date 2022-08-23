@@ -24,7 +24,6 @@ from qiboconnection.job import Job
 from qiboconnection.job_result import JobResult
 from qiboconnection.live_plots import LivePlots
 from qiboconnection.typings.connection import ConnectionConfiguration
-from qiboconnection.typings.experiment import Experiment
 from qiboconnection.typings.job import JobResponse, JobStatus
 from qiboconnection.typings.live_plot import (
     LivePlotAxis,
@@ -233,7 +232,7 @@ class API(ABC):
     def execute(
         self,
         circuit: Circuit | None = None,
-        experiment: Experiment | None = None,
+        experiment: dict | None = None,
         nshots: int = 10,
         device_ids: List[int] | None = None,
     ) -> List[int]:
@@ -242,7 +241,7 @@ class API(ABC):
 
         Args:
             circuit (Circuit): a Qibo circuit to execute
-            experiment (Experiment): an Experiment description
+            experiment (dict): an Experiment description, result of Qililab's Experiment().to_dict() function.
             nshots (int): number of times the execution is to be done.
             device_ids (List[int]): list of devices where the execution should be performed. If set, any device set
              using API.select_device_id() will not be used. This will not update the selecte
@@ -347,7 +346,9 @@ class API(ABC):
             return None
         if status == JobStatus.COMPLETED:
             logger.warning("Your job is completed.")
-            raw_result = JobResult(job_id=job_id, http_response=job_response.result).data
+            raw_result = JobResult(
+                job_id=job_id, job_type=job_response.job_type, http_response=job_response.result
+            ).data
             return raw_result[0] if isinstance(raw_result, List) else raw_result
         raise ValueError(f"Job status not supported: {status}")
 

@@ -1,11 +1,9 @@
 """ Job class """
 import base64
-import io
 import json
-import pickle  # nosec - temporary bandit ignore
 from abc import ABC
-from dataclasses import asdict, dataclass, field
-from typing import Any, List, cast
+from dataclasses import dataclass, field
+from typing import Any, List
 
 from qibo.models.circuit import Circuit
 from typeguard import typechecked
@@ -13,10 +11,8 @@ from typeguard import typechecked
 from qiboconnection.devices.device import Device
 from qiboconnection.job_result import JobResult
 from qiboconnection.typings.algorithm import ProgramDefinition
-from qiboconnection.typings.experiment import Experiment
 from qiboconnection.typings.job import JobRequest, JobResponse, JobStatus, JobType
 from qiboconnection.user import User
-from qiboconnection.util import base64url_encode
 
 
 @dataclass
@@ -27,7 +23,7 @@ class Job(ABC):
     device: Device
     program: ProgramDefinition | None = field(default=None)
     circuit: Circuit | None = None
-    experiment: Experiment | None = None
+    experiment: dict | None = None
     nshots: int = 10
     job_status: JobStatus = JobStatus.NOT_SENT
     job_result: JobResult | None = None
@@ -79,6 +75,7 @@ class Job(ABC):
             user_id=self.user.user_id,
             device_id=self.device.id,
             number_shots=self.nshots,
+            job_type=self.job_type,
             description=self._get_job_description(),
         )
 
@@ -116,7 +113,7 @@ class Job(ABC):
             raise ValueError("Job cannot allow to have both circuit and experiment")
 
         if self.experiment is not None:
-            return _jsonify_dict_and_base64_encode(object_to_encode=asdict(self.experiment))
+            return _jsonify_dict_and_base64_encode(object_to_encode=self.experiment)
         if self.circuit is not None:
             return _jsonify_str_and_base64_encode(object_to_encode=self.circuit.to_qasm())
 
@@ -155,7 +152,7 @@ class Job(ABC):
         self.job_status = (
             job_response.status if isinstance(job_response.status, JobStatus) else JobStatus(job_response.status)
         )
-        self.job_result = JobResult(job_id=self.id, http_response=job_response.result)
+        self.job_result = JobResult(job_id=self.id, job_type=job_response.job_type, http_response=job_response.result)
 
 
 def _jsonify_dict_and_base64_encode(object_to_encode: dict):

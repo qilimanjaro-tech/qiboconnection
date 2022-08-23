@@ -2,6 +2,7 @@
 
 from typing import cast
 
+import numpy as np
 import pytest
 from qibo import gates
 from qibo.models.circuit import Circuit
@@ -18,7 +19,6 @@ from qiboconnection.typings.algorithm import (
     InitialValue,
     ProgramDefinition,
 )
-from qiboconnection.typings.experiment import Experiment
 from qiboconnection.typings.job import JobRequest, JobResponse, JobStatus, JobType
 from qiboconnection.user import User
 
@@ -90,7 +90,9 @@ def test_job_creation(circuit: Circuit, user: User, simulator_device: SimulatorD
 
     job_id = 23
     job_status = JobStatus.COMPLETED
-    job_result = JobResult(job_id=job_id, http_response="WzAuMSwgMC4xLCAwLjEsIDAuMSwgMC4xXQ==")
+    job_result = JobResult(
+        job_id=job_id, http_response="WzAuMSwgMC4xLCAwLjEsIDAuMSwgMC4xXQ==", job_type=JobType.CIRCUIT
+    )
     job = Job(
         circuit=circuit,
         user=user,
@@ -154,10 +156,7 @@ def test_job_creation_experiment(circuit: Circuit, user: User, simulator_device:
         simulator_device (SimulatorDevice): SimulatorDevice
     """
 
-    experiment = Experiment(
-        platform_name="Plattform", parameter_name="Parameter", parameter_range=(1.0,), circuit=circuit
-    )
-    job = Job(experiment=experiment, user=user, device=cast(Device, simulator_device))
+    job = Job(experiment={}, user=user, device=cast(Device, simulator_device))
     assert job.job_type == JobType.EXPERIMENT
 
 
@@ -172,12 +171,8 @@ def test_job_creation_experiment_raises_value_error_when_both_circuit_and_experi
         simulator_device (SimulatorDevice): SimulatorDevice
     """
 
-    experiment = Experiment(
-        platform_name="Plattform", parameter_name="Parameter", parameter_range=(1.0,), circuit=circuit
-    )
-
     with pytest.raises(ValueError) as e_info:
-        _ = Job(experiment=experiment, circuit=circuit, user=user, device=cast(Device, simulator_device))
+        _ = Job(experiment={}, circuit=circuit, user=user, device=cast(Device, simulator_device))
     assert (
         e_info.value.args[0] == "Both circuit and experiment were provided, but execute() only takes at most of them."
     )
@@ -221,6 +216,7 @@ def test_job_request(circuit: Circuit, user: User, simulator_device: SimulatorDe
         device_id=simulator_device.id,
         description="Ly8gR2VuZXJhdGVkIGJ5IFFJQk8gMC4xLjcKT1BFTlFBU00gMi4wOwppbmNsdWRlICJxZWxpYjEuaW5jIjsKcXJlZyBxWzFdOwpjcmVnIHJlZ2lzdGVyMFsxXTsKaCBxWzBdOwptZWFzdXJlIHFbMF0gLT4gcmVnaXN0ZXIwWzBdOw==",
         number_shots=10,
+        job_type=JobType.CIRCUIT,
     )
     assert isinstance(job, Job)
     assert job.job_request == expected_job_request
@@ -247,7 +243,7 @@ def test_job_request_raises_value_error_if_not_circuit_or_experiment(
     job.circuit = None
     with pytest.raises(ValueError) as e_info:
         _ = job.job_request
-    assert e_info.value.args[0] == "Job requires either a program or a circuit"
+    assert e_info.value.args[0] == "Could not determine JobType"
 
 
 def test_job_request_raises_value_error_if_several_of_circuit_and_experiment(
@@ -261,12 +257,7 @@ def test_job_request_raises_value_error_if_several_of_circuit_and_experiment(
         simulator_device (SimulatorDevice): SimulatorDevice
     """
     job = Job(
-        experiment=Experiment(
-            platform_name="Platform",
-            parameter_name="Parameter",
-            parameter_range=(1.0,),
-            circuit=circuit,
-        ),
+        experiment={},
         user=user,
         device=cast(Device, simulator_device),
         job_status=JobStatus.COMPLETED,
@@ -276,7 +267,7 @@ def test_job_request_raises_value_error_if_several_of_circuit_and_experiment(
     job.circuit = circuit
     with pytest.raises(ValueError) as e_info:
         _ = job.job_request
-    assert e_info.value.args[0] == "Job cannot allow to have both circuit and experiment"
+    assert e_info.value.args[0] == "Could not determine JobType"
 
 
 def test_update_with_job_response(circuit: Circuit, user: User, simulator_device: SimulatorDevice):
@@ -306,10 +297,10 @@ def test_update_with_job_response(circuit: Circuit, user: User, simulator_device
         job_id=job.id,
         queue_position=0,
         status=JobStatus.COMPLETED,
-        result="WzAuMSwgMC4xLCAwLjEsIDAuMSwgMC4xXQ==",
+        result="gASVsAAAAAAAAACMFW51bXB5LmNvcmUubXVsdGlhcnJheZSMDF9yZWNvbnN0cnVjdJSTlIwFbnVtcHmUjAduZGFycmF5lJOUSwCFlEMBYpSHlFKUKEsBSwWFlGgDjAVkdHlwZZSTlIwCZjiUiYiHlFKUKEsDjAE8lE5OTkr_____Sv____9LAHSUYolDKAAAAAAAAPA_AAAAAAAA8D8AAAAAAADwPwAAAAAAAPA_AAAAAAAA8D-UdJRiLg==",
     )
     job.update_with_job_response(job_response=job_response)
-    assert job.result == [0.1, 0.1, 0.1, 0.1, 0.1]
+    assert (job.result == np.array([1.0, 1.0, 1.0, 1.0, 1.0])).all()
 
 
 def test_update_with_job_response_raises_error_when_updating_incorrect_job(

@@ -1,5 +1,4 @@
 """ Quantum Calibration Details """
-import json
 
 from typeguard import typechecked
 
