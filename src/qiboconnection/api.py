@@ -2,7 +2,9 @@
 import json
 from abc import ABC
 from dataclasses import asdict
-from typing import List, Optional, cast
+from datetime import datetime, timedelta
+from time import sleep
+from typing import Any, List, Optional, cast
 
 import numpy as np
 import numpy.typing as npt
@@ -295,8 +297,69 @@ class API(ABC):
             job_ids.append(job.id)
         return job_ids
 
+    @classmethod
+    def _log_job_status_info(cls, job_response: JobResponse):
+        status = job_response.status if isinstance(job_response.status, JobStatus) else JobStatus(job_response.status)
+        if status == JobStatus.PENDING:
+            logger.warning(
+                "Your job with id %i is still pending. Job queue position: %s",
+                job_response.job_id,
+                job_response.queue_position,
+            )
+            return None
+        if status == JobStatus.RUNNING:
+            logger.warning("Your job with id %i is still running.", job_response.job_id)
+            return None
+        if status == JobStatus.NOT_SENT:
+            logger.warning("Your job with id %i has not been sent.", job_response.job_id)
+            return None
+        if status == JobStatus.ERROR:
+            logger.error("Your job with id %i failed.", job_response.job_id)
+        if status == JobStatus.COMPLETED:
+            logger.warning("Your job with id %i is completed.", job_response.job_id)
+        raise ValueError("Job status for job with id %i is not supported: ", job_response.job_id, job_response.status)
+
+    def _get_result(self, job_id: int) -> JobResponse:
+        """Calls the API to get a job from a remote execution.
+
+        Args:
+            job_id (int): Job identifier
+
+        Raises:
+            RemoteExecutionException: Job could not be retrieved.
+
+        Returns:
+            JobResponse: typecasted backend response with the job info.
+        """
+        response, status_code = self._connection.send_get_auth_remote_api_call(path=f"{self.JOBS_CALL_PATH}/{job_id}")
+        if status_code != 200:
+            raise RemoteExecutionException(message="Job could not be retrieved.", status_code=status_code)
+
+        return JobResponse(**cast(dict, response))
+
     @typechecked
-    def get_results(self, job_ids: List[int]) -> List[AbstractState | npt.NDArray | None]:
+    def get_result(self, job_id: int) -> AbstractState | npt.NDArray | dict | None:
+        """Get a Job result from a remote execution
+
+        Args:
+            job_id (int): Job identifier
+
+        Raises:
+            RemoteExecutionException: Job could not be retrieved.
+            ValueError: Job status not supported.
+            ValueError: Your job failed.
+
+        Returns:
+            AbstractState | npt.NDArray | dict | None: The Job result as an Abstract State or None when it is not
+            executed yet.
+        """
+
+        job_response = self._get_result(job_id=job_id)
+        self._log_job_status_info(job_response=job_response)
+        return self._parse_job_responses_to_results(job_responses=[job_response])[0]
+
+    @typechecked
+    def get_results(self, job_ids: List[int]) -> List[AbstractState | npt.NDArray | dict | None]:
         """Get a Job result from a remote execution
 
         Args:
@@ -309,48 +372,97 @@ class API(ABC):
         Returns:
             Union[AbstractState, None]: The Job result as an Abstract State or None when it is not executed yet.
         """
-        return [self.get_result(job_id) for job_id in job_ids]
+        job_responses = [self._get_result(job_id) for job_id in job_ids]
+        for job_reponse in job_responses:
+            self._log_job_status_info(job_response=job_reponse)
+        return self._parse_job_responses_to_results(job_responses=job_responses)
 
-    @typechecked
-    def get_result(self, job_id: int) -> AbstractState | npt.NDArray | None:
-        """Get a Job result from a remote execution
+    @classmethod
+    def _parse_job_responses_to_results(cls, job_responses: List[JobResponse]) -> List[dict | Any | None]:
+        """Parse a list of job_responses to a list of dict with the content of each job. If the job is not COMPLETED,
+        put a None in its place. For this, we build a JobResult instance for each COMPLETED job, and then we keep its
+        `.data`.
 
         Args:
-            job_id (int): Job identifier
+            job_responses: list of JobResponse instnances from which we'll
+
+        Returns:
+
+        """
+        raw_results = [
+            JobResult(
+                job_id=job_response.job_id, job_type=job_response.job_type, http_response=job_response.result
+            ).data
+            if job_response.status == JobStatus.COMPLETED
+            else None
+            for job_response in job_responses
+        ]
+        return [raw_result[0] if isinstance(raw_result, List) else raw_result for raw_result in raw_results]
+
+    def _wait_and_return_results(
+        self, deadline: datetime, interval: int, job_ids: List[int]
+    ) -> List[dict | Any | None]:
+        """Try and recover results from the backend until all of them are finished (this is, with status being either
+        ERROR or COMPLETED).
+
+        Args:
+            deadline (datetime): date at which this process should be interrupted
+            interval (int): seconds to sleep between trials
+            job_ids (List[int]): List of jobs to get the status of.
+
+        Raises:
+            TimeoutError: timeout seconds reached
+
+        Returns:
+            List[dict | None]: list of the results for each of the
+        """
+        while datetime.now() < deadline:
+            job_responses = [self._get_result(job_id) for job_id in job_ids]
+            job_responses_status = [job_response.status for job_response in job_responses]
+            if set(job_responses_status).issubset({JobStatus.COMPLETED, JobStatus.ERROR}):
+                return self._parse_job_responses_to_results(job_responses=job_responses)
+            sleep(interval)
+        raise TimeoutError("Server did not execute the jobs in time.")
+
+    def execute_and_return_results(
+        self,
+        circuit: Circuit | None = None,
+        experiment: dict | None = None,
+        nshots: int = 10,
+        device_ids: List[int] | None = None,
+        timeout: int = 3600,
+        interval: int = 60,
+    ) -> List[dict | Any | None]:
+        """Executes a `circuit` or `experiment` the same way as :func:`qiboconnection.API.execute`.
+
+        Args:
+            circuit (Circuit): a Qibo circuit to execute
+            experiment (dict): an Experiment description, result of Qililab's Experiment().to_dict() function.
+            nshots (int): number of times the execution is to be done.
+            device_ids (List[int]): list of devices where the execution should be performed. If set, any device set
+             using API.select_device_id() will not be used. This will not update the selected
+            timeout (int): seconds passed which the function should be interrupted with an error.
+            interval (int): seconds to wait between checking with the backend if the results are ready. If the task is
+              expected to last for tens of minutes, this should be set to, at least, 60 seconds.
 
         Raises:
             RemoteExecutionException: Job could not be retrieved.
             ValueError: Job status not supported
+            TimeoutError: timeout seconds reached
 
         Returns:
             Union[AbstractState, None]: The Job result as an Abstract State or None when it is not executed yet.
+
         """
 
-        response, status_code = self._connection.send_get_auth_remote_api_call(path=f"{self.JOBS_CALL_PATH}/{job_id}")
-        if status_code != 200:
-            raise RemoteExecutionException(message="Job could not be retrieved.", status_code=status_code)
-
-        job_response = JobResponse(**cast(dict, response))
-        status = job_response.status if isinstance(job_response.status, JobStatus) else JobStatus(job_response.status)
-        if status == JobStatus.PENDING:
-            logger.warning("Your job is still pending. Job queue position: %s", job_response.queue_position)
-            return None
-        if status == JobStatus.RUNNING:
-            logger.warning("Your job is still running.")
-            return None
-        if status == JobStatus.NOT_SENT:
-            logger.warning("Your job has not been sent.")
-            return None
-        if status == JobStatus.ERROR:
-            logger.error("Your job failed.")
-            return None
-        if status == JobStatus.COMPLETED:
-            logger.warning("Your job is completed.")
-            raw_result = JobResult(
-                job_id=job_id, job_type=job_response.job_type, http_response=job_response.result
-            ).data
-            return raw_result[0] if isinstance(raw_result, List) else raw_result
-        raise ValueError(f"Job status not supported: {status}")
+        deadline = datetime.now() + timedelta(seconds=timeout)
+        job_ids = self.execute(
+            circuit=circuit,
+            experiment=experiment,
+            nshots=nshots,
+            device_ids=device_ids,
+        )
+        return self._wait_and_return_results(deadline=deadline, interval=interval, job_ids=job_ids)
 
     @typechecked
     def create_liveplot(
@@ -409,7 +521,7 @@ class API(ABC):
     ):
         """Sends point(s) to a specific plot.
         Args:
-            plot_id: Id of the plot to send points to
+            plot_id: id of the plot to send points to
             x: x coord of the point to send info to
             y: y coord of the point to send info to
             z: z coord of the point to send info to
