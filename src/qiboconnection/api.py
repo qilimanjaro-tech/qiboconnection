@@ -1,4 +1,4 @@
-""" Qilimanjaro Client API to communicate with the Qilimanajaro Global Quantum Services """
+""" Qilimanjaro Client API to communicate with the Qilimanjaro Global Quantum Services """
 import json
 from abc import ABC
 from dataclasses import asdict
@@ -144,6 +144,7 @@ class API(ABC):
             device_id (int): Device identifier
 
         """
+        self._selected_devices = []
         self._devices = self._add_or_update_single_device(device_id=device_id)
         try:
             selected_device = self._devices.select_device(device_id=device_id)
@@ -246,7 +247,7 @@ class API(ABC):
             experiment (dict): an Experiment description, result of Qililab's Experiment().to_dict() function.
             nshots (int): number of times the execution is to be done.
             device_ids (List[int]): list of devices where the execution should be performed. If set, any device set
-             using API.select_device_id() will not be used. This will not update the selecte
+             using API.select_device_id() will not be used. This will not update the selected devices.
 
         Returns:
             List[int]: list of job ids
