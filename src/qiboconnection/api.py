@@ -13,6 +13,7 @@ from qibo.core.circuit import Circuit
 from requests import HTTPError
 from typeguard import typechecked
 
+from qiboconnection.api_utils import log_job_status_info, parse_job_responses_to_results
 from qiboconnection.config import logger
 from qiboconnection.connection import Connection
 from qiboconnection.devices.device import Device
@@ -23,7 +24,6 @@ from qiboconnection.devices.simulator_device import SimulatorDevice
 from qiboconnection.devices.util import create_device
 from qiboconnection.errors import ConnectionException, RemoteExecutionException
 from qiboconnection.job import Job
-from qiboconnection.job_result import JobResult
 from qiboconnection.live_plots import LivePlots
 from qiboconnection.typings.connection import ConnectionConfiguration
 from qiboconnection.typings.job import JobResponse, JobStatus
@@ -297,28 +297,6 @@ class API(ABC):
             job_ids.append(job.id)
         return job_ids
 
-    @classmethod
-    def _log_job_status_info(cls, job_response: JobResponse):
-        status = job_response.status if isinstance(job_response.status, JobStatus) else JobStatus(job_response.status)
-        if status == JobStatus.PENDING:
-            logger.warning(
-                "Your job with id %i is still pending. Job queue position: %s",
-                job_response.job_id,
-                job_response.queue_position,
-            )
-            return None
-        if status == JobStatus.RUNNING:
-            logger.warning("Your job with id %i is still running.", job_response.job_id)
-            return None
-        if status == JobStatus.NOT_SENT:
-            logger.warning("Your job with id %i has not been sent.", job_response.job_id)
-            return None
-        if status == JobStatus.ERROR:
-            logger.error("Your job with id %i failed.", job_response.job_id)
-        if status == JobStatus.COMPLETED:
-            logger.warning("Your job with id %i is completed.", job_response.job_id)
-        raise ValueError("Job status for job with id %i is not supported: ", job_response.job_id, job_response.status)
-
     def _get_result(self, job_id: int) -> JobResponse:
         """Calls the API to get a job from a remote execution.
 
@@ -355,8 +333,8 @@ class API(ABC):
         """
 
         job_response = self._get_result(job_id=job_id)
-        self._log_job_status_info(job_response=job_response)
-        return self._parse_job_responses_to_results(job_responses=[job_response])[0]
+        log_job_status_info(job_response=job_response)
+        return parse_job_responses_to_results(job_responses=[job_response])[0]
 
     @typechecked
     def get_results(self, job_ids: List[int]) -> List[AbstractState | npt.NDArray | dict | None]:
@@ -374,30 +352,8 @@ class API(ABC):
         """
         job_responses = [self._get_result(job_id) for job_id in job_ids]
         for job_reponse in job_responses:
-            self._log_job_status_info(job_response=job_reponse)
-        return self._parse_job_responses_to_results(job_responses=job_responses)
-
-    @classmethod
-    def _parse_job_responses_to_results(cls, job_responses: List[JobResponse]) -> List[dict | Any | None]:
-        """Parse a list of job_responses to a list of dict with the content of each job. If the job is not COMPLETED,
-        put a None in its place. For this, we build a JobResult instance for each COMPLETED job, and then we keep its
-        `.data`.
-
-        Args:
-            job_responses: list of JobResponse instnances from which we'll
-
-        Returns:
-
-        """
-        raw_results = [
-            JobResult(
-                job_id=job_response.job_id, job_type=job_response.job_type, http_response=job_response.result
-            ).data
-            if job_response.status == JobStatus.COMPLETED
-            else None
-            for job_response in job_responses
-        ]
-        return [raw_result[0] if isinstance(raw_result, List) else raw_result for raw_result in raw_results]
+            log_job_status_info(job_response=job_reponse)
+        return parse_job_responses_to_results(job_responses=job_responses)
 
     def _wait_and_return_results(
         self, deadline: datetime, interval: int, job_ids: List[int]
@@ -420,7 +376,7 @@ class API(ABC):
             job_responses = [self._get_result(job_id) for job_id in job_ids]
             job_responses_status = [job_response.status for job_response in job_responses]
             if set(job_responses_status).issubset({JobStatus.COMPLETED, JobStatus.ERROR}):
-                return self._parse_job_responses_to_results(job_responses=job_responses)
+                return parse_job_responses_to_results(job_responses=job_responses)
             sleep(interval)
         raise TimeoutError("Server did not execute the jobs in time.")
 
