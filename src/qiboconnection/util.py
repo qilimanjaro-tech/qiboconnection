@@ -11,7 +11,6 @@ from typing import Any, List, Tuple
 
 import numpy as np
 import requests
-from numpy import typing as npt
 from qibo.abstractions.states import AbstractState
 
 from qiboconnection.errors import custom_raise_for_status
