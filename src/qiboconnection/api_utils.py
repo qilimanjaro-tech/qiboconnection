@@ -52,8 +52,10 @@ def log_job_status_info(job_response: JobResponse):
         return None
     if status == JobStatus.ERROR:
         logger.error("Your job with id %i failed.", job_response.job_id)
+        return None
     if status == JobStatus.COMPLETED:
         logger.warning("Your job with id %i is completed.", job_response.job_id)
+        return None
 
     raise ValueError(
         f"Job status for job with id {job_response.job_id} is not supported: status is {job_response.status}"
