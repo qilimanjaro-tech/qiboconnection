@@ -1,3 +1,9 @@
+## v0.6.1 (2022-10-20)
+
+### Fix
+
+- **api**: missing return points in function that logs (#29)
+
 ## v0.6.0 (2022-09-22)
 
 ### Feat
