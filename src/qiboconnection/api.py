@@ -50,7 +50,7 @@ class API(ABC):
     JOBS_CALL_PATH = "/jobs"
     CIRCUITS_CALL_PATH = "/circuits"
     DEVICES_CALL_PATH = "/devices"
-    SAVED_EXPERIMENTS_CALL_PATH = "/saved-experiments"
+    SAVED_EXPERIMENTS_CALL_PATH = "/save-experiments"
     PING_CALL_PATH = "/status"
     LIVE_PLOTTING_PATH = "/live-plotting"
 
