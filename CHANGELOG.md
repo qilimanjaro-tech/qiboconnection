@@ -1,9 +1,3 @@
-## v0.7.0 (2022-11-30)
-
-### Feat
-
-- **api**: added `save_experiment`, `list_saved_experiments`, and `get_experiments` functionalities
-
 ## v0.6.1 (2022-10-20)
 
 ### Fix
