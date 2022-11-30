@@ -1,4 +1,5 @@
 """ Utility functions """
+import base64
 import binascii
 import io
 import json
@@ -98,7 +99,7 @@ def decode_results_from_program(http_response: str) -> List[AbstractState | floa
     return [np.load(urlsafe_b64decode(decoded_result)) for decoded_result in decoded_results]
 
 
-def _decode_jsonified_results(http_response: str) -> dict:
+def decode_jsonified_dict(http_response: str) -> dict:
     """Decodes results that have been jsonified and base64 encoded."""
     return json.loads(urlsafe_b64decode(http_response))
 
@@ -121,7 +122,7 @@ def decode_results_from_circuit(http_response: str) -> AbstractState | dict:
         List[AbstractState]: a Qibo AbstractState
     """
     try:
-        return _decode_jsonified_results(http_response)
+        return decode_jsonified_dict(http_response)
     except (binascii.Error, UnicodeDecodeError, JSONDecodeError):
         return _decode_pickled_results(http_response)
 
@@ -135,7 +136,7 @@ def decode_results_from_experiment(http_response: str) -> dict:
     Returns:
         dict: object containing a serialized representation of a qililab Results object
     """
-    return _decode_jsonified_results(http_response)
+    return decode_jsonified_dict(http_response)
 
 
 def process_response(response: requests.Response) -> Tuple[Any, int]:
@@ -152,3 +153,15 @@ def process_response(response: requests.Response) -> Tuple[Any, int]:
         return response.json(), response.status_code
     except JSONDecodeError:
         return response.text, response.status_code
+
+
+def jsonify_dict_and_base64_encode(object_to_encode: dict):
+    """
+    Jsonifies a given dict, encodes it to bytes assuming utf-8, and encodes that byte obj to an url-save base64 str
+    """
+    return str(base64.urlsafe_b64encode(json.dumps(object_to_encode).encode("utf-8")), "utf-8")
+
+
+def jsonify_str_and_base64_encode(object_to_encode: str):
+    """Encodes a given string to bytes assuming utf-8, and encodes that byte-array to an url-save base64 str"""
+    return str(base64.urlsafe_b64encode(object_to_encode.encode("utf-8")), "utf-8")
