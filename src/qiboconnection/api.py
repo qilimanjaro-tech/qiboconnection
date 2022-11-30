@@ -7,7 +7,7 @@ from time import sleep
 from typing import Any, List, Optional, cast
 
 import numpy as np
-from numpy import typing as npt
+import numpy.typing as npt
 from qibo.abstractions.states import AbstractState
 from qibo.core.circuit import Circuit
 from requests import HTTPError
@@ -25,8 +25,6 @@ from qiboconnection.devices.util import create_device
 from qiboconnection.errors import ConnectionException, RemoteExecutionException
 from qiboconnection.job import Job
 from qiboconnection.live_plots import LivePlots
-from qiboconnection.saved_experiment import SavedExperiment
-from qiboconnection.saved_experiment_listing import SavedExperimentListing
 from qiboconnection.typings.connection import ConnectionConfiguration
 from qiboconnection.typings.job import JobResponse, JobStatus
 from qiboconnection.typings.live_plot import (
@@ -34,11 +32,6 @@ from qiboconnection.typings.live_plot import (
     LivePlotLabels,
     LivePlotType,
     PlottingResponse,
-)
-from qiboconnection.typings.saved_experiment import (
-    SavedExperimentListingItemResponse,
-    SavedExperimentRequest,
-    SavedExperimentResponse,
 )
 
 
@@ -50,7 +43,6 @@ class API(ABC):
     JOBS_CALL_PATH = "/jobs"
     CIRCUITS_CALL_PATH = "/circuits"
     DEVICES_CALL_PATH = "/devices"
-    SAVED_EXPERIMENTS_CALL_PATH = "/saved-experiments"
     PING_CALL_PATH = "/status"
     LIVE_PLOTTING_PATH = "/live-plotting"
 
@@ -64,8 +56,6 @@ class API(ABC):
         self._jobs: List[Job] = []
         self._selected_devices: List[Device] | None = None
         self._live_plots: LivePlots = LivePlots()
-        self._saved_experiments: List[SavedExperiment] = []
-        self._saved_experiments_listing: SavedExperimentListing | None = None
 
     @property
     def jobs(self) -> List[Job]:
@@ -497,87 +487,3 @@ class API(ABC):
             None
         """
         return self._live_plots.send_data(plot_id=plot_id, x=x, y=y, z=z)
-
-    @typechecked
-    def save_experiment(
-        self,
-        name: str | None,
-        description: str | None,
-        experiment_dict: dict,
-        results_dict: dict,
-        device_id: int,
-        user_id: int,
-    ):
-
-        saved_experiment = SavedExperiment(
-            id=None,
-            name=name,
-            description=description,
-            experiment=experiment_dict,
-            results=results_dict,
-            device_id=device_id,
-            user_id=user_id,
-        )
-
-        response, status_code = self._connection.send_post_auth_remote_api_call(
-            path=self.CIRCUITS_CALL_PATH, data=asdict(saved_experiment.saved_experiment_request)
-        )
-        if status_code != 201:
-            raise RemoteExecutionException(message="Experiment could not be saved.", status_code=status_code)
-        logger.debug("Job circuit queued successfully.")
-
-    def _get_list_saved_experiments_response(self) -> List[SavedExperimentListingItemResponse]:
-        response, status_code = self._connection.send_get_auth_remote_api_call(path=self.SAVED_EXPERIMENTS_CALL_PATH)
-        if status_code != 200:
-            raise RemoteExecutionException(message="Experiment could not be saved.", status_code=status_code)
-
-        return [SavedExperimentListingItemResponse(**item) for item in response]
-
-    @typechecked
-    def list_saved_experiments(self) -> SavedExperimentListing:
-        """List all available devices
-
-        Raises:
-            RemoteExecutionException: Devices could not be retrieved
-
-        Returns:
-            Devices: All available Devices
-        """
-        saved_experiments_list_response = self._get_list_saved_experiments_response()
-        # !!! TODO: handle all items, not only the returned on first call
-        self._saved_experiments_listing = SavedExperimentListing.from_response(saved_experiments_list_response)
-        return self._saved_experiments_listing
-
-    @typechecked
-    def _get_saved_experiment_response(self, saved_experiment_id: int):
-        """Gets complete information of a single saved experiment
-
-        Raises:
-            RemoteExecutionException: SavedExperiment could not be retrieved
-
-        Returns:
-            SavedExperimentResponse: All available Devices"""
-        response, status_code = self._connection.send_get_auth_remote_api_call(
-            path=f"{self.JOBS_CALL_PATH}/{saved_experiment_id}"
-        )
-        if status_code != 200:
-            raise RemoteExecutionException(message="Job could not be retrieved.", status_code=status_code)
-        return SavedExperimentResponse(**response)
-
-    @typechecked
-    def get_saved_experiments(self, saved_experiment_ids: List[int] | npt.NDArray[int]) -> List[SavedExperiment]:
-        """List all available devices
-
-        Raises:
-            RemoteExecutionException: SavedExperiments could not be retrieved
-
-        Returns:
-            Devices: All available Devices
-        """
-        self._saved_experiments = [
-            SavedExperiment.from_response(
-                **asdict(self._get_saved_experiment_response(saved_experiment_id=saved_experiment_id))
-            )
-            for saved_experiment_id in saved_experiment_ids
-        ]
-        return self._saved_experiments
