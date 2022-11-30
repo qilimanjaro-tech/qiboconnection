@@ -520,7 +520,7 @@ class API(ABC):
         )
 
         response, status_code = self._connection.send_post_auth_remote_api_call(
-            path=self.CIRCUITS_CALL_PATH, data=asdict(saved_experiment.saved_experiment_request)
+            path=self.SAVED_EXPERIMENTS_CALL_PATH, data=asdict(saved_experiment.saved_experiment_request)
         )
         if status_code != 201:
             raise RemoteExecutionException(message="Experiment could not be saved.", status_code=status_code)
@@ -558,7 +558,7 @@ class API(ABC):
         Returns:
             SavedExperimentResponse: All available Devices"""
         response, status_code = self._connection.send_get_auth_remote_api_call(
-            path=f"{self.JOBS_CALL_PATH}/{saved_experiment_id}"
+            path=f"{self.SAVED_EXPERIMENTS_CALL_PATH}/{saved_experiment_id}"
         )
         if status_code != 200:
             raise RemoteExecutionException(message="Job could not be retrieved.", status_code=status_code)
