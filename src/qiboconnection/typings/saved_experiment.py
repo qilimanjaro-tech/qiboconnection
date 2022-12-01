@@ -31,7 +31,7 @@ class SavedExperimentRequest(_FullSavedExperimentBodyBase):
 class SavedExperimentResponse(_FullSavedExperimentBodyBase):
     """Class for accommodating SavedExperiments web responses."""
 
-    id: int
+    saved_experiment_id: int
     created_at: datetime
 
 
@@ -39,5 +39,5 @@ class SavedExperimentResponse(_FullSavedExperimentBodyBase):
 class SavedExperimentListingItemResponse(_SavedExperimentBodyBase):
     """Class for accommodating SavedExperimentListings web responses"""
 
-    id: int
+    saved_experiment_id: int
     created_at: datetime

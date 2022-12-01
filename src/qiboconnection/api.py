@@ -565,8 +565,24 @@ class API(ABC):
         return SavedExperimentResponse(**response)
 
     @typechecked
+    def get_saved_experiment(self, saved_experiment_id: int):
+        """Get full information of a single experiment
+
+        Raises:
+            RemoteExecutionException: SavedExperiments could not be retrieved
+
+        Returns:
+            Devices: All available Devices
+        """
+        saved_experiment = SavedExperiment.from_response(
+            self._get_saved_experiment_response(saved_experiment_id=saved_experiment_id)
+        )
+        self._saved_experiments = [saved_experiment]
+        return saved_experiment
+
+    @typechecked
     def get_saved_experiments(self, saved_experiment_ids: List[int] | npt.NDArray[int]) -> List[SavedExperiment]:
-        """List all available devices
+        """Get full information of the chosen experiments
 
         Raises:
             RemoteExecutionException: SavedExperiments could not be retrieved
@@ -575,9 +591,7 @@ class API(ABC):
             Devices: All available Devices
         """
         self._saved_experiments = [
-            SavedExperiment.from_response(
-                **asdict(self._get_saved_experiment_response(saved_experiment_id=saved_experiment_id))
-            )
+            SavedExperiment.from_response(self._get_saved_experiment_response(saved_experiment_id=saved_experiment_id))
             for saved_experiment_id in saved_experiment_ids
         ]
         return self._saved_experiments

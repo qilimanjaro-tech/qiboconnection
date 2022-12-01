@@ -38,7 +38,7 @@ class SavedExperiment(ABC):
         """SavedExperiment constructor that takes in an instance from a SavedExperimentResponse"""
         decode_jsonified_dict(response.experiment)
         return cls(
-            id=response.id,
+            id=response.saved_experiment_id,
             created_at=response.created_at,
             name=response.name,
             description=response.description,
