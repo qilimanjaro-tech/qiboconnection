@@ -507,6 +507,7 @@ class API(ABC):
         results_dict: dict,
         device_id: int,
         user_id: int,
+        favourite: bool = False,
     ):
 
         saved_experiment = SavedExperiment(
@@ -520,7 +521,8 @@ class API(ABC):
         )
 
         response, status_code = self._connection.send_post_auth_remote_api_call(
-            path=self.SAVED_EXPERIMENTS_CALL_PATH, data=asdict(saved_experiment.saved_experiment_request)
+            path=self.SAVED_EXPERIMENTS_CALL_PATH,
+            data=asdict(saved_experiment.saved_experiment_request(favourite=favourite)),
         )
         if status_code != 201:
             raise RemoteExecutionException(message="Experiment could not be saved.", status_code=status_code)

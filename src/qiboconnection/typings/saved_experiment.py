@@ -26,6 +26,8 @@ class _FullSavedExperimentBodyBase(_SavedExperimentBodyBase):
 class SavedExperimentRequest(_FullSavedExperimentBodyBase):
     """Class for accommodating SavedExperiments web requests."""
 
+    favourite: bool = False
+
 
 @dataclass
 class SavedExperimentResponse(_FullSavedExperimentBodyBase):

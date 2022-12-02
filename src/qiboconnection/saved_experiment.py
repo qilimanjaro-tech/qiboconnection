@@ -48,8 +48,7 @@ class SavedExperiment(ABC):
             results=decode_jsonified_dict(response.results),
         )
 
-    @property
-    def saved_experiment_request(self):
+    def saved_experiment_request(self, favourite: bool = False):
         """Created a SevedExperimentRequest instance"""
         return SavedExperimentRequest(
             name=self.name,
@@ -58,4 +57,5 @@ class SavedExperiment(ABC):
             description=self.description,
             experiment=self._encoded_experiment,
             results=self._encoded_results,
+            favourite=favourite,
         )
