@@ -27,7 +27,7 @@ class SavedExperimentListingItem(ABC):
     def from_response(cls, response: SavedExperimentListingItemResponse):
         """Constructor for SavedExperimentListingItems that takes in a SavedExperimentListingItemResponse"""
         return cls(
-            id=response.saved_experiment_id,
+            id=response.id,
             created_at=response.created_at,
             name=response.name,
             user_id=response.user_id,

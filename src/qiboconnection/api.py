@@ -531,7 +531,8 @@ class API(ABC):
         if status_code != 200:
             raise RemoteExecutionException(message="Experiment could not be saved.", status_code=status_code)
 
-        return [SavedExperimentListingItemResponse(**item) for item in response]
+        # TODO: get all paginated results!
+        return [SavedExperimentListingItemResponse(**item) for item in response["items"]]
 
     @typechecked
     def list_saved_experiments(self) -> SavedExperimentListing:
