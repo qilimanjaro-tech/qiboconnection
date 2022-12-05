@@ -509,6 +509,22 @@ class API(ABC):
         user_id: int,
         favourite: bool = False,
     ):
+        """Save an experiment and its results into the database af our servers, for them to be easily recovered when
+        needed.
+
+        Args:
+            name: Name the experiment is going to be saved with.
+            description: Short descriptive text to more easily identify this specific experiment instance.
+            experiment_dict: Serialized qililab experiment (using its `.to_dict()` method)
+            results_dict: Serialized qililab results (using their `.to_dict()` method )
+            device_id: Id of the device the experiment was executed in
+            user_id: Id of the user that is executing the experiment
+            favourite: Whether to save the experiment as favourite
+
+        Returns:
+            newly created experiment id
+
+        """
 
         saved_experiment = SavedExperiment(
             id=None,
@@ -526,7 +542,12 @@ class API(ABC):
         )
         if status_code != 201:
             raise RemoteExecutionException(message="Experiment could not be saved.", status_code=status_code)
-        logger.debug("Job circuit queued successfully.")
+        logger.debug("Experiment saved successfully.")
+
+        saved_experiment.id = response["saved_experiment_id"]
+
+        self._saved_experiments = [saved_experiment]
+        return saved_experiment.id
 
     def _get_list_saved_experiments_response(self) -> List[SavedExperimentListingItemResponse]:
         response, status_code = self._connection.send_get_auth_remote_api_call(path=self.SAVED_EXPERIMENTS_CALL_PATH)
