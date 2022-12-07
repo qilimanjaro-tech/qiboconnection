@@ -45,7 +45,7 @@ class SavedExperimentListing(ABC):
     _dataframe: pd.DataFrame = field(init=False)
 
     def __post_init__(self):
-        self._dataframe = pd.DataFrame((asdict(item) for item in self.items))
+        self._dataframe = pd.DataFrame((asdict(item) for item in self.items)).set_index("id")
 
     @classmethod
     def from_response(cls, response_list: List[SavedExperimentListingItemResponse]):
