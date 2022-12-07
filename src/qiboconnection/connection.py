@@ -4,7 +4,7 @@ from abc import ABC
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from io import TextIOWrapper
-from typing import Any, Optional, TextIO, Tuple, Union
+from typing import Any, List, Optional, TextIO, Tuple, Union
 
 import jwt
 import requests
@@ -22,6 +22,7 @@ from qiboconnection.util import (
     base64url_encode,
     load_config_file_to_disk,
     process_response,
+    process_responses,
     write_config_file_to_disk,
 )
 
@@ -313,6 +314,24 @@ class Connection(ABC):
         header = {"Authorization": f"Bearer {self._authorisation_access_token}"}
         response = requests.get(f"{self._remote_server_api_url}{path}", headers=header)
         return process_response(response)
+
+    @typechecked
+    def send_get_auth_remote_api_call_all_pages(self, path: str) -> List[Tuple[Any, int]]:
+        """HTTP GET REST API authenticated call to remote server
+
+        Args:
+            path (str): path to add to the remote server api url
+
+        Returns:
+            Tuple[Any, int]: Http response
+        """
+        logger.debug("Calling: %s%s", self._remote_server_api_url, path)
+        header = {"Authorization": f"Bearer {self._authorisation_access_token}"}
+        responses = [requests.get(f"{self._remote_server_api_url}{path}", headers=header)]
+        while "None" not in responses[-1].json()["links"]["next"]:
+            next_url = responses[-1].json()["links"]["next"]
+            responses.append(requests.get(next_url, headers=header))
+        return process_responses(responses)
 
     @typechecked
     def send_get_remote_call(self, path: str) -> Tuple[Any, int]:

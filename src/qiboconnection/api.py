@@ -37,9 +37,9 @@ from qiboconnection.typings.live_plot import (
 )
 from qiboconnection.typings.saved_experiment import (
     SavedExperimentListingItemResponse,
-    SavedExperimentRequest,
     SavedExperimentResponse,
 )
+from qiboconnection.util import unzip
 
 
 class API(ABC):
@@ -50,7 +50,7 @@ class API(ABC):
     JOBS_CALL_PATH = "/jobs"
     CIRCUITS_CALL_PATH = "/circuits"
     DEVICES_CALL_PATH = "/devices"
-    SAVED_EXPERIMENTS_CALL_PATH = "/save-experiments"
+    SAVED_EXPERIMENTS_CALL_PATH = "/saved_experiments"
     PING_CALL_PATH = "/status"
     LIVE_PLOTTING_PATH = "/live-plotting"
 
@@ -106,12 +106,18 @@ class API(ABC):
         Returns:
             Devices: All available Devices
         """
-        response, status_code = self._connection.send_get_auth_remote_api_call(path=self.DEVICES_CALL_PATH)
-        if status_code != 200:
-            raise RemoteExecutionException(message="Devices could not be retrieved.", status_code=status_code)
+        responses, status_codes = unzip(
+            self._connection.send_get_auth_remote_api_call_all_pages(path=self.DEVICES_CALL_PATH)
+        )
+        for status_code in status_codes:
+            if status_code != 200:
+                raise RemoteExecutionException(message="Devices could not be retrieved.", status_code=status_code)
 
-        # !!! TODO: handle all items, not only the returned on first call
-        self._devices = Devices([create_device(device_input=device_input) for device_input in response["items"]])
+        items = []
+        for response in responses:
+            items.extend(response["items"])
+
+        self._devices = Devices([create_device(device_input=device_input) for device_input in items])
         return self._devices
 
     @typechecked
@@ -550,12 +556,18 @@ class API(ABC):
         return saved_experiment.id
 
     def _get_list_saved_experiments_response(self) -> List[SavedExperimentListingItemResponse]:
-        response, status_code = self._connection.send_get_auth_remote_api_call(path=self.SAVED_EXPERIMENTS_CALL_PATH)
-        if status_code != 200:
-            raise RemoteExecutionException(message="Experiment could not be saved.", status_code=status_code)
+        responses, status_codes = unzip(
+            self._connection.send_get_auth_remote_api_call_all_pages(path=self.SAVED_EXPERIMENTS_CALL_PATH)
+        )
+        for status_code in status_codes:
+            if status_code != 200:
+                raise RemoteExecutionException(message="Experiment could not be listed.", status_code=status_code)
 
-        # TODO: get all paginated results!
-        return [SavedExperimentListingItemResponse(**item) for item in response["items"]]
+        items = []
+        for response in responses:
+            items.extend(response["items"])
+
+        return [SavedExperimentListingItemResponse(**item) for item in items]
 
     @typechecked
     def list_saved_experiments(self) -> SavedExperimentListing:
@@ -568,7 +580,6 @@ class API(ABC):
             Devices: All available Devices
         """
         saved_experiments_list_response = self._get_list_saved_experiments_response()
-        # !!! TODO: handle all items, not only the returned on first call
         self._saved_experiments_listing = SavedExperimentListing.from_response(saved_experiments_list_response)
         return self._saved_experiments_listing
 
@@ -589,7 +600,7 @@ class API(ABC):
         return SavedExperimentResponse(**response)
 
     @typechecked
-    def get_saved_experiment(self, saved_experiment_id: int):
+    def get_saved_experiment(self, saved_experiment_id: int) -> SavedExperiment:
         """Get full information of a single experiment
 
         Raises:
