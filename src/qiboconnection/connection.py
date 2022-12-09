@@ -331,7 +331,7 @@ class Connection(ABC):
         next_url = f"{self._remote_server_api_url}{path}"
         responses = []
         while "None" not in next_url:
-            response = requests.get(f"{self._remote_server_api_url}{path}", headers=header, params=params)
+            response = requests.get(next_url, headers=header, params=params)
             json_content, status_code = process_response(response)
             next_url = json_content["links"]["next"]
             responses.append((json_content, status_code))
