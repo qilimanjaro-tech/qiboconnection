@@ -555,9 +555,16 @@ class API(ABC):
         self._saved_experiments = [saved_experiment]
         return saved_experiment.id
 
-    def _get_list_saved_experiments_response(self) -> List[SavedExperimentListingItemResponse]:
+    def _get_list_saved_experiments_response(
+        self, favourites: bool = False
+    ) -> List[SavedExperimentListingItemResponse]:
+        """Performs the actual saved_experiments listing request
+        Returns
+            List[SavedExperimentListingItemResponse]: list of objects encoding the expected response structure"""
         responses, status_codes = unzip(
-            self._connection.send_get_auth_remote_api_call_all_pages(path=self.SAVED_EXPERIMENTS_CALL_PATH)
+            self._connection.send_get_auth_remote_api_call_all_pages(
+                path=self.SAVED_EXPERIMENTS_CALL_PATH, params={"favourites": favourites}
+            )
         )
         for status_code in status_codes:
             if status_code != 200:
@@ -570,7 +577,7 @@ class API(ABC):
         return [SavedExperimentListingItemResponse(**item) for item in items]
 
     @typechecked
-    def list_saved_experiments(self) -> SavedExperimentListing:
+    def list_saved_experiments(self, favourites: bool = False) -> SavedExperimentListing:
         """List all available devices
 
         Raises:
@@ -579,7 +586,7 @@ class API(ABC):
         Returns:
             Devices: All available Devices
         """
-        saved_experiments_list_response = self._get_list_saved_experiments_response()
+        saved_experiments_list_response = self._get_list_saved_experiments_response(favourites=favourites)
         self._saved_experiments_listing = SavedExperimentListing.from_response(saved_experiments_list_response)
         return self._saved_experiments_listing
 

@@ -301,26 +301,28 @@ class Connection(ABC):
         return process_response(response)
 
     @typechecked
-    def send_get_auth_remote_api_call(self, path: str) -> Tuple[Any, int]:
+    def send_get_auth_remote_api_call(self, path: str, params: dict = None) -> Tuple[Any, int]:
         """HTTP GET REST API authenticated call to remote server
 
         Args:
             path (str): path to add to the remote server api url
+            params (str): dict of parameters to be encoded as url query params
 
         Returns:
             Tuple[Any, int]: Http response
         """
         logger.debug("Calling: %s%s", self._remote_server_api_url, path)
         header = {"Authorization": f"Bearer {self._authorisation_access_token}"}
-        response = requests.get(f"{self._remote_server_api_url}{path}", headers=header)
+        response = requests.get(f"{self._remote_server_api_url}{path}", headers=header, params=params)
         return process_response(response)
 
     @typechecked
-    def send_get_auth_remote_api_call_all_pages(self, path: str) -> List[Tuple[Any, int]]:
+    def send_get_auth_remote_api_call_all_pages(self, path: str, params: dict = None) -> List[Tuple[Any, int]]:
         """HTTP GET REST API authenticated call to remote server
 
         Args:
             path (str): path to add to the remote server api url
+            params (str): dict of parameters to be encoded as url query params
 
         Returns:
             Tuple[Any, int]: Http response
@@ -330,7 +332,7 @@ class Connection(ABC):
         responses = [requests.get(f"{self._remote_server_api_url}{path}", headers=header)]
         while "None" not in responses[-1].json()["links"]["next"]:
             next_url = responses[-1].json()["links"]["next"]
-            responses.append(requests.get(next_url, headers=header))
+            responses.append(requests.get(next_url, headers=header, params=params))
         return process_responses(responses)
 
     @typechecked
