@@ -155,18 +155,6 @@ def process_response(response: requests.Response) -> Tuple[Any, int]:
         return response.text, response.status_code
 
 
-def process_responses(responses: List[requests.Response]) -> List[Tuple[Any, int]]:
-    """Process a list of Http Response to check for errors
-
-    Args:
-        responses (List[requests.Response]): list of Http Response
-
-    Returns:
-        List[Tuple[Any, int]]: list of tuples with Data from the Response and status code
-    """
-    return [process_response(response) for response in responses]
-
-
 def jsonify_dict_and_base64_encode(object_to_encode: dict):
     """
     Jsonifies a given dict, encodes it to bytes assuming utf-8, and encodes that byte obj to an url-save base64 str

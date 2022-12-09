@@ -22,7 +22,6 @@ from qiboconnection.util import (
     base64url_encode,
     load_config_file_to_disk,
     process_response,
-    process_responses,
     write_config_file_to_disk,
 )
 
@@ -329,11 +328,14 @@ class Connection(ABC):
         """
         logger.debug("Calling: %s%s", self._remote_server_api_url, path)
         header = {"Authorization": f"Bearer {self._authorisation_access_token}"}
-        responses = [requests.get(f"{self._remote_server_api_url}{path}", headers=header)]
-        while "None" not in responses[-1].json()["links"]["next"]:
-            next_url = responses[-1].json()["links"]["next"]
-            responses.append(requests.get(next_url, headers=header, params=params))
-        return process_responses(responses)
+        next_url = f"{self._remote_server_api_url}{path}"
+        responses = []
+        while "None" not in next_url:
+            response = requests.get(f"{self._remote_server_api_url}{path}", headers=header, params=params)
+            json_content, status_code = process_response(response)
+            next_url = json_content["links"]["next"]
+            responses.append((json_content, status_code))
+        return responses
 
     @typechecked
     def send_get_remote_call(self, path: str) -> Tuple[Any, int]:
