@@ -548,7 +548,8 @@ def user_example_experiment_saving() -> None:
         results_dict=results_dict,
         device_id=1,
         user_id=qibo_api._connection._user_id,
-        favourite=True,
+        favourite=False,
+        qililab_version="0.0.0",
     )
 
     # Retrieve an experiment
