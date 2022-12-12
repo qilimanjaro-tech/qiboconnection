@@ -508,8 +508,8 @@ class API(ABC):
     @typechecked
     def save_experiment(
         self,
-        name: str | None,
-        description: str | None,
+        name: str,
+        description: str,
         experiment_dict: dict,
         results_dict: dict,
         device_id: int,
@@ -591,8 +591,9 @@ class API(ABC):
             Devices: All available Devices
         """
         saved_experiments_list_response = self._get_list_saved_experiments_response(favourites=favourites)
-        self._saved_experiments_listing = SavedExperimentListing.from_response(saved_experiments_list_response)
-        return self._saved_experiments_listing
+        saved_experiment_listing = SavedExperimentListing.from_response(saved_experiments_list_response)
+        self._saved_experiments_listing = saved_experiment_listing
+        return saved_experiment_listing
 
     @typechecked
     def _get_saved_experiment_response(self, saved_experiment_id: int):
