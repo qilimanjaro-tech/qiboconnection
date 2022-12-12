@@ -37,7 +37,6 @@ class SavedExperiment(ABC):
     @classmethod
     def from_response(cls, response: SavedExperimentResponse):
         """SavedExperiment constructor that takes in an instance from a SavedExperimentResponse"""
-        decode_jsonified_dict(response.experiment)
         return cls(
             id=response.saved_experiment_id,
             created_at=response.created_at,
