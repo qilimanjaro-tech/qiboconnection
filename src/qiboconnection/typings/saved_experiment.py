@@ -13,6 +13,7 @@ class _SavedExperimentBodyBase(ABC):
     device_id: int
     user_id: int
     description: str
+    qililab_version: str
 
 
 @dataclass

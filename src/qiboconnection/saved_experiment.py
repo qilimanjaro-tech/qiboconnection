@@ -20,6 +20,7 @@ class SavedExperiment(ABC):
     description: str
     experiment: dict
     results: dict
+    qililab_version: str
     id: int | None = field(default=None)
     created_at: datetime | None = field(default=None)
 
@@ -46,10 +47,11 @@ class SavedExperiment(ABC):
             device_id=response.device_id,
             experiment=decode_jsonified_dict(response.experiment),
             results=decode_jsonified_dict(response.results),
+            qililab_version=response.qililab_version,
         )
 
     def saved_experiment_request(self, favourite: bool = False):
-        """Created a SevedExperimentRequest instance"""
+        """Created a SavedExperimentRequest instance"""
         return SavedExperimentRequest(
             name=self.name,
             user_id=self.user_id,
@@ -58,4 +60,5 @@ class SavedExperiment(ABC):
             experiment=self._encoded_experiment,
             results=self._encoded_results,
             favourite=favourite,
+            qililab_version=self.qililab_version,
         )

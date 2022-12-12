@@ -513,6 +513,7 @@ class API(ABC):
         results_dict: dict,
         device_id: int,
         user_id: int,
+        qililab_version: str,
         favourite: bool = False,
     ):
         """Save an experiment and its results into the database af our servers, for them to be easily recovered when
@@ -526,6 +527,7 @@ class API(ABC):
             device_id: Id of the device the experiment was executed in
             user_id: Id of the user that is executing the experiment
             favourite: Whether to save the experiment as favourite
+            qililab_version: version of qililab the experm+iment was executed with
 
         Returns:
             newly created experiment id
@@ -540,6 +542,7 @@ class API(ABC):
             results=results_dict,
             device_id=device_id,
             user_id=user_id,
+            qililab_version=qililab_version,
         )
 
         response, status_code = self._connection.send_post_auth_remote_api_call(

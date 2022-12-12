@@ -20,6 +20,7 @@ class SavedExperimentListingItem(ABC):
     device_id: int
     description: str
     experiment: dict
+    qililab_version: str
     id: int | None = field(default=None)
     created_at: datetime | None = field(default=None)
 
@@ -34,6 +35,7 @@ class SavedExperimentListingItem(ABC):
             device_id=response.device_id,
             description=response.description,
             experiment=decode_jsonified_dict(response.experiment),
+            qililab_version=response.qililab_version,
         )
 
 
