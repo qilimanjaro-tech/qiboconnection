@@ -627,7 +627,7 @@ class API(ABC):
         return saved_experiment
 
     @typechecked
-    def get_saved_experiments(self, saved_experiment_ids: List[int] | npt.NDArray[int]) -> List[SavedExperiment]:
+    def get_saved_experiments(self, saved_experiment_ids: List[int] | npt.NDArray[np.intp]) -> List[SavedExperiment]:
         """Get full information of the chosen experiments
 
         Raises:
