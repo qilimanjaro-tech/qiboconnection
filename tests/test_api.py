@@ -47,6 +47,7 @@ def test_select_device_id(mocked_web_call: MagicMock, mocked_api: API):
     mocked_api.select_device_id(device_id=1)
 
     mocked_web_call.assert_called_with(self=mocked_api._connection, path=f"{mocked_api.DEVICES_CALL_PATH}/1")
+    assert mocked_api._selected_devices is not None
     assert len(mocked_api._selected_devices) == 1
     assert mocked_api._selected_devices[0] == create_device(WebResponses.get_device_response[0])
 
@@ -59,6 +60,7 @@ def test_select_device_ids(mocked_web_call: MagicMock, mocked_api: API):
     mocked_api.select_device_ids(device_ids=[1])
 
     mocked_web_call.assert_called_with(self=mocked_api._connection, path=f"{mocked_api.DEVICES_CALL_PATH}/1")
+    assert mocked_api._selected_devices is not None
     assert len(mocked_api._selected_devices) == 1
     assert mocked_api._selected_devices[0] == create_device(WebResponses.get_device_response[0])
 
