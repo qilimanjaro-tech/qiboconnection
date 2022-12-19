@@ -6,6 +6,7 @@ import pytest
 from qiboconnection.api import API
 from qiboconnection.devices.device import Device
 from qiboconnection.devices.devices import Devices
+from qiboconnection.devices.util import create_device
 from qiboconnection.saved_experiment import SavedExperiment
 from qiboconnection.saved_experiment_listing import SavedExperimentListing
 
@@ -47,7 +48,7 @@ def test_select_device_id(mocked_web_call: MagicMock, mocked_api: API):
 
     mocked_web_call.assert_called_with(self=mocked_api._connection, path=f"{mocked_api.DEVICES_CALL_PATH}/1")
     assert len(mocked_api._selected_devices) == 1
-    assert mocked_api._selected_devices[0] == mocked_api._devices._devices[0]
+    assert mocked_api._selected_devices[0] == create_device(WebResponses.get_device_response[0])
 
 
 @patch("qiboconnection.connection.Connection.send_get_auth_remote_api_call", autospec=True)
@@ -59,7 +60,7 @@ def test_select_device_ids(mocked_web_call: MagicMock, mocked_api: API):
 
     mocked_web_call.assert_called_with(self=mocked_api._connection, path=f"{mocked_api.DEVICES_CALL_PATH}/1")
     assert len(mocked_api._selected_devices) == 1
-    assert mocked_api._selected_devices[0] == mocked_api._devices._devices[0]
+    assert mocked_api._selected_devices[0] == create_device(WebResponses.get_device_response[0])
 
 
 @patch("qiboconnection.connection.Connection.send_post_auth_remote_api_call", autospec=True)
