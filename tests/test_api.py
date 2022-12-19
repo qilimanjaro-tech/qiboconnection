@@ -41,11 +41,25 @@ def test_list_devices(mocked_web_call: MagicMock, mocked_api: API):
 @patch("qiboconnection.connection.Connection.send_get_auth_remote_api_call", autospec=True)
 def test_select_device_id(mocked_web_call: MagicMock, mocked_api: API):
     """Test list devices function"""
-    mocked_web_call.return_value = WebResponses.list_devices_response
+    mocked_web_call.return_value = WebResponses.get_device_response
 
     mocked_api.select_device_id(device_id=1)
 
-    mocked_web_call.assert_called_with(self=mocked_api._connection, path=mocked_api.DEVICES_CALL_PATH)
+    mocked_web_call.assert_called_with(self=mocked_api._connection, path=f"{mocked_api.DEVICES_CALL_PATH}/1")
+    assert len(mocked_api._selected_devices) == 1
+    assert mocked_api._selected_devices[0] == mocked_api._devices._devices[0]
+
+
+@patch("qiboconnection.connection.Connection.send_get_auth_remote_api_call", autospec=True)
+def test_select_device_ids(mocked_web_call: MagicMock, mocked_api: API):
+    """Test list devices function"""
+    mocked_web_call.return_value = WebResponses.get_device_response
+
+    mocked_api.select_device_ids(device_ids=[1])
+
+    mocked_web_call.assert_called_with(self=mocked_api._connection, path=f"{mocked_api.DEVICES_CALL_PATH}/1")
+    assert len(mocked_api._selected_devices) == 1
+    assert mocked_api._selected_devices[0] == mocked_api._devices._devices[0]
 
 
 @patch("qiboconnection.connection.Connection.send_post_auth_remote_api_call", autospec=True)

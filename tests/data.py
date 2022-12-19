@@ -125,6 +125,25 @@ class WebResponses:
         ),
     )
 
+    get_device_response = (
+        {
+            "device_id": 1,
+            "device_name": "AWS Development Simulator",
+            "status": "available",
+            "channel_id": 2,
+            "number_pending_jobs": 6,
+            "characteristics": {
+                "type": "simulator",
+                "cpu": "Intel @ 4x 2GHz",
+                "gpu": "None",
+                "os": "Ubuntu 22.04 jammy",
+                "kernel": "x86_64 Linux 5.4.0-80-generic",
+                "ram": "4096MiB",
+            },
+        },
+        200,
+    )
+
     save_experiment_rest_response = (
         {
             "saved_experiment_id": 1,
