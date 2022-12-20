@@ -563,7 +563,8 @@ class API(ABC):
         experiment's endpoint"""
 
         response, status_code = self._connection.send_put_auth_remote_api_call(
-            path=f"{self.SAVED_EXPERIMENTS_CALL_PATH}/{saved_experiment_id}", data={"favourite": favourite}
+            path=f"{self.SAVED_EXPERIMENTS_CALL_PATH}/{saved_experiment_id}",
+            data={"favourite": favourite, "user_id": self._connection.user.user_id},
         )
 
         if status_code != 201:
