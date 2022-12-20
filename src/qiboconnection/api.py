@@ -85,6 +85,15 @@ class API(ABC):
         """
         return self._jobs[-1]
 
+    @property
+    def user_id(self) -> int:
+        """Exposes the id of the authenticated user
+
+        Returns:
+            int: user ir
+        """
+        return self._connection.user.user_id
+
     def ping(self) -> str:
         """Checks if the connection is alive and response OK when it is.
 

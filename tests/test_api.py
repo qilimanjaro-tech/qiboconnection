@@ -139,7 +139,7 @@ def test_fav_saved_experiment(mocked_web_call: MagicMock, mocked_api: API):
     mocked_web_call.assert_called_with(
         self=mocked_api._connection,
         path=f"{mocked_api.SAVED_EXPERIMENTS_CALL_PATH}/1",
-        data={"favourite": True, "user_id": mocked_api._connection.user.user_id},
+        data={"favourite": True, "user_id": mocked_api.user_id},
     )
 
 
@@ -153,7 +153,7 @@ def test_fav_saved_experiments(mocked_web_call: MagicMock, mocked_api: API):
     mocked_web_call.assert_called_with(
         self=mocked_api._connection,
         path=f"{mocked_api.SAVED_EXPERIMENTS_CALL_PATH}/1",
-        data={"favourite": True, "user_id": mocked_api._connection.user.user_id},
+        data={"favourite": True, "user_id": mocked_api.user_id},
     )
 
 
@@ -167,7 +167,7 @@ def test_unfav_saved_experiment(mocked_web_call: MagicMock, mocked_api: API):
     mocked_web_call.assert_called_with(
         self=mocked_api._connection,
         path=f"{mocked_api.SAVED_EXPERIMENTS_CALL_PATH}/1",
-        data={"favourite": False, "user_id": mocked_api._connection.user.user_id},
+        data={"favourite": False, "user_id": mocked_api.user_id},
     )
 
 
@@ -181,5 +181,5 @@ def test_unfav_saved_experiments(mocked_web_call: MagicMock, mocked_api: API):
     mocked_web_call.assert_called_with(
         self=mocked_api._connection,
         path=f"{mocked_api.SAVED_EXPERIMENTS_CALL_PATH}/1",
-        data={"favourite": False, "user_id": mocked_api._connection.user.user_id},
+        data={"favourite": False, "user_id": mocked_api.user_id},
     )
