@@ -558,6 +558,39 @@ class API(ABC):
         self._saved_experiments = [saved_experiment]
         return saved_experiment.id
 
+    def _update_favourite_saved_experiment(self, saved_experiment_id: int, favourite: bool):
+        """Ask the api to add or remove a saved experiment from the favourite relations, by using the update saved
+        experiment's endpoint"""
+
+        response, status_code = self._connection.send_put_auth_remote_api_call(
+            path=f"{self.SAVED_EXPERIMENTS_CALL_PATH}/{saved_experiment_id}", data={"favourite": favourite}
+        )
+
+        if status_code != 201:
+            raise RemoteExecutionException(
+                message="Experiment favourite status could not be updated.", status_code=status_code
+            )
+
+        logger.debug(f"Experiment {response['saved_experiment_id']} updated successfully.")
+
+    def fav_saved_experiment(self, saved_experiment_id: int):
+        """Adds a saved experiment to the list of favourite saved experiments"""
+        return self._update_favourite_saved_experiment(saved_experiment_id=saved_experiment_id, favourite=True)
+
+    def fav_saved_experiments(self, saved_experiment_ids: List[int] | npt.NDArray[np.int_]):
+        """Adds a list of saved experiments to the list of favourite saved experiments"""
+        for saved_experiment_id in saved_experiment_ids:
+            self._update_favourite_saved_experiment(saved_experiment_id=saved_experiment_id, favourite=True)
+
+    def unfav_saved_experiment(self, saved_experiment_id: int):
+        """Removes a saved experiment from the list of favourite saved experiments"""
+        return self._update_favourite_saved_experiment(saved_experiment_id=saved_experiment_id, favourite=False)
+
+    def unfav_saved_experiments(self, saved_experiment_ids: List[int] | npt.NDArray[np.int_]):
+        """Removes a list of saved experiments from the list of favourite saved experiments"""
+        for saved_experiment_id in saved_experiment_ids:
+            self._update_favourite_saved_experiment(saved_experiment_id=saved_experiment_id, favourite=False)
+
     def _get_list_saved_experiments_response(
         self, favourites: bool = False
     ) -> List[SavedExperimentListingItemResponse]:

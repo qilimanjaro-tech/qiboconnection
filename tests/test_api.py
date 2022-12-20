@@ -127,3 +127,51 @@ def test_get_saved_experiments(mocked_web_call: MagicMock, mocked_api: API):
 
     mocked_web_call.assert_called_with(self=mocked_api._connection, path=f"{mocked_api.SAVED_EXPERIMENTS_CALL_PATH}/1")
     assert isinstance(saved_experiment[0], SavedExperiment)
+
+
+@patch("qiboconnection.connection.Connection.send_put_auth_remote_api_call", autospec=True)
+def test_fav_saved_experiment(mocked_web_call: MagicMock, mocked_api: API):
+    """Tests API.list_saved_experiments() method"""
+    mocked_web_call.return_value = WebResponses.update_experiment_rest_response
+
+    mocked_api.fav_saved_experiment(saved_experiment_id=1)
+
+    mocked_web_call.assert_called_with(
+        self=mocked_api._connection, path=f"{mocked_api.SAVED_EXPERIMENTS_CALL_PATH}/1", data={"favourite": True}
+    )
+
+
+@patch("qiboconnection.connection.Connection.send_put_auth_remote_api_call", autospec=True)
+def test_fav_saved_experiments(mocked_web_call: MagicMock, mocked_api: API):
+    """Tests API.list_saved_experiments() method"""
+    mocked_web_call.return_value = WebResponses.update_experiment_rest_response
+
+    mocked_api.fav_saved_experiments(saved_experiment_ids=[1])
+
+    mocked_web_call.assert_called_with(
+        self=mocked_api._connection, path=f"{mocked_api.SAVED_EXPERIMENTS_CALL_PATH}/1", data={"favourite": True}
+    )
+
+
+@patch("qiboconnection.connection.Connection.send_put_auth_remote_api_call", autospec=True)
+def test_unfav_saved_experiment(mocked_web_call: MagicMock, mocked_api: API):
+    """Tests API.list_saved_experiments() method"""
+    mocked_web_call.return_value = WebResponses.update_experiment_rest_response
+
+    mocked_api.unfav_saved_experiment(saved_experiment_id=1)
+
+    mocked_web_call.assert_called_with(
+        self=mocked_api._connection, path=f"{mocked_api.SAVED_EXPERIMENTS_CALL_PATH}/1", data={"favourite": False}
+    )
+
+
+@patch("qiboconnection.connection.Connection.send_put_auth_remote_api_call", autospec=True)
+def test_unfav_saved_experiments(mocked_web_call: MagicMock, mocked_api: API):
+    """Tests API.list_saved_experiments() method"""
+    mocked_web_call.return_value = WebResponses.update_experiment_rest_response
+
+    mocked_api.unfav_saved_experiments(saved_experiment_ids=[1])
+
+    mocked_web_call.assert_called_with(
+        self=mocked_api._connection, path=f"{mocked_api.SAVED_EXPERIMENTS_CALL_PATH}/1", data={"favourite": False}
+    )
