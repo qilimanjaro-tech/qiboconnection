@@ -567,7 +567,7 @@ class API(ABC):
             data={"favourite": favourite, "user_id": self._connection.user.user_id},
         )
 
-        if status_code != 201:
+        if status_code != 200:
             raise RemoteExecutionException(
                 message="Experiment favourite status could not be updated.", status_code=status_code
             )
