@@ -132,7 +132,7 @@ def test_get_saved_experiments(mocked_web_call: MagicMock, mocked_api: API):
 @patch("qiboconnection.connection.Connection.send_put_auth_remote_api_call", autospec=True)
 def test_fav_saved_experiment(mocked_web_call: MagicMock, mocked_api: API):
     """Tests API.list_saved_experiments() method"""
-    mocked_web_call.return_value = WebResponses.update_experiment_rest_response
+    mocked_web_call.return_value = WebResponses.saved_experiment_rest_response
 
     mocked_api.fav_saved_experiment(saved_experiment_id=1)
 
@@ -146,7 +146,7 @@ def test_fav_saved_experiment(mocked_web_call: MagicMock, mocked_api: API):
 @patch("qiboconnection.connection.Connection.send_put_auth_remote_api_call", autospec=True)
 def test_fav_saved_experiments(mocked_web_call: MagicMock, mocked_api: API):
     """Tests API.list_saved_experiments() method"""
-    mocked_web_call.return_value = WebResponses.update_experiment_rest_response
+    mocked_web_call.return_value = WebResponses.saved_experiment_rest_response
 
     mocked_api.fav_saved_experiments(saved_experiment_ids=[1])
 
@@ -160,7 +160,7 @@ def test_fav_saved_experiments(mocked_web_call: MagicMock, mocked_api: API):
 @patch("qiboconnection.connection.Connection.send_put_auth_remote_api_call", autospec=True)
 def test_unfav_saved_experiment(mocked_web_call: MagicMock, mocked_api: API):
     """Tests API.list_saved_experiments() method"""
-    mocked_web_call.return_value = WebResponses.update_experiment_rest_response
+    mocked_web_call.return_value = WebResponses.saved_experiment_rest_response
 
     mocked_api.unfav_saved_experiment(saved_experiment_id=1)
 
@@ -174,7 +174,7 @@ def test_unfav_saved_experiment(mocked_web_call: MagicMock, mocked_api: API):
 @patch("qiboconnection.connection.Connection.send_put_auth_remote_api_call", autospec=True)
 def test_unfav_saved_experiments(mocked_web_call: MagicMock, mocked_api: API):
     """Tests API.list_saved_experiments() method"""
-    mocked_web_call.return_value = WebResponses.update_experiment_rest_response
+    mocked_web_call.return_value = WebResponses.saved_experiment_rest_response
 
     mocked_api.unfav_saved_experiments(saved_experiment_ids=[1])
 
