@@ -91,7 +91,13 @@ class API(ABC):
 
         Returns:
             int: user ir
+
+        Raises:
+            ValueError: User does not have user_id
         """
+        if self._connection.user.user_id is None:
+            raise ValueError("User does not have user_id")
+
         return self._connection.user.user_id
 
     def ping(self) -> str:
