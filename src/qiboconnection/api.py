@@ -630,13 +630,13 @@ class API(ABC):
 
     @typechecked
     def list_saved_experiments(self, favourites: bool = False) -> SavedExperimentListing:
-        """List all available devices
+        """List all saved experiments
 
         Raises:
             RemoteExecutionException: Devices could not be retrieved
 
         Returns:
-            Devices: All available Devices
+            Devices: All SavedExperiments
         """
         saved_experiments_list_response = self._get_list_saved_experiments_response(favourites=favourites)
         saved_experiment_listing = SavedExperimentListing.from_response(saved_experiments_list_response)
@@ -651,12 +651,12 @@ class API(ABC):
             RemoteExecutionException: SavedExperiment could not be retrieved
 
         Returns:
-            SavedExperimentResponse: All available Devices"""
+            SavedExperimentResponse: response with the info of the requested saved experiment"""
         response, status_code = self._connection.send_get_auth_remote_api_call(
             path=f"{self.SAVED_EXPERIMENTS_CALL_PATH}/{saved_experiment_id}"
         )
         if status_code != 200:
-            raise RemoteExecutionException(message="Job could not be retrieved.", status_code=status_code)
+            raise RemoteExecutionException(message="SavedExperiment could not be retrieved.", status_code=status_code)
         return SavedExperimentResponse(**response)
 
     @typechecked
@@ -667,7 +667,7 @@ class API(ABC):
             RemoteExecutionException: SavedExperiments could not be retrieved
 
         Returns:
-            Devices: All available Devices
+            SavedExperiment: complete saved experiment, including results
         """
         saved_experiment = SavedExperiment.from_response(
             self._get_saved_experiment_response(saved_experiment_id=saved_experiment_id)
@@ -683,7 +683,7 @@ class API(ABC):
             RemoteExecutionException: SavedExperiments could not be retrieved
 
         Returns:
-            Devices: All available Devices
+            List[SavedExperiment]: complete saved experiment list, including results
         """
         self._saved_experiments = [
             SavedExperiment.from_response(self._get_saved_experiment_response(saved_experiment_id=saved_experiment_id))
