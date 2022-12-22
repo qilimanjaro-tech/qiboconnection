@@ -1,6 +1,5 @@
 """ SavedExperiment class"""
-from abc import ABC
-from dataclasses import asdict, dataclass, field
+from dataclasses import dataclass, field
 from datetime import datetime
 
 from qiboconnection.typings.saved_experiment import (
@@ -11,7 +10,7 @@ from qiboconnection.util import decode_jsonified_dict, jsonify_dict_and_base64_e
 
 
 @dataclass
-class SavedExperiment(ABC):
+class SavedExperiment:
     """SavedExperiment representation"""
 
     name: str

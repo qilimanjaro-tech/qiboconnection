@@ -4,7 +4,6 @@ import pandas as pd
 import pytest
 
 from qiboconnection.api import API
-from qiboconnection.devices.device import Device
 from qiboconnection.devices.devices import Devices
 from qiboconnection.devices.util import create_device
 from qiboconnection.saved_experiment import SavedExperiment

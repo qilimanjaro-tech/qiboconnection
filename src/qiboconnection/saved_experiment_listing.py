@@ -1,6 +1,6 @@
 """ SavedExperimentListing class """
 
-from abc import ABC
+
 from dataclasses import asdict, dataclass, field
 from datetime import datetime
 from typing import List
@@ -12,7 +12,7 @@ from qiboconnection.util import decode_jsonified_dict
 
 
 @dataclass
-class SavedExperimentListingItem(ABC):
+class SavedExperimentListingItem:
     """SavedExperimentListing single item representation"""
 
     name: str
@@ -40,7 +40,7 @@ class SavedExperimentListingItem(ABC):
 
 
 @dataclass
-class SavedExperimentListing(ABC):
+class SavedExperimentListing:
     """SavedExperimentListing representation"""
 
     items: List[SavedExperimentListingItem]
