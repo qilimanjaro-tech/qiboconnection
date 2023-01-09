@@ -540,7 +540,7 @@ class API(ABC):
             device_id: Id of the device the experiment was executed in
             user_id: Id of the user that is executing the experiment
             favourite: Whether to save the experiment as favourite
-            qililab_version: version of qililab the experm+iment was executed with
+            qililab_version: version of qililab the experiment was executed with
 
         Returns:
             newly created experiment id
