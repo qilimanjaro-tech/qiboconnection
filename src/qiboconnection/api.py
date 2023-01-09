@@ -65,7 +65,7 @@ class API(ABC):
         self._jobs: List[Job] = []
         self._selected_devices: List[Device] | None = None
         self._live_plots: LivePlots = LivePlots()
-        self._saved_experiments: List[SavedExperiment] = []
+        self._saved_experiment: SavedExperiment | None = None
         self._saved_experiments_listing: SavedExperimentListing | None = None
 
     @property
@@ -85,6 +85,24 @@ class API(ABC):
             Job: last Job launched
         """
         return self._jobs[-1]
+
+    @property
+    def last_saved_experiment(self) -> SavedExperiment | None:
+        """Returns the last saved experiment of the current session, in case there has been one.
+
+        Returns:
+            SavedExperiment | None: last saved experiment
+        """
+        return self._saved_experiment
+
+    @property
+    def last_saved_experiment_listing(self) -> SavedExperimentListing | None:
+        """Returns the last experiment listing downloaded in the current session, in case there has been one.
+
+        Returns:
+            SavedExperimentListing | None: last downloaded experiment listing
+        """
+        return self._saved_experiments_listing
 
     @property
     def user_id(self) -> int:
@@ -569,7 +587,7 @@ class API(ABC):
 
         saved_experiment.id = response[API_CONSTANTS.SAVED_EXPERIMENT_ID]
 
-        self._saved_experiments = [saved_experiment]
+        self._saved_experiment = saved_experiment
         return saved_experiment.id
 
     def _update_favourite_saved_experiment(self, saved_experiment_id: int, favourite: bool):
@@ -665,11 +683,9 @@ class API(ABC):
         Returns:
             SavedExperiment: complete saved experiment, including results
         """
-        saved_experiment = SavedExperiment.from_response(
+        return SavedExperiment.from_response(
             self._get_saved_experiment_response(saved_experiment_id=saved_experiment_id)
         )
-        self._saved_experiments = [saved_experiment]
-        return saved_experiment
 
     @typechecked
     def get_saved_experiments(self, saved_experiment_ids: List[int] | npt.NDArray[np.int_]) -> List[SavedExperiment]:
@@ -681,8 +697,7 @@ class API(ABC):
         Returns:
             List[SavedExperiment]: complete saved experiment list, including results
         """
-        self._saved_experiments = [
+        return [
             SavedExperiment.from_response(self._get_saved_experiment_response(saved_experiment_id=saved_experiment_id))
             for saved_experiment_id in saved_experiment_ids
         ]
-        return self._saved_experiments
