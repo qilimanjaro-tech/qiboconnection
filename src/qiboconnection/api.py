@@ -129,7 +129,7 @@ class API(ABC):
             if status_code != 200:
                 raise RemoteExecutionException(message="Devices could not be retrieved.", status_code=status_code)
 
-        items = [response[REST.ITEMS] for response in responses]
+        items = [item for response in responses for item in response[REST.ITEMS]]
 
         self._devices = Devices([create_device(device_input=device_input) for device_input in items])
         return self._devices
@@ -621,7 +621,7 @@ class API(ABC):
             if status_code != 200:
                 raise RemoteExecutionException(message="Experiment could not be listed.", status_code=status_code)
 
-        items = [response[REST.ITEMS] for response in responses]
+        items = [item for response in responses for item in response[REST.ITEMS]]
         return [SavedExperimentListingItemResponse(**item) for item in items]
 
     @typechecked
