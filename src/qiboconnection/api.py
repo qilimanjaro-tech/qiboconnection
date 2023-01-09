@@ -16,6 +16,7 @@ from typeguard import typechecked
 from qiboconnection.api_utils import log_job_status_info, parse_job_responses_to_results
 from qiboconnection.config import logger
 from qiboconnection.connection import Connection
+from qiboconnection.constants import API_CONSTANTS, REST, REST_ERROR
 from qiboconnection.devices.device import Device
 from qiboconnection.devices.devices import Devices
 from qiboconnection.devices.offline_device import OfflineDevice
@@ -128,7 +129,7 @@ class API(ABC):
             if status_code != 200:
                 raise RemoteExecutionException(message="Devices could not be retrieved.", status_code=status_code)
 
-        items = [response["items"] for response in responses]
+        items = [response[REST.ITEMS] for response in responses]
 
         self._devices = Devices([create_device(device_input=device_input) for device_input in items])
         return self._devices
@@ -180,7 +181,7 @@ class API(ABC):
             self._selected_devices = [selected_device]
             logger.info("Device %s selected.", selected_device.name)
         except HTTPError as ex:
-            logger.error(json.loads(str(ex))["detail"])
+            logger.error(json.loads(str(ex))[REST_ERROR.DETAIL])
             raise ex
 
     @typechecked
@@ -196,7 +197,7 @@ class API(ABC):
             try:
                 self._selected_devices.append(self._devices.select_device(device_id=device_id))
             except HTTPError as ex:
-                logger.error(json.loads(str(ex))["detail"])
+                logger.error(json.loads(str(ex))[REST_ERROR.DETAIL])
                 raise ex
         linebreak = "\n"
         text = (
@@ -215,7 +216,7 @@ class API(ABC):
         try:
             self._devices.block_device(connection=self._connection, device_id=device_id)
         except HTTPError as ex:
-            logger.error(json.loads(str(ex))["detail"])
+            logger.error(json.loads(str(ex))[REST_ERROR.DETAIL])
             raise ex
 
     @typechecked
@@ -229,7 +230,7 @@ class API(ABC):
         try:
             self._devices.release_device(connection=self._connection, device_id=device_id)
         except HTTPError as ex:
-            logger.error(json.loads(str(ex))["detail"])
+            logger.error(json.loads(str(ex))[REST_ERROR.DETAIL])
             raise ex
 
     # @typechecked
@@ -293,7 +294,7 @@ class API(ABC):
                     self._devices = self._add_or_update_single_device(device_id=device_id)
                     selected_devices.append(self._devices.select_device(device_id=device_id))
                 except HTTPError as ex:
-                    logger.error(json.loads(str(ex))["detail"])
+                    logger.error(json.loads(str(ex))[REST_ERROR.DETAIL])
                     raise ex
         else:
             selected_devices = cast(
@@ -322,7 +323,7 @@ class API(ABC):
                     message=f"Circuit {job.job_id} could not be executed.", status_code=status_code
                 )
             logger.debug("Job circuit queued successfully.")
-            job.id = response["job_id"]
+            job.id = response[API_CONSTANTS.JOB_ID]
             self._jobs.append(job)
             job_ids.append(job.id)
         return job_ids
@@ -381,8 +382,8 @@ class API(ABC):
             Union[AbstractState, None]: The Job result as an Abstract State or None when it is not executed yet.
         """
         job_responses = [self._get_result(job_id) for job_id in job_ids]
-        for job_reponse in job_responses:
-            log_job_status_info(job_response=job_reponse)
+        for job_response in job_responses:
+            log_job_status_info(job_response=job_response)
         return parse_job_responses_to_results(job_responses=job_responses)
 
     def _wait_and_return_results(
@@ -539,8 +540,8 @@ class API(ABC):
             results_dict: Serialized qililab results (using their `.to_dict()` method )
             device_id: Id of the device the experiment was executed in
             user_id: Id of the user that is executing the experiment
-            favourite: Whether to save the experiment as favourite
             qililab_version: version of qililab the experiment was executed with
+            favourite: Whether to save the experiment as favourite
 
         Returns:
             newly created experiment id
@@ -566,7 +567,7 @@ class API(ABC):
             raise RemoteExecutionException(message="Experiment could not be saved.", status_code=status_code)
         logger.debug("Experiment saved successfully.")
 
-        saved_experiment.id = response["saved_experiment_id"]
+        saved_experiment.id = response[API_CONSTANTS.SAVED_EXPERIMENT_ID]
 
         self._saved_experiments = [saved_experiment]
         return saved_experiment.id
@@ -577,7 +578,7 @@ class API(ABC):
 
         response, status_code = self._connection.send_put_auth_remote_api_call(
             path=f"{self.SAVED_EXPERIMENTS_CALL_PATH}/{saved_experiment_id}",
-            data={"favourite": favourite, "user_id": self._connection.user.user_id},
+            data={API_CONSTANTS.FAVOURITE: favourite, API_CONSTANTS.USER_ID: self._connection.user.user_id},
         )
 
         if status_code != 200:
@@ -585,7 +586,7 @@ class API(ABC):
                 message="Experiment favourite status could not be updated.", status_code=status_code
             )
 
-        logger.debug(f"Experiment {response['saved_experiment_id']} updated successfully.")
+        logger.debug(f"Experiment {response[API_CONSTANTS.SAVED_EXPERIMENT_ID]} updated successfully.")
 
     def fav_saved_experiment(self, saved_experiment_id: int):
         """Adds a saved experiment to the list of favourite saved experiments"""
@@ -613,14 +614,14 @@ class API(ABC):
             List[SavedExperimentListingItemResponse]: list of objects encoding the expected response structure"""
         responses, status_codes = unzip(
             self._connection.send_get_auth_remote_api_call_all_pages(
-                path=self.SAVED_EXPERIMENTS_CALL_PATH, params={"favourites": favourites}
+                path=self.SAVED_EXPERIMENTS_CALL_PATH, params={API_CONSTANTS.FAVOURITES: favourites}
             )
         )
         for status_code in status_codes:
             if status_code != 200:
                 raise RemoteExecutionException(message="Experiment could not be listed.", status_code=status_code)
 
-        items = [response["items"] for response in responses]
+        items = [response[REST.ITEMS] for response in responses]
         return [SavedExperimentListingItemResponse(**item) for item in items]
 
     @typechecked
