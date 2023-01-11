@@ -1,6 +1,5 @@
 """ Tests methods for Devices """
 
-import json
 from typing import List
 
 import pytest
@@ -8,20 +7,9 @@ import pytest
 from qiboconnection.devices.device import Device
 from qiboconnection.devices.devices import Devices
 from qiboconnection.devices.simulator_device import SimulatorDevice
-from qiboconnection.devices.simulator_device_characteristics import (
-    SimulatorDeviceCharacteristics,
-)
-from qiboconnection.typings.device import (
-    DeviceInput,
-    SimulatorDeviceCharacteristicsInput,
-    SimulatorDeviceInput,
-)
+from qiboconnection.typings.device import SimulatorDeviceInput
 
-from .data import (
-    device_inputs,
-    simulator_device_characteristics_inputs,
-    simulator_device_inputs,
-)
+from .data import simulator_device_inputs
 
 #
 # @pytest.mark.parametrize("device_input", device_inputs)

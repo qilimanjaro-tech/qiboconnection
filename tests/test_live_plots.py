@@ -1,11 +1,6 @@
 """ Tests methods for LivePlots """
 
-import json
-from dataclasses import asdict
-from typing import cast
-
 import pytest
-import websocket
 
 from qiboconnection.live_plot import LivePlot
 from qiboconnection.live_plots import LivePlots
@@ -13,30 +8,35 @@ from qiboconnection.typings.live_plot import (
     LivePlotAxis,
     LivePlotLabels,
     LivePlotPacket,
-    LivePlotPoints,
     LivePlotType,
 )
-from qiboconnection.user import User
 
-from .data import heatmap_unit_plot_points, unit_plot_point
+
+def ok_method(*args, **kwargs):
+    """returns `'ok'`"""
+    return "OK"
 
 
 @pytest.fixture(name="live_plot_type")
 def fixture_plot_type():
+    """return lines type"""
     return LivePlotType.LINES
 
 
 @pytest.fixture(name="live_plot_labels")
 def fixture_plot_labels():
+    """return valid labels instance"""
     return LivePlotLabels()
 
 
 @pytest.fixture(name="live_plot_axis")
 def fixture_plot_axis():
+    """return valid axis instance"""
     return LivePlotAxis()
 
 
 def test_live_plots_constructor():
+    """test live plot creation"""
     live_plots = LivePlots()
     assert isinstance(live_plots, LivePlots)
 
@@ -44,6 +44,7 @@ def test_live_plots_constructor():
 def test_live_plots_add_plot(
     live_plot_type: LivePlotType, live_plot_labels: LivePlotLabels, live_plot_axis: LivePlotAxis
 ):
+    """test live plot `create_live_plot`"""
     live_plots = LivePlots()
     expected_live_plot = LivePlot(
         plot_id=1,
@@ -66,7 +67,7 @@ def test_live_plots_add_plot(
 def test_check_data_and_plot_type_compatibility_with_ok_case(
     live_plot_type: LivePlotType, live_plot_labels: LivePlotLabels, live_plot_axis: LivePlotAxis
 ):
-
+    """test live plot `CheckDataAndPlotTypeCompatibility` works with base case"""
     live_plot = LivePlot(
         plot_id=1,
         plot_type=live_plot_type,
@@ -85,9 +86,6 @@ def test_check_data_and_plot_type_compatibility_with_ok_case(
         axis=live_plot_axis,
     )
 
-    def ok_method(*args, **kwargs):
-        return "OK"
-
     test_result = LivePlots.CheckDataAndPlotTypeCompatibility(method=ok_method).__call__(
         live_plot=live_plot, data_packet=data_packet
     )
@@ -98,8 +96,7 @@ def test_check_data_and_plot_type_compatibility_with_ok_case(
 def test_check_data_and_plot_type_compatibility_rises_attribute_error(
     live_plot_type: LivePlotType, live_plot_labels: LivePlotLabels, live_plot_axis: LivePlotAxis
 ):
-    def ok_method(*args, **kwargs):
-        return "OK"
+    """test live plot `CheckDataAndPlotTypeCompatibility` works as expected in wrong attr err case"""
 
     with pytest.raises(AttributeError) as e_info:
         _ = LivePlots.CheckDataAndPlotTypeCompatibility(method=ok_method).__call__(live_plot=None, data_packet=None)
@@ -110,7 +107,7 @@ def test_check_data_and_plot_type_compatibility_rises_attribute_error(
 def test_check_data_and_plot_type_compatibility_rises_value_error_for_lines(
     live_plot_labels: LivePlotLabels, live_plot_axis: LivePlotAxis
 ):
-
+    """test live plot `CheckDataAndPlotTypeCompatibility` works as expected in wrong val err case"""
     live_plot = LivePlot(
         plot_id=1,
         plot_type=LivePlotType.LINES,
@@ -128,9 +125,6 @@ def test_check_data_and_plot_type_compatibility_rises_value_error_for_lines(
         labels=live_plot_labels,
         axis=live_plot_axis,
     )
-
-    def ok_method(*args, **kwargs):
-        return "OK"
 
     with pytest.raises(ValueError) as e_info:
         _ = LivePlots.CheckDataAndPlotTypeCompatibility(method=ok_method).__call__(
@@ -143,7 +137,7 @@ def test_check_data_and_plot_type_compatibility_rises_value_error_for_lines(
 def test_check_data_and_plot_type_compatibility_rises_value_error_for_scatter3d(
     live_plot_labels: LivePlotLabels, live_plot_axis: LivePlotAxis
 ):
-
+    """test live plot `CheckDataAndPlotTypeCompatibility` works as expected in wrong val err case"""
     live_plot = LivePlot(
         plot_id=1,
         plot_type=LivePlotType.SCATTER3D,
@@ -162,9 +156,6 @@ def test_check_data_and_plot_type_compatibility_rises_value_error_for_scatter3d(
         axis=live_plot_axis,
     )
 
-    def ok_method(*args, **kwargs):
-        return "OK"
-
     with pytest.raises(ValueError) as e_info:
         _ = LivePlots.CheckDataAndPlotTypeCompatibility(method=ok_method).__call__(
             live_plot=live_plot, data_packet=data_packet
@@ -176,7 +167,7 @@ def test_check_data_and_plot_type_compatibility_rises_value_error_for_scatter3d(
 def test_check_data_and_plot_type_compatibility_rises_value_error_for_heatmap(
     live_plot_labels: LivePlotLabels, live_plot_axis: LivePlotAxis
 ):
-
+    """test live plot `CheckDataAndPlotTypeCompatibility` works as expected in wrong val err case"""
     live_plot = LivePlot(
         plot_id=1,
         plot_type=LivePlotType.HEATMAP,
@@ -195,9 +186,6 @@ def test_check_data_and_plot_type_compatibility_rises_value_error_for_heatmap(
         axis=live_plot_axis,
     )
 
-    def ok_method(*args, **kwargs):
-        return "OK"
-
     with pytest.raises(ValueError) as e_info:
         _ = LivePlots.CheckDataAndPlotTypeCompatibility(method=ok_method).__call__(
             live_plot=live_plot, data_packet=data_packet
@@ -209,6 +197,7 @@ def test_check_data_and_plot_type_compatibility_rises_value_error_for_heatmap(
 def test_check_data_and_plot_type_compatibility_rises_value_error_for_heatmap_axis(
     live_plot_labels: LivePlotLabels, live_plot_axis: LivePlotAxis
 ):
+    """test live plot `CheckDataAndPlotTypeCompatibility` works as expected in wrong val err case"""
 
     live_plot = LivePlot(
         plot_id=1,
@@ -227,9 +216,6 @@ def test_check_data_and_plot_type_compatibility_rises_value_error_for_heatmap_ax
         labels=live_plot_labels,
         axis=live_plot_axis,
     )
-
-    def ok_method(*args, **kwargs):
-        return "OK"
 
     with pytest.raises(ValueError) as e_info:
         _ = LivePlots.CheckDataAndPlotTypeCompatibility(method=ok_method).__call__(

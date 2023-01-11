@@ -7,10 +7,6 @@ import pytest
 from qiboconnection.devices.device import Device
 from qiboconnection.devices.offline_device import OfflineDevice, OfflineDeviceInput
 from qiboconnection.devices.quantum_device import QuantumDevice, QuantumDeviceInput
-from qiboconnection.devices.quantum_device_calibration_details import (
-    CalibrationDetails,
-    CalibrationDetailsInput,
-)
 from qiboconnection.devices.quantum_device_characteristics import (
     QuantumDeviceCharacteristics,
     QuantumDeviceCharacteristicsInput,
