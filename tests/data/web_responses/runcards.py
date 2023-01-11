@@ -12,4 +12,4 @@ class Runcards:
 
     update_response: tuple[dict, int] = ({}, 200)
 
-    delete_response: tuple[dict, int] = ({}, 204)
+    delete_response: tuple[str, int] = ("Runcard deleted", 204)

@@ -8,6 +8,7 @@ from .testing_data import (
     quantum_device_characteristics_inputs,
     quantum_device_inputs,
     results_dict,
+    runcard_dict,
     simulator_device_characteristics_inputs,
     simulator_device_inputs,
     unit_plot_point,

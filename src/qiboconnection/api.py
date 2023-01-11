@@ -729,6 +729,17 @@ class API(ABC):
 
     """ RUNCARDS """
 
+    def _create_runcard_response(self, runcard: Runcard):
+        """Make the runcard create request and parse the response"""
+        response, status_code = self._connection.send_post_auth_remote_api_call(
+            path=self.RUNCARDS_CALL_PATH,
+            data=asdict(runcard.runcard_request()),
+        )
+        if status_code != 201:
+            raise RemoteExecutionException(message="Runcard could not be saved.", status_code=status_code)
+        logger.debug("Experiment saved successfully.")
+        return RuncardResponse(**response)
+
     @typechecked
     def save_runcard(
         self,
@@ -764,18 +775,11 @@ class API(ABC):
             qililab_version=qililab_version,
         )
 
-        response, status_code = self._connection.send_post_auth_remote_api_call(
-            path=self.RUNCARDS_CALL_PATH,
-            data=asdict(runcard.runcard_request()),
-        )
-        if status_code != 201:
-            raise RemoteExecutionException(message="Runcard could not be saved.", status_code=status_code)
-        logger.debug("Experiment saved successfully.")
+        runcard_response = self._create_runcard_response(runcard=runcard)
+        created_runcard = Runcard.from_response(response=runcard_response)
 
-        runcard.id = response[API_CONSTANTS.RUNCARD_ID]
-
-        self._runcard = runcard
-        return runcard.id
+        self._runcard = created_runcard
+        return created_runcard.id
 
     @typechecked
     def _get_runcard_response(self, runcard_id: int):
@@ -833,6 +837,36 @@ class API(ABC):
         """
         runcards_response = self._get_list_runcard_response()
         return [Runcard.from_response(response=response) for response in runcards_response]
+
+    @typechecked
+    def update_runcard(self, runcard: Runcard) -> Runcard:
+        """Update the info of a runcard in the database
+
+        Raises:
+            RemoteExecutionException: Runcard could not be retrieved
+
+        Returns:
+            Runcard: serialized runcard dictionary
+        """
+        if runcard.id is None:
+            raise ValueError("Runcard id must be defined for updating its info in the database.")
+
+        runcard_response = self._update_runcard_response(runcard=runcard)
+        updated_runcard = Runcard.from_response(response=runcard_response)
+
+        self._runcard = updated_runcard
+        return updated_runcard
+
+    def _update_runcard_response(self, runcard: Runcard):
+        """Make the runcard update request and parse the response"""
+        response, status_code = self._connection.send_post_auth_remote_api_call(
+            path=f"{self.RUNCARDS_CALL_PATH}/{runcard.id}",
+            data=asdict(runcard.runcard_request()),
+        )
+        if status_code != 200:
+            raise RemoteExecutionException(message="Runcard could not be saved.", status_code=status_code)
+        logger.debug("Runcard updated successfully.")
+        return RuncardResponse(**response)
 
     @typechecked
     def delete_runcard(self, runcard_id: int) -> None:

@@ -78,6 +78,8 @@ heatmap_unit_plot_points = [
 web_responses = WebResponses()
 
 
+runcard_dict: dict = {}
+
 experiment_dict = {
     "platform": {
         "settings": {

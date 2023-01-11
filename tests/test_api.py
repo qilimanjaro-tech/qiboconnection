@@ -7,10 +7,11 @@ import pytest
 from qiboconnection.api import API
 from qiboconnection.devices.devices import Devices
 from qiboconnection.devices.util import create_device
+from qiboconnection.runcard import Runcard
 from qiboconnection.saved_experiment import SavedExperiment
 from qiboconnection.saved_experiment_listing import SavedExperimentListing
 
-from .data import experiment_dict, results_dict, web_responses
+from .data import experiment_dict, results_dict, runcard_dict, web_responses
 
 
 def test_api_constructor(mocked_api: API):
@@ -183,3 +184,70 @@ def test_unfav_saved_experiments(mocked_web_call: MagicMock, mocked_api: API):
         path=f"{mocked_api.SAVED_EXPERIMENTS_CALL_PATH}/1",
         data={"favourite": False, "user_id": mocked_api.user_id},
     )
+
+
+@patch("qiboconnection.connection.Connection.send_post_auth_remote_api_call", autospec=True)
+def test_save_runcard(mocked_web_call: MagicMock, mocked_api: API):
+    """Tests API.list_saved_experiments() method"""
+    mocked_web_call.return_value = web_responses.saved_experiments.create_response
+
+    name = "MyDemoExperiment"
+    description = "A test saved experiment"
+    device_id = 1
+    user_id = 1
+    qililab_version = "0.0.0"
+
+    runcard_id = mocked_api.save_runcard(
+        name=name,
+        description=description,
+        runcard=runcard_dict,
+        device_id=device_id,
+        user_id=user_id,
+        qililab_version=qililab_version,
+    )
+
+    mocked_web_call.assert_called()
+    assert runcard_id == web_responses.runcards.create_response[0]["runcard_id"]
+
+
+@patch("qiboconnection.connection.Connection.send_get_auth_remote_api_call", autospec=True)
+def test_get_runcard(mocked_web_call: MagicMock, mocked_api: API):
+    """Tests API.get_runcard() method"""
+    mocked_web_call.return_value = web_responses.runcards.retrieve_response
+
+    runcard = mocked_api.get_runcard(runcard_id=1)
+
+    mocked_web_call.assert_called_with(self=mocked_api._connection, path=f"{mocked_api.RUNCARDS_CALL_PATH}/1")
+    assert isinstance(runcard, Runcard)
+
+
+@patch("qiboconnection.connection.Connection.send_get_auth_remote_api_call", autospec=True)
+def test_list_runcards(mocked_web_call: MagicMock, mocked_api: API):
+    """Tests API.get_runcard() method"""
+    mocked_web_call.return_value = web_responses.runcards.retrieve_response
+
+    runcards = mocked_api.list_runcards()
+
+    mocked_web_call.assert_called_with(self=mocked_api._connection, path=f"{mocked_api.RUNCARDS_CALL_PATH}")
+    assert isinstance(runcards[0], Runcard)
+
+
+@patch("qiboconnection.connection.Connection.send_post_auth_remote_api_call", autospec=True)
+def test_update_runcard(mocked_web_call: MagicMock, mocked_api: API):
+    """Tests API.get_runcard() method"""
+    mocked_web_call.return_value = web_responses.runcards.retrieve_response
+
+    runcard = mocked_api.update_runcard()
+
+    mocked_web_call.assert_called_with(self=mocked_api._connection, path=f"{mocked_api.RUNCARDS_CALL_PATH}/1")
+    assert isinstance(runcard, Runcard)
+
+
+@patch("qiboconnection.connection.Connection.send_delete_auth_remote_api_call", autospec=True)
+def test_delete_runcard(mocked_web_call: MagicMock, mocked_api: API):
+    """Tests API.get_runcard() method"""
+    mocked_web_call.return_value = web_responses.runcards.delete_response
+
+    mocked_api.delete_runcard(runcard_id=1)
+
+    mocked_web_call.assert_called_with(self=mocked_api._connection, path=f"{mocked_api.RUNCARDS_CALL_PATH}/1")
