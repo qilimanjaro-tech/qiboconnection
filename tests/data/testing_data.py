@@ -74,11 +74,295 @@ heatmap_unit_plot_points = [
     UnitPoint(x=1, y=1, z=3, idx=1, idy=1),
 ]
 
-
 web_responses = WebResponses()
 
-
-runcard_dict: dict = {}
+runcard_dict: dict = {
+    "settings": {
+        "id_": 0,
+        "name": "galadriel",
+        "category": "platform",
+        "delay_between_pulses": 0,
+        "delay_before_readout": 40,
+        "master_amplitude_gate": 1,
+        "master_duration_gate": 100,
+        "gates": [
+            {
+                "name": "M",
+                "amplitude": "master_amplitude_gate",
+                "phase": 0,
+                "duration": 2000,
+                "shape": {"name": "rectangular"},
+            },
+            {
+                "name": "I",
+                "amplitude": 0,
+                "phase": 0,
+                "duration": 0,
+                "shape": {"name": "rectangular"},
+            },
+            {
+                "name": "X",
+                "amplitude": "master_amplitude_gate",
+                "phase": 0,
+                "duration": "master_duration_gate",
+                "shape": {"name": "drag", "num_sigmas": 4, "drag_coefficient": 0},
+            },
+            {
+                "name": "Y",
+                "amplitude": "master_amplitude_gate",
+                "phase": 1.5707963267948966,
+                "duration": "master_duration_gate",
+                "shape": {"name": "drag", "num_sigmas": 4, "drag_coefficient": 0},
+            },
+        ],
+    },
+    "schema": {
+        "instruments": [
+            {
+                "id_": 0,
+                "name": "QCM",
+                "alias": "QCM",
+                "category": "awg",
+                "firmware": "0.7.0",
+                "num_sequencers": 1,
+                "awg_sequencers": [
+                    {
+                        "identifier": 0,
+                        "chip_port_id": 0,
+                        "path0": {"output_channel": 0},
+                        "path1": {"output_channel": 1},
+                        "num_bins": 1,
+                        "intermediate_frequency": 100000000,
+                        "gain_path0": 1,
+                        "gain_path1": 1,
+                        "gain_imbalance": 0,
+                        "phase_imbalance": 0,
+                        "offset_path0": 0,
+                        "offset_path1": 0,
+                        "hardware_modulation": False,
+                        "sync_enabled": True,
+                    }
+                ],
+                "awg_iq_channels": [
+                    {
+                        "identifier": 0,
+                        "i_channel": {
+                            "awg_sequencer_identifier": 0,
+                            "awg_sequencer_path_identifier": 0,
+                        },
+                        "q_channel": {
+                            "awg_sequencer_identifier": 0,
+                            "awg_sequencer_path_identifier": 1,
+                        },
+                    }
+                ],
+            },
+            {
+                "id_": 1,
+                "name": "QRM",
+                "alias": "QRM",
+                "category": "awg",
+                "firmware": "0.7.0",
+                "num_sequencers": 1,
+                "acquisition_delay_time": 100,
+                "awg_sequencers": [
+                    {
+                        "identifier": 0,
+                        "chip_port_id": 1,
+                        "path0": {"output_channel": 0},
+                        "path1": {"output_channel": 1},
+                        "num_bins": 1,
+                        "intermediate_frequency": 100000000,
+                        "gain_path0": 1,
+                        "gain_path1": 1,
+                        "gain_imbalance": 0,
+                        "phase_imbalance": 0,
+                        "offset_path0": 0,
+                        "offset_path1": 0,
+                        "hardware_modulation": False,
+                        "sync_enabled": True,
+                        "scope_acquire_trigger_mode": "sequencer",
+                        "scope_hardware_averaging": True,
+                        "sampling_rate": 1000000000.0,
+                        "integration_length": 2000,
+                        "integration_mode": "ssb",
+                        "sequence_timeout": 1,
+                        "acquisition_timeout": 1,
+                        "hardware_demodulation": True,
+                        "scope_store_enabled": False,
+                    }
+                ],
+                "awg_iq_channels": [
+                    {
+                        "identifier": 0,
+                        "i_channel": {
+                            "awg_sequencer_identifier": 0,
+                            "awg_sequencer_path_identifier": 0,
+                        },
+                        "q_channel": {
+                            "awg_sequencer_identifier": 0,
+                            "awg_sequencer_path_identifier": 1,
+                        },
+                    }
+                ],
+            },
+            {
+                "id_": 0,
+                "name": "rohde_schwarz",
+                "alias": "rs_0",
+                "category": "signal_generator",
+                "firmware": "4.30.046.295",
+                "power": 15,
+                "frequency": 7247300000.0,
+            },
+            {
+                "id_": 1,
+                "name": "rohde_schwarz",
+                "alias": "rs_1",
+                "category": "signal_generator",
+                "firmware": "4.30.046.295",
+                "power": 15,
+                "frequency": 3351000000.0,
+            },
+            {
+                "id_": 1,
+                "name": "mini_circuits",
+                "alias": "attenuator",
+                "category": "attenuator",
+                "attenuation": 30,
+                "firmware": None,
+            },
+            {
+                "id_": 1,
+                "name": "keithley_2600",
+                "alias": "keithley_2600",
+                "category": "dc_source",
+                "firmware": None,
+                "max_current": 0.1,
+                "max_voltage": 20.0,
+            },
+        ],
+        "chip": {
+            "id_": 0,
+            "category": "chip",
+            "nodes": [
+                {"name": "port", "id_": 0, "nodes": [3]},
+                {"name": "port", "id_": 1, "nodes": [2]},
+                {
+                    "name": "resonator",
+                    "id_": 2,
+                    "alias": "port",
+                    "frequency": 7347300000.0,
+                    "nodes": [1, 3],
+                },
+                {
+                    "name": "qubit",
+                    "id_": 3,
+                    "alias": "qubit",
+                    "qubit_index": 0,
+                    "frequency": 3451000000.0,
+                    "nodes": [0, 2],
+                },
+            ],
+        },
+        "buses": [
+            {
+                "id_": 0,
+                "name": "time_domain_control_bus",
+                "category": "bus",
+                "bus_category": "time_domain",
+                "bus_subcategory": "control",
+                "alias": "drive_line_bus",
+                "system_control": {
+                    "id_": 0,
+                    "name": "time_domain_control_system_control",
+                    "category": "system_control",
+                    "system_control_category": "time_domain",
+                    "system_control_subcategory": "control",
+                    "awg": "QCM",
+                    "signal_generator": "rs_0",
+                },
+                "port": 0,
+            },
+            {
+                "id_": 1,
+                "name": "time_domain_readout_bus",
+                "category": "bus",
+                "bus_category": "time_domain",
+                "bus_subcategory": "readout",
+                "alias": "feedline_input_output_bus",
+                "system_control": {
+                    "id_": 1,
+                    "name": "time_domain_readout_system_control",
+                    "category": "system_control",
+                    "system_control_category": "time_domain",
+                    "system_control_subcategory": "readout",
+                    "awg": "QRM",
+                    "signal_generator": "rs_1",
+                },
+                "port": 1,
+            },
+        ],
+        "instrument_controllers": [
+            {
+                "id_": 0,
+                "name": "qblox_pulsar",
+                "alias": "pulsar_controller_qcm_0",
+                "category": "instrument_controller",
+                "subcategory": "single_instrument",
+                "reference_clock": "internal",
+                "connection": {"name": "tcp_ip", "address": "192.168.0.3"},
+                "modules": [{"awg": "QCM", "slot_id": 0}],
+            },
+            {
+                "id_": 1,
+                "name": "qblox_pulsar",
+                "alias": "pulsar_controller_qrm_0",
+                "category": "instrument_controller",
+                "subcategory": "single_instrument",
+                "reference_clock": "external",
+                "connection": {"name": "tcp_ip", "address": "192.168.0.4"},
+                "modules": [{"awg": "QRM", "slot_id": 0}],
+            },
+            {
+                "id_": 2,
+                "name": "rohde_schwarz",
+                "alias": "rohde_schwarz_controller_0",
+                "category": "instrument_controller",
+                "subcategory": "single_instrument",
+                "connection": {"name": "tcp_ip", "address": "192.168.0.10"},
+                "modules": [{"signal_generator": "rs_0", "slot_id": 0}],
+            },
+            {
+                "id_": 3,
+                "name": "rohde_schwarz",
+                "alias": "rohde_schwarz_controller_1",
+                "category": "instrument_controller",
+                "subcategory": "single_instrument",
+                "connection": {"name": "tcp_ip", "address": "192.168.0.7"},
+                "modules": [{"signal_generator": "rs_1", "slot_id": 0}],
+            },
+            {
+                "id_": 4,
+                "name": "mini_circuits",
+                "alias": "attenuator_controller_0",
+                "category": "instrument_controller",
+                "subcategory": "single_instrument",
+                "connection": {"name": "tcp_ip", "address": "192.168.0.222"},
+                "modules": [{"attenuator": "attenuator", "slot_id": 0}],
+            },
+            {
+                "id_": 5,
+                "name": "keithley_2600",
+                "alias": "keithley_2600_controller_0",
+                "category": "instrument_controller",
+                "subcategory": "single_instrument",
+                "connection": {"name": "tcp_ip", "address": "192.168.0.112"},
+                "modules": [{"dc_source": "keithley_2600", "slot_id": 0}],
+            },
+        ],
+    },
+}
 
 experiment_dict = {
     "platform": {
