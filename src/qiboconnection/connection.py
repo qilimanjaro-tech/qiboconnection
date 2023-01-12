@@ -4,7 +4,7 @@ from abc import ABC
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from io import TextIOWrapper
-from typing import Any, Optional, TextIO, Tuple, Union
+from typing import Any, List, Optional, TextIO, Tuple, Union
 
 import jwt
 import requests
@@ -300,19 +300,42 @@ class Connection(ABC):
         return process_response(response)
 
     @typechecked
-    def send_get_auth_remote_api_call(self, path: str) -> Tuple[Any, int]:
+    def send_get_auth_remote_api_call(self, path: str, params: dict = None) -> Tuple[Any, int]:
         """HTTP GET REST API authenticated call to remote server
 
         Args:
             path (str): path to add to the remote server api url
+            params (str): dict of parameters to be encoded as url query params
 
         Returns:
             Tuple[Any, int]: Http response
         """
         logger.debug("Calling: %s%s", self._remote_server_api_url, path)
         header = {"Authorization": f"Bearer {self._authorisation_access_token}"}
-        response = requests.get(f"{self._remote_server_api_url}{path}", headers=header)
+        response = requests.get(f"{self._remote_server_api_url}{path}", headers=header, params=params)
         return process_response(response)
+
+    @typechecked
+    def send_get_auth_remote_api_call_all_pages(self, path: str, params: dict = None) -> List[Tuple[Any, int]]:
+        """HTTP GET REST API authenticated call to remote server
+
+        Args:
+            path (str): path to add to the remote server api url
+            params (str): dict of parameters to be encoded as url query params
+
+        Returns:
+            Tuple[Any, int]: Http response
+        """
+        logger.debug("Calling: %s%s", self._remote_server_api_url, path)
+        header = {"Authorization": f"Bearer {self._authorisation_access_token}"}
+        next_url = f"{self._remote_server_api_url}{path}"
+        responses = []
+        while "None" not in next_url:
+            response = requests.get(next_url, headers=header, params=params)
+            json_content, status_code = process_response(response)
+            next_url = json_content["links"]["next"]
+            responses.append((json_content, status_code))
+        return responses
 
     @typechecked
     def send_get_remote_call(self, path: str) -> Tuple[Any, int]:

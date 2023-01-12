@@ -13,6 +13,10 @@ from qiboconnection.job_result import JobResult
 from qiboconnection.typings.algorithm import ProgramDefinition
 from qiboconnection.typings.job import JobRequest, JobResponse, JobStatus, JobType
 from qiboconnection.user import User
+from qiboconnection.util import (
+    jsonify_dict_and_base64_encode,
+    jsonify_str_and_base64_encode,
+)
 
 
 @dataclass
@@ -113,9 +117,9 @@ class Job(ABC):
             raise ValueError("Job cannot allow to have both circuit and experiment")
 
         if self.experiment is not None:
-            return _jsonify_dict_and_base64_encode(object_to_encode=self.experiment)
+            return jsonify_dict_and_base64_encode(object_to_encode=self.experiment)
         if self.circuit is not None:
-            return _jsonify_str_and_base64_encode(object_to_encode=self.circuit.to_qasm())
+            return jsonify_str_and_base64_encode(object_to_encode=self.circuit.to_qasm())
 
         raise ValueError("Something failed.")
 
@@ -153,15 +157,3 @@ class Job(ABC):
             job_response.status if isinstance(job_response.status, JobStatus) else JobStatus(job_response.status)
         )
         self.job_result = JobResult(job_id=self.id, job_type=job_response.job_type, http_response=job_response.result)
-
-
-def _jsonify_dict_and_base64_encode(object_to_encode: dict):
-    """
-    Jsonifies a given dict, encodes it to bytes assuming utf-8, and encodes that byte obj to an url-save base64 str
-    """
-    return str(base64.urlsafe_b64encode(json.dumps(object_to_encode).encode("utf-8")), "utf-8")
-
-
-def _jsonify_str_and_base64_encode(object_to_encode: str):
-    """Encodes a given string to bytes assuming utf-8, and encodes that byte-array to a nurl-save base64 str"""
-    return str(base64.urlsafe_b64encode(object_to_encode.encode("utf-8")), "utf-8")

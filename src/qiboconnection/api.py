@@ -7,7 +7,7 @@ from time import sleep
 from typing import Any, List, Optional, cast
 
 import numpy as np
-import numpy.typing as npt
+from numpy import typing as npt
 from qibo.abstractions.states import AbstractState
 from qibo.core.circuit import Circuit
 from requests import HTTPError
@@ -16,6 +16,7 @@ from typeguard import typechecked
 from qiboconnection.api_utils import log_job_status_info, parse_job_responses_to_results
 from qiboconnection.config import logger
 from qiboconnection.connection import Connection
+from qiboconnection.constants import API_CONSTANTS, REST, REST_ERROR
 from qiboconnection.devices.device import Device
 from qiboconnection.devices.devices import Devices
 from qiboconnection.devices.offline_device import OfflineDevice
@@ -25,6 +26,8 @@ from qiboconnection.devices.util import create_device
 from qiboconnection.errors import ConnectionException, RemoteExecutionException
 from qiboconnection.job import Job
 from qiboconnection.live_plots import LivePlots
+from qiboconnection.saved_experiment import SavedExperiment
+from qiboconnection.saved_experiment_listing import SavedExperimentListing
 from qiboconnection.typings.connection import ConnectionConfiguration
 from qiboconnection.typings.job import JobResponse, JobStatus
 from qiboconnection.typings.live_plot import (
@@ -33,6 +36,11 @@ from qiboconnection.typings.live_plot import (
     LivePlotType,
     PlottingResponse,
 )
+from qiboconnection.typings.saved_experiment import (
+    SavedExperimentListingItemResponse,
+    SavedExperimentResponse,
+)
+from qiboconnection.util import unzip
 
 
 class API(ABC):
@@ -43,6 +51,7 @@ class API(ABC):
     JOBS_CALL_PATH = "/jobs"
     CIRCUITS_CALL_PATH = "/circuits"
     DEVICES_CALL_PATH = "/devices"
+    SAVED_EXPERIMENTS_CALL_PATH = "/saved_experiments"
     PING_CALL_PATH = "/status"
     LIVE_PLOTTING_PATH = "/live-plotting"
 
@@ -56,6 +65,8 @@ class API(ABC):
         self._jobs: List[Job] = []
         self._selected_devices: List[Device] | None = None
         self._live_plots: LivePlots = LivePlots()
+        self._saved_experiment: SavedExperiment | None = None
+        self._saved_experiments_listing: SavedExperimentListing | None = None
 
     @property
     def jobs(self) -> List[Job]:
@@ -74,6 +85,39 @@ class API(ABC):
             Job: last Job launched
         """
         return self._jobs[-1]
+
+    @property
+    def last_saved_experiment(self) -> SavedExperiment | None:
+        """Returns the last saved experiment of the current session, in case there has been one.
+
+        Returns:
+            SavedExperiment | None: last saved experiment
+        """
+        return self._saved_experiment
+
+    @property
+    def last_saved_experiment_listing(self) -> SavedExperimentListing | None:
+        """Returns the last experiment listing downloaded in the current session, in case there has been one.
+
+        Returns:
+            SavedExperimentListing | None: last downloaded experiment listing
+        """
+        return self._saved_experiments_listing
+
+    @property
+    def user_id(self) -> int:
+        """Exposes the id of the authenticated user
+
+        Returns:
+            int: user ir
+
+        Raises:
+            ValueError: User does not have user_id
+        """
+        if self._connection.user.user_id is None:
+            raise ValueError("User does not have user_id")
+
+        return self._connection.user.user_id
 
     def ping(self) -> str:
         """Checks if the connection is alive and response OK when it is.
@@ -96,12 +140,16 @@ class API(ABC):
         Returns:
             Devices: All available Devices
         """
-        response, status_code = self._connection.send_get_auth_remote_api_call(path=self.DEVICES_CALL_PATH)
-        if status_code != 200:
-            raise RemoteExecutionException(message="Devices could not be retrieved.", status_code=status_code)
+        responses, status_codes = unzip(
+            self._connection.send_get_auth_remote_api_call_all_pages(path=self.DEVICES_CALL_PATH)
+        )
+        for status_code in status_codes:
+            if status_code != 200:
+                raise RemoteExecutionException(message="Devices could not be retrieved.", status_code=status_code)
 
-        # !!! TODO: handle all items, not only the returned on first call
-        self._devices = Devices([create_device(device_input=device_input) for device_input in response["items"]])
+        items = [item for response in responses for item in response[REST.ITEMS]]
+
+        self._devices = Devices([create_device(device_input=device_input) for device_input in items])
         return self._devices
 
     @typechecked
@@ -151,7 +199,7 @@ class API(ABC):
             self._selected_devices = [selected_device]
             logger.info("Device %s selected.", selected_device.name)
         except HTTPError as ex:
-            logger.error(json.loads(str(ex))["detail"])
+            logger.error(json.loads(str(ex))[REST_ERROR.DETAIL])
             raise ex
 
     @typechecked
@@ -167,7 +215,7 @@ class API(ABC):
             try:
                 self._selected_devices.append(self._devices.select_device(device_id=device_id))
             except HTTPError as ex:
-                logger.error(json.loads(str(ex))["detail"])
+                logger.error(json.loads(str(ex))[REST_ERROR.DETAIL])
                 raise ex
         linebreak = "\n"
         text = (
@@ -186,7 +234,7 @@ class API(ABC):
         try:
             self._devices.block_device(connection=self._connection, device_id=device_id)
         except HTTPError as ex:
-            logger.error(json.loads(str(ex))["detail"])
+            logger.error(json.loads(str(ex))[REST_ERROR.DETAIL])
             raise ex
 
     @typechecked
@@ -200,7 +248,7 @@ class API(ABC):
         try:
             self._devices.release_device(connection=self._connection, device_id=device_id)
         except HTTPError as ex:
-            logger.error(json.loads(str(ex))["detail"])
+            logger.error(json.loads(str(ex))[REST_ERROR.DETAIL])
             raise ex
 
     # @typechecked
@@ -264,7 +312,7 @@ class API(ABC):
                     self._devices = self._add_or_update_single_device(device_id=device_id)
                     selected_devices.append(self._devices.select_device(device_id=device_id))
                 except HTTPError as ex:
-                    logger.error(json.loads(str(ex))["detail"])
+                    logger.error(json.loads(str(ex))[REST_ERROR.DETAIL])
                     raise ex
         else:
             selected_devices = cast(
@@ -293,7 +341,7 @@ class API(ABC):
                     message=f"Circuit {job.job_id} could not be executed.", status_code=status_code
                 )
             logger.debug("Job circuit queued successfully.")
-            job.id = response["job_id"]
+            job.id = response[API_CONSTANTS.JOB_ID]
             self._jobs.append(job)
             job_ids.append(job.id)
         return job_ids
@@ -352,8 +400,8 @@ class API(ABC):
             Union[AbstractState, None]: The Job result as an Abstract State or None when it is not executed yet.
         """
         job_responses = [self._get_result(job_id) for job_id in job_ids]
-        for job_reponse in job_responses:
-            log_job_status_info(job_response=job_reponse)
+        for job_response in job_responses:
+            log_job_status_info(job_response=job_response)
         return parse_job_responses_to_results(job_responses=job_responses)
 
     def _wait_and_return_results(
@@ -487,3 +535,169 @@ class API(ABC):
             None
         """
         return self._live_plots.send_data(plot_id=plot_id, x=x, y=y, z=z)
+
+    @typechecked
+    def save_experiment(
+        self,
+        name: str,
+        description: str,
+        experiment_dict: dict,
+        results_dict: dict,
+        device_id: int,
+        user_id: int,
+        qililab_version: str,
+        favourite: bool = False,
+    ):
+        """Save an experiment and its results into the database af our servers, for them to be easily recovered when
+        needed.
+
+        Args:
+            name: Name the experiment is going to be saved with.
+            description: Short descriptive text to more easily identify this specific experiment instance.
+            experiment_dict: Serialized qililab experiment (using its `.to_dict()` method)
+            results_dict: Serialized qililab results (using their `.to_dict()` method )
+            device_id: Id of the device the experiment was executed in
+            user_id: Id of the user that is executing the experiment
+            qililab_version: version of qililab the experiment was executed with
+            favourite: Whether to save the experiment as favourite
+
+        Returns:
+            newly created experiment id
+
+        """
+
+        saved_experiment = SavedExperiment(
+            id=None,
+            name=name,
+            description=description,
+            experiment=experiment_dict,
+            results=results_dict,
+            device_id=device_id,
+            user_id=user_id,
+            qililab_version=qililab_version,
+        )
+
+        response, status_code = self._connection.send_post_auth_remote_api_call(
+            path=self.SAVED_EXPERIMENTS_CALL_PATH,
+            data=asdict(saved_experiment.saved_experiment_request(favourite=favourite)),
+        )
+        if status_code != 201:
+            raise RemoteExecutionException(message="Experiment could not be saved.", status_code=status_code)
+        logger.debug("Experiment saved successfully.")
+
+        saved_experiment.id = response[API_CONSTANTS.SAVED_EXPERIMENT_ID]
+
+        self._saved_experiment = saved_experiment
+        return saved_experiment.id
+
+    def _update_favourite_saved_experiment(self, saved_experiment_id: int, favourite: bool):
+        """Ask the api to add or remove a saved experiment from the favourite relations, by using the update saved
+        experiment's endpoint"""
+
+        response, status_code = self._connection.send_put_auth_remote_api_call(
+            path=f"{self.SAVED_EXPERIMENTS_CALL_PATH}/{saved_experiment_id}",
+            data={API_CONSTANTS.FAVOURITE: favourite, API_CONSTANTS.USER_ID: self._connection.user.user_id},
+        )
+
+        if status_code != 200:
+            raise RemoteExecutionException(
+                message="Experiment favourite status could not be updated.", status_code=status_code
+            )
+
+        logger.debug(f"Experiment {response[API_CONSTANTS.SAVED_EXPERIMENT_ID]} updated successfully.")
+
+    def fav_saved_experiment(self, saved_experiment_id: int):
+        """Adds a saved experiment to the list of favourite saved experiments"""
+        return self._update_favourite_saved_experiment(saved_experiment_id=saved_experiment_id, favourite=True)
+
+    def fav_saved_experiments(self, saved_experiment_ids: List[int] | npt.NDArray[np.int_]):
+        """Adds a list of saved experiments to the list of favourite saved experiments"""
+        for saved_experiment_id in saved_experiment_ids:
+            self._update_favourite_saved_experiment(saved_experiment_id=saved_experiment_id, favourite=True)
+
+    def unfav_saved_experiment(self, saved_experiment_id: int):
+        """Removes a saved experiment from the list of favourite saved experiments"""
+        return self._update_favourite_saved_experiment(saved_experiment_id=saved_experiment_id, favourite=False)
+
+    def unfav_saved_experiments(self, saved_experiment_ids: List[int] | npt.NDArray[np.int_]):
+        """Removes a list of saved experiments from the list of favourite saved experiments"""
+        for saved_experiment_id in saved_experiment_ids:
+            self._update_favourite_saved_experiment(saved_experiment_id=saved_experiment_id, favourite=False)
+
+    def _get_list_saved_experiments_response(
+        self, favourites: bool = False
+    ) -> List[SavedExperimentListingItemResponse]:
+        """Performs the actual saved_experiments listing request
+        Returns
+            List[SavedExperimentListingItemResponse]: list of objects encoding the expected response structure"""
+        responses, status_codes = unzip(
+            self._connection.send_get_auth_remote_api_call_all_pages(
+                path=self.SAVED_EXPERIMENTS_CALL_PATH, params={API_CONSTANTS.FAVOURITES: favourites}
+            )
+        )
+        for status_code in status_codes:
+            if status_code != 200:
+                raise RemoteExecutionException(message="Experiment could not be listed.", status_code=status_code)
+
+        items = [item for response in responses for item in response[REST.ITEMS]]
+        return [SavedExperimentListingItemResponse(**item) for item in items]
+
+    @typechecked
+    def list_saved_experiments(self, favourites: bool = False) -> SavedExperimentListing:
+        """List all saved experiments
+
+        Raises:
+            RemoteExecutionException: Devices could not be retrieved
+
+        Returns:
+            Devices: All SavedExperiments
+        """
+        saved_experiments_list_response = self._get_list_saved_experiments_response(favourites=favourites)
+        saved_experiment_listing = SavedExperimentListing.from_response(saved_experiments_list_response)
+        self._saved_experiments_listing = saved_experiment_listing
+        return saved_experiment_listing
+
+    @typechecked
+    def _get_saved_experiment_response(self, saved_experiment_id: int):
+        """Gets complete information of a single saved experiment
+
+        Raises:
+            RemoteExecutionException: SavedExperiment could not be retrieved
+
+        Returns:
+            SavedExperimentResponse: response with the info of the requested saved experiment"""
+        response, status_code = self._connection.send_get_auth_remote_api_call(
+            path=f"{self.SAVED_EXPERIMENTS_CALL_PATH}/{saved_experiment_id}"
+        )
+        if status_code != 200:
+            raise RemoteExecutionException(message="SavedExperiment could not be retrieved.", status_code=status_code)
+        return SavedExperimentResponse(**response)
+
+    @typechecked
+    def get_saved_experiment(self, saved_experiment_id: int) -> SavedExperiment:
+        """Get full information of a single experiment
+
+        Raises:
+            RemoteExecutionException: SavedExperiments could not be retrieved
+
+        Returns:
+            SavedExperiment: complete saved experiment, including results
+        """
+        return SavedExperiment.from_response(
+            self._get_saved_experiment_response(saved_experiment_id=saved_experiment_id)
+        )
+
+    @typechecked
+    def get_saved_experiments(self, saved_experiment_ids: List[int] | npt.NDArray[np.int_]) -> List[SavedExperiment]:
+        """Get full information of the chosen experiments
+
+        Raises:
+            RemoteExecutionException: SavedExperiments could not be retrieved
+
+        Returns:
+            List[SavedExperiment]: complete saved experiment list, including results
+        """
+        return [
+            SavedExperiment.from_response(self._get_saved_experiment_response(saved_experiment_id=saved_experiment_id))
+            for saved_experiment_id in saved_experiment_ids
+        ]
