@@ -608,7 +608,7 @@ class API(ABC):
             path=self.SAVED_EXPERIMENTS_CALL_PATH,
             data=asdict(saved_experiment.saved_experiment_request(favourite=favourite)),
         )
-        if status_code not in [200, 201]:
+        if status_code != 201:
             raise RemoteExecutionException(message="Experiment could not be saved.", status_code=status_code)
         logger.debug("Experiment saved successfully.")
 
@@ -737,7 +737,7 @@ class API(ABC):
             path=self.RUNCARDS_CALL_PATH,
             data=asdict(runcard.runcard_request()),
         )
-        if status_code != 201:
+        if status_code not in [200, 201]:
             raise RemoteExecutionException(message="Runcard could not be saved.", status_code=status_code)
         logger.debug("Experiment saved successfully.")
         return RuncardResponse(**response)
@@ -819,7 +819,7 @@ class API(ABC):
 
         items = [item for response in responses for item in response[REST.ITEMS]]
 
-        if len(items) >= 1:
+        if len(items) > 1:
             raise ValueError("Unexpectedly found several runcards with the same name.")
 
         return RuncardResponse(**(items[0]))
