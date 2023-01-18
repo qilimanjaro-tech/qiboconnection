@@ -808,8 +808,10 @@ class API(ABC):
 
         Returns:
             RuncardResponse: response with the info of the requested runcard"""
-        responses, status_codes = self._connection.send_get_auth_remote_api_call_all_pages(
-            path=self.RUNCARDS_CALL_PATH, params={"name": runcard_name}
+        responses, status_codes = unzip(
+            self._connection.send_get_auth_remote_api_call_all_pages(
+                path=self.RUNCARDS_CALL_PATH, params={"name": runcard_name}
+            )
         )
         for status_code in status_codes:
             if status_code != 200:
