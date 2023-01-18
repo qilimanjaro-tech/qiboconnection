@@ -819,6 +819,8 @@ class API(ABC):
 
         items = [item for response in responses for item in response[REST.ITEMS]]
 
+        if not items:
+            raise ValueError("Unexpectedly found no runcards with the same name.")
         if len(items) > 1:
             raise ValueError("Unexpectedly found several runcards with the same name.")
 
