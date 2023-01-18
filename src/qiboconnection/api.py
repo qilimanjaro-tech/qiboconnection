@@ -575,6 +575,8 @@ class API(ABC):
     ):
         """Save an experiment and its results into the database af our servers, for them to be easily recovered when
         needed.
+        Default behaviour is to create one if no previous occurrence with the same name exists, or to create a new one
+        if none exists.
 
         Args:
             name: Name the experiment is going to be saved with.
@@ -606,7 +608,7 @@ class API(ABC):
             path=self.SAVED_EXPERIMENTS_CALL_PATH,
             data=asdict(saved_experiment.saved_experiment_request(favourite=favourite)),
         )
-        if status_code != 201:
+        if status_code not in [200, 201]:
             raise RemoteExecutionException(message="Experiment could not be saved.", status_code=status_code)
         logger.debug("Experiment saved successfully.")
 
