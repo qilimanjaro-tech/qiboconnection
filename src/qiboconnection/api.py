@@ -800,8 +800,28 @@ class API(ABC):
         return RuncardResponse(**response)
 
     @typechecked
-    def get_runcard(self, runcard_id: int) -> Runcard:
+    def _get_runcard_by_name_response(self, runcard_name: str):
+        """Gets complete information of a specific runcard by name
+
+        Raises:
+            RemoteExecutionException: Runcard could not be retrieved
+
+        Returns:
+            RuncardResponse: response with the info of the requested runcard"""
+        response, status_code = self._connection.send_get_auth_remote_api_call(
+            path=f"{self.RUNCARDS_CALL_PATH}/", params={"name": runcard_name}
+        )
+        if status_code != 200:
+            raise RemoteExecutionException(message="Runcard could not be retrieved.", status_code=status_code)
+        return RuncardResponse(**response)
+
+    @typechecked
+    def get_runcard(self, runcard_id: int | None = None, runcard_name: str | None = None) -> Runcard:
         """Get full information of a specific runcard
+
+        Args:
+            runcard_id(int, optional): id of the runcard to retrieve. Incompatible with providing a name.
+            runcard_name(str, optional): name of the runcard to retrieve. Incompatible with providing an id.
 
         Raises:
             RemoteExecutionException: Runcard could not be retrieved
@@ -809,7 +829,13 @@ class API(ABC):
         Returns:
             Runcard: serialized runcard dictionary
         """
-        return Runcard.from_response(self._get_runcard_response(runcard_id=runcard_id))
+        if runcard_id is not None and runcard_name is not None:
+            raise ValueError("Both of of id and name cannot be simultaneously provided")
+        if runcard_id is not None:
+            return Runcard.from_response(self._get_runcard_response(runcard_id=runcard_id))
+        if runcard_name is not None:
+            return Runcard.from_response(self._get_runcard_by_name_response(runcard_name=runcard_name))
+        raise ValueError("At least one of id and name must be provided")
 
     def _get_list_runcard_response(
         self,
