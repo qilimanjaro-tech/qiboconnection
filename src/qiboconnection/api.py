@@ -809,7 +809,7 @@ class API(ABC):
         Returns:
             RuncardResponse: response with the info of the requested runcard"""
         response, status_code = self._connection.send_get_auth_remote_api_call(
-            path=f"{self.RUNCARDS_CALL_PATH}/", params={"name": runcard_name}
+            path=self.RUNCARDS_CALL_PATH, params={"name": runcard_name}
         )
         if status_code != 200:
             raise RemoteExecutionException(message="Runcard could not be retrieved.", status_code=status_code)
