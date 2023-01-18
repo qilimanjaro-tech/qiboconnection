@@ -808,23 +808,14 @@ class API(ABC):
 
         Returns:
             RuncardResponse: response with the info of the requested runcard"""
-        responses, status_codes = unzip(
-            self._connection.send_get_auth_remote_api_call_all_pages(
-                path=self.RUNCARDS_CALL_PATH, params={"name": runcard_name}
-            )
+        response, status_code = self._connection.send_get_auth_remote_api_call(
+            path=f"{self.RUNCARDS_CALL_PATH}/by_keys", params={"name": runcard_name}
         )
-        for status_code in status_codes:
-            if status_code != 200:
-                raise RemoteExecutionException(message="Runcard could not be retrieved.", status_code=status_code)
 
-        items = [item for response in responses for item in response[REST.ITEMS]]
+        if status_code != 200:
+            raise RemoteExecutionException(message="Runcard could not be retrieved.", status_code=status_code)
 
-        if not items:
-            raise ValueError("Unexpectedly found no runcards with the same name.")
-        if len(items) > 1:
-            raise ValueError("Unexpectedly found several runcards with the same name.")
-
-        return RuncardResponse(**(items[0]))
+        return RuncardResponse(**response)
 
     @typechecked
     def get_runcard(self, runcard_id: int | None = None, runcard_name: str | None = None) -> Runcard:
