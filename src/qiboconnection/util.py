@@ -12,7 +12,7 @@ from typing import Any, List, Tuple
 
 import numpy as np
 import requests
-from qibo.states import CircuitResult
+from qibo.abstractions.states import AbstractState
 
 from qiboconnection.errors import custom_raise_for_status
 from qiboconnection.typings.connection import ConnectionEstablished
@@ -80,14 +80,14 @@ def load_config_file_to_disk() -> ConnectionEstablished:
         return ConnectionEstablished(**json.load(fp=config_file))
 
 
-def decode_results_from_program(http_response: str) -> List[CircuitResult | float]:
+def decode_results_from_program(http_response: str) -> List[AbstractState | float]:
     """Decode the results from the program execution
 
     Args:
         http_response (str): the execution results as an Http Response
 
     Returns:
-        List[CircuitResult]: a Qibo CircuitResult
+        List[AbstractState]: a Qibo AbstractState
     """
     decoded_results = base64url_decode(http_response)
     if not isinstance(decoded_results, list):
@@ -111,15 +111,15 @@ def _decode_pickled_results(http_response: str) -> Any:
     return pickle.loads(result_bytes.getbuffer())  # nosec - temporary bandit ignore
 
 
-def decode_results_from_circuit(http_response: str) -> CircuitResult | dict:
+def decode_results_from_circuit(http_response: str) -> AbstractState | dict:
     """Decode the results from the circuit execution. Ideally we should always expect dictionaries here, but for qibo we
-    are still serializing `CircuitResult`s that must be pickled.
+    are still serializing `AbstractState`s that must be pickled.
 
     Args:
         http_response (str): the execution results as an Http Response
 
     Returns:
-        List[CircuitResult]: a Qibo CircuitResult
+        List[AbstractState]: a Qibo AbstractState
     """
     try:
         return decode_jsonified_dict(http_response)
