@@ -32,6 +32,7 @@ def test_runcard_response_creation():
         qililab_version="0.0.0",
         runcard_id=0,
         created_at=datetime.now(timezone.utc),
+        updated_at=datetime.now(timezone.utc),
     )
 
     assert isinstance(runcard_response, RuncardResponse)

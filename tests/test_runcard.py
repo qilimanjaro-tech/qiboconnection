@@ -33,6 +33,7 @@ def test_runcard_creation_from_response():
         qililab_version="0.0.0",
         runcard_id=0,
         created_at=datetime.now(timezone.utc),
+        updated_at=datetime.now(timezone.utc),
     )
 
     runcard = Runcard.from_response(response=runcard_response)

@@ -18,6 +18,7 @@ class Runcard:
     qililab_version: str
     id: int | None = field(default=None)
     created_at: datetime | None = field(default=None)
+    updated_at: datetime | None = field(default=None)
 
     @property
     def _encoded_runcard(self):
@@ -30,6 +31,7 @@ class Runcard:
         return cls(
             id=response.runcard_id,
             created_at=response.created_at,
+            updated_at=response.updated_at,
             name=response.name,
             description=response.description,
             user_id=response.user_id,

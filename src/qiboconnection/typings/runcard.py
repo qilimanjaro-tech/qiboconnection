@@ -21,3 +21,4 @@ class RuncardResponse(RuncardRequest):
 
     runcard_id: int
     created_at: datetime
+    updated_at: datetime
