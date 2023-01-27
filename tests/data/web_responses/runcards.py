@@ -16,6 +16,7 @@ runcard_base_response = {
 class Runcards:
     """Runcards Web Responses"""
 
+    ise_response: tuple[dict, int] = ({}, 500)
     create_response: tuple[dict, int] = (runcard_base_response, 201)
     retrieve_response: tuple[dict, int] = (runcard_base_response, 200)
     retrieve_many_response: tuple[tuple[dict, int]] = (
@@ -33,6 +34,12 @@ class Runcards:
                 },
             },
             200,
+        ),
+    )
+    ise_many_response: tuple[tuple[dict, int]] = (
+        (
+            {},
+            500,
         ),
     )
     update_response: tuple[dict, int] = retrieve_response

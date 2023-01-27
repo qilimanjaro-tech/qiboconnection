@@ -270,34 +270,6 @@ class API(ABC):
             logger.error(json.loads(str(ex))[REST_ERROR.DETAIL])
             raise ex
 
-    # @typechecked
-    # def execute_program(self, program: ProgramDefinition) -> Any:
-    #     """Send a remote experiment from the provided algorithm to be executed on the remote service API
-    #
-    #     Args:
-    #         program (ProgramDefinition): program details conforming the experiment
-    #
-    #     Returns:
-    #         Any: Result of the algorithm executed remotely
-    #     """
-    #     job = Job(
-    #         program=program,
-    #         user=self._connection.user,
-    #         device=cast(Device, self._selected_device),
-    #     )
-    #
-    #     logger.debug("Sending experiment for a remote execution...")
-    #     response, status_code = self._connection.send_post_auth_remote_api_call(
-    #         path=self.JOBS_CALL_PATH, data=job.job_request
-    #     )
-    #     if status_code != 201:
-    #         raise RemoteExecutionException(message="Experiment could not be executed.", status_code=status_code)
-    #     logger.debug("Experiment completed successfully.")
-    #     job.update_with_job_response(job_response=JobResponse(**cast(dict, response)))
-    #     self._jobs.append(job)
-    #
-    #     return job.result
-
     """ REMOTE EXECUTIONS """
 
     @typechecked

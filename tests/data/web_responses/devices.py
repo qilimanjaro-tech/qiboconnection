@@ -30,6 +30,7 @@ class Devices:
     """Devices Web Responses"""
 
     retrieve_response: tuple[dict, int] = (device_base_response_a, 200)
+    ise_response: tuple[dict, int] = ({}, 500)
     update_response: tuple[dict, int] = retrieve_response
     retrieve_many_response: tuple[tuple[dict, int]] = (
         (
@@ -46,5 +47,11 @@ class Devices:
                 },
             },
             200,
+        ),
+    )
+    ise_many_response: tuple[tuple[dict, int]] = (
+        (
+            {},
+            500,
         ),
     )

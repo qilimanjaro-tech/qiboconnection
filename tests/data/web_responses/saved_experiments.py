@@ -40,6 +40,7 @@ class SavedExperiments:
 
     create_response: tuple[dict, int] = (complete_experiment_response, 201)
     retrieve_response: tuple[dict, int] = (complete_experiment_response, 200)
+    ise_response: tuple[dict, int] = ({}, 500)
     update_response: tuple[dict, int] = retrieve_response
     retrieve_listing_response: tuple[tuple[dict, int]] = (
         (
@@ -56,5 +57,11 @@ class SavedExperiments:
                 },
             },
             200,
+        ),
+    )
+    ise_listing_response: tuple[tuple[dict, int]] = (
+        (
+            {},
+            500,
         ),
     )
