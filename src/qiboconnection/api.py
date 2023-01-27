@@ -349,7 +349,7 @@ class API(ABC):
             RemoteExecutionException: Job could not be retrieved.
 
         Returns:
-            JobResponse: typecasted backend response with the job info.
+            JobResponse: type-casted backend response with the job info.
         """
         response, status_code = self._connection.send_get_auth_remote_api_call(path=f"{self.JOBS_CALL_PATH}/{job_id}")
         if status_code != 200:

@@ -489,6 +489,28 @@ def test_get_runcard(mocked_web_call: MagicMock, mocked_api: API):
 
 
 @patch("qiboconnection.connection.Connection.send_get_auth_remote_api_call", autospec=True)
+def test_get_runcard_with_redundant_info(mocked_web_call: MagicMock, mocked_api: API):
+    """Tests API.get_runcard() method"""
+    mocked_web_call.return_value = web_responses.runcards.retrieve_response
+
+    with pytest.raises(ValueError):
+        _ = mocked_api.get_runcard(runcard_id=1, runcard_name="TEST_RUNCARD")
+
+    mocked_web_call.assert_not_called()
+
+
+@patch("qiboconnection.connection.Connection.send_get_auth_remote_api_call", autospec=True)
+def test_get_runcard_with_insufficient_info(mocked_web_call: MagicMock, mocked_api: API):
+    """Tests API.get_runcard() method"""
+    mocked_web_call.return_value = web_responses.runcards.retrieve_response
+
+    with pytest.raises(ValueError):
+        _ = mocked_api.get_runcard()
+
+    mocked_web_call.assert_not_called()
+
+
+@patch("qiboconnection.connection.Connection.send_get_auth_remote_api_call", autospec=True)
 def test_get_runcard_ise(mocked_web_call: MagicMock, mocked_api: API):
     """Tests API.get_runcard() method"""
     mocked_web_call.return_value = web_responses.runcards.ise_response
@@ -501,7 +523,7 @@ def test_get_runcard_ise(mocked_web_call: MagicMock, mocked_api: API):
 
 @patch("qiboconnection.connection.Connection.send_get_auth_remote_api_call_all_pages", autospec=True)
 def test_list_runcards(mocked_web_call: MagicMock, mocked_api: API):
-    """Tests API.get_runcard() method"""
+    """Tests API.list_runcard() method"""
     mocked_web_call.return_value = web_responses.runcards.retrieve_many_response
 
     runcards = mocked_api.list_runcards()
@@ -512,7 +534,7 @@ def test_list_runcards(mocked_web_call: MagicMock, mocked_api: API):
 
 @patch("qiboconnection.connection.Connection.send_get_auth_remote_api_call_all_pages", autospec=True)
 def test_list_runcards_ise(mocked_web_call: MagicMock, mocked_api: API):
-    """Tests API.get_runcard() method"""
+    """Tests API.list_runcard() method"""
     mocked_web_call.return_value = web_responses.runcards.ise_many_response
 
     with pytest.raises(RemoteExecutionException):
@@ -523,7 +545,7 @@ def test_list_runcards_ise(mocked_web_call: MagicMock, mocked_api: API):
 
 @patch("qiboconnection.connection.Connection.send_post_auth_remote_api_call", autospec=True)
 def test_update_runcard(mocked_web_call: MagicMock, mocked_api: API):
-    """Tests API.get_runcard() method"""
+    """Tests API.update_runcard() method"""
     mocked_web_call.return_value = web_responses.runcards.update_response
 
     runcard_id = 1
@@ -553,8 +575,34 @@ def test_update_runcard(mocked_web_call: MagicMock, mocked_api: API):
 
 
 @patch("qiboconnection.connection.Connection.send_post_auth_remote_api_call", autospec=True)
+def test_update_runcard_with_no_id(mocked_web_call: MagicMock, mocked_api: API):
+    """Tests API.update_runcard() method"""
+    mocked_web_call.return_value = web_responses.runcards.update_response
+
+    name = "MyDemoRuncard"
+    description = "A test runcard"
+    device_id = 1
+    user_id = 1
+    qililab_version = "0.0.0"
+    modified_runcard = Runcard(
+        id=None,
+        name=name,
+        description=description,
+        runcard=runcard_dict,
+        device_id=device_id,
+        user_id=user_id,
+        qililab_version=qililab_version,
+    )
+
+    with pytest.raises(ValueError):
+        _ = mocked_api.update_runcard(runcard=modified_runcard)
+
+    mocked_web_call.assert_not_called()
+
+
+@patch("qiboconnection.connection.Connection.send_post_auth_remote_api_call", autospec=True)
 def test_update_runcard_ise(mocked_web_call: MagicMock, mocked_api: API):
-    """Tests API.get_runcard() method"""
+    """Tests API.update_runcard() method"""
     mocked_web_call.return_value = web_responses.runcards.ise_response
 
     runcard_id = 1
@@ -585,7 +633,7 @@ def test_update_runcard_ise(mocked_web_call: MagicMock, mocked_api: API):
 
 @patch("qiboconnection.connection.Connection.send_delete_auth_remote_api_call", autospec=True)
 def test_delete_runcard(mocked_web_call: MagicMock, mocked_api: API):
-    """Tests API.get_runcard() method"""
+    """Tests API.delete_runcard() method"""
     mocked_web_call.return_value = web_responses.runcards.delete_response
 
     mocked_api.delete_runcard(runcard_id=1)
@@ -595,7 +643,7 @@ def test_delete_runcard(mocked_web_call: MagicMock, mocked_api: API):
 
 @patch("qiboconnection.connection.Connection.send_delete_auth_remote_api_call", autospec=True)
 def test_delete_runcard_ise(mocked_web_call: MagicMock, mocked_api: API):
-    """Tests API.get_runcard() method"""
+    """Tests API.delete_runcard() method"""
     mocked_web_call.return_value = web_responses.runcards.ise_response
 
     with pytest.raises(RemoteExecutionException):
