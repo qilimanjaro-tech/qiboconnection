@@ -2,7 +2,7 @@ import os
 from time import sleep
 
 from qibo import gates
-from qibo.core.circuit import Circuit
+from qibo.models.circuit import Circuit
 
 from qiboconnection.api import API
 from qiboconnection.connection import ConnectionConfiguration
