@@ -479,7 +479,7 @@ def test_save_runcard_ise(mocked_web_call: MagicMock, mocked_api: API):
 
 @patch("qiboconnection.connection.Connection.send_get_auth_remote_api_call", autospec=True)
 def test_get_runcard(mocked_web_call: MagicMock, mocked_api: API):
-    """Tests API.get_runcard() method"""
+    """Tests API.get_runcard() method using runcard id"""
     mocked_web_call.return_value = web_responses.runcards.retrieve_response
 
     runcard = mocked_api.get_runcard(runcard_id=1)
@@ -489,8 +489,21 @@ def test_get_runcard(mocked_web_call: MagicMock, mocked_api: API):
 
 
 @patch("qiboconnection.connection.Connection.send_get_auth_remote_api_call", autospec=True)
+def test_get_runcard_by_name(mocked_web_call: MagicMock, mocked_api: API):
+    """Tests API.get_runcard() method using runcard name"""
+    mocked_web_call.return_value = web_responses.runcards.retrieve_response
+
+    runcard = mocked_api.get_runcard(runcard_name="DEMO_RUNCARD")
+
+    mocked_web_call.assert_called_with(
+        self=mocked_api._connection, path=f"{mocked_api.RUNCARDS_CALL_PATH}/by_keys", params={"name": "DEMO_RUNCARD"}
+    )
+    assert isinstance(runcard, Runcard)
+
+
+@patch("qiboconnection.connection.Connection.send_get_auth_remote_api_call", autospec=True)
 def test_get_runcard_with_redundant_info(mocked_web_call: MagicMock, mocked_api: API):
-    """Tests API.get_runcard() method"""
+    """Tests API.get_runcard() method fails when providing name and id at the same time"""
     mocked_web_call.return_value = web_responses.runcards.retrieve_response
 
     with pytest.raises(ValueError):
@@ -501,7 +514,7 @@ def test_get_runcard_with_redundant_info(mocked_web_call: MagicMock, mocked_api:
 
 @patch("qiboconnection.connection.Connection.send_get_auth_remote_api_call", autospec=True)
 def test_get_runcard_with_insufficient_info(mocked_web_call: MagicMock, mocked_api: API):
-    """Tests API.get_runcard() method"""
+    """Tests API.get_runcard() method fails if not name nor id are provided"""
     mocked_web_call.return_value = web_responses.runcards.retrieve_response
 
     with pytest.raises(ValueError):
@@ -512,7 +525,7 @@ def test_get_runcard_with_insufficient_info(mocked_web_call: MagicMock, mocked_a
 
 @patch("qiboconnection.connection.Connection.send_get_auth_remote_api_call", autospec=True)
 def test_get_runcard_ise(mocked_web_call: MagicMock, mocked_api: API):
-    """Tests API.get_runcard() method"""
+    """Tests API.get_runcard() method when server response raises an error"""
     mocked_web_call.return_value = web_responses.runcards.ise_response
 
     with pytest.raises(RemoteExecutionException):
