@@ -883,5 +883,5 @@ class API(ABC):
             path=f"{self.RUNCARDS_CALL_PATH}/{runcard_id}"
         )
         if status_code != 204:
-            raise RemoteExecutionException(message="Runcard could not be retrieved.", status_code=status_code)
+            raise RemoteExecutionException(message="Runcard could not be removed.", status_code=status_code)
         logger.info("Runcard %i deleted successfully with message: %s", runcard_id, response)

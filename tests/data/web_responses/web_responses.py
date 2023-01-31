@@ -4,6 +4,7 @@ from .devices import Devices
 from .ping import Ping
 from .runcards import Runcards
 from .saved_experiments import SavedExperiments
+from .users import Users
 
 
 class WebResponses:
@@ -13,3 +14,4 @@ class WebResponses:
     devices = Devices()
     saved_experiments = SavedExperiments()
     runcards = Runcards()
+    users = Users()
