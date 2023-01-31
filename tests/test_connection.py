@@ -3,6 +3,7 @@ from copy import deepcopy
 from unittest.mock import MagicMock, patch
 
 import pytest
+from requests import Response, delete, get, post, put
 
 from qiboconnection.connection import Connection
 from qiboconnection.user import User
@@ -109,3 +110,96 @@ def test_user_slack_id_without_user(mocked_web_call: MagicMock, mocked_connectio
         _ = mocked_connection_no_user.user_slack_id
 
     mocked_web_call.assert_not_called()
+
+
+@patch("qiboconnection.connection.requests.put", autospec=True)
+def test_send_put_auth_remote_api_call(mocked_rest_call: MagicMock, mocked_connection: Connection):
+    """tests send_put_auth_remote_api_call"""
+    mocked_rest_call.return_value = web_responses.raw.response_200
+
+    response, code = mocked_connection.send_put_auth_remote_api_call(path="/PATH", data={"demo": "demo"})
+
+    mocked_rest_call.assert_called_with(
+        f"{mocked_connection._remote_server_api_url}/PATH",
+        json={"demo": "demo"},
+        headers={
+            "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
+            ".eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ"
+            ".SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+        },
+    )
+    assert response == web_responses.raw.response_200.json()
+    assert code == web_responses.raw.response_200.status_code
+
+
+@patch("qiboconnection.connection.requests.post", autospec=True)
+def test_send_post_auth_remote_api_call(mocked_rest_call: MagicMock, mocked_connection: Connection):
+    """tests send_post_auth_remote_api_call"""
+    mocked_rest_call.return_value = web_responses.raw.response_201
+
+    response, code = mocked_connection.send_post_auth_remote_api_call(path="/PATH", data={"demo": "demo"})
+
+    mocked_rest_call.assert_called_with(
+        f"{mocked_connection._remote_server_api_url}/PATH",
+        json={"demo": "demo"},
+        headers={
+            "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
+            ".eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ"
+            ".SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+        },
+    )
+    assert response == web_responses.raw.response_201.json()
+    assert code == web_responses.raw.response_201.status_code
+
+
+@patch("qiboconnection.connection.requests.get", autospec=True)
+def test_send_get_auth_remote_api_call(mocked_rest_call: MagicMock, mocked_connection: Connection):
+    """tests send_get_auth_remote_api_call"""
+    mocked_rest_call.return_value = web_responses.raw.response_200
+
+    response, code = mocked_connection.send_get_auth_remote_api_call(path="/PATH", params={"demo": "demo"})
+
+    mocked_rest_call.assert_called_with(
+        f"{mocked_connection._remote_server_api_url}/PATH",
+        params={"demo": "demo"},
+        headers={
+            "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
+            ".eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ"
+            ".SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+        },
+    )
+    assert response == web_responses.raw.response_200.json()
+    assert code == web_responses.raw.response_200.status_code
+
+
+@patch("qiboconnection.connection.requests.delete", autospec=True)
+def test_send_delete_auth_remote_api_call(mocked_rest_call: MagicMock, mocked_connection: Connection):
+    """tests send_delete_auth_remote_api_call"""
+    mocked_rest_call.return_value = web_responses.raw.response_204
+
+    response, code = mocked_connection.send_delete_auth_remote_api_call(path="/PATH")
+
+    mocked_rest_call.assert_called_with(
+        f"{mocked_connection._remote_server_api_url}/PATH",
+        headers={
+            "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
+            ".eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ"
+            ".SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+        },
+    )
+    assert response == web_responses.raw.response_204.json()
+    assert code == web_responses.raw.response_204.status_code
+
+
+@patch("qiboconnection.connection.requests.get", autospec=True)
+def test_send_get_remote_call(mocked_rest_call: MagicMock, mocked_connection: Connection):
+    """tests send_get_remote_call"""
+    mocked_rest_call.return_value = web_responses.raw.response_200
+
+    response, code = mocked_connection.send_get_remote_call(path="/PATH")
+
+    mocked_rest_call.assert_called_with(
+        f"{mocked_connection._remote_server_base_url}/PATH",
+    )
+    assert response == web_responses.raw.response_200.json()
+    assert code == web_responses.raw.response_200.status_code
