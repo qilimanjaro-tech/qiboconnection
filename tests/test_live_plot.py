@@ -38,7 +38,6 @@ def fixture_plot_axis():
 
 
 def test_live_plot(live_plot_type: LivePlotType, live_plot_labels: LivePlotLabels, live_plot_axis: LivePlotAxis):
-
     plot_id = 1
     websocket_url = "test_url"
     live_plot = LivePlot(
@@ -61,7 +60,6 @@ def fixture_live_plot_points() -> LivePlotPoints:
 
 
 def test_live_plot_points_constructor(live_plot_points: LivePlotPoints):
-
     assert isinstance(live_plot_points, LivePlotPoints)
     assert live_plot_points.x == unit_plot_point[0]["x"]
     assert live_plot_points.y == unit_plot_point[0]["y"]
@@ -69,7 +67,6 @@ def test_live_plot_points_constructor(live_plot_points: LivePlotPoints):
 
 
 def test_live_plot_points_equality(live_plot_points: LivePlotPoints):
-
     live_plot_points_1 = LivePlotPoints(x=0, y=0)
     live_plot_points_2 = LivePlotPoints(x=0, y=0)
     assert live_plot_points_1 == live_plot_points_2
@@ -82,7 +79,6 @@ def test_live_plot_points_equality(live_plot_points: LivePlotPoints):
 
 
 def test_live_plot_points_raises_value_error_for_mixed_array_like_with_number_like_input():
-
     with pytest.raises(ValueError) as e_info:
         _ = LivePlotPoints(x=0, y=[0])
 
@@ -120,7 +116,6 @@ def test_heatmap_data_packet(
     heatmap_plot_axis: LivePlotAxis,
     heatmap_plot_points: LivePlotPoints,
 ):
-
     plot_id = 1
     live_plot_packet = LivePlotPacket.build_packet(
         plot_id=plot_id,
@@ -160,7 +155,6 @@ def test_heatmap_data_packet_with_numpy_arrays(
     heatmap_plot_axis: LivePlotAxis,
     heatmap_plot_points: LivePlotPoints,
 ):
-
     plot_id = 1
     live_plot_packet = LivePlotPacket.build_packet(
         plot_id=plot_id,
@@ -188,7 +182,6 @@ def test_heatmap_data_packet_parsing_with_point_single_values(
     heatmap_plot_axis: LivePlotAxis,
     heatmap_plot_points: LivePlotPoints,
 ):
-
     plot_id = 1
     live_plot_packets = [
         LivePlotPacket.build_packet(
