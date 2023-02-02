@@ -36,7 +36,7 @@ class ResponsesRaw:
     def response_301(self):
         """Builds a 301 MOVED response"""
         response = Response()
-        response.status_code = 204
+        response.status_code = 301
         response._content = json.dumps({"status": "MOVED"}).encode("utf-8")
         return response
 
