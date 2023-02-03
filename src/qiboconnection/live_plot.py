@@ -3,8 +3,10 @@ from abc import ABC
 from ssl import SSLError
 from typing import Optional
 
-from websocket import WebSocket, WebSocketException, create_connection
+import websockets
+from websockets.exceptions import ConnectionClosed, WebSocketException
 
+from qiboconnection.config import logger
 from qiboconnection.typings.live_plot import (
     LivePlotAxis,
     LivePlotLabels,
@@ -25,7 +27,7 @@ class LivePlot(ABC):
         self._labels: LivePlotLabels = labels
         self._axis: LivePlotAxis = axis
         self._websocket_url: str = websocket_url
-        self._connection: Optional[WebSocket] = None
+        self._connection = None
 
     @property
     def plot_id(self) -> int:
@@ -55,6 +57,11 @@ class LivePlot(ABC):
         try:
             return self._send_data_over_connection(data=data)
         except (AttributeError, ValueError, SSLError, WebSocketException):
+            logger.debug(
+                f"Could not send message with the following info:\n"
+                f"\tx:{data.data.x}\n\ty:{data.data.y}\n\tz:{data.data.z}\nRetrying..."
+            )
+            self._close_connection()
             self._open_connection()
             return self._send_data_over_connection(data=data)
 
@@ -70,8 +77,15 @@ class LivePlot(ABC):
             raise ValueError("Connection is not opened.")
         return self._connection.send(data.to_json())
 
+    def _close_connection(self):
+        if self._connection is not None:
+            try:
+                self._connection.close()
+            except (AttributeError, ValueError, SSLError, WebSocketException, ConnectionClosed):
+                self._connection = None
+
     def _open_connection(self):
         """
         Creates connection using self._websocket_url and saves it to self._connection.
         """
-        self._connection = create_connection(url=self._websocket_url)
+        self._connection = websockets.client.connect(self._websocket_url)
