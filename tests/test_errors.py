@@ -18,12 +18,10 @@ def fixture_response_400():
         Response: response object
     """
     response = Response()
-    response.code = "expired"
-    response.error_type = "expired"
     response.status_code = 400
     response.url = "server/api"
     response._content = b'{"DEMO": "400"}'
-    response.reason = b"expired"
+    response.reason = "expired"
     return response
 
 
@@ -35,8 +33,6 @@ def fixture_response_500():
         Response: response object
     """
     response = Response()
-    response.code = "internal server error"
-    response.error_type = "internal server error"
     response.status_code = 500
     response.url = "server/api"
     response._content = b'{"DEMO": "500"}'

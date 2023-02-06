@@ -5,7 +5,7 @@ from dataclasses import dataclass, field
 from typing import List
 
 from numpy import typing as npt
-from qibo.abstractions.states import AbstractState
+from qibo.states import CircuitResult
 
 from qiboconnection.typings.job import JobType
 from qiboconnection.util import (
@@ -21,7 +21,7 @@ class JobResult(ABC):
     job_id: int
     http_response: str
     job_type: str | JobType
-    data: List[AbstractState] | AbstractState | npt.NDArray | List[int] | List[float] | dict | List[
+    data: List[CircuitResult] | CircuitResult | npt.NDArray | List[int] | List[float] | dict | List[
         dict
     ] | None = field(init=False)
 

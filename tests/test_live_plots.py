@@ -66,7 +66,6 @@ def test_live_plots_add_plot(
 def test_check_data_and_plot_type_compatibility_with_ok_case(
     live_plot_type: LivePlotType, live_plot_labels: LivePlotLabels, live_plot_axis: LivePlotAxis
 ):
-
     live_plot = LivePlot(
         plot_id=1,
         plot_type=live_plot_type,
@@ -110,7 +109,6 @@ def test_check_data_and_plot_type_compatibility_rises_attribute_error(
 def test_check_data_and_plot_type_compatibility_rises_value_error_for_lines(
     live_plot_labels: LivePlotLabels, live_plot_axis: LivePlotAxis
 ):
-
     live_plot = LivePlot(
         plot_id=1,
         plot_type=LivePlotType.LINES,
@@ -143,7 +141,6 @@ def test_check_data_and_plot_type_compatibility_rises_value_error_for_lines(
 def test_check_data_and_plot_type_compatibility_rises_value_error_for_scatter3d(
     live_plot_labels: LivePlotLabels, live_plot_axis: LivePlotAxis
 ):
-
     live_plot = LivePlot(
         plot_id=1,
         plot_type=LivePlotType.SCATTER3D,
@@ -176,7 +173,6 @@ def test_check_data_and_plot_type_compatibility_rises_value_error_for_scatter3d(
 def test_check_data_and_plot_type_compatibility_rises_value_error_for_heatmap(
     live_plot_labels: LivePlotLabels, live_plot_axis: LivePlotAxis
 ):
-
     live_plot = LivePlot(
         plot_id=1,
         plot_type=LivePlotType.HEATMAP,
@@ -209,7 +205,6 @@ def test_check_data_and_plot_type_compatibility_rises_value_error_for_heatmap(
 def test_check_data_and_plot_type_compatibility_rises_value_error_for_heatmap_axis(
     live_plot_labels: LivePlotLabels, live_plot_axis: LivePlotAxis
 ):
-
     live_plot = LivePlot(
         plot_id=1,
         plot_type=LivePlotType.HEATMAP,
