@@ -33,7 +33,7 @@ class CalibrationDetails(DeviceDetails):
         Returns:
             dict: Output dictionary of SimulatorDeviceCharacteristics object
         """
-        calibration_dict = {}
+        calibration_dict: dict = {}
 
         if self._elapsed_time:
             calibration_dict |= {"elapsed_time": self._elapsed_time}

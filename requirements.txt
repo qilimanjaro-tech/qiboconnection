@@ -2,7 +2,7 @@ requests~=2.28.2
 typeguard==2.13.3
 types-requests==2.28.11.8
 numpy==1.24.1
-qibo==0.1.7
+qibo==0.1.10
 PyJWT==2.6.0
 pandas~=1.5.3
 

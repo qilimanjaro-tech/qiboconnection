@@ -23,7 +23,7 @@ def test_environment_constructor_raises_value_error_for_unexpected_environment_t
         UNEXPECTED = "unexpected"
 
     with pytest.raises(ValueError) as e_info:
-        _ = Environment(environment_type=EnvironmentType.UNEXPECTED)
+        _ = Environment(environment_type=EnvironmentType.UNEXPECTED)  # type: ignore[arg-type]
     assert e_info.value.args[0] == "Environment Type MUST be 'local', 'staging' or 'development'"
 
 
