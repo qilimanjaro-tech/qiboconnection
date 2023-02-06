@@ -91,7 +91,7 @@ class LivePlots(ABC):
 
             return self._method(*args, **kwargs)
 
-    def send_data(
+    async def send_data(
         self,
         plot_id: int,
         x: npt.NDArray[np.float_ | np.int_] | list[float] | list[int] | float | int,
@@ -117,7 +117,7 @@ class LivePlots(ABC):
             labels=live_plot.labels,
             axis=live_plot.axis,
         )
-        self._send_data(live_plot=live_plot, data_packet=data_packet)
+        await self._send_data(live_plot=live_plot, data_packet=data_packet)
 
     @CheckDataAndPlotTypeCompatibility
     def _send_data(self, live_plot: LivePlot, data_packet: LivePlotPacket):

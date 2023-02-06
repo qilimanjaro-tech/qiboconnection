@@ -517,7 +517,7 @@ class API(ABC):
         return plotting_response.plot_id
 
     @typechecked
-    def send_plot_points(
+    async def send_plot_points(
         self,
         plot_id: int,
         x: npt.NDArray[np.float_ | np.int_] | list[float] | list[int] | float | int,
@@ -534,7 +534,7 @@ class API(ABC):
         Returns:
             None
         """
-        return self._live_plots.send_data(plot_id=plot_id, x=x, y=y, z=z)
+        return await self._live_plots.send_data(plot_id=plot_id, x=x, y=y, z=z)
 
     @typechecked
     def save_experiment(

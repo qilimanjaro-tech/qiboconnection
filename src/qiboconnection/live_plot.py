@@ -1,5 +1,6 @@
 """ LivePlot class """
 from abc import ABC
+from asyncio import Queue, create_task, run
 from ssl import SSLError
 from typing import Optional
 
@@ -28,6 +29,26 @@ class LivePlot(ABC):
         self._axis: LivePlotAxis = axis
         self._websocket_url: str = websocket_url
         self._connection = None
+        self._connection_open = False
+        self._send_queue: Queue | None = None
+
+        create_task(self._start_up())
+
+    async def _start_up(self):
+        self._send_queue = Queue()
+        await self._open_connection()
+        await self._sending_loop()
+
+    async def _sending_loop(self):
+        """Main loop, where we send over the socket whatever there is in the _send_queue"""
+        while True:
+            packet: LivePlotPacket = await self._send_queue.get()
+            try:
+                await self._connection.send(packet.to_json())
+            except (AttributeError, ValueError, SSLError, WebSocketException, ConnectionClosed):
+                self._close_connection()
+                await self._open_connection()
+                await self._connection.send(packet.to_json())
 
     @property
     def plot_id(self) -> int:
@@ -49,43 +70,30 @@ class LivePlot(ABC):
         """Gets the plot_type."""
         return self._axis
 
-    def send_data(self, data: LivePlotPacket):
+    async def send_data(self, data: LivePlotPacket):
         """Sends a LivePlotPacket over the websocket connection.
         Returns:
             Length of message sent.
         """
-        try:
-            return self._send_data_over_connection(data=data)
-        except (AttributeError, ValueError, SSLError, WebSocketException):
-            logger.debug(
-                f"Could not send message with the following info:\n"
-                f"\tx:{data.data.x}\n\ty:{data.data.y}\n\tz:{data.data.z}\nRetrying..."
-            )
-            self._close_connection()
-            self._open_connection()
-            return self._send_data_over_connection(data=data)
-
-    def _send_data_over_connection(self, data: LivePlotPacket):
-        """
-        Sends data over connection if self._connection is available.
-        Args:
-            data: data to be sent.
-        Raises:
-            ValueError: Connection is not opened.
-        """
-        if self._connection is None:
-            raise ValueError("Connection is not opened.")
-        return self._connection.send(data.to_json())
+        if self._send_queue is not None:
+            await self._send_queue.put(data)
 
     def _close_connection(self):
+        """
+        Closes the created connection and restores the variable to None.
+        """
         if self._connection is not None:
             try:
                 self._connection.close()
             except (AttributeError, ValueError, SSLError, WebSocketException, ConnectionClosed):
                 self._connection = None
 
-    def _open_connection(self):
+    async def _open_connection(self):
         """
         Creates connection using self._websocket_url and saves it to self._connection.
         """
-        self._connection = websockets.client.connect(self._websocket_url)
+        try:
+            self._connection = await websockets.client.connect(self._websocket_url)
+            self._connection_open = True
+        except ConnectionRefusedError:
+            self._close_connection()
