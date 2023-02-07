@@ -8,5 +8,4 @@ pandas~=1.5.3
 
 pytest~=7.2.1
 setuptools~=67.1.0
-qiboconnection~=0.6.1
 websockets~=10.4

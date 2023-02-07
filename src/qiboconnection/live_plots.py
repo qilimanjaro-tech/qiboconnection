@@ -22,7 +22,7 @@ class LivePlots(ABC):
 
     _live_plots: dict = field(default_factory=dict)
 
-    def create_live_plot(
+    async def create_live_plot(
         self, plot_id: int, plot_type: LivePlotType, websocket_url: str, labels: LivePlotLabels, axis: LivePlotAxis
     ):
         """Creates a new LivePlot with the provided information and appends it to the internal _live_plots dict"""
@@ -33,6 +33,7 @@ class LivePlots(ABC):
             labels=labels,
             axis=axis,
         )
+        await self._live_plots[plot_id].start_up()
 
     def _get_live_plot(self, plot_id: int) -> LivePlot:
         """
@@ -121,4 +122,5 @@ class LivePlots(ABC):
 
     @CheckDataAndPlotTypeCompatibility
     def _send_data(self, live_plot: LivePlot, data_packet: LivePlotPacket):
+        """Actually sends the data using the live_plot's socket"""
         return live_plot.send_data(data=data_packet)

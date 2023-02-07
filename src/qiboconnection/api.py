@@ -470,7 +470,7 @@ class API(ABC):
         return self._wait_and_return_results(deadline=deadline, interval=interval, job_ids=job_ids)
 
     @typechecked
-    def create_liveplot(
+    async def create_liveplot(
         self,
         plot_type: str = LivePlotType.LINES.value,
         title: str | None = None,
@@ -507,7 +507,7 @@ class API(ABC):
                 message="Live-plotting connection data could not be retrieved.", status_code=status_code
             )
         plotting_response = PlottingResponse.from_response(**response)
-        self._live_plots.create_live_plot(
+        await self._live_plots.create_live_plot(
             plot_id=plotting_response.plot_id,
             websocket_url=plotting_response.websocket_url,
             plot_type=LivePlotType(plot_type),
