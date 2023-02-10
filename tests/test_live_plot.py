@@ -2,11 +2,9 @@
 
 import json
 from dataclasses import asdict
-from typing import cast
 
 import numpy as np
 import pytest
-import websocket
 
 from qiboconnection.live_plot import LivePlot
 from qiboconnection.typings.live_plot import (
@@ -17,7 +15,6 @@ from qiboconnection.typings.live_plot import (
     LivePlotType,
     PlottingResponse,
 )
-from qiboconnection.user import User
 
 from .data import heatmap_unit_plot_points, unit_plot_point
 

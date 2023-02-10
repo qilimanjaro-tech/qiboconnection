@@ -1,11 +1,8 @@
 """ Tests methods for LivePlots """
 
-import json
-from dataclasses import asdict
-from typing import cast
+import asyncio
 
 import pytest
-import websocket
 
 from qiboconnection.live_plot import LivePlot
 from qiboconnection.live_plots import LivePlots
@@ -13,12 +10,8 @@ from qiboconnection.typings.live_plot import (
     LivePlotAxis,
     LivePlotLabels,
     LivePlotPacket,
-    LivePlotPoints,
     LivePlotType,
 )
-from qiboconnection.user import User
-
-from .data import heatmap_unit_plot_points, unit_plot_point
 
 
 @pytest.fixture(name="live_plot_type")
@@ -52,12 +45,14 @@ def test_live_plots_add_plot(
         labels=live_plot_labels,
         axis=live_plot_axis,
     )
-    live_plots.create_live_plot(
-        plot_id=1,
-        plot_type=live_plot_type,
-        websocket_url="server/demo-url",
-        labels=live_plot_labels,
-        axis=live_plot_axis,
+    asyncio.run(
+        live_plots.create_live_plot(
+            plot_id=1,
+            plot_type=live_plot_type,
+            websocket_url="server/demo-url",
+            labels=live_plot_labels,
+            axis=live_plot_axis,
+        )
     )
 
     assert expected_live_plot.__dict__ == live_plots._get_live_plot(plot_id=1).__dict__
