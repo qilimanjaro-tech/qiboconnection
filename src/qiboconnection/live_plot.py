@@ -1,6 +1,7 @@
 """ LivePlot class """
 import asyncio
 import datetime
+import os
 import threading
 import time
 from abc import ABC
@@ -19,7 +20,8 @@ from qiboconnection.typings.live_plot import (
     LivePlotType,
 )
 
-SECONDS_TOO_LONG = 5
+WEBSOCKET_CONNECTION_LIFETIME = os.getenv("QIBOCONNECTION_WEBSOCKET_CONNECTION_LIFETIME", default=5)
+PACKET_POINT_NUMBER_LIMIT = os.getenv("QIBOCONNECTION_PACKET_POINT_NUMBER_LIMIT", default=1000)
 
 
 class LivePlot(ABC):
@@ -45,34 +47,31 @@ class LivePlot(ABC):
         self._send_queue = Queue()
         await self._open_connection()
         self._send_queue_thread = threading.Thread(target=asyncio.run, args=(self._sending_loop(),))
+        self._send_queue_thread.daemon = True
         self._send_queue_thread.start()
 
     def _setup_queue(self):
+        """Sets up an empty queue"""
         self._send_queue = Queue()
 
     async def _reset_connection_if_opened_for_too_long(self):
         """Resets the connection if it has been up for too long"""
         elapsed_time = datetime.datetime.now() - self._connection_started_at
-        if elapsed_time.seconds > SECONDS_TOO_LONG:
+        if elapsed_time.seconds > WEBSOCKET_CONNECTION_LIFETIME:
             await self._reset_connection()
 
     def _consume_and_agglutinate_all_packets_in_queue(self):
         """Consumes all packets in queue into a list and agglutinates them into a single packet"""
 
         packet_list: List[LivePlotPacket] = []
-        while not self._send_queue.empty():
+        while not self._send_queue.empty() and len(packet_list) < PACKET_POINT_NUMBER_LIMIT:
             packet_list.append(self._send_queue.get())
-
         return LivePlotPacket.agglutinate(packets=packet_list)
 
     async def _sending_loop(self):
         """Main loop, where we send over the socket whatever there is in the _send_queue"""
         while True:
             await self._reset_connection_if_opened_for_too_long()
-
-            packet_list: List[LivePlotPacket] = []
-            while not self._send_queue.empty():
-                packet_list.append(self._send_queue.get())
 
             if agglutinated_packet := self._consume_and_agglutinate_all_packets_in_queue():
                 try:
@@ -90,7 +89,7 @@ class LivePlot(ABC):
                     await self._reset_connection()
                     await self._connection.send(agglutinated_packet.to_json())
             else:
-                time.sleep(0.1)
+                time.sleep(0.2)
 
     @property
     def plot_id(self) -> int:
@@ -128,6 +127,7 @@ class LivePlot(ABC):
         """
         Closes the created connection and restores the variable to None.
         """
+        logger.debug("Closing connection")
         if self._connection is not None:
             try:
                 await self._connection.close()
@@ -139,6 +139,7 @@ class LivePlot(ABC):
         """
         Creates connection using self._websocket_url and saves it to self._connection.
         """
+        logger.debug("Opening connection")
         try:
             self._connection = await websockets.connect(self._websocket_url)  # pylint: disable=no-member
             self._connection_started_at = datetime.datetime.now()
@@ -149,5 +150,6 @@ class LivePlot(ABC):
         """
         Resets the connection.
         """
+        logger.debug("Resetting connection")
         await self._close_connection()
         await self._open_connection()
