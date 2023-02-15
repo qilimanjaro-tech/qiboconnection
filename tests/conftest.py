@@ -1,10 +1,10 @@
 """ Pytest configuration fixtures for each session """
 
-
 from dataclasses import asdict
 from unittest.mock import patch
 
 import pytest
+import websockets
 
 from qiboconnection.api import API
 from qiboconnection.connection import Connection
@@ -12,6 +12,19 @@ from qiboconnection.typings.connection import (
     ConnectionConfiguration,
     ConnectionEstablished,
 )
+
+
+@pytest.fixture
+def patch_websockets_connect(monkeypatch):
+    """Builds a mocked websocket connection"""
+
+    async def mock_ws_connect(*args, **kwargs):
+        mock_connection = websockets.WebSocketClientProtocol()  # pylint: disable=no-member
+        mock_connection.is_closed = False
+        return mock_connection
+
+    monkeypatch.setattr("websockets.connect", mock_ws_connect)
+    return monkeypatch
 
 
 @pytest.fixture(scope="session", name="mocked_connection_configuration")

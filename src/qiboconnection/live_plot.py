@@ -5,6 +5,7 @@ import os
 import threading
 import time
 from abc import ABC
+from dataclasses import asdict
 from queue import Queue
 from ssl import SSLError
 from typing import List
@@ -74,9 +75,10 @@ class LivePlot(ABC):
             await self._reset_connection_if_opened_for_too_long()
 
             if agglutinated_packet := self._consume_and_agglutinate_all_packets_in_queue():
+                agglutinated_message = agglutinated_packet.to_json()
                 try:
                     assert self._connection.open
-                    await self._connection.send(agglutinated_packet.to_json())
+                    await self._connection.send(agglutinated_message)
                 except (
                     AssertionError,
                     AttributeError,
@@ -87,7 +89,7 @@ class LivePlot(ABC):
                 ) as ex:
                     logger.debug(f"Found error {ex} ({type(ex)}) while plotting. Resetting connection")
                     await self._reset_connection()
-                    await self._connection.send(agglutinated_packet.to_json())
+                    await self._connection.send(agglutinated_message)
             else:
                 time.sleep(0.2)
 
@@ -153,3 +155,16 @@ class LivePlot(ABC):
         logger.debug("Resetting connection")
         await self._close_connection()
         await self._open_connection()
+
+    def __eq__(self, other):
+        return (
+            (
+                other.plot_id == self.plot_id
+                and other.plot_type == self.plot_type
+                and asdict(other.axis) == asdict(self.axis)
+                and asdict(self.labels) == asdict(self.labels)
+                and other._websocket_url == self._websocket_url
+            )
+            if isinstance(other, LivePlot)
+            else False
+        )
