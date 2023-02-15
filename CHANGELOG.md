@@ -1,3 +1,20 @@
+## v0.7.1 (2023-02-06)
+
+### Fix
+
+- updates to Qibo v0.1.11 (#38)
+
+## v0.7.0 (2023-02-06)
+
+### Feat
+
+- qibo 179 save experiment and results (#30)
+- **api**: added `save_experiment`, `list_saved_experiments`, and `get_experiments` functionalities
+
+### Fix
+
+- updates to Qibo v0.1.10 and some dev packages (#36)
+
 ## v0.6.1 (2022-10-20)
 
 ### Fix

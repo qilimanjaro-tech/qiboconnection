@@ -300,7 +300,7 @@ class Connection(ABC):
         return process_response(response)
 
     @typechecked
-    def send_get_auth_remote_api_call(self, path: str, params: dict = None) -> Tuple[Any, int]:
+    def send_get_auth_remote_api_call(self, path: str, params: dict | None = None) -> Tuple[Any, int]:
         """HTTP GET REST API authenticated call to remote server
 
         Args:
@@ -316,7 +316,7 @@ class Connection(ABC):
         return process_response(response)
 
     @typechecked
-    def send_get_auth_remote_api_call_all_pages(self, path: str, params: dict = None) -> List[Tuple[Any, int]]:
+    def send_get_auth_remote_api_call_all_pages(self, path: str, params: dict | None = None) -> List[Tuple[Any, int]]:
         """HTTP GET REST API authenticated call to remote server
 
         Args:

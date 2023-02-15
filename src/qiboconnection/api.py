@@ -8,8 +8,8 @@ from typing import Any, List, Optional, cast
 
 import numpy as np
 from numpy import typing as npt
-from qibo.abstractions.states import AbstractState
-from qibo.core.circuit import Circuit
+from qibo.models.circuit import Circuit
+from qibo.states import CircuitResult
 from requests import HTTPError
 from typeguard import typechecked
 
@@ -358,7 +358,7 @@ class API(ABC):
         return JobResponse(**cast(dict, response))
 
     @typechecked
-    def get_result(self, job_id: int) -> AbstractState | npt.NDArray | dict | None:
+    def get_result(self, job_id: int) -> CircuitResult | npt.NDArray | dict | None:
         """Get a Job result from a remote execution
 
         Args:
@@ -370,7 +370,7 @@ class API(ABC):
             ValueError: Your job failed.
 
         Returns:
-            AbstractState | npt.NDArray | dict | None: The Job result as an Abstract State or None when it is not
+            CircuitResult | npt.NDArray | dict | None: The Job result as an Abstract State or None when it is not
             executed yet.
         """
 
@@ -379,7 +379,7 @@ class API(ABC):
         return parse_job_responses_to_results(job_responses=[job_response])[0]
 
     @typechecked
-    def get_results(self, job_ids: List[int]) -> List[AbstractState | npt.NDArray | dict | None]:
+    def get_results(self, job_ids: List[int]) -> List[CircuitResult | npt.NDArray | dict | None]:
         """Get a Job result from a remote execution
 
         Args:
@@ -390,7 +390,7 @@ class API(ABC):
             ValueError: Job status not supported
 
         Returns:
-            Union[AbstractState, None]: The Job result as an Abstract State or None when it is not executed yet.
+            Union[CircuitResult, None]: The Job result as an Abstract State or None when it is not executed yet.
         """
         job_responses = [self._get_result(job_id) for job_id in job_ids]
         for job_response in job_responses:
@@ -449,7 +449,7 @@ class API(ABC):
             TimeoutError: timeout seconds reached
 
         Returns:
-            Union[AbstractState, None]: The Job result as an Abstract State or None when it is not executed yet.
+            Union[CircuitResult, None]: The Job result as an Abstract State or None when it is not executed yet.
 
         """
 

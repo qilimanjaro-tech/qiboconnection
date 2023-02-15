@@ -198,7 +198,6 @@ def test_check_data_and_plot_type_compatibility_rises_value_error_for_heatmap_ax
     live_plot_labels: LivePlotLabels, live_plot_axis: LivePlotAxis
 ):
     """test live plot `CheckDataAndPlotTypeCompatibility` works as expected in wrong val err case"""
-
     live_plot = LivePlot(
         plot_id=1,
         plot_type=LivePlotType.HEATMAP,
