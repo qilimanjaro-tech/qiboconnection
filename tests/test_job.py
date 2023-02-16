@@ -214,7 +214,7 @@ def test_job_request(circuit: Circuit, user: User, simulator_device: SimulatorDe
     expected_job_request = JobRequest(
         user_id=user_id,
         device_id=simulator_device.id,
-        description="Ly8gR2VuZXJhdGVkIGJ5IFFJQk8gMC4xLjEwCk9QRU5RQVNNIDIuMDsKaW5jbHVkZSAicWVsaWIxLmluYyI7CnFyZWcgcVsxXTsKY3JlZyByZWdpc3RlcjBbMV07CmggcVswXTsKbWVhc3VyZSBxWzBdIC0-IHJlZ2lzdGVyMFswXTs=",
+        description="Ly8gR2VuZXJhdGVkIGJ5IFFJQk8gMC4xLjExCk9QRU5RQVNNIDIuMDsKaW5jbHVkZSAicWVsaWIxLmluYyI7CnFyZWcgcVsxXTsKY3JlZyByZWdpc3RlcjBbMV07CmggcVswXTsKbWVhc3VyZSBxWzBdIC0-IHJlZ2lzdGVyMFswXTs=",
         number_shots=10,
         job_type=JobType.CIRCUIT,
     )
