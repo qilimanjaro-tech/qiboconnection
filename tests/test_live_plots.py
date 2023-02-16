@@ -36,16 +36,24 @@ def test_live_plots_constructor():
     assert isinstance(live_plots, LivePlots)
 
 
-@patch("qiboconnection.live_plot.websockets.connect", autospec=True)
+@patch("websockets.connect", autospec=True)
 def test_live_plots_add_plot(
     mocked_websockets_connect: MagicMock,
-    patch_websockets_connect: websockets.WebSocketClientProtocol,  # pylint: disable=no-member
     live_plot_type: LivePlotType,
     live_plot_labels: LivePlotLabels,
     live_plot_axis: LivePlotAxis,
 ):
     """Tests LivePlots add plot functionality"""
-    mocked_websockets_connect.return_value = patch_websockets_connect
+
+    try:
+        loop = asyncio.get_event_loop()
+    except RuntimeError:
+        loop = asyncio.new_event_loop()
+
+    mocked_connection_future = loop.create_future()
+    mocked_connection_future.set_result(MagicMock())
+    mocked_websockets_connect.return_value = mocked_connection_future
+
     live_plots = LivePlots()
     expected_live_plot = LivePlot(
         plot_id=1,
@@ -65,8 +73,10 @@ def test_live_plots_add_plot(
             axis=live_plot_axis,
         )
     )
+    created_live_plot = live_plots._get_live_plot(plot_id=1)
+
     mocked_websockets_connect.assert_called_with("server/demo-url")
-    assert expected_live_plot == live_plots._get_live_plot(plot_id=1)
+    assert expected_live_plot == created_live_plot
 
 
 @patch("qiboconnection.live_plot.LivePlot.send_data", autospec=True)
@@ -74,13 +84,21 @@ def test_live_plots_add_plot(
 def test_live_plots_send_data(
     mocked_websockets_connect: MagicMock,
     live_plot_send_data: MagicMock,
-    patch_websockets_connect: websockets.WebSocketClientProtocol,  # pylint: disable=no-member
     live_plot_type: LivePlotType,
     live_plot_labels: LivePlotLabels,
     live_plot_axis: LivePlotAxis,
 ):
     """Tests the LivePlots send_data functionality, mocking the inferior LivePlot layer."""
-    mocked_websockets_connect.return_value = patch_websockets_connect
+
+    try:
+        loop = asyncio.get_event_loop()
+    except RuntimeError:
+        loop = asyncio.new_event_loop()
+
+    mocked_connection_future = loop.create_future()
+    mocked_connection_future.set_result(MagicMock())
+    mocked_websockets_connect.return_value = mocked_connection_future
+
     live_plots = LivePlots()
     asyncio.run(
         live_plots.create_live_plot(

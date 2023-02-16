@@ -286,7 +286,7 @@ class LivePlotPacket(ABC):
         if not packets:
             return None
 
-        assert all(isinstance(packet, LivePlotPacket) for packet in packets), "Not all packets were LivePlotPackets"
+        assert all(isinstance(packet, cls) for packet in packets), "Not all packets were LivePlotPackets"
         _ensure_packet_compatibility(packets=packets)
 
         extended_x: list[int] | list[float] | npt.NDArray[np.int_ | np.float_] = []

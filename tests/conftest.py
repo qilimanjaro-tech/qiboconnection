@@ -14,19 +14,6 @@ from qiboconnection.typings.connection import (
 )
 
 
-@pytest.fixture
-def patch_websockets_connect(monkeypatch):
-    """Builds a mocked websocket connection"""
-
-    async def mock_ws_connect(*args, **kwargs):
-        mock_connection = websockets.WebSocketClientProtocol()  # pylint: disable=no-member
-        mock_connection.is_closed = False
-        return mock_connection
-
-    monkeypatch.setattr("websockets.connect", mock_ws_connect)
-    return monkeypatch
-
-
 @pytest.fixture(scope="session", name="mocked_connection_configuration")
 def fixture_create_mocked_connection_configuration() -> ConnectionConfiguration:
     """Create a mock connection configuration"""

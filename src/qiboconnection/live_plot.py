@@ -1,5 +1,7 @@
 """ LivePlot class """
+
 import asyncio
+import contextlib
 import datetime
 import os
 import threading
@@ -21,8 +23,8 @@ from qiboconnection.typings.live_plot import (
     LivePlotType,
 )
 
-WEBSOCKET_CONNECTION_LIFETIME = os.getenv("QIBOCONNECTION_WEBSOCKET_CONNECTION_LIFETIME", default=5)
-PACKET_POINT_NUMBER_LIMIT = os.getenv("QIBOCONNECTION_PACKET_POINT_NUMBER_LIMIT", default=1000)
+WEBSOCKET_CONNECTION_LIFETIME = int(os.getenv("QIBOCONNECTION_WEBSOCKET_CONNECTION_LIFETIME", default="5"))
+PACKET_POINT_NUMBER_LIMIT = int(os.getenv("QIBOCONNECTION_PACKET_POINT_NUMBER_LIMIT", default="1000"))
 
 
 class LivePlot(ABC):
@@ -45,15 +47,19 @@ class LivePlot(ABC):
 
     async def start_up(self):
         """Sets up the queue, opens the connection and creates and starts the sending data thread"""
-        self._send_queue = Queue()
+        self._setup_queue()
         await self._open_connection()
-        self._send_queue_thread = threading.Thread(target=asyncio.run, args=(self._sending_loop(),))
-        self._send_queue_thread.daemon = True
-        self._send_queue_thread.start()
+        self._setup_sending_thread()
 
     def _setup_queue(self):
         """Sets up an empty queue"""
         self._send_queue = Queue()
+
+    def _setup_sending_thread(self):
+        """Sets up and starts the sending thread"""
+        self._send_queue_thread = threading.Thread(target=asyncio.run, args=(self._sending_loop(),))
+        self._send_queue_thread.daemon = True
+        self._send_queue_thread.start()
 
     async def _reset_connection_if_opened_for_too_long(self):
         """Resets the connection if it has been up for too long"""
@@ -131,11 +137,10 @@ class LivePlot(ABC):
         """
         logger.debug("Closing connection")
         if self._connection is not None:
-            try:
+            with contextlib.suppress(AttributeError, ValueError, SSLError, WebSocketException, ConnectionClosed):
                 await self._connection.close()
-            except (AttributeError, ValueError, SSLError, WebSocketException, ConnectionClosed):
-                self._connection = None
-                self._connection_started_at = None
+            self._connection = None
+            self._connection_started_at = None
 
     async def _open_connection(self):
         """

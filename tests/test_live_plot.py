@@ -1,12 +1,19 @@
 """ Tests methods for LivePlot """
 
+import asyncio
+import datetime
 import json
+import threading
+import time
 from dataclasses import asdict
+from queue import Queue
+from unittest.mock import MagicMock, patch
 
 import numpy as np
 import pytest
+import websockets
 
-from qiboconnection.live_plot import LivePlot
+from qiboconnection.live_plot import WEBSOCKET_CONNECTION_LIFETIME, LivePlot
 from qiboconnection.typings.live_plot import (
     LivePlotAxis,
     LivePlotLabels,
@@ -97,7 +104,7 @@ def fixture_heatmap_plot_axis() -> LivePlotAxis:
 
 @pytest.fixture(name="heatmap_plot_points")
 def fixture_heatmap_plot_points() -> LivePlotPoints:
-    assert all([None not in point.values() for point in heatmap_unit_plot_points])
+    assert all(None not in point.values() for point in heatmap_unit_plot_points)
     x = [int(point["x"]) for point in heatmap_unit_plot_points]  # type: ignore
     y = [int(point["y"]) for point in heatmap_unit_plot_points]  # type: ignore
     z = [int(point["z"]) for point in heatmap_unit_plot_points]  # type: ignore
@@ -233,3 +240,388 @@ def test_plotting_response_to_dict():
     assert isinstance(plotting_response_dict, dict)
     assert plotting_response_dict["plot_id"] == 1
     assert plotting_response_dict["websocket_url"] == "server/demo-url"
+
+
+@patch("websockets.connect", autospec=True)
+def test_start_up(
+    mocked_websockets_connect: MagicMock,
+    live_plot_type: LivePlotType,
+    live_plot_labels: LivePlotLabels,
+    live_plot_axis: LivePlotAxis,
+):
+    """Tests start-up method for the initialisation of a LivePlot"""
+
+    try:
+        loop = asyncio.get_event_loop()
+    except RuntimeError:
+        loop = asyncio.new_event_loop()
+
+    mocked_connection_future = loop.create_future()
+    mocked_connection_future.set_result(MagicMock())
+    mocked_websockets_connect.return_value = mocked_connection_future
+
+    plot_id = 1
+    websocket_url = "test_url"
+    live_plot = LivePlot(
+        plot_id=plot_id,
+        plot_type=live_plot_type,
+        websocket_url=websocket_url,
+        labels=live_plot_labels,
+        axis=live_plot_axis,
+    )
+
+    asyncio.run(live_plot.start_up())
+
+    mocked_websockets_connect.assert_called_with(websocket_url)
+    assert isinstance(live_plot._send_queue_thread, threading.Thread)
+    assert isinstance(live_plot._send_queue, Queue)
+
+
+@patch("websockets.connect", autospec=True)
+def test_open_connection_with_failing_connection(
+    mocked_websockets_connect: MagicMock,
+    live_plot_type: LivePlotType,
+    live_plot_labels: LivePlotLabels,
+    live_plot_axis: LivePlotAxis,
+):
+    """Test _open_connection and _close_connection work as intended"""
+
+    mocked_connection_connect_return = MagicMock(side_effect=Exception("Test exception"))
+    mocked_websockets_connect.return_value = mocked_connection_connect_return
+
+    plot_id = 1
+    websocket_url = "test_url"
+    live_plot = LivePlot(
+        plot_id=plot_id,
+        plot_type=live_plot_type,
+        websocket_url=websocket_url,
+        labels=live_plot_labels,
+        axis=live_plot_axis,
+    )
+
+    with pytest.raises(ValueError):
+        asyncio.run(live_plot._open_connection())
+    assert live_plot._connection is None
+    assert live_plot._connection_started_at is None
+
+
+@patch("websockets.connect", autospec=True)
+def test_open_and_close_connection(
+    mocked_websockets_connect: MagicMock,
+    live_plot_type: LivePlotType,
+    live_plot_labels: LivePlotLabels,
+    live_plot_axis: LivePlotAxis,
+):
+    """Test _open_connection and _close_connection work as intended"""
+
+    try:
+        loop = asyncio.get_event_loop()
+    except RuntimeError:
+        loop = asyncio.new_event_loop()
+
+    mocked_connection_close = MagicMock()
+
+    mocked_connection_close_future = loop.create_future()
+    mocked_connection_close_future.set_result(mocked_connection_close)
+
+    mocked_connection = MagicMock()
+    mocked_connection.open = True
+    mocked_connection.close.return_value = mocked_connection_close_future
+
+    mocked_connection_connect_future = loop.create_future()
+    mocked_connection_connect_future.set_result(mocked_connection)
+
+    mocked_websockets_connect.return_value = mocked_connection_connect_future
+
+    plot_id = 1
+    websocket_url = "test_url"
+    live_plot = LivePlot(
+        plot_id=plot_id,
+        plot_type=live_plot_type,
+        websocket_url=websocket_url,
+        labels=live_plot_labels,
+        axis=live_plot_axis,
+    )
+
+    asyncio.run(live_plot._open_connection())
+    mocked_websockets_connect.assert_called_with("test_url")
+    assert live_plot._connection is not None
+    assert isinstance(live_plot._connection_started_at, datetime.datetime)
+
+    asyncio.run(live_plot._close_connection())
+    mocked_connection.close.assert_called()
+    assert live_plot._connection is None
+    assert live_plot._connection_started_at is None
+
+
+@patch("qiboconnection.live_plot.LivePlot._open_connection", autospec=True)
+@patch("qiboconnection.live_plot.LivePlot._close_connection", autospec=True)
+def test_reset_connection(
+    mocked_open_connection: MagicMock,
+    mocked_close_connection: MagicMock,
+    live_plot_type: LivePlotType,
+    live_plot_labels: LivePlotLabels,
+    live_plot_axis: LivePlotAxis,
+):
+    """Tests _reset_connection method closes and opens a connection"""
+
+    try:
+        loop = asyncio.get_event_loop()
+    except RuntimeError:
+        loop = asyncio.new_event_loop()
+
+    mocked_open_connection_return = MagicMock()
+    mocked_open_connection_future = loop.create_future()
+    mocked_open_connection_future.set_result(mocked_open_connection_return)
+    mocked_open_connection.return_value = mocked_open_connection_future
+
+    mocked_close_connection_return = MagicMock()
+    mocked_close_connection_future = loop.create_future()
+    mocked_close_connection_future.set_result(mocked_close_connection_return)
+    mocked_close_connection.return_value = mocked_close_connection_future
+
+    plot_id = 1
+    websocket_url = "test_url"
+    live_plot = LivePlot(
+        plot_id=plot_id,
+        plot_type=live_plot_type,
+        websocket_url=websocket_url,
+        labels=live_plot_labels,
+        axis=live_plot_axis,
+    )
+
+    asyncio.run(live_plot._reset_connection())
+    mocked_close_connection.assert_called()
+    mocked_open_connection.assert_called()
+
+
+@patch("qiboconnection.live_plot.LivePlot._close_connection")
+@patch("websockets.connect", autospec=True)
+def test_send_data(
+    mocked_websockets_connect: MagicMock,
+    _mocked_close_connection: MagicMock,
+    live_plot_type: LivePlotType,
+    live_plot_labels: LivePlotLabels,
+    live_plot_axis: LivePlotAxis,
+):
+    """Tests start-up method for the initialisation of a LivePlot"""
+
+    try:
+        loop = asyncio.get_event_loop()
+    except RuntimeError:
+        loop = asyncio.new_event_loop()
+
+    mocked_connection_send_future = loop.create_future()
+    mocked_connection_send_future.set_result("OK")
+
+    mocked_connection = MagicMock()
+    mocked_connection.open = True
+    mocked_connection.send.return_value = mocked_connection_send_future
+
+    mocked_connection_connect_future = loop.create_future()
+    mocked_connection_connect_future.set_result(mocked_connection)
+
+    mocked_websockets_connect.return_value = mocked_connection_connect_future
+
+    plot_id = 1
+    websocket_url = "test_url"
+    live_plot = LivePlot(
+        plot_id=plot_id,
+        plot_type=live_plot_type,
+        websocket_url=websocket_url,
+        labels=live_plot_labels,
+        axis=live_plot_axis,
+    )
+
+    asyncio.run(live_plot.start_up())
+
+    data_packet = LivePlotPacket.build_packet(
+        plot_id=1,
+        plot_type=LivePlotType.LINES,
+        x=1,
+        y=2,
+        z=None,
+        labels=live_plot_labels,
+        axis=live_plot_axis,
+    )
+    live_plot._connection_started_at = datetime.datetime.now()
+    asyncio.run(live_plot.send_data(data=data_packet))
+
+    time.sleep(1)
+    mocked_connection.send.assert_called_with(data_packet.to_json())
+
+
+@patch("qiboconnection.live_plot.LivePlot._reset_connection", autospec=True)
+@patch("websockets.connect", autospec=True)
+def test_send_data_with_too_log_lived_connection(
+    mocked_websockets_connect: MagicMock,
+    mocked_reset_connection: MagicMock,
+    live_plot_type: LivePlotType,
+    live_plot_labels: LivePlotLabels,
+    live_plot_axis: LivePlotAxis,
+):
+    """Tests start-up method for the initialisation of a LivePlot"""
+
+    try:
+        loop = asyncio.get_event_loop()
+    except RuntimeError:
+        loop = asyncio.new_event_loop()
+
+    mocked_connection_send_future = loop.create_future()
+    mocked_connection_send_future.set_result("OK")
+    mocked_connection_close_future = loop.create_future()
+    mocked_connection_close_future.set_result("OK")
+    mocked_connection = MagicMock()
+    mocked_connection.open = True
+    mocked_connection.send.return_value = mocked_connection_send_future
+    mocked_connection.close.return_value = mocked_connection_close_future
+
+    mocked_connection_connect_future = loop.create_future()
+    mocked_connection_connect_future.set_result(mocked_connection)
+    mocked_websockets_connect.return_value = mocked_connection_connect_future
+
+    mocked_reset_connection_return = MagicMock()
+    mocked_reset_connection_future = loop.create_future()
+    mocked_reset_connection_future.set_result(mocked_reset_connection_return)
+    mocked_reset_connection.return_value = mocked_reset_connection_future
+
+    plot_id = 1
+    websocket_url = "test_url"
+    live_plot = LivePlot(
+        plot_id=plot_id,
+        plot_type=live_plot_type,
+        websocket_url=websocket_url,
+        labels=live_plot_labels,
+        axis=live_plot_axis,
+    )
+
+    asyncio.run(live_plot.start_up())
+
+    data_packet = LivePlotPacket.build_packet(
+        plot_id=1,
+        plot_type=LivePlotType.LINES,
+        x=1,
+        y=2,
+        z=None,
+        labels=live_plot_labels,
+        axis=live_plot_axis,
+    )
+    live_plot._connection_started_at = datetime.datetime.now() - datetime.timedelta(
+        seconds=WEBSOCKET_CONNECTION_LIFETIME + 1
+    )
+    asyncio.run(live_plot.send_data(data=data_packet))
+
+    time.sleep(1)
+    mocked_reset_connection.assert_called()
+    mocked_connection.send.assert_called_with(data_packet.to_json())
+
+
+@patch("qiboconnection.live_plot.LivePlot._reset_connection", autospec=True)
+@patch("websockets.connect", autospec=True)
+def test_send_data_with_closed_connection(
+    mocked_websockets_connect: MagicMock,
+    mocked_reset_connection: MagicMock,
+    live_plot_type: LivePlotType,
+    live_plot_labels: LivePlotLabels,
+    live_plot_axis: LivePlotAxis,
+):
+    """Tests start-up method for the initialisation of a LivePlot"""
+
+    try:
+        loop = asyncio.get_event_loop()
+    except RuntimeError:
+        loop = asyncio.new_event_loop()
+
+    mocked_connection_send_future = loop.create_future()
+    mocked_connection_send_future.set_result("OK")
+    mocked_connection = MagicMock()
+    mocked_connection.open = False
+    mocked_connection.send.return_value = mocked_connection_send_future
+
+    mocked_connection_connect_future = loop.create_future()
+    mocked_connection_connect_future.set_result(mocked_connection)
+    mocked_websockets_connect.return_value = mocked_connection_connect_future
+
+    mocked_reset_connection_return = MagicMock()
+    mocked_reset_connection_future = loop.create_future()
+    mocked_reset_connection_future.set_result(mocked_reset_connection_return)
+    mocked_reset_connection.return_value = mocked_reset_connection_future
+
+    plot_id = 1
+    websocket_url = "test_url"
+    live_plot = LivePlot(
+        plot_id=plot_id,
+        plot_type=live_plot_type,
+        websocket_url=websocket_url,
+        labels=live_plot_labels,
+        axis=live_plot_axis,
+    )
+
+    asyncio.run(live_plot.start_up())
+
+    data_packet = LivePlotPacket.build_packet(
+        plot_id=1,
+        plot_type=LivePlotType.LINES,
+        x=1,
+        y=2,
+        z=None,
+        labels=live_plot_labels,
+        axis=live_plot_axis,
+    )
+    live_plot._connection_started_at = datetime.datetime.now()
+    asyncio.run(live_plot.send_data(data=data_packet))
+
+    time.sleep(1)
+    mocked_reset_connection.assert_called()
+
+
+@patch("qiboconnection.live_plot.LivePlot._setup_queue", autospec=True)
+@patch("websockets.connect", autospec=True)
+def test_send_data_with_missbehaving_queue(
+    mocked_websockets_connect: MagicMock,
+    mocked_setup_queue: MagicMock,
+    live_plot_type: LivePlotType,
+    live_plot_labels: LivePlotLabels,
+    live_plot_axis: LivePlotAxis,
+):
+    """Tests start-up method for the initialisation of a LivePlot"""
+
+    try:
+        loop = asyncio.get_event_loop()
+    except RuntimeError:
+        loop = asyncio.new_event_loop()
+
+    mocked_connection_send_future = loop.create_future()
+    mocked_connection_send_future.set_result("OK")
+    mocked_connection = MagicMock()
+    mocked_connection.open = False
+    mocked_connection.send.return_value = mocked_connection_send_future
+
+    mocked_connection_connect_future = loop.create_future()
+    mocked_connection_connect_future.set_result(mocked_connection)
+    mocked_websockets_connect.return_value = mocked_connection_connect_future
+
+    mocked_setup_queue.return_value = None
+
+    plot_id = 1
+    websocket_url = "test_url"
+    live_plot = LivePlot(
+        plot_id=plot_id,
+        plot_type=live_plot_type,
+        websocket_url=websocket_url,
+        labels=live_plot_labels,
+        axis=live_plot_axis,
+    )
+
+    data_packet = LivePlotPacket.build_packet(
+        plot_id=1,
+        plot_type=LivePlotType.LINES,
+        x=1,
+        y=2,
+        z=None,
+        labels=live_plot_labels,
+        axis=live_plot_axis,
+    )
+    live_plot._connection_started_at = datetime.datetime.now()
+    with pytest.raises(ValueError):
+        asyncio.run(live_plot.send_data(data=data_packet))
