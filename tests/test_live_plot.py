@@ -64,8 +64,8 @@ def test_ensure_packet_compatibility(
     )
     agg_live_packet = LivePlotPacket.agglutinate(packets=[live_plot_packet_a, live_plot_packet_b])
 
-    assert agg_live_packet.data.x == [0, 0]
-    assert agg_live_packet.data.y == [1, 1]
+    assert agg_live_packet.data.x == [0, 1]
+    assert agg_live_packet.data.y == [0, 1]
 
 
 def test_ensure_packet_compatibility_with_bad_packet_list(
