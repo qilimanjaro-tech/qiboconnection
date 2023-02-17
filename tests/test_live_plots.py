@@ -15,6 +15,8 @@ from qiboconnection.typings.live_plot import (
     LivePlotType,
 )
 
+from .utils import get_current_event_loop_or_create
+
 
 @pytest.fixture(name="live_plot_type")
 def fixture_plot_type():
@@ -45,10 +47,7 @@ def test_live_plots_add_plot(
 ):
     """Tests LivePlots add plot functionality"""
 
-    try:
-        loop = asyncio.get_event_loop()
-    except RuntimeError:
-        loop = asyncio.new_event_loop()
+    loop = get_current_event_loop_or_create()
 
     mocked_connection_future = loop.create_future()
     mocked_connection_future.set_result(MagicMock())
@@ -90,10 +89,7 @@ def test_live_plots_send_data(
 ):
     """Tests the LivePlots send_data functionality, mocking the inferior LivePlot layer."""
 
-    try:
-        loop = asyncio.get_event_loop()
-    except RuntimeError:
-        loop = asyncio.new_event_loop()
+    loop = get_current_event_loop_or_create()
 
     mocked_connection_future = loop.create_future()
     mocked_connection_future.set_result(MagicMock())

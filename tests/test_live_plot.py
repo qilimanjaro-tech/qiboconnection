@@ -24,6 +24,7 @@ from qiboconnection.typings.live_plot import (
 )
 
 from .data import heatmap_unit_plot_points, unit_plot_point
+from .utils import get_current_event_loop_or_create
 
 
 @pytest.fixture(name="live_plot_type")
@@ -251,10 +252,7 @@ def test_start_up(
 ):
     """Tests start-up method for the initialisation of a LivePlot"""
 
-    try:
-        loop = asyncio.get_event_loop()
-    except RuntimeError:
-        loop = asyncio.new_event_loop()
+    loop = get_current_event_loop_or_create()
 
     mocked_connection_future = loop.create_future()
     mocked_connection_future.set_result(MagicMock())
@@ -314,10 +312,7 @@ def test_open_and_close_connection(
 ):
     """Test _open_connection and _close_connection work as intended"""
 
-    try:
-        loop = asyncio.get_event_loop()
-    except RuntimeError:
-        loop = asyncio.new_event_loop()
+    loop = get_current_event_loop_or_create()
 
     mocked_connection_close = MagicMock()
 
@@ -365,10 +360,7 @@ def test_reset_connection(
 ):
     """Tests _reset_connection method closes and opens a connection"""
 
-    try:
-        loop = asyncio.get_event_loop()
-    except RuntimeError:
-        loop = asyncio.new_event_loop()
+    loop = get_current_event_loop_or_create()
 
     mocked_open_connection_return = MagicMock()
     mocked_open_connection_future = loop.create_future()
@@ -404,23 +396,18 @@ def test_send_data(
     live_plot_labels: LivePlotLabels,
     live_plot_axis: LivePlotAxis,
 ):
-    """Tests start-up method for the initialisation of a LivePlot"""
+    """Tests send_data method in the"""
 
-    try:
-        loop = asyncio.get_event_loop()
-    except RuntimeError:
-        loop = asyncio.new_event_loop()
+    loop = get_current_event_loop_or_create()
 
     mocked_connection_send_future = loop.create_future()
     mocked_connection_send_future.set_result("OK")
-
     mocked_connection = MagicMock()
     mocked_connection.open = True
     mocked_connection.send.return_value = mocked_connection_send_future
 
     mocked_connection_connect_future = loop.create_future()
     mocked_connection_connect_future.set_result(mocked_connection)
-
     mocked_websockets_connect.return_value = mocked_connection_connect_future
 
     plot_id = 1
@@ -462,10 +449,7 @@ def test_send_data_with_too_log_lived_connection(
 ):
     """Tests start-up method for the initialisation of a LivePlot"""
 
-    try:
-        loop = asyncio.get_event_loop()
-    except RuntimeError:
-        loop = asyncio.new_event_loop()
+    loop = get_current_event_loop_or_create()
 
     mocked_connection_send_future = loop.create_future()
     mocked_connection_send_future.set_result("OK")
@@ -527,10 +511,7 @@ def test_send_data_with_closed_connection(
 ):
     """Tests start-up method for the initialisation of a LivePlot"""
 
-    try:
-        loop = asyncio.get_event_loop()
-    except RuntimeError:
-        loop = asyncio.new_event_loop()
+    loop = get_current_event_loop_or_create()
 
     mocked_connection_send_future = loop.create_future()
     mocked_connection_send_future.set_result("OK")
@@ -586,10 +567,7 @@ def test_send_data_with_missbehaving_queue(
 ):
     """Tests start-up method for the initialisation of a LivePlot"""
 
-    try:
-        loop = asyncio.get_event_loop()
-    except RuntimeError:
-        loop = asyncio.new_event_loop()
+    loop = get_current_event_loop_or_create()
 
     mocked_connection_send_future = loop.create_future()
     mocked_connection_send_future.set_result("OK")
