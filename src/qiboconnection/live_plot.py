@@ -39,7 +39,8 @@ class LivePlot(ABC):
         self._labels: LivePlotLabels = labels
         self._axis: LivePlotAxis = axis
         self._websocket_url: str = websocket_url
-        self._connection: websockets.WebSocketClientProtocol | None = None  # pylint: disable=no-member
+        # pylint: disable=no-member
+        self._connection: websockets.WebSocketClientProtocol | None = None  # type: ignore [name-defined]
         self._connection_open = False
         self._send_queue: Queue | None = None
         self._send_queue_thread: threading.Thread | None = None
