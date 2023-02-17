@@ -21,6 +21,8 @@ from qiboconnection.typings.live_plot import (
     LivePlotPoints,
     LivePlotType,
     PlottingResponse,
+    _ensure_packet_compatibility,
+    _ensure_packet_types,
 )
 
 from .data import heatmap_unit_plot_points, unit_plot_point
@@ -40,6 +42,46 @@ def fixture_plot_labels():
 @pytest.fixture(name="live_plot_axis")
 def fixture_plot_axis():
     return LivePlotAxis()
+
+
+def test_ensure_packet_types_with_bad_list():
+    """Test that the `_ensure_packet_types` function rises its error when a bad list is provided."""
+    not_packet_list = [1, "a", None]
+    with pytest.raises(ValueError):
+        _ensure_packet_types(not_packet_list)
+
+
+def test_ensure_packet_compatibility(
+    live_plot_type: LivePlotType, live_plot_labels: LivePlotLabels, live_plot_axis: LivePlotAxis
+):
+    """Test that the `_ensure_packet_types` works as intended in the nominal case."""
+
+    live_plot_packet_a = LivePlotPacket.build_packet(
+        plot_id=1, plot_type=live_plot_type, labels=live_plot_labels, axis=live_plot_axis, x=0, y=0, z=None
+    )
+    live_plot_packet_b = LivePlotPacket.build_packet(
+        plot_id=1, plot_type=live_plot_type, labels=live_plot_labels, axis=live_plot_axis, x=1, y=1, z=None
+    )
+    agg_live_packet = LivePlotPacket.agglutinate(packets=[live_plot_packet_a, live_plot_packet_b])
+
+    assert agg_live_packet.data.x == [0, 0]
+    assert agg_live_packet.data.y == [1, 1]
+
+
+def test_ensure_packet_compatibility_with_bad_packet_list(
+    live_plot_type: LivePlotType, live_plot_labels: LivePlotLabels, live_plot_axis: LivePlotAxis
+):
+    """Test that the `_ensure_packet_types` function rises its error when a bad list is provided."""
+
+    live_plot_packet_a = LivePlotPacket.build_packet(
+        plot_id=1, plot_type=live_plot_type, labels=live_plot_labels, axis=live_plot_axis, x=0, y=0, z=None
+    )
+    live_plot_packet_b = LivePlotPacket.build_packet(
+        plot_id=2, plot_type=live_plot_type, labels=live_plot_labels, axis=live_plot_axis, x=1, y=1, z=None
+    )
+
+    with pytest.raises(ValueError):
+        LivePlotPacket.agglutinate(packets=[live_plot_packet_a, live_plot_packet_b])
 
 
 def test_live_plot(live_plot_type: LivePlotType, live_plot_labels: LivePlotLabels, live_plot_axis: LivePlotAxis):
