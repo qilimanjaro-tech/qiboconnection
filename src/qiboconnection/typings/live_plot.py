@@ -289,11 +289,11 @@ class LivePlotPacket(ABC):
         assert all(isinstance(packet, cls) for packet in packets), "Not all packets were LivePlotPackets"
         _ensure_packet_compatibility(packets=packets)
 
-        extended_x: list[int] | list[float] | npt.NDArray[np.int_ | np.float_] = []
-        extended_y: list[int] | list[float] | npt.NDArray[np.int_ | np.float_] = []
-        extended_z: list[int] | list[float] | npt.NDArray[np.int_ | np.float_] = []
-        extended_idx: list[int] | npt.NDArray[np.int_] = []
-        extended_idy: list[int] | npt.NDArray[np.int_] = []
+        extended_x: list[int] | list[float] | list[None] = []
+        extended_y: list[int] | list[float] | list[None] = []
+        extended_z: list[int] | list[float] | list[None] = []
+        extended_idx: list[int] = []
+        extended_idy: list[int] = []
         extended_x.extend((packet.data.x for packet in packets))
         extended_y.extend((packet.data.y for packet in packets))
         extended_z.extend((packet.data.z for packet in packets))
