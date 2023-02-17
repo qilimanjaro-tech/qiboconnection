@@ -76,6 +76,20 @@ class LivePlot(ABC):
             packet_list.append(self._send_queue.get())
         return LivePlotPacket.agglutinate(packets=packet_list)
 
+    @property
+    def connection_open(self):
+        """Return true if the connection is open"""
+        return self._connection.open if self._connection else False
+
+    def ensure_connection_open(self):
+        """Raises ValueError if the connection is not open
+
+        Raises:
+           ValueError: The connection is not open
+        """
+        if not self.connection_open:
+            raise ValueError("The connection is not open")
+
     async def _sending_loop(self):
         """Main loop, where we send over the socket whatever there is in the _send_queue"""
         while True:
@@ -84,7 +98,7 @@ class LivePlot(ABC):
             if agglutinated_packet := self._consume_and_agglutinate_all_packets_in_queue():
                 agglutinated_message = agglutinated_packet.to_json()
                 try:
-                    assert self._connection.open
+                    self.ensure_connection_open()
                     await self._connection.send(agglutinated_message)
                 except (
                     AssertionError,

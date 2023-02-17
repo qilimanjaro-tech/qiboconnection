@@ -169,8 +169,14 @@ class LivePlotPoints(ABC):
         return False
 
 
+def _ensure_packet_types(packets: List):
+    """Ensures all elements are valid LivePlotPackets"""
+    if not all(isinstance(packet, LivePlotPacket) for packet in packets):
+        raise ValueError("Not all packets were LivePlotPackets")
+
+
 def _ensure_packet_compatibility(packets: List):
-    """Asserts all elements of packets arefrom a same compatible Liveplot"""
+    """Ensures all elements of packets are from a same compatible Liveplot"""
     same_plot_id = (packet.plot_id == packets[0].plot_id for packet in packets)
     same_plot_type = (packet.plot_type == packets[0].plot_type for packet in packets)
     same_labels = (packet.labels == packets[0].labels for packet in packets)
@@ -286,7 +292,7 @@ class LivePlotPacket(ABC):
         if not packets:
             return None
 
-        assert all(isinstance(packet, cls) for packet in packets), "Not all packets were LivePlotPackets"
+        _ensure_packet_types(packets=packets)
         _ensure_packet_compatibility(packets=packets)
 
         extended_x: list[int] | list[float] = list[float]()
