@@ -338,6 +338,21 @@ class Connection(ABC):
         return responses
 
     @typechecked
+    def send_delete_auth_remote_api_call(self, path: str) -> Tuple[Any, int]:
+        """HTTP DELETE REST API authenticated call to remote server
+
+        Args:
+            path (str): path to add to the remote server api url
+
+        Returns:
+            Tuple[Any, int]: Http response
+        """
+        logger.debug("Calling: %s%s", self._remote_server_api_url, path)
+        header = {"Authorization": f"Bearer {self._authorisation_access_token}"}
+        response = requests.delete(f"{self._remote_server_api_url}{path}", headers=header)
+        return process_response(response)
+
+    @typechecked
     def send_get_remote_call(self, path: str) -> Tuple[Any, int]:
         """HTTP GET REST API call to remote server (without authentication)
 

@@ -1,4 +1,4 @@
-""" Test methods for SavedExperiment typing classes"""
+""" Test methods for SavedExperiment classes"""
 
 import datetime
 
