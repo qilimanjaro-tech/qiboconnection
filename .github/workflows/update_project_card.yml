@@ -11,6 +11,6 @@ jobs:
       - name: Update Project Card
         uses: peter-evans/create-or-update-project-card@v2
         with:
-          token: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
+          token: ${{ secrets.PROJECT_TOKEN }}
           project-number: 2
           column-name: To do
