@@ -1,16 +1,16 @@
-name: Add new opened issue to project
+name: Add new issue to project
 
 on:
   issues:
-    types: [opened]
+    types:
+      - opened
 
 jobs:
-  createCard:
+  add-to-project:
+    name: Add issue to project
     runs-on: ubuntu-latest
     steps:
-      - name: Create Project Card
-        uses: peter-evans/create-or-update-project-card@v2
+      - uses: actions/add-to-project@RELEASE_VERSION
         with:
-          token: ${{ secrets.PROJECT_TOKEN }}
-          project-number: 2
-          column-name: Backlog
+          project-url: https://github.com/orgs/qilimanjaro-tech/projects/2
+          github-token: ${{ secrets.PROJECT_TOKEN }}
