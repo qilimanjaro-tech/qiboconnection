@@ -1,0 +1,16 @@
+name: Update assigned issue
+
+on:
+  issues:
+    types: [assigned]
+
+jobs:
+  updateCard:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Update Project Card
+        uses: peter-evans/create-or-update-project-card@v2
+        with:
+          token: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
+          project-number: 2
+          column-name: To do
