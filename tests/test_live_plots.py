@@ -1,6 +1,10 @@
 """ Tests methods for LivePlots """
 
+import asyncio
+from unittest.mock import MagicMock, patch
+
 import pytest
+import websockets
 
 from qiboconnection.live_plot import LivePlot
 from qiboconnection.live_plots import LivePlots
@@ -10,6 +14,8 @@ from qiboconnection.typings.live_plot import (
     LivePlotPacket,
     LivePlotType,
 )
+
+from .utils import get_current_event_loop_or_create
 
 
 def ok_method(*args, **kwargs):
@@ -41,10 +47,22 @@ def test_live_plots_constructor():
     assert isinstance(live_plots, LivePlots)
 
 
+@patch("websockets.connect", autospec=True)
 def test_live_plots_add_plot(
-    live_plot_type: LivePlotType, live_plot_labels: LivePlotLabels, live_plot_axis: LivePlotAxis
+    mocked_websockets_connect: MagicMock,
+    live_plot_type: LivePlotType,
+    live_plot_labels: LivePlotLabels,
+    live_plot_axis: LivePlotAxis,
 ):
     """test live plot `create_live_plot`"""
+    """Tests LivePlots add plot functionality"""
+
+    loop = get_current_event_loop_or_create()
+
+    mocked_connection_future = loop.create_future()
+    mocked_connection_future.set_result(MagicMock())
+    mocked_websockets_connect.return_value = mocked_connection_future
+
     live_plots = LivePlots()
     expected_live_plot = LivePlot(
         plot_id=1,
@@ -53,15 +71,58 @@ def test_live_plots_add_plot(
         labels=live_plot_labels,
         axis=live_plot_axis,
     )
-    live_plots.create_live_plot(
-        plot_id=1,
-        plot_type=live_plot_type,
-        websocket_url="server/demo-url",
-        labels=live_plot_labels,
-        axis=live_plot_axis,
+    asyncio.run(expected_live_plot.start_up())
+
+    asyncio.run(
+        live_plots.create_live_plot(
+            plot_id=1,
+            plot_type=live_plot_type,
+            websocket_url="server/demo-url",
+            labels=live_plot_labels,
+            axis=live_plot_axis,
+        )
+    )
+    created_live_plot = live_plots._get_live_plot(plot_id=1)
+
+    mocked_websockets_connect.assert_called_with("server/demo-url")
+    assert expected_live_plot == created_live_plot
+
+
+@patch("qiboconnection.live_plot.LivePlot.send_data", autospec=True)
+@patch("qiboconnection.live_plot.websockets.connect", autospec=True)
+def test_live_plots_send_data(
+    mocked_websockets_connect: MagicMock,
+    live_plot_send_data: MagicMock,
+    live_plot_type: LivePlotType,
+    live_plot_labels: LivePlotLabels,
+    live_plot_axis: LivePlotAxis,
+):
+    """Tests the LivePlots send_data functionality, mocking the inferior LivePlot layer."""
+
+    loop = get_current_event_loop_or_create()
+
+    mocked_connection_future = loop.create_future()
+    mocked_connection_future.set_result(MagicMock())
+    mocked_websockets_connect.return_value = mocked_connection_future
+
+    live_plots = LivePlots()
+    asyncio.run(
+        live_plots.create_live_plot(
+            plot_id=1,
+            plot_type=live_plot_type,
+            websocket_url="server/demo-url",
+            labels=live_plot_labels,
+            axis=live_plot_axis,
+        )
     )
 
-    assert expected_live_plot.__dict__ == live_plots._get_live_plot(plot_id=1).__dict__
+    asyncio.run(live_plots.send_data(plot_id=1, x=1, y=1, z=None))
+
+    expected_sent_data_packet = LivePlotPacket.build_packet(
+        plot_id=1, plot_type=live_plot_type, x=1, y=1, z=None, labels=live_plot_labels, axis=live_plot_axis
+    )
+
+    live_plot_send_data.assert_called_with(self=live_plots._get_live_plot(plot_id=1), data=expected_sent_data_packet)
 
 
 def test_check_data_and_plot_type_compatibility_with_ok_case(

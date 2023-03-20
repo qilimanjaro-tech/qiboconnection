@@ -4,6 +4,7 @@ from dataclasses import asdict
 from unittest.mock import patch
 
 import pytest
+import websockets
 
 from qiboconnection.api import API
 from qiboconnection.connection import Connection

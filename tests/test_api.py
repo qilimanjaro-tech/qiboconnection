@@ -1,4 +1,5 @@
 """API testing"""
+import asyncio
 from dataclasses import asdict
 from unittest.mock import MagicMock, patch
 
@@ -12,8 +13,10 @@ from qiboconnection.errors import ConnectionException, RemoteExecutionException
 from qiboconnection.runcard import Runcard
 from qiboconnection.saved_experiment import SavedExperiment
 from qiboconnection.saved_experiment_listing import SavedExperimentListing
+from qiboconnection.typings.live_plot import PlottingResponse
 
 from .data import experiment_dict, results_dict, runcard_dict, web_responses
+from .utils import get_current_event_loop_or_create
 
 
 def test_api_constructor(mocked_api: API):
@@ -186,6 +189,60 @@ def test_select_device_ids_ise(mocked_web_call: MagicMock, mocked_api: API):
 
     mocked_web_call.assert_called_with(self=mocked_api._connection, path=f"{mocked_api.DEVICES_CALL_PATH}/1")
     assert mocked_api._selected_devices == []
+
+
+@patch("websockets.connect", autospec=True)
+@patch("qiboconnection.connection.Connection.send_post_auth_remote_api_call", autospec=True)
+def test_create_live_plot(mocked_web_call: MagicMock, mocked_websockets_connect: MagicMock, mocked_api: API):
+    """Test the creation of a liveplot using the api"""
+
+    loop = get_current_event_loop_or_create()
+    mocked_connection_future = loop.create_future()
+    mocked_connection_future.set_result(MagicMock())
+    mocked_websockets_connect.return_value = mocked_connection_future
+
+    mocked_web_call.return_value = PlottingResponse(websocket_url="test_url", plot_id=1).to_dict(), 200
+
+    plot_id = asyncio.run(mocked_api.create_liveplot())
+
+    mocked_web_call.assert_called_with(self=mocked_api._connection, path=mocked_api.LIVE_PLOTTING_PATH, data={})
+    mocked_websockets_connect.assert_called_with("test_url")
+    assert plot_id == 1
+
+
+@patch("qiboconnection.connection.Connection.send_post_auth_remote_api_call", autospec=True)
+def test_create_live_plot_with_unexpected_response(mocked_web_call: MagicMock, mocked_api: API):
+    """Test the creation of a liveplot using the api"""
+
+    mocked_web_call.return_value = {}, 400
+
+    with pytest.raises(RemoteExecutionException):
+        _ = asyncio.run(mocked_api.create_liveplot())
+
+
+@patch("qiboconnection.live_plot.LivePlot.send_data", autospec=True)
+@patch("websockets.connect", autospec=True)
+@patch("qiboconnection.connection.Connection.send_post_auth_remote_api_call", autospec=True)
+def test_send_plot_points(
+    mocked_web_call: MagicMock,
+    mocked_websockets_connect: MagicMock,
+    mocked_live_plot_send_data: MagicMock,
+    mocked_api: API,
+):
+    """Test the creation of a liveplot using the api"""
+
+    loop = get_current_event_loop_or_create()
+    mocked_connection_future = loop.create_future()
+    mocked_connection_future.set_result(MagicMock())
+    mocked_websockets_connect.return_value = mocked_connection_future
+
+    mocked_web_call.return_value = PlottingResponse(websocket_url="test_url", plot_id=1).to_dict(), 200
+
+    plot_id = asyncio.run(mocked_api.create_liveplot())
+
+    asyncio.run(mocked_api.send_plot_points(plot_id=plot_id, x=0, y=0))
+
+    mocked_live_plot_send_data.assert_called()
 
 
 @patch("qiboconnection.connection.Connection.send_post_auth_remote_api_call", autospec=True)

@@ -465,7 +465,7 @@ class API(ABC):
     """ REMOTE PLOTTING """
 
     @typechecked
-    def create_liveplot(
+    async def create_liveplot(
         self,
         plot_type: str = LivePlotType.LINES.value,
         title: str | None = None,
@@ -502,7 +502,7 @@ class API(ABC):
                 message="Live-plotting connection data could not be retrieved.", status_code=status_code
             )
         plotting_response = PlottingResponse.from_response(**response)
-        self._live_plots.create_live_plot(
+        await self._live_plots.create_live_plot(
             plot_id=plotting_response.plot_id,
             websocket_url=plotting_response.websocket_url,
             plot_type=LivePlotType(plot_type),
@@ -512,7 +512,7 @@ class API(ABC):
         return plotting_response.plot_id
 
     @typechecked
-    def send_plot_points(
+    async def send_plot_points(
         self,
         plot_id: int,
         x: npt.NDArray[np.float_ | np.int_] | list[float] | list[int] | float | int,
@@ -529,7 +529,7 @@ class API(ABC):
         Returns:
             None
         """
-        return self._live_plots.send_data(plot_id=plot_id, x=x, y=y, z=z)
+        return await self._live_plots.send_data(plot_id=plot_id, x=x, y=y, z=z)
 
     """ SAVED EXPERIMENTS """
 

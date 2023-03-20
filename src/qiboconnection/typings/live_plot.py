@@ -100,6 +100,16 @@ class LivePlotPoints(ABC):
         """z getter."""
         return self._z
 
+    @property
+    def idx(self):
+        """idx getter."""
+        return self._idx
+
+    @property
+    def idy(self):
+        """idy getter."""
+        return self._idy
+
     def _parse_to_points(
         self,
         x: int | float | list[int] | list[float] | npt.NDArray[np.int_ | np.float_],
@@ -157,6 +167,22 @@ class LivePlotPoints(ABC):
                 ]
             )
         return False
+
+
+def _ensure_packet_types(packets: List):
+    """Ensures all elements are valid LivePlotPackets"""
+    if not all(isinstance(packet, LivePlotPacket) for packet in packets):
+        raise ValueError("Not all packets were LivePlotPackets")
+
+
+def _ensure_packet_compatibility(packets: List):
+    """Ensures all elements of packets are from a same compatible Liveplot"""
+    same_plot_id = (packet.plot_id == packets[0].plot_id for packet in packets)
+    same_plot_type = (packet.plot_type == packets[0].plot_type for packet in packets)
+    same_labels = (packet.labels == packets[0].labels for packet in packets)
+    same_axis = (packet.axis == packets[0].axis for packet in packets)
+    if not (all(same_plot_id) and all(same_plot_type) and all(same_labels) and all(same_axis)):
+        raise ValueError("Trying to agglutinate data packets with different information")
 
 
 @dataclass
@@ -258,3 +284,31 @@ class LivePlotPacket(ABC):
         Serializes the info of the class in a json-formatted string
         """
         return json.dumps(self.to_dict())
+
+    @classmethod
+    def agglutinate(cls, packets: List):
+        """Build a single LivePlotPacket from a list of LivePlotPackets with the data merged"""
+
+        if not packets:
+            return None
+
+        _ensure_packet_types(packets=packets)
+        _ensure_packet_compatibility(packets=packets)
+
+        extended_x: list[int] | list[float] = list[float]()
+        extended_y: list[int] | list[float] = list[float]()
+        extended_z: list[int] | list[float] = list[float]()
+        extended_idx: list[int] = list[int]()
+        extended_idy: list[int] = list[int]()
+        extended_x.extend((packet.data.x for packet in packets))
+        extended_y.extend((packet.data.y for packet in packets))
+        extended_z.extend((packet.data.z for packet in packets))
+        extended_idx.extend((packet.data.idx for packet in packets))
+        extended_idy.extend((packet.data.idy for packet in packets))
+        return cls(
+            plot_id=packets[0].plot_id,
+            plot_type=packets[0].plot_type,
+            data=LivePlotPoints(x=extended_x, y=extended_y, z=extended_z, idx=extended_idx, idy=extended_idy),
+            labels=packets[0].labels,
+            axis=packets[0].axis,
+        )
