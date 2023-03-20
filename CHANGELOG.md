@@ -1,3 +1,9 @@
+## v0.7.2 (2023-03-15)
+
+### Fix
+
+- Fix qibo version to `0.1.10` to allow installation on Mac (#50)
+
 ## v0.7.1 (2023-02-06)
 
 ### Fix

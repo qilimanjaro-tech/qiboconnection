@@ -26,6 +26,7 @@ from qiboconnection.devices.util import create_device
 from qiboconnection.errors import ConnectionException, RemoteExecutionException
 from qiboconnection.job import Job
 from qiboconnection.live_plots import LivePlots
+from qiboconnection.runcard import Runcard
 from qiboconnection.saved_experiment import SavedExperiment
 from qiboconnection.saved_experiment_listing import SavedExperimentListing
 from qiboconnection.typings.connection import ConnectionConfiguration
@@ -36,6 +37,7 @@ from qiboconnection.typings.live_plot import (
     LivePlotType,
     PlottingResponse,
 )
+from qiboconnection.typings.runcard import RuncardResponse
 from qiboconnection.typings.saved_experiment import (
     SavedExperimentListingItemResponse,
     SavedExperimentResponse,
@@ -52,6 +54,7 @@ class API(ABC):
     CIRCUITS_CALL_PATH = "/circuits"
     DEVICES_CALL_PATH = "/devices"
     SAVED_EXPERIMENTS_CALL_PATH = "/saved_experiments"
+    RUNCARDS_CALL_PATH = "/runcards"
     PING_CALL_PATH = "/status"
     LIVE_PLOTTING_PATH = "/live-plotting"
 
@@ -67,6 +70,9 @@ class API(ABC):
         self._live_plots: LivePlots = LivePlots()
         self._saved_experiment: SavedExperiment | None = None
         self._saved_experiments_listing: SavedExperimentListing | None = None
+        self._runcard: Runcard | None = None
+
+    """ LOCAL INFORMATION """
 
     @property
     def jobs(self) -> List[Job]:
@@ -105,6 +111,15 @@ class API(ABC):
         return self._saved_experiments_listing
 
     @property
+    def last_runcard(self) -> Runcard | None:
+        """Returns the last runcard uploaded in the current session, in case there has been one.
+
+        Returns:
+            Runcard | None: last uploaded runcard
+        """
+        return self._runcard
+
+    @property
     def user_id(self) -> int:
         """Exposes the id of the authenticated user
 
@@ -119,6 +134,8 @@ class API(ABC):
 
         return self._connection.user.user_id
 
+    """ PING """
+
     def ping(self) -> str:
         """Checks if the connection is alive and response OK when it is.
 
@@ -129,6 +146,8 @@ class API(ABC):
         if status_code != 200:
             raise ConnectionException("Error connecting to Qilimanjaro API")
         return response
+
+    """ DEVICES"""
 
     @typechecked
     def list_devices(self) -> Devices:
@@ -251,33 +270,7 @@ class API(ABC):
             logger.error(json.loads(str(ex))[REST_ERROR.DETAIL])
             raise ex
 
-    # @typechecked
-    # def execute_program(self, program: ProgramDefinition) -> Any:
-    #     """Send a remote experiment from the provided algorithm to be executed on the remote service API
-    #
-    #     Args:
-    #         program (ProgramDefinition): program details conforming the experiment
-    #
-    #     Returns:
-    #         Any: Result of the algorithm executed remotely
-    #     """
-    #     job = Job(
-    #         program=program,
-    #         user=self._connection.user,
-    #         device=cast(Device, self._selected_device),
-    #     )
-    #
-    #     logger.debug("Sending experiment for a remote execution...")
-    #     response, status_code = self._connection.send_post_auth_remote_api_call(
-    #         path=self.JOBS_CALL_PATH, data=job.job_request
-    #     )
-    #     if status_code != 201:
-    #         raise RemoteExecutionException(message="Experiment could not be executed.", status_code=status_code)
-    #     logger.debug("Experiment completed successfully.")
-    #     job.update_with_job_response(job_response=JobResponse(**cast(dict, response)))
-    #     self._jobs.append(job)
-    #
-    #     return job.result
+    """ REMOTE EXECUTIONS """
 
     @typechecked
     def execute(
@@ -356,7 +349,7 @@ class API(ABC):
             RemoteExecutionException: Job could not be retrieved.
 
         Returns:
-            JobResponse: typecasted backend response with the job info.
+            JobResponse: type-casted backend response with the job info.
         """
         response, status_code = self._connection.send_get_auth_remote_api_call(path=f"{self.JOBS_CALL_PATH}/{job_id}")
         if status_code != 200:
@@ -469,6 +462,8 @@ class API(ABC):
         )
         return self._wait_and_return_results(deadline=deadline, interval=interval, job_ids=job_ids)
 
+    """ REMOTE PLOTTING """
+
     @typechecked
     async def create_liveplot(
         self,
@@ -536,6 +531,8 @@ class API(ABC):
         """
         return await self._live_plots.send_data(plot_id=plot_id, x=x, y=y, z=z)
 
+    """ SAVED EXPERIMENTS """
+
     @typechecked
     def save_experiment(
         self,
@@ -550,6 +547,8 @@ class API(ABC):
     ):
         """Save an experiment and its results into the database af our servers, for them to be easily recovered when
         needed.
+        Default behaviour is to create one if no previous occurrence with the same name exists, or to create a new one
+        if none exists.
 
         Args:
             name: Name the experiment is going to be saved with.
@@ -604,7 +603,7 @@ class API(ABC):
                 message="Experiment favourite status could not be updated.", status_code=status_code
             )
 
-        logger.debug(f"Experiment {response[API_CONSTANTS.SAVED_EXPERIMENT_ID]} updated successfully.")
+        logger.debug("Experiment %s updated successfully.", response[API_CONSTANTS.SAVED_EXPERIMENT_ID])
 
     def fav_saved_experiment(self, saved_experiment_id: int):
         """Adds a saved experiment to the list of favourite saved experiments"""
@@ -701,3 +700,188 @@ class API(ABC):
             SavedExperiment.from_response(self._get_saved_experiment_response(saved_experiment_id=saved_experiment_id))
             for saved_experiment_id in saved_experiment_ids
         ]
+
+    """ RUNCARDS """
+
+    def _create_runcard_response(self, runcard: Runcard):
+        """Make the runcard create request and parse the response"""
+        response, status_code = self._connection.send_post_auth_remote_api_call(
+            path=self.RUNCARDS_CALL_PATH,
+            data=asdict(runcard.runcard_request()),
+        )
+        if status_code not in [200, 201]:
+            raise RemoteExecutionException(message="Runcard could not be saved.", status_code=status_code)
+        logger.debug("Experiment saved successfully.")
+        return RuncardResponse(**response)
+
+    @typechecked
+    def save_runcard(
+        self,
+        name: str,
+        description: str,
+        runcard_dict: dict,
+        device_id: int,
+        user_id: int,
+        qililab_version: str,
+    ):
+        """Save a runcard into the database af our servers, for it to be easily recovered when needed.
+
+        Args:
+            name: Name the experiment is going to be saved with.
+            description: Short descriptive text to more easily identify this specific experiment instance.
+            runcard_dict: Serialized runcard (using its `.to_dict()` method)
+            device_id: Id of the device the experiment was executed in
+            user_id: Id of the user that is executing the experiment
+            qililab_version: version of qililab the experiment was executed with
+
+        Returns:
+            new saved runcard
+
+        """
+
+        runcard = Runcard(
+            id=None,
+            name=name,
+            description=description,
+            runcard=runcard_dict,
+            device_id=device_id,
+            user_id=user_id,
+            qililab_version=qililab_version,
+        )
+
+        runcard_response = self._create_runcard_response(runcard=runcard)
+        created_runcard = Runcard.from_response(response=runcard_response)
+
+        self._runcard = created_runcard
+        return created_runcard.id
+
+    @typechecked
+    def _get_runcard_response(self, runcard_id: int):
+        """Gets complete information of a specific runcard
+
+        Raises:
+            RemoteExecutionException: Runcard could not be retrieved
+
+        Returns:
+            RuncardResponse: response with the info of the requested runcard"""
+        response, status_code = self._connection.send_get_auth_remote_api_call(
+            path=f"{self.RUNCARDS_CALL_PATH}/{runcard_id}"
+        )
+        if status_code != 200:
+            raise RemoteExecutionException(message="Runcard could not be retrieved.", status_code=status_code)
+        return RuncardResponse(**response)
+
+    @typechecked
+    def _get_runcard_by_name_response(self, runcard_name: str):
+        """Gets complete information of a specific runcard by name
+
+        Raises:
+            RemoteExecutionException: Runcard could not be retrieved
+
+        Returns:
+            RuncardResponse: response with the info of the requested runcard"""
+        response, status_code = self._connection.send_get_auth_remote_api_call(
+            path=f"{self.RUNCARDS_CALL_PATH}/by_keys", params={"name": runcard_name}
+        )
+
+        if status_code != 200:
+            raise RemoteExecutionException(message="Runcard could not be retrieved.", status_code=status_code)
+
+        return RuncardResponse(**response)
+
+    @typechecked
+    def get_runcard(self, runcard_id: int | None = None, runcard_name: str | None = None) -> Runcard:
+        """Get full information of a specific runcard
+
+        Args:
+            runcard_id(int, optional): id of the runcard to retrieve. Incompatible with providing a name.
+            runcard_name(str, optional): name of the runcard to retrieve. Incompatible with providing an id.
+
+        Raises:
+            RemoteExecutionException: Runcard could not be retrieved
+
+        Returns:
+            Runcard: serialized runcard dictionary
+        """
+        if runcard_id is not None and runcard_name is not None:
+            raise ValueError("Both of of id and name cannot be simultaneously provided")
+        if runcard_id is not None:
+            return Runcard.from_response(self._get_runcard_response(runcard_id=runcard_id))
+        if runcard_name is not None:
+            return Runcard.from_response(self._get_runcard_by_name_response(runcard_name=runcard_name))
+        raise ValueError("At least one of id and name must be provided")
+
+    def _get_list_runcard_response(
+        self,
+    ) -> List[RuncardResponse]:
+        """Performs the actual runcard listing request
+        Returns
+            List[RuncardResponse]: list of objects encoding the expected response structure"""
+        responses, status_codes = unzip(
+            self._connection.send_get_auth_remote_api_call_all_pages(path=self.RUNCARDS_CALL_PATH)
+        )
+        for status_code in status_codes:
+            if status_code != 200:
+                raise RemoteExecutionException(message="Runcards could not be listed.", status_code=status_code)
+
+        items = [item for response in responses for item in response[REST.ITEMS]]
+        return [RuncardResponse(**item) for item in items]
+
+    @typechecked
+    def list_runcards(self) -> List[Runcard]:
+        """List all saved experiments
+
+        Raises:
+            RemoteExecutionException: Devices could not be retrieved
+
+        Returns:
+            Devices: All SavedExperiments
+        """
+        runcards_response = self._get_list_runcard_response()
+        return [Runcard.from_response(response=response) for response in runcards_response]
+
+    @typechecked
+    def update_runcard(self, runcard: Runcard) -> Runcard:
+        """Update the info of a runcard in the database
+
+        Raises:
+            RemoteExecutionException: Runcard could not be retrieved
+
+        Returns:
+            Runcard: serialized runcard dictionary
+        """
+        if runcard.id is None:
+            raise ValueError("Runcard id must be defined for updating its info in the database.")
+
+        runcard_response = self._update_runcard_response(runcard=runcard)
+        updated_runcard = Runcard.from_response(response=runcard_response)
+
+        self._runcard = updated_runcard
+        return updated_runcard
+
+    def _update_runcard_response(self, runcard: Runcard):
+        """Make the runcard update request and parse the response"""
+        response, status_code = self._connection.send_post_auth_remote_api_call(
+            path=f"{self.RUNCARDS_CALL_PATH}/{runcard.id}",
+            data=asdict(runcard.runcard_request()),
+        )
+        if status_code != 200:
+            raise RemoteExecutionException(message="Runcard could not be saved.", status_code=status_code)
+        logger.debug("Runcard updated successfully.")
+        return RuncardResponse(**response)
+
+    @typechecked
+    def delete_runcard(self, runcard_id: int) -> None:
+        """Deletes a runcard from the database
+
+        Raises:
+            RemoteExecutionException: Devices could not be retrieved
+
+        Returns:
+        """
+        response, status_code = self._connection.send_delete_auth_remote_api_call(
+            path=f"{self.RUNCARDS_CALL_PATH}/{runcard_id}"
+        )
+        if status_code != 204:
+            raise RemoteExecutionException(message="Runcard could not be removed.", status_code=status_code)
+        logger.info("Runcard %i deleted successfully with message: %s", runcard_id, response)

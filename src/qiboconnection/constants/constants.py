@@ -19,5 +19,6 @@ class API_CONSTANTS:
     JOB_ID = "job_id"
     USER_ID = "user_id"
     SAVED_EXPERIMENT_ID = "saved_experiment_id"
+    RUNCARD_ID = "runcard_id"
     FAVOURITE = "favourite"
     FAVOURITES = "favourites"

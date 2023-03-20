@@ -33,8 +33,7 @@ def fixture_create_mocked_connection_established(
     )
 
 
-@pytest.fixture(scope="session", name="mocked_connection")
-def fixture_create_mocked_connection(mocked_connection_established: ConnectionEstablished) -> Connection:
+def _create_mocked_connection(mocked_connection_established: ConnectionEstablished) -> Connection:
     """Create a mocked connection
     Returns:
         Connection: mocked connection
@@ -47,6 +46,26 @@ def fixture_create_mocked_connection(mocked_connection_established: ConnectionEs
         connection = Connection(api_path="/mocked")
         mock_config.assert_called()
         return connection
+
+
+@pytest.fixture(scope="session", name="mocked_connection")
+def fixture_create_mocked_connection(mocked_connection_established: ConnectionEstablished) -> Connection:
+    """Fixture for creating a mocked connection
+    Returns:
+        Connection: mocked connection
+    """
+    return _create_mocked_connection(mocked_connection_established=mocked_connection_established)
+
+
+@pytest.fixture(scope="session", name="mocked_connection_no_user")
+def fixture_create_mocked_connection_with_no_user(mocked_connection_established: ConnectionEstablished) -> Connection:
+    """Create a mocked connection with a None user
+    Returns:
+        Connection: mocked connection
+    """
+    mocked_connection = _create_mocked_connection(mocked_connection_established=mocked_connection_established)
+    mocked_connection._user = None
+    return mocked_connection
 
 
 @pytest.fixture(scope="session", name="mocked_api")
