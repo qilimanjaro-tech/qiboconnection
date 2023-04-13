@@ -68,7 +68,7 @@ class SimulatorDeviceCharacteristicsInput:
     ram: str | None = None
 
 
-@dataclass
+@dataclass(kw_only=True)
 class DeviceInput:
     """Device Input
 
@@ -82,9 +82,10 @@ class DeviceInput:
     device_name: str
     status: str | DeviceStatus
     channel_id: int | None
+    number_pending_jobs: Optional[int] = 0
 
 
-@dataclass
+@dataclass(kw_only=True)
 class CalibrationDetailsInput:
     """Calibration Details Input
 
@@ -99,19 +100,17 @@ class CalibrationDetailsInput:
     frequency: int | None = None
 
 
-@dataclass
+@dataclass(kw_only=True)
 class OfflineDeviceInput(DeviceInput):
     """Offline Device Input"""
 
 
-@dataclass
+@dataclass(kw_only=True)
 class OnlineDeviceInput(DeviceInput):
     """Online Device Input"""
 
-    number_pending_jobs: Optional[int] = 0
 
-
-@dataclass
+@dataclass(kw_only=True)
 class SimulatorDeviceInput(OnlineDeviceInput):
     """Simulator Device Input"""
 
@@ -126,7 +125,7 @@ class SimulatorDeviceInput(OnlineDeviceInput):
         return self._characteristics
 
 
-@dataclass
+@dataclass(kw_only=True)
 class QuantumDeviceInput(OnlineDeviceInput):
     """Quantum Device Input"""
 
