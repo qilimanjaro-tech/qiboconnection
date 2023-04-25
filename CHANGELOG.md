@@ -1,3 +1,13 @@
+## v0.8.0 (2023-04-25)
+
+### Feat
+
+- Update qibo to 0.1.12
+
+### Fix
+
+- upgrade test
+
 ## v0.7.2 (2023-03-15)
 
 ### Fix
