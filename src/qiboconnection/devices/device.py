@@ -28,7 +28,7 @@ class Device(DeviceDetails):
 
         self._str = (
             f"<Device: device_id={self._device_id}, device_name='{self._device_name}', "
-            + f"status='{self._status.value}',availability='{self._availability}', channel_id={self._channel_id}>"
+            + f"status='{self._status.value}', availability='{self._availability}', channel_id={self._channel_id}>"
         )
 
     @property

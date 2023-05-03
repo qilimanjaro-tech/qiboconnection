@@ -2,6 +2,7 @@
 """ Data to used alongside the test suite. """
 
 from qiboconnection.typings.device import (
+    DeviceAvailability,
     DeviceInput,
     DeviceStatus,
     OfflineDeviceInput,
@@ -15,13 +16,27 @@ from qiboconnection.typings.live_plot import UnitPoint
 from .web_responses import WebResponses
 
 device_inputs = [
-    DeviceInput(device_id=1, device_name="one_device", status="available", channel_id=None),
-    DeviceInput(device_id=2, device_name="second_device", status=DeviceStatus.AVAILABLE, channel_id=None),
+    DeviceInput(device_id=1, device_name="one_device", status="online", availability="available", channel_id=None),
+    DeviceInput(
+        device_id=2,
+        device_name="second_device",
+        status=DeviceStatus.ONLINE,
+        availability=DeviceAvailability.AVAILABLE,
+        channel_id=None,
+    ),
 ]
 
 offline_device_inputs = [
-    OfflineDeviceInput(device_id=1, device_name="one_device", status="offline", channel_id=None),
-    OfflineDeviceInput(device_id=2, device_name="second_device", status=DeviceStatus.OFFLINE, channel_id=None),
+    OfflineDeviceInput(
+        device_id=1, device_name="one_device", status="offline", availability="available", channel_id=None
+    ),
+    OfflineDeviceInput(
+        device_id=2,
+        device_name="second_device",
+        status=DeviceStatus.OFFLINE,
+        availability=DeviceAvailability.AVAILABLE,
+        channel_id=None,
+    ),
 ]
 
 simulator_device_characteristics_inputs = [
@@ -39,7 +54,8 @@ simulator_device_inputs = [
     SimulatorDeviceInput(
         device_id=1,
         device_name="radagast-simulator",
-        status="available",
+        status="online",
+        availability="available",
         channel_id=None,
         characteristics={
             "type": "simulator",
@@ -57,7 +73,8 @@ quantum_device_inputs = [
     QuantumDeviceInput(
         device_id=1,
         device_name="galadriel-cluster",
-        status="available",
+        status="online",
+        availability="available",
         last_calibration_time="0",
         channel_id=None,
         characteristics={"type": "quantum", "description": "Cluster"},

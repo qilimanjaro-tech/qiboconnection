@@ -3,7 +3,8 @@
 device_base_response_a = {
     "device_id": 1,
     "device_name": "AWS Development Simulator",
-    "status": "available",
+    "status": "online",
+    "availability": "available",
     "channel_id": 2,
     "number_pending_jobs": 6,
     "characteristics": {
@@ -19,7 +20,8 @@ device_base_response_a = {
 device_base_response_b = {
     "device_id": 9,
     "device_name": "AWS Development Quantum",
-    "status": "available",
+    "status": "online",
+    "availability": "available",
     "channel_id": 2,
     "characteristics": {"type": "quantum"},
     "calibration_details": {"t1": 10, "frequency": 988},
