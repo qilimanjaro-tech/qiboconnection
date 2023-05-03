@@ -221,7 +221,7 @@ class Connection(ABC):
         return self.send_put_auth_remote_api_call(path=f"/devices/{device_id}", data={"status": status})
 
     def update_device_availability(self, device_id: int, availability: str) -> Tuple[Any, int]:
-        """Update a Device a
+        """Makes the request for updating a Device availability with a new value.
 
         Args:
             device_id (int): device identifier

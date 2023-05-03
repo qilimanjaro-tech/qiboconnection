@@ -244,7 +244,7 @@ class API(ABC):
 
     @typechecked
     def set_device_to_online(self, device_id: int) -> None:
-        """Blocks a device to avoid others to use it
+        """Sets a device into online mode, allowing external traffic and blocking manual manipulation.
 
         Args:
             device_id (int): Device identifier
@@ -258,7 +258,7 @@ class API(ABC):
 
     @typechecked
     def set_device_to_maintenance(self, device_id: int) -> None:
-        """Blocks a device to avoid others to use it
+        """Sets a device in maintenance mode, blocking external traffic and allowing for manual manipulation.
 
         Args:
             device_id (int): Device identifier
@@ -272,7 +272,7 @@ class API(ABC):
 
     @typechecked
     def block_device_id(self, device_id: int) -> None:
-        """Blocks a device to avoid others to use it
+        """Blocks a device to avoid others to manually use it.
 
         Args:
             device_id (int): Device identifier
@@ -286,7 +286,7 @@ class API(ABC):
 
     @typechecked
     def release_device(self, device_id: int) -> None:
-        """Releases a device to let others use it
+        """Releases a device to let others manually using it.
 
         Args:
             device_id (int): Device identifier

@@ -88,7 +88,7 @@ class Device(DeviceDetails):
         self._status = set_device_status(status=DeviceStatus.ONLINE)
 
     def set_to_maintenance(self, connection: Connection) -> None:
-        """Puts a device in maintenace mode, so that it can only accept local jobs.
+        """Puts a device in maintenance mode, so that it can only accept local jobs.
          Incoming remote jobs will be blocked.
 
         Args:
