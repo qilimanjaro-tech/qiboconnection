@@ -243,6 +243,34 @@ class API(ABC):
         logger.info(text)
 
     @typechecked
+    def set_device_to_online(self, device_id: int) -> None:
+        """Blocks a device to avoid others to use it
+
+        Args:
+            device_id (int): Device identifier
+        """
+        self._devices = self._add_or_update_single_device(device_id=device_id)
+        try:
+            self._devices.set_device_to_online(connection=self._connection, device_id=device_id)
+        except HTTPError as ex:
+            logger.error(json.loads(str(ex))[REST_ERROR.DETAIL])
+            raise ex
+
+    @typechecked
+    def set_device_to_maintenance(self, device_id: int) -> None:
+        """Blocks a device to avoid others to use it
+
+        Args:
+            device_id (int): Device identifier
+        """
+        self._devices = self._add_or_update_single_device(device_id=device_id)
+        try:
+            self._devices.set_device_to_maintenance(connection=self._connection, device_id=device_id)
+        except HTTPError as ex:
+            logger.error(json.loads(str(ex))[REST_ERROR.DETAIL])
+            raise ex
+
+    @typechecked
     def block_device_id(self, device_id: int) -> None:
         """Blocks a device to avoid others to use it
 

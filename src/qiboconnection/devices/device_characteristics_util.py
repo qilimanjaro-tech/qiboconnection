@@ -4,7 +4,7 @@ from typing import Union
 
 from typeguard import typechecked
 
-from qiboconnection.typings.device import DeviceStatus, DeviceType
+from qiboconnection.typings.device import DeviceAvailability, DeviceStatus, DeviceType
 
 
 @typechecked
@@ -33,3 +33,17 @@ def set_device_status(status: Union[str, DeviceStatus]) -> DeviceStatus:
         DeviceStatus: Created DeviceStatus object
     """
     return DeviceStatus(status) if isinstance(status, str) else status
+
+
+@typechecked
+def set_device_availability(availability: Union[str, DeviceAvailability]) -> DeviceAvailability:
+    """Creates a DeviceAvailability object from a string or directly from a DeviceStatus
+
+    Args:
+        availability (Union[str, DeviceAvailability]): name corresponding to the device status or
+        directly the DeviceStatus
+
+    Returns:
+        DeviceAvailability: Created DeviceAvailability object
+    """
+    return DeviceAvailability(availability) if isinstance(availability, str) else availability
