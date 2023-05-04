@@ -113,7 +113,7 @@ class Devices(ABC):
         """Finds the specific device and returns it
 
         Args:
-            id (int): Device identifier
+            device_id (int): Device identifier
 
         Returns:
             Union[QuantumDevice, SimulatorDevice]: Device selected
@@ -145,6 +145,7 @@ class Devices(ABC):
         """
         device_found = self._find_device(device_id)
         block_device(connection=connection, device=device_found)
+        logger.info("Device %s blocked for execution. AVAILABILITY: blocked", device_found.name)
 
     def release_device(self, connection: Connection, device_id: int) -> None:
         """Releases a device to let others use it
@@ -155,4 +156,26 @@ class Devices(ABC):
         """
         device_found = self._find_device(device_id)
         device_found.release_device(connection=connection)
-        logger.info("Device %s released.", device_found.name)
+        logger.info("Device %s released. AVAILABILITY: AVAILABLE", device_found.name)
+
+    def set_device_to_online(self, connection: Connection, device_id: int) -> None:
+        """Releases a device to let others use it
+
+        Args:
+            connection (Connection): Qibo remote connection
+            device_id (int): Device identifier
+        """
+        device_found = self._find_device(device_id)
+        device_found.set_to_online(connection=connection)
+        logger.info("Device %s set online. STATUS: ONLINE", device_found.name)
+
+    def set_device_to_maintenance(self, connection: Connection, device_id: int) -> None:
+        """Releases a device to let others use it
+
+        Args:
+            connection (Connection): Qibo remote connection
+            device_id (int): Device identifier
+        """
+        device_found = self._find_device(device_id)
+        device_found.set_to_maintenance(connection=connection)
+        logger.info("Device %s set to maintenance. STATUS: MAINTENANCE", device_found.name)
