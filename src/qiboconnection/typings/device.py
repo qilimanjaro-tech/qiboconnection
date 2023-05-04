@@ -4,22 +4,22 @@ from dataclasses import InitVar, dataclass
 from typing import Literal, Optional
 
 
-class DeviceStatus(enum.Enum):
-    """Device Status
+class DeviceStatus(str, enum.Enum):
+    """Device status"""
 
-    Args:
-        enum (str): Device Status options available:
-            * available
-            * busy
-            * offline
-    """
-
-    AVAILABLE = "available"
-    BUSY = "busy"
+    ONLINE = "online"
+    MAINTENANCE = "maintenance"
     OFFLINE = "offline"
 
 
-class DeviceType(enum.Enum):
+class DeviceAvailability(str, enum.Enum):
+    """Device availability"""
+
+    AVAILABLE = "available"
+    BLOCKED = "blocked"
+
+
+class DeviceType(str, enum.Enum):
     """Device Type
 
     Args:
@@ -32,7 +32,7 @@ class DeviceType(enum.Enum):
     SIMULATOR = "simulator"
 
 
-@dataclass
+@dataclass(kw_only=True)
 class QuantumDeviceCharacteristicsInput:
     """Quantum Device Characteristics Input
 
@@ -46,7 +46,7 @@ class QuantumDeviceCharacteristicsInput:
     description: str | None = None
 
 
-@dataclass
+@dataclass(kw_only=True)
 class SimulatorDeviceCharacteristicsInput:
     """Simulator Device Characteristics Input
 
@@ -68,7 +68,7 @@ class SimulatorDeviceCharacteristicsInput:
     ram: str | None = None
 
 
-@dataclass
+@dataclass(kw_only=True)
 class DeviceInput:
     """Device Input
 
@@ -81,10 +81,12 @@ class DeviceInput:
     device_id: int
     device_name: str
     status: str | DeviceStatus
+    availability: str | DeviceAvailability
     channel_id: int | None
+    number_pending_jobs: Optional[int] = 0
 
 
-@dataclass
+@dataclass(kw_only=True)
 class CalibrationDetailsInput:
     """Calibration Details Input
 
@@ -99,19 +101,17 @@ class CalibrationDetailsInput:
     frequency: int | None = None
 
 
-@dataclass
+@dataclass(kw_only=True)
 class OfflineDeviceInput(DeviceInput):
     """Offline Device Input"""
 
 
-@dataclass
+@dataclass(kw_only=True)
 class OnlineDeviceInput(DeviceInput):
     """Online Device Input"""
 
-    number_pending_jobs: Optional[int] = 0
 
-
-@dataclass
+@dataclass(kw_only=True)
 class SimulatorDeviceInput(OnlineDeviceInput):
     """Simulator Device Input"""
 
@@ -126,7 +126,7 @@ class SimulatorDeviceInput(OnlineDeviceInput):
         return self._characteristics
 
 
-@dataclass
+@dataclass(kw_only=True)
 class QuantumDeviceInput(OnlineDeviceInput):
     """Quantum Device Input"""
 

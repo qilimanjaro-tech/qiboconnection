@@ -243,8 +243,36 @@ class API(ABC):
         logger.info(text)
 
     @typechecked
+    def set_device_to_online(self, device_id: int) -> None:
+        """Sets a device into online mode, allowing external traffic and blocking manual manipulation.
+
+        Args:
+            device_id (int): Device identifier
+        """
+        self._devices = self._add_or_update_single_device(device_id=device_id)
+        try:
+            self._devices.set_device_to_online(connection=self._connection, device_id=device_id)
+        except HTTPError as ex:
+            logger.error(json.loads(str(ex))[REST_ERROR.DETAIL])
+            raise ex
+
+    @typechecked
+    def set_device_to_maintenance(self, device_id: int) -> None:
+        """Sets a device in maintenance mode, blocking external traffic and allowing for manual manipulation.
+
+        Args:
+            device_id (int): Device identifier
+        """
+        self._devices = self._add_or_update_single_device(device_id=device_id)
+        try:
+            self._devices.set_device_to_maintenance(connection=self._connection, device_id=device_id)
+        except HTTPError as ex:
+            logger.error(json.loads(str(ex))[REST_ERROR.DETAIL])
+            raise ex
+
+    @typechecked
     def block_device_id(self, device_id: int) -> None:
-        """Blocks a device to avoid others to use it
+        """Blocks a device to avoid others to manually use it.
 
         Args:
             device_id (int): Device identifier
@@ -258,7 +286,7 @@ class API(ABC):
 
     @typechecked
     def release_device(self, device_id: int) -> None:
-        """Releases a device to let others use it
+        """Releases a device to let others manually using it.
 
         Args:
             device_id (int): Device identifier
