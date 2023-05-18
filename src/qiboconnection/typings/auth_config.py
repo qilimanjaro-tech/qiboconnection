@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from typing import Literal
 
 
-class UserRole(enum.Enum):
+class UserRole(str, enum.Enum):
     """User Roles
 
     Args:
@@ -17,7 +17,7 @@ class UserRole(enum.Enum):
     ADMIN = "admin"
 
 
-class GrantType(enum.Enum):
+class GrantType(str, enum.Enum):
     """Grant Type
 
     Args:
@@ -27,7 +27,7 @@ class GrantType(enum.Enum):
     JWT_BEARER = "urn:ietf:params:oauth:grant-type:jwt-bearer"
 
 
-class UserScope(enum.Enum):
+class UserScope(str, enum.Enum):
     """User Scope
 
     Args:
@@ -53,7 +53,7 @@ class AuthorisationRequestPayload:
     scope: UserScope
 
 
-class TokenType(enum.Enum):
+class TokenType(str, enum.Enum):
     """Token Type
 
     Args:
