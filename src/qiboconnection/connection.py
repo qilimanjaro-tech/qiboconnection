@@ -1,7 +1,7 @@
 """ Remote Connection """
 import json
 from abc import ABC
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from io import TextIOWrapper
 from typing import Any, List, Optional, TextIO, Tuple, Union
@@ -11,7 +11,7 @@ import requests
 from typeguard import typechecked
 
 from qiboconnection.config import get_environment, logger
-from qiboconnection.errors import ConnectionException
+from qiboconnection.errors import ConnectionException, HTTPError
 from qiboconnection.typings.auth_config import AccessTokenResponse, AssertionPayload
 from qiboconnection.typings.connection import (
     ConnectionConfiguration,
@@ -24,6 +24,27 @@ from qiboconnection.util import (
     process_response,
     write_config_file_to_disk,
 )
+
+
+def refresh_token_if_unauthorised(func):
+    """Decorator that, if an HttpError is raised during a call, will retry to perform the call after
+    updating the AccessToken.
+
+    Args:
+        func: function to decorate
+    """
+
+    def decorated(self: "Connection", *args, **kwargs):
+        """decorated"""
+        try:
+            return func(self, *args, **kwargs)
+        except HTTPError as ex:
+            if ex.response.status_code not in [400, 401]:
+                raise ex
+            self.update_authorisation_using_refresh_token()
+            return func(self, *args, **kwargs)
+
+    return decorated
 
 
 @dataclass
@@ -41,10 +62,12 @@ class Connection(ABC):
         self._remote_server_api_url: str | None = None
         self._remote_server_base_url: str | None = None
         self._authorisation_server_api_call: str | None = None
+        self._authorisation_server_refresh_api_call: str | None = None
         self._user_slack_id: Union[str, None] = None
         self._audience_url = f"{self._environment.audience_url}/api/v1"
         self._user: User | None = None
         self._authorisation_access_token: str | None = None
+        self._authorisation_refresh_token: str | None = None
         self._load_configuration(configuration, api_path)
 
     @property
@@ -132,6 +155,7 @@ class Connection(ABC):
         self._remote_server_api_url = f"{self._environment.qibo_quantum_service_url}{api_path}"
         self._remote_server_base_url = f"{self._environment.qibo_quantum_service_url}"
         self._authorisation_server_api_call = f"{self._remote_server_api_url}/authorisation-tokens"
+        self._authorisation_server_refresh_api_call = f"{self._remote_server_api_url}/authorisation-tokens/refresh"
 
     def _store_configuration(self) -> None:
         """
@@ -179,7 +203,7 @@ class Connection(ABC):
             configuration: configuration to save.
         """
         self._register_connection_configuration(configuration)
-        self._authorisation_access_token = self._request_authorisation_access_token()
+        self._authorisation_access_token, self._authorisation_refresh_token = self._request_authorisation_token()
 
     def _register_configuration_with_authorisation_access_token(self, configuration: ConnectionEstablished):
         """
@@ -244,37 +268,7 @@ class Connection(ABC):
         """
         return self.send_post_auth_remote_api_call(path=f"/messages?channel={channel_id}", data=message)
 
-    def send_file(self, channel_id: int, file: TextIOWrapper, filename: str) -> Tuple[Any, int]:
-        """Sends a file to a channel registered in the system
-
-        Args:
-            channel_id (int): channel identifier
-            file (TextIOWrapper): file to send
-            filename (str): file name
-
-        Returns:
-            Tuple[Any, int]: Http response
-        """
-        return self.send_post_file_auth_remote_api_call(
-            path=f"/files?channel={channel_id}", file=file, filename=filename
-        )
-
-    @typechecked
-    def send_put_auth_remote_api_call(self, path: str, data: Any) -> Tuple[Any, int]:
-        """HTTP PUT REST API authenticated call to remote server
-
-        Args:
-            path (str): path to add to the remote server api url
-            data (Any): data to send
-
-        Returns:
-            Tuple[Any, int]: Http response
-        """
-        logger.debug("Calling: %s%s", self._remote_server_api_url, path)
-        header = {"Authorization": f"Bearer {self._authorisation_access_token}"}
-        response = requests.put(f"{self._remote_server_api_url}{path}", json=data.copy(), headers=header)
-        return process_response(response)
-
+    @refresh_token_if_unauthorised
     @typechecked
     def send_post_auth_remote_api_call(self, path: str, data: Any) -> Tuple[Any, int]:
         """HTTP POST REST API authenticated call to remote server
@@ -291,6 +285,39 @@ class Connection(ABC):
         response = requests.post(f"{self._remote_server_api_url}{path}", json=data.copy(), headers=header)
         return process_response(response)
 
+    def send_file(self, channel_id: int, file: TextIOWrapper, filename: str) -> Tuple[Any, int]:
+        """Sends a file to a channel registered in the system
+
+        Args:
+            channel_id (int): channel identifier
+            file (TextIOWrapper): file to send
+            filename (str): file name
+
+        Returns:
+            Tuple[Any, int]: Http response
+        """
+        return self.send_post_file_auth_remote_api_call(
+            path=f"/files?channel={channel_id}", file=file, filename=filename
+        )
+
+    @refresh_token_if_unauthorised
+    @typechecked
+    def send_put_auth_remote_api_call(self, path: str, data: Any) -> Tuple[Any, int]:
+        """HTTP PUT REST API authenticated call to remote server
+
+        Args:
+            path (str): path to add to the remote server api url
+            data (Any): data to send
+
+        Returns:
+            Tuple[Any, int]: Http response
+        """
+        logger.debug("Calling: %s%s", self._remote_server_api_url, path)
+        header = {"Authorization": f"Bearer {self._authorisation_access_token}"}
+        response = requests.put(f"{self._remote_server_api_url}{path}", json=data.copy(), headers=header)
+        return process_response(response)
+
+    @refresh_token_if_unauthorised
     @typechecked
     def send_post_file_auth_remote_api_call(
         self, path: str, file: Union[TextIOWrapper, TextIO], filename: str
@@ -311,6 +338,7 @@ class Connection(ABC):
         response = requests.post(f"{self._remote_server_api_url}{path}", files=packed_file, headers=header)
         return process_response(response)
 
+    @refresh_token_if_unauthorised
     @typechecked
     def send_get_auth_remote_api_call(self, path: str, params: dict | None = None) -> Tuple[Any, int]:
         """HTTP GET REST API authenticated call to remote server
@@ -327,6 +355,7 @@ class Connection(ABC):
         response = requests.get(f"{self._remote_server_api_url}{path}", headers=header, params=params)
         return process_response(response)
 
+    @refresh_token_if_unauthorised
     @typechecked
     def send_get_auth_remote_api_call_all_pages(self, path: str, params: dict | None = None) -> List[Tuple[Any, int]]:
         """HTTP GET REST API authenticated call to remote server
@@ -349,6 +378,7 @@ class Connection(ABC):
             responses.append((json_content, status_code))
         return responses
 
+    @refresh_token_if_unauthorised
     @typechecked
     def send_delete_auth_remote_api_call(self, path: str) -> Tuple[Any, int]:
         """HTTP DELETE REST API authenticated call to remote server
@@ -364,6 +394,7 @@ class Connection(ABC):
         response = requests.delete(f"{self._remote_server_api_url}{path}", headers=header)
         return process_response(response)
 
+    @refresh_token_if_unauthorised
     @typechecked
     def send_get_remote_call(self, path: str) -> Tuple[Any, int]:
         """HTTP GET REST API call to remote server (without authentication)
@@ -378,18 +409,18 @@ class Connection(ABC):
         response = requests.get(f"{self._remote_server_base_url}{path}")
         return process_response(response)
 
-    def _request_authorisation_access_token(self) -> str:
+    def _request_authorisation_token(self) -> tuple[str, str]:
         """
         Builds assertion payload with user info, encodes it and uses it to POST the server for a new Access Token.
-        Returns: str witha  new Access Token.
+        Returns: str tuple with new Access  and Refresh Tokens.
         """
-        assertion_payload: AssertionPayload = {
+        assertion_payload = AssertionPayload(
             **self._user.__dict__,  # type: ignore
-            "audience": self._audience_url,
-            "iat": int(datetime.now(timezone.utc).timestamp()),
-        }
+            audience=self._audience_url,
+            iat=int(datetime.now(timezone.utc).timestamp()),
+        )
 
-        encoded_assertion_payload = base64url_encode(json.dumps(assertion_payload, indent=2))
+        encoded_assertion_payload = base64url_encode(json.dumps(asdict(assertion_payload), indent=2))
 
         authorisation_request_payload = {
             "grantType": "urn:ietf:params:oauth:grant-type:jwt-bearer",
@@ -409,4 +440,24 @@ class Connection(ABC):
         access_token_response: AccessTokenResponse = AccessTokenResponse(**response.json())
         logger.debug("Connection successfully established.")
 
-        return access_token_response.accessToken
+        return access_token_response.accessToken, access_token_response.refreshToken
+
+    def update_authorisation_using_refresh_token(self):
+        """Updates the saved access token sending the request token. For this, it
+        builds assertion payload with user info, encodes it and uses it to POST the server for a new Access Token.
+        Returns:
+            str with a new Access Token.
+        """
+
+        if self._authorisation_server_refresh_api_call is None:
+            raise ValueError("Authorisation server api call is required")
+        logger.debug("Calling: %s", self._authorisation_server_refresh_api_call)
+        response: requests.Response = requests.post(
+            self._authorisation_server_refresh_api_call,
+            json={},
+            headers={"Authorization": f"Bearer {self._authorisation_refresh_token}"},
+        )
+        if response.status_code not in [200, 201]:
+            raise ValueError(f"Authorisation request failed: {response.reason}")
+        logger.debug("Connection successfully renewed.")
+        self._authorisation_access_token = AccessTokenResponse(**response.json()).accessToken
