@@ -29,6 +29,7 @@ from qiboconnection.live_plots import LivePlots
 from qiboconnection.runcard import Runcard
 from qiboconnection.saved_experiment import SavedExperiment
 from qiboconnection.saved_experiment_listing import SavedExperimentListing
+from qiboconnection.job_listing import JobListing
 from qiboconnection.typings.connection import ConnectionConfiguration
 from qiboconnection.typings.job import JobResponse, JobStatus
 from qiboconnection.typings.live_plot import (
@@ -41,6 +42,10 @@ from qiboconnection.typings.runcard import RuncardResponse
 from qiboconnection.typings.saved_experiment import (
     SavedExperimentListingItemResponse,
     SavedExperimentResponse,
+)
+from qiboconnection.typings.job import (
+    JobListingItemResponse,
+    JobResponse,
 )
 from qiboconnection.util import unzip
 
@@ -668,6 +673,24 @@ class API(ABC):
 
         items = [item for response in responses for item in response[REST.ITEMS]]
         return [SavedExperimentListingItemResponse(**item) for item in items]
+    
+    def _get_list_jobs_response(
+        self, favourites: bool = False
+    ) -> List[JobListingItemResponse]:
+        """Performs the actual jobs listing request
+        Returns
+            List[JobListingItemResponse]: list of objects encoding the expected response structure"""
+        responses, status_codes = unzip(
+            self._connection.send_get_auth_remote_api_call_all_pages(
+                path=self.JOBS_CALL_PATH, params={API_CONSTANTS.FAVOURITES: favourites}
+            )
+        )
+        for status_code in status_codes:
+            if status_code != 200:
+                raise RemoteExecutionException(message="Job could not be listed.", status_code=status_code)
+
+        items = [item for response in responses for item in response[REST.ITEMS]]
+        return [JobListingItemResponse(**item) for item in items]
 
     @typechecked
     def list_saved_experiments(self, favourites: bool = False) -> SavedExperimentListing:
@@ -683,6 +706,21 @@ class API(ABC):
         saved_experiment_listing = SavedExperimentListing.from_response(saved_experiments_list_response)
         self._saved_experiments_listing = saved_experiment_listing
         return saved_experiment_listing
+    
+    @typechecked
+    def list_jobs(self, favourites: bool = False) -> SavedExperimentListing:
+        """List all jobs
+
+        Raises:
+            RemoteExecutionException: Devices could not be retrieved
+
+        Returns:
+            Devices: All Jobs
+        """
+        jobs_list_response = self._get_list_jobs_response(favourites=favourites)
+        jobs_listing = JobListing.from_response(jobs_list_response)
+        self._jobs_listing = jobs_listing
+        return jobs_listing
 
     @typechecked
     def _get_saved_experiment_response(self, saved_experiment_id: int):
@@ -699,6 +737,22 @@ class API(ABC):
         if status_code != 200:
             raise RemoteExecutionException(message="SavedExperiment could not be retrieved.", status_code=status_code)
         return SavedExperimentResponse(**response)
+    
+    @typechecked
+    def _get_job_response(self, job_id: int):
+        """Gets complete information of a single job
+
+        Raises:
+            RemoteExecutionException: Job could not be retrieved
+
+        Returns:
+            JobResponse: response with the info of the requested saved experiment"""
+        response, status_code = self._connection.send_get_auth_remote_api_call(
+            path=f"{self.JOBS_CALL_PATH}/{job_id}"
+        )
+        if status_code != 200:
+            raise RemoteExecutionException(message="Job could not be retrieved.", status_code=status_code)
+        return JobResponse(**response)
 
     @typechecked
     def get_saved_experiment(self, saved_experiment_id: int) -> SavedExperiment:
@@ -712,6 +766,20 @@ class API(ABC):
         """
         return SavedExperiment.from_response(
             self._get_saved_experiment_response(saved_experiment_id=saved_experiment_id)
+        )
+    
+    @typechecked
+    def get_job(self, job_id: int) -> Job:
+        """Get full information of a single job
+
+        Raises:
+            RemoteExecutionException: Job could not be retrieved
+
+        Returns:
+            Job: complete job, including all the information about the job
+        """
+        return Job.from_response(
+            self._get_job_response(job_id=job_id)
         )
 
     @typechecked
