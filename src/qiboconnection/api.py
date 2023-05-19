@@ -262,6 +262,7 @@ class API(ABC):
 
         Args:
             device_id (int): Device identifier
+
         """
         self._devices = self._add_or_update_single_device(device_id=device_id)
         try:

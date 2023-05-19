@@ -409,7 +409,7 @@ class Connection(ABC):
         response = requests.get(f"{self._remote_server_base_url}{path}")
         return process_response(response)
 
-    def _request_authorisation_token(self) -> tuple[str, str]:
+    def _request_authorisation_token(self):
         """
         Builds assertion payload with user info, encodes it and uses it to POST the server for a new Access Token.
         Returns: str tuple with new Access  and Refresh Tokens.
