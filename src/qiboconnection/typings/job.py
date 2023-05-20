@@ -1,7 +1,8 @@
 """ Job Typing """
 import enum
 from abc import ABC
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from datetime import datetime
 
 
 class JobType(str, enum.Enum):
@@ -58,7 +59,8 @@ class JobRequest(ABC):
 
 @dataclass
 class JobResponse(JobRequest):
-    """Job Response
+    """Full Job Response. Includes job results which may
+    be weight a few GB.
 
     Attributes:
         user_id (int): User identifier
@@ -73,4 +75,24 @@ class JobResponse(JobRequest):
     job_id: int
     queue_position: int
     result: str
+    status: str | JobStatus
+
+
+@dataclass(slots=True)
+class ListingJobResponse(JobRequest):
+    """Job Response without the results. Includes all jobs metadata so that
+    the user can identify the id from the job he is interested to retrieve the results.
+
+    Attributes:
+        user_id (int): User identifier
+        device_id (int): Device identifier
+        description (str): Description of the job
+        job_id (int): Job identifier
+        queue_position (int): Job queue position
+        status (str | JobStatus): Status of the job
+        result (str): Job result
+    """
+
+    job_id: int
+    queue_position: int
     status: str | JobStatus

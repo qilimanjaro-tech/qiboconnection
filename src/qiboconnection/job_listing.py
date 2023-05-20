@@ -1,5 +1,5 @@
 """ JobListing class """
-
+# TODO: properly document these new code and the old one!
 
 from dataclasses import asdict, dataclass, field
 from datetime import datetime
@@ -7,7 +7,7 @@ from typing import List
 
 import pandas as pd
 
-from qiboconnection.typings.job import JobListingItemResponse
+from qiboconnection.typings.job import JobStatus, JobType, ListingJobResponse
 from qiboconnection.util import decode_jsonified_dict
 
 
@@ -15,27 +15,27 @@ from qiboconnection.util import decode_jsonified_dict
 class JobListingItem:
     """JobListing single item representation"""
 
-    name: str
     user_id: int
-    device_id: int       
+    device_id: int
+    status: str | JobStatus
+    job_type: str | JobType
     description: str
-    experiment: dict
-    qililab_version: str
+    number_shots: int
     id: int | None = field(default=None)
-    created_at: datetime | None = field(default=None)
+    # TODO: including created_at attribute requires modifying .execute() method
+    # created_at: datetime | None = field(default=None)
 
     @classmethod
-    def from_response(cls, response: JobListingItemResponse):
-        """Constructor for JobListingItems that takes in a JobListingItemResponse"""
+    def from_response(cls, response: ListingJobResponse):
+        """Constructor for JobListingItems that takes in a ListingJobResponse"""
         return cls(
-            id=response.id,
-            created_at=response.created_at,
-            name=response.name,
+            id=response.job_id,
             user_id=response.user_id,
             device_id=response.device_id,
             description=response.description,
-            experiment=decode_jsonified_dict(response.experiment),
-            qililab_version=response.qililab_version,
+            job_type=response.job_type,
+            status=response.status,
+            number_shots=response.number_shots,
         )
 
 
@@ -59,8 +59,8 @@ class JobListing:
         self._dataframe["created_at"] = pd.to_datetime(self._dataframe["created_at"])
 
     @classmethod
-    def from_response(cls, response_list: List[JobListingItemResponse]):
-        """Constructor for JobListing that takes in a list of JobListingItemResponse"""
+    def from_response(cls, response_list: List[ListingJobResponse]):
+        """Constructor for JobListing that takes in a list of JobResponse"""
         return cls(items=[JobListingItem.from_response(response=response) for response in response_list])
 
     @property
