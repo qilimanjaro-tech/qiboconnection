@@ -790,8 +790,7 @@ class API(ABC):
             ValueError: Your job failed.
 
         Returns:
-            CircuitResult | npt.NDArray | dict | None: The Job result as an Abstract State or None when it is not
-            executed yet.
+            JobResponse
         """
 
         job_response = self._get_result(job_id=job_id)
