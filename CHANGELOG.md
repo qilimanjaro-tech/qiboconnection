@@ -1,3 +1,9 @@
+## v0.10.0 (2023-05-23)
+
+### Feat
+
+- **connection**: added logic for trying to refresh the access token … (#59)
+
 ## v0.9.0 (2023-05-04)
 
 ### Feat
