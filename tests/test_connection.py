@@ -5,7 +5,8 @@ from unittest.mock import MagicMock, patch
 import pytest
 from requests import Response, delete, get, post, put
 
-from qiboconnection.connection import Connection
+from qiboconnection.connection import Connection, refresh_token_if_unauthorised
+from qiboconnection.errors import ConnectionException, HTTPError
 from qiboconnection.user import User
 
 from .data import web_responses
@@ -203,3 +204,114 @@ def test_send_get_remote_call(mocked_rest_call: MagicMock, mocked_connection: Co
     )
     assert response == web_responses.raw.response_200.json()
     assert code == web_responses.raw.response_200.status_code
+
+
+@patch("qiboconnection.connection.requests.post", autospec=True)
+def test_update_authorisation_using_refresh_token_no_server_refresh_api_call(
+    mocked_rest_call: MagicMock, mocked_connection: Connection
+):
+    """test Connection's update_authorisation_using_refresh_token, with no refresh api call defined"""
+
+    mocked_connection_copy = deepcopy(mocked_connection)
+
+    mocked_rest_call.return_value = web_responses.auth.raw_retrieve_response
+
+    mocked_connection_copy._authorisation_server_refresh_api_call = None
+
+    with pytest.raises(ValueError, match="Authorisation server api call is required"):
+        mocked_connection_copy.update_authorisation_using_refresh_token()
+
+
+@patch("qiboconnection.connection.requests.post", autospec=True)
+def test_update_authorisation_using_refresh_token_unsuccessful(
+    mocked_rest_call: MagicMock, mocked_connection: Connection
+):
+    """test Connection's update_authorisation_using_refresh_token"""
+
+    mocked_rest_call.return_value = web_responses.raw.response_400
+
+    mocked_connection._authorisation_refresh_token = (
+        "eyJhbGciOiJFZERTQSIsImtpZCI6InlYaG5lSUtxUEV5UklSLXVyMHdGZUZzLTZ2VS01amJEY18wUFN0X2Etc1UiLCJ0eXAiOiJKV1QifQ"
+        + ".eyJhdWQiOiJodHRwczovL3FpbGltYW5qYXJvZGV2LmRkbnMubmV0OjgwODAvYXBpL3YxIiwiZXhwIjoxNjg0NDk"
+        + "yMDcxLCJpYXQiOjE2ODQ0MDU2NzEsImlzcyI6Imh0dHBzOi8vcWlsaW1hbmphcm9kZXYuZGRucy5uZXQ6ODA4MC8i"
+        + "LCJ0eXBlIjoicmVmcmVzaCIsInVzZXJfaWQiOjMsInVzZXJfcm9sZSI6ImFkbWluIn0"
+        + ".4oSyRW9Ia7C-50x2yZxQAEXDZp-TLkFkPOtHBR4cCi9LnkREtYrJpDXufep_EYoRwDSJL_2z20moYMuMHy0QCg"
+    )
+
+    with pytest.raises(ValueError, match=f"Authorisation request failed: {web_responses.raw.response_400.reason}"):
+        mocked_connection.update_authorisation_using_refresh_token()
+
+
+@patch("qiboconnection.connection.requests.post", autospec=True)
+def test_update_authorisation_using_refresh_token(mocked_rest_call: MagicMock, mocked_connection: Connection):
+    """test Connection's update_authorisation_using_refresh_token"""
+
+    mocked_rest_call.return_value = web_responses.auth.raw_retrieve_response
+
+    mocked_connection._authorisation_refresh_token = (
+        "eyJhbGciOiJFZERTQSIsImtpZCI6InlYaG5lSUtxUEV5UklSLXVyMHdGZUZzLTZ2VS01amJEY18wUFN0X2Etc1UiLCJ0eXAiOiJKV1QifQ"
+        + ".eyJhdWQiOiJodHRwczovL3FpbGltYW5qYXJvZGV2LmRkbnMubmV0OjgwODAvYXBpL3YxIiwiZXhwIjoxNjg0NDk"
+        + "yMDcxLCJpYXQiOjE2ODQ0MDU2NzEsImlzcyI6Imh0dHBzOi8vcWlsaW1hbmphcm9kZXYuZGRucy5uZXQ6ODA4MC8i"
+        + "LCJ0eXBlIjoicmVmcmVzaCIsInVzZXJfaWQiOjMsInVzZXJfcm9sZSI6ImFkbWluIn0"
+        + ".4oSyRW9Ia7C-50x2yZxQAEXDZp-TLkFkPOtHBR4cCi9LnkREtYrJpDXufep_EYoRwDSJL_2z20moYMuMHy0QCg"
+    )
+
+    mocked_connection.update_authorisation_using_refresh_token()
+
+    mocked_rest_call.assert_called_with(
+        mocked_connection._authorisation_server_refresh_api_call,
+        json={},
+        headers={
+            "Authorization": (
+                "Bearer "
+                + "eyJhbGciOiJFZERTQSIsImtpZCI6InlYaG5lSUtxUEV5Uk"
+                + "lSLXVyMHdGZUZzLTZ2VS01amJEY18wUFN0X2Etc1UiLCJ0eXAiOiJKV1QifQ"
+                + ".eyJhdWQiOiJodHRwczovL3FpbGltYW5qYXJvZGV2LmRkbnMubmV0OjgwODAvYXBpL3YxIiwiZXhwIjoxNjg0NDk"
+                + "yMDcxLCJpYXQiOjE2ODQ0MDU2NzEsImlzcyI6Imh0dHBzOi8vcWlsaW1hbmphcm9kZXYuZGRucy5uZXQ6ODA4MC8i"
+                + "LCJ0eXBlIjoicmVmcmVzaCIsInVzZXJfaWQiOjMsInVzZXJfcm9sZSI6ImFkbWluIn0"
+                + ".4oSyRW9Ia7C-50x2yZxQAEXDZp-TLkFkPOtHBR4cCi9LnkREtYrJpDXufep_EYoRwDSJL_2z20moYMuMHy0QCg"
+            )
+        },
+    )
+    assert (
+        mocked_connection._authorisation_access_token == web_responses.auth.raw_retrieve_response.json()["accessToken"]
+    ), "Value of saved access token does not coincide with the one provided in response."
+
+
+def test_refresh_token_if_unauthorised_when_ok():
+    """Tests the refresh_token_if_unauthorised with a valid response"""
+
+    func = MagicMock()
+    connection = MagicMock()
+
+    refresh_token_if_unauthorised(func=func)(self=connection)
+
+    func.assert_called_once_with(connection)
+    connection.update_authorisation_using_refresh_token.assert_not_called()
+
+
+def test_refresh_token_if_unauthorised_when_unauthorised():
+    """Tests the refresh_token_if_unauthorised with a valid response"""
+
+    func = MagicMock()
+    func.side_effect = [HTTPError(response=web_responses.raw.response_401), func.DEFAULT]
+    connection = MagicMock()
+
+    refresh_token_if_unauthorised(func=func)(self=connection)
+
+    assert func.call_count == 2
+    connection.update_authorisation_using_refresh_token.assert_called_once_with()
+
+
+def test_refresh_token_if_unauthorised_when_other_error():
+    """Tests the refresh_token_if_unauthorised with a valid response"""
+
+    func = MagicMock()
+    func.side_effect = HTTPError(response=web_responses.raw.response_500)
+    connection = MagicMock()
+
+    with pytest.raises(HTTPError):
+        refresh_token_if_unauthorised(func=func)(self=connection)
+
+    func.assert_called_once_with(connection)
+    connection.update_authorisation_using_refresh_token.assert_not_called()

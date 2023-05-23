@@ -1,5 +1,6 @@
 """ Web Responses class"""
 
+from .auth import Auth
 from .devices import Devices
 from .ping import Ping
 from .responses_raw import ResponsesRaw
@@ -16,4 +17,5 @@ class WebResponses:
     saved_experiments = SavedExperiments()
     runcards = Runcards()
     users = Users()
+    auth = Auth()
     raw = ResponsesRaw()
