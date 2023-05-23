@@ -263,7 +263,6 @@ class API(ABC):
 
         Args:
             device_id (int): Device identifier
-
         """
         self._devices = self._add_or_update_single_device(device_id=device_id)
         try:
@@ -779,7 +778,7 @@ class API(ABC):
 
     # TODO: change the docstring, document and ensure to push clean code!
     @typechecked
-    def get_job(self, job_id: int) -> CircuitResult | npt.NDArray | dict | None:
+    def get_job_metadata(self, job_id: int) -> CircuitResult | npt.NDArray | dict | None:
         """Get a complete job from a remote execution
 
         Args:
@@ -796,7 +795,32 @@ class API(ABC):
 
         job_response = self._get_result(job_id=job_id)
         log_job_status_info(job_response=job_response)
-        return job_response
+        return {
+            "user_id": job_response.user_id,
+            "device_id": job_response.device_id,
+            "number_shots": job_response.number_shots,
+            "job_type": job_response.job_type,
+            "queue_position": job_response.queue_position,
+            "status": job_response.status,
+        }
+
+    def list_jobs_metadata(self):
+        """_summary_
+
+        Raises:
+            RemoteExecutionException: _description_
+            RemoteExecutionException: _description_
+            RemoteExecutionException: _description_
+            ValueError: _description_
+            ValueError: _description_
+            RemoteExecutionException: _description_
+            ValueError: _description_
+            RemoteExecutionException: _description_
+            RemoteExecutionException: _description_
+
+        Returns:
+            _type_: _description_
+        """
 
     @typechecked
     def get_saved_experiments(self, saved_experiment_ids: List[int] | npt.NDArray[np.int_]) -> List[SavedExperiment]:
