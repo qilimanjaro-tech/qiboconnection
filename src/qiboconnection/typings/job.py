@@ -79,7 +79,7 @@ class JobResponse(JobRequest):
 
 
 @dataclass(slots=True)
-class ListingJobResponse(JobRequest):
+class ListingJobResponse:
     """Job Response without the results. Includes all jobs metadata so that
     the user can identify the id from the job he is interested to retrieve the results.
 
@@ -93,6 +93,10 @@ class ListingJobResponse(JobRequest):
         result (str): Job result
     """
 
+    user_id: int | None
+    device_id: int
+    number_shots: int
+    job_type: str | JobType
     job_id: int
     queue_position: int
     status: str | JobStatus

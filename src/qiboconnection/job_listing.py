@@ -19,7 +19,6 @@ class JobListingItem:
     device_id: int
     status: str | JobStatus
     job_type: str | JobType
-    description: str
     number_shots: int
     id: int | None = field(default=None)
     # TODO: including created_at attribute requires modifying .execute() method
@@ -32,7 +31,6 @@ class JobListingItem:
             id=response.job_id,
             user_id=response.user_id,
             device_id=response.device_id,
-            description=response.description,
             job_type=response.job_type,
             status=response.status,
             number_shots=response.number_shots,
@@ -48,15 +46,11 @@ class JobListing:
 
     def __post_init__(self):
         self._dataframe = self._build_dataframe()
-        self._coerce_dataframe_column_types()
+        # self._coerce_dataframe_column_types()
 
     def _build_dataframe(self):
         """Builds the dataframe from the info in each listing item"""
         return pd.DataFrame((asdict(item) for item in self.items))
-
-    def _coerce_dataframe_column_types(self):
-        """Parses each column that can potentially have its type missinterpretated to the one we would expect"""
-        self._dataframe["created_at"] = pd.to_datetime(self._dataframe["created_at"])
 
     @classmethod
     def from_response(cls, response_list: List[ListingJobResponse]):

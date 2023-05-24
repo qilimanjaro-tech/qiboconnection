@@ -263,6 +263,7 @@ class API(ABC):
 
         Args:
             device_id (int): Device identifier
+
         """
         self._devices = self._add_or_update_single_device(device_id=device_id)
         try:
@@ -705,8 +706,8 @@ class API(ABC):
         return saved_experiment_listing
 
     @typechecked
-    def list_jobs(self, favourites: bool = False) -> SavedExperimentListing:
-        """List all jobs
+    def list_jobs(self, favourites: bool = False) -> JobListing:
+        """List all jobs metadata
 
         Raises:
             RemoteExecutionException: Devices could not be retrieved
@@ -735,21 +736,6 @@ class API(ABC):
             raise RemoteExecutionException(message="SavedExperiment could not be retrieved.", status_code=status_code)
         return SavedExperimentResponse(**response)
 
-    # NOTE: we probably do not need this
-    # @typechecked
-    # def _get_job_response(self, job_id: int):
-    #     """Gets complete information of a single job
-
-    #     Raises:
-    #         RemoteExecutionException: Job could not be retrieved
-
-    #     Returns:
-    #         JobResponse: response with the info of the requested saved experiment"""
-    #     response, status_code = self._connection.send_get_auth_remote_api_call(path=f"{self.JOBS_CALL_PATH}/{job_id}")
-    #     if status_code != 200:
-    #         raise RemoteExecutionException(message="Job could not be retrieved.", status_code=status_code)
-    #     return JobResponse(**response)
-
     @typechecked
     def get_saved_experiment(self, saved_experiment_id: int) -> SavedExperiment:
         """Get full information of a single experiment
@@ -764,22 +750,10 @@ class API(ABC):
             self._get_saved_experiment_response(saved_experiment_id=saved_experiment_id)
         )
 
-    # @typechecked
-    # def get_job(self, job_id: int) -> Job:
-    #     """Get full information of a single job
-
-    #     Raises:
-    #         RemoteExecutionException: Job could not be retrieved
-
-    #     Returns:
-    #         Job: complete job, including all the information about the job
-    #     """
-    #     return Job.from_response(self._get_job_response(job_id=job_id))
-
     # TODO: change the docstring, document and ensure to push clean code!
     @typechecked
-    def get_job_metadata(self, job_id: int) -> CircuitResult | npt.NDArray | dict | None:
-        """Get a complete job from a remote execution
+    def get_job(self, job_id: int) -> dict | None:
+        """Get metadata and result from a remote job execution.
 
         Args:
             job_id (int): Job identifier
@@ -790,12 +764,12 @@ class API(ABC):
             ValueError: Your job failed.
 
         Returns:
-            JobResponse
+            dict
         """
 
         job_response = self._get_result(job_id=job_id)
-        log_job_status_info(job_response=job_response)
-        return {
+        job_result = parse_job_responses_to_results(job_responses=[job_response])[0]
+        job_metadata = {
             "user_id": job_response.user_id,
             "device_id": job_response.device_id,
             "number_shots": job_response.number_shots,
@@ -803,24 +777,8 @@ class API(ABC):
             "queue_position": job_response.queue_position,
             "status": job_response.status,
         }
-
-    def list_jobs_metadata(self):
-        """_summary_
-
-        Raises:
-            RemoteExecutionException: _description_
-            RemoteExecutionException: _description_
-            RemoteExecutionException: _description_
-            ValueError: _description_
-            ValueError: _description_
-            RemoteExecutionException: _description_
-            ValueError: _description_
-            RemoteExecutionException: _description_
-            RemoteExecutionException: _description_
-
-        Returns:
-            _type_: _description_
-        """
+        log_job_status_info(job_response=job_response)
+        return {**job_metadata, **job_result}
 
     @typechecked
     def get_saved_experiments(self, saved_experiment_ids: List[int] | npt.NDArray[np.int_]) -> List[SavedExperiment]:
