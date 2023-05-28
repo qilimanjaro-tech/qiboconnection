@@ -166,9 +166,12 @@ class Connection(ABC):
             raise ValueError("API path not specified")
         if self._authorisation_access_token is None:
             raise ValueError("Authorisation access token not specified")
+        if self._authorisation_refresh_token is None:
+            raise ValueError("Authorisation refresh token not specified")
         config_data = ConnectionEstablished(
             **self._user.__dict__,
             authorisation_access_token=self._authorisation_access_token,
+            authorisation_refresh_token=self._authorisation_refresh_token,
             api_path=self._api_path,
         )
 
@@ -181,7 +184,7 @@ class Connection(ABC):
     ) -> None:
         if input_configuration is None:
             try:
-                self._register_configuration_with_authorisation_access_token(load_config_file_to_disk())
+                self._register_configuration_with_authorisation_tokens(load_config_file_to_disk())
                 return
             except FileNotFoundError as ex:
                 raise ConnectionException(
@@ -205,7 +208,7 @@ class Connection(ABC):
         self._register_connection_configuration(configuration)
         self._authorisation_access_token, self._authorisation_refresh_token = self._request_authorisation_token()
 
-    def _register_configuration_with_authorisation_access_token(self, configuration: ConnectionEstablished):
+    def _register_configuration_with_authorisation_tokens(self, configuration: ConnectionEstablished):
         """
         Saves the connection info of user and calls urls, and saves to self._authorisation_access_token the access
          token.
@@ -215,6 +218,7 @@ class Connection(ABC):
         logger.debug("Configuration loaded successfully.")
         self._register_connection_established(configuration)
         self._authorisation_access_token = configuration.authorisation_access_token
+        self._authorisation_refresh_token = configuration.authorisation_refresh_token
 
     def _register_connection_established(self, configuration: ConnectionEstablished):
         """
