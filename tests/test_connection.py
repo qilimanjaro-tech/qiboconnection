@@ -207,6 +207,41 @@ def test_send_get_remote_call(mocked_rest_call: MagicMock, mocked_connection: Co
 
 
 @patch("qiboconnection.connection.requests.post", autospec=True)
+def tests_request_authorisation_token(mocked_rest_call: MagicMock, mocked_connection: Connection):
+    """tests send_get_remote_call"""
+    mocked_rest_call.return_value = web_responses.auth.raw_retrieve_response
+
+    acces_token, refresh_token = mocked_connection._request_authorisation_token()
+
+    assert (
+        acces_token == web_responses.auth.retrieve_response[0]["accessToken"]
+    ), "accessToken does not coincide with expected"
+
+    assert (
+        refresh_token == web_responses.auth.retrieve_response[0]["refreshToken"]
+    ), "refreshToken does not coincide with expected"
+
+
+def tests_request_authorisation_token_with_no_url_raises_error(mocked_connection: Connection):
+    """tests send_get_remote_call"""
+
+    mocked_connection_copy = deepcopy(mocked_connection)
+    mocked_connection_copy._authorisation_server_api_call = None
+
+    with pytest.raises(ValueError, match="Authorisation server api call is required"):
+        _, _ = mocked_connection_copy._request_authorisation_token()
+
+
+@patch("qiboconnection.connection.requests.post", autospec=True)
+def tests_request_authorisation_token_with_ise(mocked_rest_call: MagicMock, mocked_connection: Connection):
+    """tests send_get_remote_call"""
+    mocked_rest_call.return_value = web_responses.raw.response_500
+
+    with pytest.raises(ValueError, match=f"Authorisation request failed: {web_responses.raw.response_500.reason}"):
+        _, _ = mocked_connection._request_authorisation_token()
+
+
+@patch("qiboconnection.connection.requests.post", autospec=True)
 def test_update_authorisation_using_refresh_token_no_server_refresh_api_call(
     mocked_rest_call: MagicMock, mocked_connection: Connection
 ):
