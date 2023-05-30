@@ -258,10 +258,10 @@ def test_store_configuration_nominal(mocked_write_call: MagicMock, mocked_connec
     mocked_write_call.assert_called_with(
         config_data=ConnectionEstablished(
             **mocked_connection.user.__dict__,
-            authorisation_access_token=mocked_connection._authorisation_access_token,
-            authorisation_refresh_token=mocked_connection._authorisation_refresh_token,
-            api_path=mocked_connection._api_path,
-        )  # type: ignore[arg-type]
+            authorisation_access_token=mocked_connection._authorisation_access_token,  # type: ignore[arg-type]
+            authorisation_refresh_token=mocked_connection._authorisation_refresh_token,  # type: ignore[arg-type]
+            api_path=mocked_connection._api_path,  # type: ignore[arg-type]
+        )
     )
 
 
