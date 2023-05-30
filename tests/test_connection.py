@@ -261,7 +261,7 @@ def test_store_configuration_nominal(mocked_write_call: MagicMock, mocked_connec
             authorisation_access_token=mocked_connection._authorisation_access_token,
             authorisation_refresh_token=mocked_connection._authorisation_refresh_token,
             api_path=mocked_connection._api_path,
-        )
+        )  # type: ignore[arg-type]
     )
 
 
