@@ -37,7 +37,11 @@ def fixture_connection_established() -> ConnectionEstablished:
         ConnectionEstablished: ConnectionEstablished instance
     """
     return ConnectionEstablished(
-        api_key="DEMO_KEY", api_path="DEMO_PATH", authorisation_access_token="DEMO_TOKEN", username="DEMO_USERNAME"
+        api_key="DEMO_KEY",
+        api_path="DEMO_PATH",
+        authorisation_access_token="DEMO_TOKEN",
+        authorisation_refresh_token="DEMO_TOKEN",
+        username="DEMO_USERNAME",
     )
 
 
