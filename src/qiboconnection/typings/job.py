@@ -52,7 +52,6 @@ class JobRequest(ABC):
 
     user_id: int | None
     device_id: int
-    description: str
     number_shots: int
     job_type: str | JobType
 
@@ -93,6 +92,5 @@ class ListingJobResponse(JobRequest):
         result (str): Job result
     """
 
-    job_id: int
-    queue_position: int
+    id: int
     status: str | JobStatus

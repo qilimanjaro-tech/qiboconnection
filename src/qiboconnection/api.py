@@ -663,15 +663,15 @@ class API(ABC):
             List[SavedExperimentListingItemResponse]: list of objects encoding the expected response structure"""
         responses, status_codes = unzip(
             self._connection.send_get_auth_remote_api_call_all_pages(
-                path=self.SAVED_EXPERIMENTS_CALL_PATH, params={API_CONSTANTS.FAVOURITES: favourites}
+                path=self.JOBS_CALL_PATH, params={API_CONSTANTS.FAVOURITES: favourites}
             )
         )
         for status_code in status_codes:
             if status_code != 200:
-                raise RemoteExecutionException(message="Experiment could not be listed.", status_code=status_code)
+                raise RemoteExecutionException(message="Job could not be listed.", status_code=status_code)
 
         items = [item for response in responses for item in response[REST.ITEMS]]
-        return [SavedExperimentListingItemResponse(**item) for item in items]
+        return [ListingJobResponse(**item) for item in items]
 
     def _get_list_jobs_response(self, favourites: bool = False) -> List[ListingJobResponse]:
         """Performs the actual jobs listing request
