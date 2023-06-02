@@ -4,6 +4,7 @@ from abc import ABC
 from dataclasses import asdict
 from datetime import datetime, timedelta
 from time import sleep
+from types import NoneType
 from typing import Any, List, Optional, cast
 
 import numpy as np
@@ -672,7 +673,7 @@ class API(ABC):
                 raise RemoteExecutionException(message="Job could not be listed.", status_code=status_code)
 
         items = [item for response in responses for item in response[REST.ITEMS]]
-        return [ListingJobResponse(**item) for item in items]
+        return [SavedExperimentListingItemResponse(**item) for item in items]
 
     def _get_list_jobs_response(self, favourites: bool = False) -> List[ListingJobResponse]:
         """Performs the actual jobs listing request
@@ -778,7 +779,11 @@ class API(ABC):
             "status": job_response.status,
         }
         log_job_status_info(job_response=job_response)
-        return {**job_metadata, **job_result}
+
+        if type(job_result) == NoneType:
+            return job_metadata
+        else:
+            return {**job_metadata, **job_result}
 
     @typechecked
     def get_saved_experiments(self, saved_experiment_ids: List[int] | npt.NDArray[np.int_]) -> List[SavedExperiment]:
