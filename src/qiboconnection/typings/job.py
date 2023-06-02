@@ -92,11 +92,10 @@ class ListingJobResponse:
         result (str): Job result
     """
 
-    id: int | None = field(default=None)
-    queue_position: int
     status: str | JobStatus
     user_id: int
     device_id: int
     job_type: str | JobType
     number_shots: int
+    id: int | None = field(default=None)
     

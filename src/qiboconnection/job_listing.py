@@ -28,7 +28,7 @@ class JobListingItem:
     def from_response(cls, response: ListingJobResponse):
         """Constructor for JobListingItems that takes in a ListingJobResponse"""
         return cls(
-            id=response.job_id,
+            id=response.id,
             user_id=response.user_id,
             device_id=response.device_id,
             job_type=response.job_type,
