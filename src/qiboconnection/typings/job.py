@@ -78,7 +78,7 @@ class JobResponse(JobRequest):
 
 
 @dataclass(slots=True)
-class ListingJobResponse(JobRequest):
+class ListingJobResponse:
     """Job Response without the results. Includes all jobs metadata so that
     the user can identify the id from the job he is interested to retrieve the results.
 
@@ -92,5 +92,11 @@ class ListingJobResponse(JobRequest):
         result (str): Job result
     """
 
-    id: int
+    id: int | None = field(default=None)
+    queue_position: int
     status: str | JobStatus
+    user_id: int
+    device_id: int
+    job_type: str | JobType
+    number_shots: int
+    

@@ -218,7 +218,7 @@ def test_update_authorisation_using_refresh_token_no_server_refresh_api_call(
 
     mocked_connection_copy._authorisation_server_refresh_api_call = None
 
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Authorisation server api call is required"):
         mocked_connection_copy.update_authorisation_using_refresh_token()
 
 
@@ -238,7 +238,7 @@ def test_update_authorisation_using_refresh_token_unsuccessful(
         + ".4oSyRW9Ia7C-50x2yZxQAEXDZp-TLkFkPOtHBR4cCi9LnkREtYrJpDXufep_EYoRwDSJL_2z20moYMuMHy0QCg"
     )
 
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match=f"Authorisation request failed: {web_responses.raw.response_400.reason}"):
         mocked_connection.update_authorisation_using_refresh_token()
 
 
@@ -273,6 +273,9 @@ def test_update_authorisation_using_refresh_token(mocked_rest_call: MagicMock, m
             )
         },
     )
+    assert (
+        mocked_connection._authorisation_access_token == web_responses.auth.raw_retrieve_response.json()["accessToken"]
+    ), "Value of saved access token does not coincide with the one provided in response."
 
 
 def test_refresh_token_if_unauthorised_when_ok():
@@ -283,7 +286,7 @@ def test_refresh_token_if_unauthorised_when_ok():
 
     refresh_token_if_unauthorised(func=func)(self=connection)
 
-    func.assert_called_once()
+    func.assert_called_once_with(connection)
     connection.update_authorisation_using_refresh_token.assert_not_called()
 
 
@@ -297,7 +300,7 @@ def test_refresh_token_if_unauthorised_when_unauthorised():
     refresh_token_if_unauthorised(func=func)(self=connection)
 
     assert func.call_count == 2
-    connection.update_authorisation_using_refresh_token.assert_called_once()
+    connection.update_authorisation_using_refresh_token.assert_called_once_with()
 
 
 def test_refresh_token_if_unauthorised_when_other_error():
@@ -310,5 +313,5 @@ def test_refresh_token_if_unauthorised_when_other_error():
     with pytest.raises(HTTPError):
         refresh_token_if_unauthorised(func=func)(self=connection)
 
-    func.assert_called_once()
+    func.assert_called_once_with(connection)
     connection.update_authorisation_using_refresh_token.assert_not_called()
