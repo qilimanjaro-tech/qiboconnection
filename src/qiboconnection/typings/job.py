@@ -75,6 +75,7 @@ class JobResponse(JobRequest):
     queue_position: int
     result: str
     status: str | JobStatus
+    description: str
 
 
 @dataclass(slots=True)
