@@ -4,7 +4,6 @@ from abc import ABC
 from dataclasses import asdict
 from datetime import datetime, timedelta
 from time import sleep
-from types import NoneType
 from typing import Any, List, Optional, cast
 
 import numpy as np
