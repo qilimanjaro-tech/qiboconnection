@@ -780,7 +780,7 @@ class API(ABC):
         }
         log_job_status_info(job_response=job_response)
 
-        if type(job_result) == NoneType:
+        if job_result is None:
             return job_metadata
         else:
             return {**job_metadata, **job_result}
