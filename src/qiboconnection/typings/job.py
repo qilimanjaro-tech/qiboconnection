@@ -54,6 +54,7 @@ class JobRequest(ABC):
     device_id: int
     number_shots: int
     job_type: str | JobType
+    description: str
 
 
 @dataclass
@@ -73,7 +74,7 @@ class JobResponse(JobRequest):
 
     job_id: int
     queue_position: int
-    result: str
+    result: str | None
     status: str | JobStatus
     description: str
 
@@ -99,4 +100,3 @@ class ListingJobResponse:
     job_type: str | JobType
     number_shots: int
     id: int | None = field(default=None)
-    
