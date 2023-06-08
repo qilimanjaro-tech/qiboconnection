@@ -31,7 +31,12 @@ from qiboconnection.runcard import Runcard
 from qiboconnection.saved_experiment import SavedExperiment
 from qiboconnection.saved_experiment_listing import SavedExperimentListing
 from qiboconnection.typings.connection import ConnectionConfiguration
-from qiboconnection.typings.job import JobResponse, JobStatus, ListingJobResponse
+from qiboconnection.typings.job import (
+    JobFullData,
+    JobResponse,
+    JobStatus,
+    ListingJobResponse,
+)
 from qiboconnection.typings.live_plot import (
     LivePlotAxis,
     LivePlotLabels,
@@ -750,9 +755,8 @@ class API(ABC):
             self._get_saved_experiment_response(saved_experiment_id=saved_experiment_id)
         )
 
-    # TODO: change the docstring, document and ensure to push clean code!
     @typechecked
-    def get_job(self, job_id: int) -> dict | None:
+    def get_job(self, job_id: int) -> dict:
         """Get metadata and result from a remote job execution.
 
         Args:
@@ -766,23 +770,25 @@ class API(ABC):
         Returns:
             dict
         """
+        from dataclasses import asdict
 
         job_response = self._get_result(job_id=job_id)
-        job_result = parse_job_responses_to_results(job_responses=[job_response])[0]
-        job_metadata = {
-            "user_id": job_response.user_id,
-            "device_id": job_response.device_id,
-            "number_shots": job_response.number_shots,
-            "job_type": job_response.job_type,
-            "queue_position": job_response.queue_position,
-            "status": job_response.status,
-        }
         log_job_status_info(job_response=job_response)
+        job_result = parse_job_responses_to_results(job_responses=[job_response])[0]
 
-        if job_result is None:
-            return job_metadata
-        else:
-            return {**job_metadata, **job_result}
+        # result is a duplicated key. job_result overwerites the value from job_response
+        return asdict(
+            JobFullData(
+                status=job_response.status,
+                queue_position=job_response.queue_position,
+                user_id=job_response.user_id,
+                device_id=job_response.device_id,
+                job_id=job_response.job_id,
+                job_type=job_response.job_type,
+                number_shots=job_response.number_shots,
+                result=job_result,
+            )
+        )
 
     @typechecked
     def get_saved_experiments(self, saved_experiment_ids: List[int] | npt.NDArray[np.int_]) -> List[SavedExperiment]:
