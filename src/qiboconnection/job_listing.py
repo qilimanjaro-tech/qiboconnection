@@ -21,8 +21,7 @@ class JobListingItem:
     job_type: str | JobType
     number_shots: int
     id: int | None = field(default=None)
-    # TODO: including created_at attribute requires modifying .execute() method
-    # created_at: datetime | None = field(default=None)
+   
 
     @classmethod
     def from_response(cls, response: ListingJobResponse):
