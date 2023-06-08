@@ -8,8 +8,6 @@ from typing import Any
 
 import numpy
 
-from qiboconnection import job_result
-
 
 class JobType(str, enum.Enum):
     """Job Type
@@ -56,7 +54,7 @@ class JobRequest(ABC):
         number_shots (int): number of times the job is to be executed
     """
 
-    user_id: int | None
+    user_id: int
     device_id: int
     number_shots: int
     job_type: str | JobType
@@ -80,9 +78,8 @@ class JobResponse(JobRequest):
 
     job_id: int
     queue_position: int
-    result: str | None
+    result: str
     status: str | JobStatus
-    description: str
 
 
 @dataclass(slots=True)
