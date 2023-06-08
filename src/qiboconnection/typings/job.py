@@ -54,7 +54,7 @@ class JobRequest(ABC):
         number_shots (int): number of times the job is to be executed
     """
 
-    user_id: int
+    user_id: int | None
     device_id: int
     number_shots: int
     job_type: str | JobType
