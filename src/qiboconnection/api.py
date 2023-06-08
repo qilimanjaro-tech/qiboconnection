@@ -342,6 +342,9 @@ class API(ABC):
                 List[Device | QuantumDevice | SimulatorDevice | OfflineDevice], self._selected_devices
             )
 
+        if not selected_devices:
+            raise ValueError("No devices were selected for execution.")
+
         jobs = [
             Job(
                 circuit=circuit,
@@ -368,6 +371,7 @@ class API(ABC):
             self._jobs.append(job)
             job_ids.append(job.id)
         return job_ids
+    
 
     def _get_result(self, job_id: int) -> JobResponse:
         """Calls the API to get a job from a remote execution.
