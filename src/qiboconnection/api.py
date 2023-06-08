@@ -669,7 +669,7 @@ class API(ABC):
             List[SavedExperimentListingItemResponse]: list of objects encoding the expected response structure"""
         responses, status_codes = unzip(
             self._connection.send_get_auth_remote_api_call_all_pages(
-                path=self.JOBS_CALL_PATH, params={API_CONSTANTS.FAVOURITES: favourites}
+                path=self.SAVED_EXPERIMENTS_CALL_PATH, params={API_CONSTANTS.FAVOURITES: favourites}
             )
         )
         for status_code in status_codes:
