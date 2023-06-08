@@ -112,7 +112,7 @@ class JobFullData:
 
     status: str | JobStatus
     queue_position: int
-    user_id: int
+    user_id: int | None
     device_id: int
     job_id: int
     job_type: str | JobType
