@@ -13,7 +13,7 @@ from qiboconnection.util import decode_jsonified_dict
 
 @dataclass
 class JobListingItem:
-    """JobListing single item representation"""
+    """JobListing single item representation."""
 
     user_id: int
     device_id: int
@@ -21,7 +21,6 @@ class JobListingItem:
     job_type: str | JobType
     number_shots: int
     id: int | None = field(default=None)
-   
 
     @classmethod
     def from_response(cls, response: ListingJobResponse):
