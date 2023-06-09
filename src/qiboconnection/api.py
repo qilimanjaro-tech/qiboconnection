@@ -770,7 +770,6 @@ class API(ABC):
         Returns:
             dict
         """
-        from dataclasses import asdict
 
         job_response = self._get_result(job_id=job_id)
         log_job_status_info(job_response=job_response)
