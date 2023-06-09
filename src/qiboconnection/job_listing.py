@@ -1,5 +1,4 @@
 """ JobListing class """
-# TODO: properly document these new code and the old one!
 
 from dataclasses import asdict, dataclass, field
 from datetime import datetime
