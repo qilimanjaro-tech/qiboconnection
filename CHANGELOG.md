@@ -1,8 +1,12 @@
+### Fix (2023-06-13)
+
+- Allow qilimanjaro users to effectively block devices when availability=maintenance (#71)
+
 ## v0.9.0 (2023-05-04)
 
 ### Feat
 
-- **api**: maintinance mode (#57)
+- **api**: maintenance mode (#57)
 
 ## v0.8.0 (2023-04-25)
 
