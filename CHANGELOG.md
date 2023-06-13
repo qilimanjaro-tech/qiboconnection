@@ -1,6 +1,6 @@
-### Fix (2023-06-13)
+### Feat (2023-06-13)
 
-- Allow qilimanjaro users to effectively block devices when availability=maintenance (#71)
+- Added get_job() and list_jobs() which retrieves all job data (including results) for one job and job metadata for all jobs the user has access to(#71)
 
 ## v0.9.0 (2023-05-04)
 
