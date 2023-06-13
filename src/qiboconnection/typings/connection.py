@@ -35,6 +35,7 @@ class _ConnectionEstablishedBase(ABC):
     """Internal class for the non-default-value attributes of ConnectionEstablished"""
 
     authorisation_access_token: str
+    authorisation_refresh_token: str
     api_path: str
 
 

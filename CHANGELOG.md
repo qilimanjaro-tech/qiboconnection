@@ -1,8 +1,12 @@
+### Feat (2023-06-13)
+
+- Added get_job() and list_jobs() which retrieves all job data (including results) for one job and job metadata for all jobs the user has access to(#71)
+
 ## v0.9.0 (2023-05-04)
 
 ### Feat
 
-- **api**: maintinance mode (#57)
+- **api**: maintenance mode (#57)
 
 ## v0.8.0 (2023-04-25)
 

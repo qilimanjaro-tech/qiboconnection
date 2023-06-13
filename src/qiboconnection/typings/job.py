@@ -1,8 +1,12 @@
 """ Job Typing """
+import collections
 import enum
 from abc import ABC
 from dataclasses import dataclass, field
 from datetime import datetime
+from typing import Any
+
+import numpy
 
 
 class JobType(str, enum.Enum):
@@ -74,9 +78,8 @@ class JobResponse(JobRequest):
 
     job_id: int
     queue_position: int
-    result: str | None
+    result: str
     status: str | JobStatus
-    description: str
 
 
 @dataclass(slots=True)
@@ -87,11 +90,10 @@ class ListingJobResponse:
     Attributes:
         user_id (int): User identifier
         device_id (int): Device identifier
-        description (str): Description of the job
-        job_id (int): Job identifier
+
+        id (int): Job identifier
         queue_position (int): Job queue position
         status (str | JobStatus): Status of the job
-        result (str): Job result
     """
 
     status: str | JobStatus
@@ -100,3 +102,19 @@ class ListingJobResponse:
     job_type: str | JobType
     number_shots: int
     id: int | None = field(default=None)
+
+
+@dataclass(slots=True)
+class JobFullData:
+    """Data shown to the user when get_job() method is used. It includes job result and
+    metadata.
+    """
+
+    status: str | JobStatus
+    queue_position: int
+    user_id: int | None
+    device_id: int
+    job_id: int
+    job_type: str | JobType
+    number_shots: int
+    result: dict | Any | None
