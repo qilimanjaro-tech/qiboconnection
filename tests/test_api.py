@@ -353,6 +353,7 @@ def test_get_saved_experiment(mocked_web_call: MagicMock, mocked_api: API):
     assert isinstance(saved_experiment, SavedExperiment)
 
 
+
 @patch("qiboconnection.connection.Connection.send_get_auth_remote_api_call", autospec=True)
 def test_get_saved_experiment_ise(mocked_web_call: MagicMock, mocked_api: API):
     """Tests API.get_saved_experiment() method"""
@@ -736,3 +737,32 @@ def test_delete_runcard_ise(mocked_web_call: MagicMock, mocked_api: API):
         mocked_api.delete_runcard(runcard_id=1)
 
     mocked_web_call.assert_called_with(self=mocked_api._connection, path=f"{mocked_api.RUNCARDS_CALL_PATH}/1")
+
+@patch("qiboconnection.connection.Connection.send_get_auth_remote_api_call", autospec=True)
+def test_get_result_exception(mocked_api_call: MagicMock, mocked_api: API):
+    """Tests API.get_result() method with non-existent job id"""
+    
+    # Define the behavior of the mocked function to raise the RemoteExecutionException
+    mocked_api_call.side_effect = RemoteExecutionException("The job does not exist!", status_code=400)
+
+    with pytest.raises(RemoteExecutionException, match="The job does not exist!"):
+        # Call the function that should raise the exception
+        mocked_api.get_result(job_id=0)
+    
+    # Assert that the mocked function was called with correct arguments
+    mocked_api_call.assert_called_with(self=mocked_api._connection, path=f"{mocked_api.JOBS_CALL_PATH}/{0}")
+
+@patch("qiboconnection.connection.Connection.send_get_auth_remote_api_call_all_pages", autospec=True)
+def test_no_devices_selected_exception(mocked_api_call: MagicMock, mocked_api: API):
+    """Tests API.execute() method with no devices selected"""
+
+    # Define the behavior of the mocked function to raise the ValueError
+    mocked_api_call.side_effect = ValueError("No devices were selected for execution.")
+
+    with pytest.raises(ValueError, match='No devices were selected for execution.'):
+        # Here, a circuit should be passed which will be ignored as the call is mocked
+        mocked_api.execute(device_ids=None)
+
+    # Check that the mocked function was not called
+    mocked_api_call.assert_not_called()
+
