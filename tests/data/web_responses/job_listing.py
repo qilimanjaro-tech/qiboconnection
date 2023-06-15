@@ -20,8 +20,8 @@ job_listing_item_response_b = {
 }
 
 
-class ListingJobResponse:
-    """mock job listing web response"""
+class JobResponse:
+    """mock job web responses"""
 
     retrieve_job_listing_response: tuple[tuple[dict, int]] = (
         (
