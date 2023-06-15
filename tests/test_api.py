@@ -743,7 +743,7 @@ def test_get_result_exception(mocked_api_call: MagicMock, mocked_api: API):
     """Tests API.get_result() method with non-existent job id"""
 
     # Define the behavior of the mocked function to raise the RemoteExecutionException
-    mocked_api_call.side_effect = RemoteExecutionException("The job does not exis", status_code=400)
+    mocked_api_call.side_effect = RemoteExecutionException("The job does not exist!", status_code=400)
 
     with pytest.raises(RemoteExecutionException, match="The job does not exist!"):
         # Call the function that should raise the exception
