@@ -376,13 +376,12 @@ class API(ABC):
             self._jobs.append(job)
             job_ids.append(job.id)
         return job_ids
-    
 
     def _get_result(self, job_id: int) -> JobResponse:
         """Calls the API to get a job from a remote execution.
 
         Args:
-            job_id (int): Job identifier
+            job_id (int): Job identifier.
 
         Raises:
             RemoteExecutionException: Job could not be retrieved.
