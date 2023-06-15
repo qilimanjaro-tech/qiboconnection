@@ -1,5 +1,4 @@
 """ Job Typing """
-import collections
 import enum
 from abc import ABC
 from dataclasses import dataclass, field
