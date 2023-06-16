@@ -2,7 +2,7 @@
 
 from .auth import Auth
 from .devices import Devices
-from .job_listing import JobResponse
+from .job import JobResponse
 from .ping import Ping
 from .responses_raw import ResponsesRaw
 from .runcards import Runcards
