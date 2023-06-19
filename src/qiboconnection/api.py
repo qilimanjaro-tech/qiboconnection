@@ -639,7 +639,7 @@ class API(ABC):
             )
 
         logger.debug(
-            "Experiment %s updated successfullyo crearía otro endpoint para el list_jobsy.",
+            "Experiment %s updated successfully.",
             response[API_CONSTANTS.SAVED_EXPERIMENT_ID],
         )
 
