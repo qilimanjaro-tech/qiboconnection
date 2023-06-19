@@ -50,13 +50,22 @@ def test_device_constructor(device_input: DeviceInput):
 def test_device_string_representation(device_input: DeviceInput):
     """Tests Device().__str__() method"""
     device = Device(device_input=device_input)
+    print(device.__str__())
+    print(
+        f"<Device: device_id={device._device_id},"
+        f" device_name='{device._device_name}',"
+        f" status='{device._status}',"
+        f" availability='{device._availability}',"
+        f" channel_id=None"
+        f">"
+    )
 
     assert (
         device.__str__() == f"<Device: device_id={device._device_id},"
         f" device_name='{device._device_name}',"
-        f" status='{device._status.value}',"
-        f" availability='{device._availability.value}',"
-        f" channel_id=None"
+        f" status='{device._status}',"
+        f" availability='{device._availability}',"
+        f" channel_id={device._channel_id}"
         f">"
     )
 

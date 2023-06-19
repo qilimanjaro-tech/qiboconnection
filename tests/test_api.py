@@ -10,6 +10,7 @@ from qiboconnection.api import API
 from qiboconnection.devices.devices import Devices
 from qiboconnection.devices.util import create_device
 from qiboconnection.errors import ConnectionException, RemoteExecutionException
+from qiboconnection.job_listing import JobListing
 from qiboconnection.runcard import Runcard
 from qiboconnection.saved_experiment import SavedExperiment
 from qiboconnection.saved_experiment_listing import SavedExperimentListing
@@ -295,6 +296,21 @@ def test_save_experiment_ise(mocked_web_call: MagicMock, mocked_api: API):
             favourite=favourite,
         )
     mocked_web_call.assert_called()
+
+
+@pytest.mark.parametrize("favourites", [False, True])
+@patch("qiboconnection.connection.Connection.send_get_auth_remote_api_call_all_pages", autospec=True)
+def test_list_jobs(mocked_web_call: MagicMock, favourites: bool, mocked_api: API):
+    """Tests API.list_jobs() method"""
+    mocked_web_call.return_value = web_responses.job_listing.retrieve_job_listing_response
+
+    jobs_list = mocked_api.list_jobs(favourites=favourites)
+
+    mocked_web_call.assert_called_with(
+        self=mocked_api._connection, path=mocked_api.JOBS_CALL_PATH, params={"favourites": favourites}
+    )
+    assert isinstance(jobs_list, JobListing)
+    assert isinstance(jobs_list.dataframe, pd.DataFrame)
 
 
 @pytest.mark.parametrize("favourites", [False, True])
