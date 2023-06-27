@@ -1,3 +1,7 @@
+### Feat (2023-06-27)
+
+- Return an exception if the user want to retrieve a job that doesn't exist or execute without any device selected.(#73)
+
 ### Feat (2023-06-13)
 
 - Added get_job() and list_jobs() which retrieves all job data (including results) for one job and job metadata for all jobs the user has access to(#71)
