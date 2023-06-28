@@ -2,7 +2,7 @@
 
 from .auth import Auth
 from .devices import Devices
-from .job_listing import ListingJobResponse
+from .job import JobResponse
 from .ping import Ping
 from .responses_raw import ResponsesRaw
 from .runcards import Runcards
@@ -20,4 +20,4 @@ class WebResponses:
     users = Users()
     auth = Auth()
     raw = ResponsesRaw()
-    job_listing = ListingJobResponse()
+    job_listing = JobResponse()
