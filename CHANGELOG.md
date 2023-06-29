@@ -1,3 +1,8 @@
+## v0.11.0 (2023-06-29)
+
+- Release 0.11.0
+  \[#77\] (https://github.com/qilimanjaro-tech/qiboconnection/pull/77)
+
 ### Feat (2023-06-13)
 
 - Added get_job() and list_jobs() which retrieves all job data (including results) for one job and job metadata for all jobs the user has access to(#71)
