@@ -186,7 +186,7 @@ def test_send_get_auth_remote_api_call(mocked_rest_call: MagicMock, mocked_conne
 def test_send_get_auth_remote_api_call_exception(mocked_rest_call: MagicMock, mocked_connection: Connection):
     """tests send_get_auth_remote_api_call"""
 
-    mocked_rest_call.return_value = web_responses.job_listing.retrieve_job_response_400_raw
+    mocked_rest_call.return_value = web_responses.job_listing.retrieve_job_response_400_raw()
 
     with pytest.raises(RemoteExecutionException, match="The job does not exist!"):
         # Call the function that should raise the exception
