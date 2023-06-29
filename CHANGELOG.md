@@ -1,6 +1,11 @@
-### Feat (2023-06-27)
+### Feat (2023-06-29)
 
 - Return an exception if the user want to retrieve a job that doesn't exist or execute without any device selected.(#73)
+
+## v0.11.0 (2023-06-29)
+
+- Release 0.11.0
+  \[#77\] (https://github.com/qilimanjaro-tech/qiboconnection/pull/77)
 
 ### Feat (2023-06-13)
 
