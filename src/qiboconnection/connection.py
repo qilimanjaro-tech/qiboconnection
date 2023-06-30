@@ -11,7 +11,11 @@ import requests
 from typeguard import typechecked
 
 from qiboconnection.config import get_environment, logger
-from qiboconnection.errors import ConnectionException, HTTPError
+from qiboconnection.errors import (
+    ConnectionException,
+    HTTPError,
+    RemoteExecutionException,
+)
 from qiboconnection.typings.auth_config import AccessTokenResponse, AssertionPayload
 from qiboconnection.typings.connection import (
     ConnectionConfiguration,
@@ -357,6 +361,14 @@ class Connection(ABC):
         logger.debug("Calling: %s%s", self._remote_server_api_url, path)
         header = {"Authorization": f"Bearer {self._authorisation_access_token}"}
         response = requests.get(f"{self._remote_server_api_url}{path}", headers=header, params=params)
+
+        if response.status_code != 200:
+            error_details = response.json()
+            if "detail" in error_details and "does not exist" in error_details["detail"]:
+                raise RemoteExecutionException("The job does not exist!", status_code=400)
+            else:
+                response.raise_for_status()
+
         return process_response(response)
 
     @refresh_token_if_unauthorised
@@ -450,7 +462,7 @@ class Connection(ABC):
         """Updates the saved access token sending the request token. For this, it
         builds assertion payload with user info, encodes it and uses it to POST the server for a new Access Token.
         Returns:
-            str with a new Access Token.
+            str with a new Access Token
         """
 
         if self._authorisation_server_refresh_api_call is None:
