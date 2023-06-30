@@ -988,3 +988,15 @@ class API(ABC):
         if status_code != 204:
             raise RemoteExecutionException(message="Runcard could not be removed.", status_code=status_code)
         logger.info("Runcard %i deleted successfully with message: %s", runcard_id, response)
+
+    @typechecked
+    def delete_job(self, job_id: int) -> None:
+        """Deletes a job from the database (only for admin users)        Raises:
+        RemoteExecutionException: Devices could not be retrieved        Returns:
+        """
+        response, status_code = self._connection.send_delete_auth_remote_api_call(
+            path=f"{self.JOBS_CALL_PATH}/{job_id}"
+        )
+        if status_code != 204:
+            raise RemoteExecutionException(message="Job could not be removed.", status_code=status_code)
+        logger.info("Job %i deleted successfully with message: %s", job_id, response)
