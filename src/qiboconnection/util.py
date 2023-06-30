@@ -37,7 +37,7 @@ def base64url_encode(payload: dict | bytes | str) -> str:
     return urlsafe_b64encode(payload).decode("utf-8")
 
 
-def base64url_decode(encoded_data: str) -> Any:
+def base64_decode(encoded_data: str) -> str:
     """Decodes a base64 encoded string
 
     Args:
@@ -46,7 +46,7 @@ def base64url_decode(encoded_data: str) -> Any:
     Returns:
         Any: The data decoded
     """
-    return json.loads(urlsafe_b64decode(encoded_data).decode("utf-8"))
+    return urlsafe_b64decode(encoded_data).decode("utf-8")
 
 
 def write_config_file_to_disk(config_data: ConnectionEstablished) -> None:
@@ -89,7 +89,7 @@ def decode_results_from_program(http_response: str) -> List[CircuitResult | floa
     Returns:
         List[CircuitResult]: a Qibo CircuitResult
     """
-    decoded_results = base64url_decode(http_response)
+    decoded_results = base64_decode(http_response)
     if not isinstance(decoded_results, list):
         raise ValueError(f"decoded results is not a list. type: {type(decoded_results)}")
     if len(decoded_results) <= 0:

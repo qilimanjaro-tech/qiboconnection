@@ -7,7 +7,7 @@ from requests.models import Response
 
 from qiboconnection.connection import ConnectionEstablished
 from qiboconnection.util import (
-    base64url_decode,
+    base64_decode,
     base64url_encode,
     load_config_file_to_disk,
     process_response,
@@ -73,7 +73,7 @@ def test_base64url_decode():
     """Test the base64url_decode() function"""
     data = "WzAuMSwgMC4xLCAwLjEsIDAuMSwgMC4xXQ=="
     expected_decoded = [0.1, 0.1, 0.1, 0.1, 0.1]
-    assert base64url_decode(data) == expected_decoded
+    assert json.loads(base64_decode(data)) == expected_decoded
 
 
 def test_base64url_decode_list():
@@ -86,7 +86,7 @@ def test_base64url_decode_list():
             "options": {"number_qubits": 2, "initial_value": "zero"},
         }
     ]
-    assert base64url_decode(data) == expected_decoded
+    assert json.loads(base64_decode(data)) == expected_decoded
 
 
 def test_save_and_load_config_to_disk(connection_established: ConnectionEstablished):

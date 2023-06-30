@@ -13,7 +13,11 @@ from qibo.states import CircuitResult
 from requests import HTTPError
 from typeguard import typechecked
 
-from qiboconnection.api_utils import log_job_status_info, parse_job_responses_to_results
+from qiboconnection.api_utils import (
+    deserialize_job_description,
+    log_job_status_info,
+    parse_job_responses_to_results,
+)
 from qiboconnection.config import logger
 from qiboconnection.connection import Connection
 from qiboconnection.constants import API_CONSTANTS, REST, REST_ERROR
@@ -773,9 +777,11 @@ class API(ABC):
 
         job_response = self._get_result(job_id=job_id)
         log_job_status_info(job_response=job_response)
-        job_result = parse_job_responses_to_results(job_responses=[job_response])[0]
+        parsed_job_result = parse_job_responses_to_results(job_responses=[job_response])[0]
 
-        # result is a duplicated key. job_result overwerites the value from job_response
+        parsed_job_description = deserialize_job_description(
+            base64_description=job_response.description, job_type=job_response.job_type
+        )
         return asdict(
             JobFullData(
                 status=job_response.status,
@@ -785,7 +791,8 @@ class API(ABC):
                 job_id=job_response.job_id,
                 job_type=job_response.job_type,
                 number_shots=job_response.number_shots,
-                result=job_result,
+                description=parsed_job_description,
+                result=parsed_job_result,
             )
         )
 

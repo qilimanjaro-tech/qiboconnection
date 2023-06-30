@@ -5,6 +5,7 @@ from dataclasses import dataclass, field
 from typing import Any
 
 import numpy
+from qibo.models.circuit import Circuit
 
 
 class JobType(str, enum.Enum):
@@ -115,4 +116,5 @@ class JobFullData:
     job_id: int
     job_type: str | JobType
     number_shots: int
+    description: Circuit | dict
     result: dict | Any | None

@@ -12,6 +12,7 @@ def test_JobFullData_typing():
         job_id=4,
         job_type="jaiof",
         number_shots=84,
+        description="<qibo.models.circuit.Circuit at 0x7fb8c2127650>",
         result={},
     )
     assert isinstance(job_full_data, JobFullData)
