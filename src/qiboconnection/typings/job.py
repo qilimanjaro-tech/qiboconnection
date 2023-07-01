@@ -104,7 +104,7 @@ class ListingJobResponse:
 
 
 @dataclass(slots=True)
-class JobFullData:
+class JobData:
     """Data shown to the user when get_job() method is used. It includes job human-readable results and
     metadata.
     """
@@ -117,4 +117,4 @@ class JobFullData:
     job_type: str | JobType
     number_shots: int
     description: Circuit | dict
-    result: dict | Any | None
+    result: dict | None

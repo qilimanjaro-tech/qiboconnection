@@ -3,9 +3,12 @@
 import json
 
 import pytest
+from qibo.models.circuit import Circuit
 from requests.models import Response
 
+from qiboconnection.api_utils import deserialize_job_description
 from qiboconnection.connection import ConnectionEstablished
+from qiboconnection.typings.job import JobType
 from qiboconnection.util import (
     base64_decode,
     base64url_encode,
@@ -13,36 +16,6 @@ from qiboconnection.util import (
     process_response,
     write_config_file_to_disk,
 )
-
-
-@pytest.fixture(name="response")
-def fixture_response() -> Response:
-    """Creates an status_code 200 Response object with demo values
-
-    Returns:
-        Response: response object
-    """
-    response = Response()
-    response.status_code = 200
-    response.url = "server/api"
-    response._content = json.dumps({"DEMO": "200"}).encode("utf8")
-    return response
-
-
-@pytest.fixture(name="connection_established")
-def fixture_connection_established() -> ConnectionEstablished:
-    """Creates a ConnectionEstablished object with demo values
-
-    Returns:
-        ConnectionEstablished: ConnectionEstablished instance
-    """
-    return ConnectionEstablished(
-        api_key="DEMO_KEY",
-        api_path="DEMO_PATH",
-        authorisation_access_token="DEMO_TOKEN",
-        authorisation_refresh_token="DEMO_TOKEN",
-        username="DEMO_USERNAME",
-    )
 
 
 def test_base64url_encode():
@@ -103,3 +76,14 @@ def test_process_response(response: Response):
 
     assert processed_response[0] == json.loads(response.text)
     assert processed_response[1] == response.status_code
+
+
+def test_deserialize_job_description(base64_qibo_circuit: str, base64_qililab_experiment: str):
+    """Unit test of deserialize_job_description()"""
+
+    assert isinstance(
+        deserialize_job_description(base64_description=base64_qibo_circuit, job_type=JobType.CIRCUIT), Circuit
+    )
+    assert isinstance(
+        deserialize_job_description(base64_description=base64_qililab_experiment, job_type=JobType.EXPERIMENT), dict
+    )

@@ -32,12 +32,24 @@ def parse_job_responses_to_results(job_responses: List[JobResponse]) -> List[dic
 
 
 def deserialize_job_description(base64_description: str, job_type: str) -> Circuit | dict:
+    """Convert base64 job description to its corresponding Qibo Circuit or Qililab experiment
+
+    Args:
+        base64_description (str):
+        job_type (str):
+
+    Raises:
+        ValueError: Job type isn't nor Qibo Circuit neither Qililab experiment
+
+    Returns:
+        Circuit | dict: _description_
+    """
     if job_type == JobType.CIRCUIT:
         return Circuit.from_qasm(base64_decode(encoded_data=base64_description))
-    elif job_type == JobType.EXPERIMENT:
+
+    if job_type == JobType.EXPERIMENT:
         return json.loads(base64_decode(encoded_data=base64_description))
-    else:
-        raise ValueError(f"{job_type} not supported, it needs to be either {JobType.CIRCUIT} or {JobType.EXPERIMENT}")
+    raise ValueError(f"{job_type} not supported, it needs to be either {JobType.CIRCUIT} or {JobType.EXPERIMENT}")
 
 
 def log_job_status_info(job_response: JobResponse):

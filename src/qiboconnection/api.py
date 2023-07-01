@@ -36,7 +36,7 @@ from qiboconnection.saved_experiment import SavedExperiment
 from qiboconnection.saved_experiment_listing import SavedExperimentListing
 from qiboconnection.typings.connection import ConnectionConfiguration
 from qiboconnection.typings.job import (
-    JobFullData,
+    JobData,
     JobResponse,
     JobStatus,
     ListingJobResponse,
@@ -760,8 +760,8 @@ class API(ABC):
         )
 
     @typechecked
-    def get_job(self, job_id: int) -> dict:
-        """Get metadata and result from a remote job execution.
+    def get_job(self, job_id: int):
+        """Get metadata, result and the correspondig Qibo circuit or Qililab experiment from a remote job execution.
 
         Args:
             job_id (int): Job identifier
@@ -782,18 +782,16 @@ class API(ABC):
         parsed_job_description = deserialize_job_description(
             base64_description=job_response.description, job_type=job_response.job_type
         )
-        return asdict(
-            JobFullData(
-                status=job_response.status,
-                queue_position=job_response.queue_position,
-                user_id=job_response.user_id,
-                device_id=job_response.device_id,
-                job_id=job_response.job_id,
-                job_type=job_response.job_type,
-                number_shots=job_response.number_shots,
-                description=parsed_job_description,
-                result=parsed_job_result,
-            )
+        return JobData(
+            status=job_response.status,
+            queue_position=job_response.queue_position,
+            user_id=job_response.user_id,
+            device_id=job_response.device_id,
+            job_id=job_response.job_id,
+            job_type=job_response.job_type,
+            number_shots=job_response.number_shots,
+            description=parsed_job_description,
+            result=parsed_job_result,
         )
 
     @typechecked

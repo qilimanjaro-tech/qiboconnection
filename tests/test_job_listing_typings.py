@@ -1,10 +1,10 @@
-from qiboconnection.typings.job import JobFullData, ListingJobResponse
+from qiboconnection.typings.job import JobData, ListingJobResponse
 
 
-def test_JobFullData_typing():
-    """Test JobFullData typing, this is what is returned to the user with get_job()."""
+def test_JobData_typing():
+    """Test JobData typing, this is what is returned to the user with get_job()."""
 
-    job_full_data = JobFullData(
+    job_full_data = JobData(
         queue_position=32,
         status="89",
         user_id=None,
@@ -15,7 +15,7 @@ def test_JobFullData_typing():
         description="<qibo.models.circuit.Circuit at 0x7fb8c2127650>",
         result={},
     )
-    assert isinstance(job_full_data, JobFullData)
+    assert isinstance(job_full_data, JobData)
 
 
 def test_ListingJobResponse_typing():
