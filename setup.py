@@ -33,8 +33,8 @@ with open(os.path.join(this_directory, "README.md"), encoding="utf-8") as f:
 setup(
     name="qiboconnection",
     version=get_version(),
-    description="manage the remote connection to send qibo experiment to the quantum devices and simulators",
-    author="Qibo team",
+    description="Python interface to Qilimanjaro's Services for quantum job executions.",
+    author="Qilimanjaro",
     author_email="info@qilimanjaro.tech",
     url="https://github.com/qilimanjaro-tech/qiboconnection",
     packages=find_packages("src"),

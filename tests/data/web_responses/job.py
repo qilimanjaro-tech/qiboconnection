@@ -1,5 +1,9 @@
 """Job listing web responses"""
 
+import json
+
+from requests import Response
+
 from qiboconnection.typings.job import JobStatus, JobType
 
 job_listing_item_response_a = {
@@ -19,9 +23,24 @@ job_listing_item_response_b = {
     "id": 45,
 }
 
+job_listing_item_response_c = {
+    "title": "Bad Request",
+    "status": 400,
+    "detail": "Requested job with 'job_id': 8310, does not exist.",
+}
+
 
 class JobResponse:
     """mock job web responses"""
+
+    @classmethod
+    def retrieve_job_response_400_raw(cls):
+        response = Response()
+        response.status_code = 404
+        response._content = json.dumps(
+            {"title": "Bad Request", "detail": "Requested job with 'job_id': 8310, does not exist."}
+        ).encode("utf-8")
+        return response
 
     retrieve_job_listing_response: tuple[tuple[dict, int]] = (
         (
