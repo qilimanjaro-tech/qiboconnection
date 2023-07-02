@@ -381,7 +381,7 @@ class API(ABC):
             job_ids.append(job.id)
         return job_ids
 
-    def _get_result(self, job_id: int) -> JobResponse:
+    def _get_job(self, job_id: int) -> JobResponse:
         """Calls the API to get a job from a remote execution.
 
         Args:
@@ -416,7 +416,7 @@ class API(ABC):
             executed yet.
         """
 
-        job_response = self._get_result(job_id=job_id)
+        job_response = self._get_job(job_id=job_id)
         log_job_status_info(job_response=job_response)
         return parse_job_responses_to_results(job_responses=[job_response])[0]
 
@@ -434,7 +434,7 @@ class API(ABC):
         Returns:
             Union[CircuitResult, None]: The Job result as an Abstract State or None when it is not executed yet.
         """
-        job_responses = [self._get_result(job_id) for job_id in job_ids]
+        job_responses = [self._get_job(job_id) for job_id in job_ids]
         for job_response in job_responses:
             log_job_status_info(job_response=job_response)
         return parse_job_responses_to_results(job_responses=job_responses)
@@ -457,7 +457,7 @@ class API(ABC):
             List[dict | None]: list of the results for each of the
         """
         while datetime.now() < deadline:
-            job_responses = [self._get_result(job_id) for job_id in job_ids]
+            job_responses = [self._get_job(job_id) for job_id in job_ids]
             job_responses_status = [job_response.status for job_response in job_responses]
             if set(job_responses_status).issubset({JobStatus.COMPLETED, JobStatus.ERROR}):
                 return parse_job_responses_to_results(job_responses=job_responses)
@@ -778,7 +778,7 @@ class API(ABC):
             dict
         """
 
-        job_response = self._get_result(job_id=job_id)
+        job_response = self._get_job(job_id=job_id)
         log_job_status_info(job_response=job_response)
         parsed_job_result = parse_job_responses_to_results(job_responses=[job_response])[0]
 
