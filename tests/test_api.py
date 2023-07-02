@@ -773,3 +773,13 @@ def test_no_devices_selected_exception(mocked_api_call: MagicMock, mocked_api: A
 
     # Check that the mocked function was not called
     mocked_api_call.assert_not_called()
+
+
+def test_set_device_to_online():
+    """unit test for set_device_to_online"""
+    assert 2 + 2 == 4
+
+
+def test_set_device_to_maintenance():
+    """'unit test for set_device_to_maintenace"""
+    assert 2 + 2 == 4

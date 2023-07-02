@@ -49,6 +49,7 @@ def deserialize_job_description(base64_description: str, job_type: str) -> Circu
 
     if job_type == JobType.EXPERIMENT:
         return json.loads(base64_decode(encoded_data=base64_description))
+
     raise ValueError(f"{job_type} not supported, it needs to be either {JobType.CIRCUIT} or {JobType.EXPERIMENT}")
 
 
