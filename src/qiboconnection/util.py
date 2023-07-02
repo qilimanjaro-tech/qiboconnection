@@ -80,6 +80,7 @@ def load_config_file_to_disk() -> ConnectionEstablished:
         return ConnectionEstablished(**json.load(fp=config_file))
 
 
+'''
 def decode_results_from_program(http_response: str) -> List[CircuitResult | float]:
     """Decode the results from the program execution
 
@@ -97,6 +98,7 @@ def decode_results_from_program(http_response: str) -> List[CircuitResult | floa
     if isinstance(decoded_results[0], float):
         return decoded_results
     return [np.load(urlsafe_b64decode(decoded_result)) for decoded_result in decoded_results]
+'''
 
 
 def decode_jsonified_dict(http_response: str) -> dict:
