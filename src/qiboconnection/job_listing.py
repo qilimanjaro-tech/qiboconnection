@@ -43,6 +43,7 @@ class JobListing:
 
     def __post_init__(self):
         self._dataframe = self._build_dataframe()
+        # self._coerce_dataframe_column_types()
 
     def _build_dataframe(self):
         """Builds the dataframe from the info in each listing item"""

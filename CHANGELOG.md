@@ -1,3 +1,7 @@
+### Feat (2023-07-03)
+
+- Delete a job by its ID using the endpoint of the public api.(#80)
+
 ### Feat (2023-06-29)
 
 - Return an exception if the user want to retrieve a job that doesn't exist or execute without any device selected.(#73)
