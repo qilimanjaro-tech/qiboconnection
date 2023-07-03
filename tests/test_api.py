@@ -736,3 +736,15 @@ def test_delete_runcard_ise(mocked_web_call: MagicMock, mocked_api: API):
         mocked_api.delete_runcard(runcard_id=1)
 
     mocked_web_call.assert_called_with(self=mocked_api._connection, path=f"{mocked_api.RUNCARDS_CALL_PATH}/1")
+
+
+@patch("qiboconnection.connection.Connection.send_delete_auth_remote_api_call", autospec=True)
+def test_delete_job_exception(mocked_api_call: MagicMock, mocked_api: API):
+    """Tests API.delete_job() method with non-existent job id"""
+    # Define the behavior of the mocked function to raise the RemoteExecutionException
+    mocked_api_call.side_effect = RemoteExecutionException("The job does not exist!", status_code=400)
+    with pytest.raises(RemoteExecutionException, match="The job does not exist!"):
+        # Call the function that should raise the exception
+        mocked_api.delete_job(job_id=0)
+    # Assert that the mocked function was called with correct arguments
+    mocked_api_call.assert_called_with(self=mocked_api._connection, path=f"{mocked_api.JOBS_CALL_PATH}/{0}")
