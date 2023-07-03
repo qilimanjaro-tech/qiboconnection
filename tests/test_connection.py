@@ -186,7 +186,7 @@ def test_send_get_auth_remote_api_call(mocked_rest_call: MagicMock, mocked_conne
 def test_send_get_auth_remote_api_call_exception(mocked_rest_call: MagicMock, mocked_connection: Connection):
     """tests send_get_auth_remote_api_call"""
 
-    mocked_rest_call.return_value = web_responses.job_listing.retrieve_job_response_400_raw()
+    mocked_rest_call.return_value = web_responses.job_response.retrieve_job_response_400_raw()
 
     with pytest.raises(RemoteExecutionException, match="The job does not exist!"):
         # Call the function that should raise the exception
@@ -210,6 +210,44 @@ def test_send_delete_auth_remote_api_call(mocked_rest_call: MagicMock, mocked_co
     )
     assert response == web_responses.raw.response_204.json()
     assert code == web_responses.raw.response_204.status_code
+
+
+@patch("qiboconnection.connection.requests.delete", autospec=True)
+def test_send_delete_auth_remote_api_call_not_204_not_job_details(
+    mocked_rest_call: MagicMock, mocked_connection: Connection
+):
+    """tests send_delete_auth_remote_api_call raise"""
+    mocked_rest_call.return_value = web_responses.raw.response_500
+    with pytest.raises(HTTPError):
+        response, code = mocked_connection.send_delete_auth_remote_api_call(path="/PATH")
+
+    mocked_rest_call.assert_called_with(
+        f"{mocked_connection._remote_server_api_url}/PATH",
+        headers={
+            "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
+            ".eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ"
+            ".SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+        },
+    )
+
+
+@patch("qiboconnection.connection.requests.delete", autospec=True)
+def test_send_delete_auth_remote_api_call_not_204_with_job_details(
+    mocked_rest_call: MagicMock, mocked_connection: Connection
+):
+    """tests send_delete_auth_remote_api_call raise"""
+    mocked_rest_call.return_value = web_responses.job_response.retrieve_job_response_400_raw()
+    with pytest.raises(RemoteExecutionException, match="The job does not exist!"):
+        response, code = mocked_connection.send_delete_auth_remote_api_call(path="/PATH")
+
+    mocked_rest_call.assert_called_with(
+        f"{mocked_connection._remote_server_api_url}/PATH",
+        headers={
+            "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
+            ".eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ"
+            ".SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+        },
+    )
 
 
 @patch("qiboconnection.connection.requests.get", autospec=True)

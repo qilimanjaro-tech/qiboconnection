@@ -7,6 +7,7 @@ from datetime import datetime
 from typing import Any
 
 import numpy
+from qibo.models.circuit import Circuit
 
 
 class JobType(str, enum.Enum):
@@ -105,7 +106,7 @@ class ListingJobResponse:
 
 
 @dataclass(slots=True)
-class JobFullData:
+class JobData:
     """Data shown to the user when get_job() method is used. It includes job human-readable results and
     metadata.
     """
@@ -117,4 +118,5 @@ class JobFullData:
     job_id: int
     job_type: str | JobType
     number_shots: int
-    result: dict | Any | None
+    description: Circuit | dict
+    result: dict | None

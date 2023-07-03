@@ -1,7 +1,7 @@
 import pandas as pd
 
 from qiboconnection.job_listing import JobListing, JobListingItem
-from qiboconnection.typings.job import JobFullData, ListingJobResponse
+from qiboconnection.typings.job import ListingJobResponse
 
 
 def test_job_listing_item_creation_from_response():
