@@ -60,6 +60,7 @@ class JobResponse:
         ),
     )
 
+    delete_job_response: tuple[str, int] = ("", 204)
     retrieve_job_response: tuple[dict[str, object], int] = (
         {
             "job_id": 10320,

@@ -796,6 +796,16 @@ def test_no_devices_selected_exception(mocked_api_call: MagicMock, mocked_api: A
 
 
 @patch("qiboconnection.connection.Connection.send_delete_auth_remote_api_call", autospec=True)
+def test_delete_job(mocked_api_call: MagicMock, mocked_api: API):
+    """Tests API.delete_job() method"""
+    # Define the behavior of the mocked function to raise the RemoteExecutionException
+    mocked_api_call.return_value = web_responses.job_response.delete_job_response
+    mocked_api.delete_job(job_id=0)
+
+    mocked_api_call.assert_called_with(self=mocked_api._connection, path=f"{mocked_api.JOBS_CALL_PATH}/{0}")
+
+
+@patch("qiboconnection.connection.Connection.send_delete_auth_remote_api_call", autospec=True)
 def test_delete_job_exception(mocked_api_call: MagicMock, mocked_api: API):
     """Tests API.delete_job() method with non-existent job id"""
     # Define the behavior of the mocked function to raise the RemoteExecutionException

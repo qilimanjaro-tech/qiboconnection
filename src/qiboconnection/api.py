@@ -1007,4 +1007,4 @@ class API(ABC):
         )
         if status_code != 204:
             raise RemoteExecutionException(message="Job could not be removed.", status_code=status_code)
-        logger.info("Job %i deleted successfully with message: %s", job_id, response)
+        logger.info("Job %i deleted successfully")
