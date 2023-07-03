@@ -20,4 +20,4 @@ class WebResponses:
     users = Users()
     auth = Auth()
     raw = ResponsesRaw()
-    job_listing = JobResponse()
+    job_response = JobResponse()

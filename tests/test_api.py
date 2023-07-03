@@ -303,7 +303,7 @@ def test_save_experiment_ise(mocked_web_call: MagicMock, mocked_api: API):
 @patch("qiboconnection.connection.Connection.send_get_auth_remote_api_call_all_pages", autospec=True)
 def test_list_jobs(mocked_web_call: MagicMock, favourites: bool, mocked_api: API):
     """Tests API.list_jobs() method"""
-    mocked_web_call.return_value = web_responses.job_listing.retrieve_job_listing_response
+    mocked_web_call.return_value = web_responses.job_response.retrieve_job_listing_response
 
     jobs_list = mocked_api.list_jobs(favourites=favourites)
 
@@ -357,7 +357,27 @@ def test_get_saved_experiment(mocked_web_call: MagicMock, mocked_api: API):
 @patch("qiboconnection.connection.Connection.send_get_auth_remote_api_call", autospec=True)
 def test_get_job(mocked_web_call: MagicMock, mocked_api: API):
     """Tests API.get_job() method. Should be very similar to get_saved_esperiment. Unit test for _get_job() should be defined first. wrote this test only for being able to pass codecov"""
-    assert 2 == 1 + 1
+    mocked_web_call.return_value = web_responses.job_response.retrieve_job_response
+
+    job_data = mocked_api.get_job(job_id=1)
+
+    mocked_web_call.assert_called_with(self=mocked_api._connection, path=f"{mocked_api.JOBS_CALL_PATH}/1")
+    assert isinstance(job_data, JobData)
+
+
+@patch("qiboconnection.connection.Connection.send_get_auth_remote_api_call", autospec=True)
+def test_get_job_exception(mocked_api_call: MagicMock, mocked_api: API):
+    """Tests API.get_result() method with non-existent job id"""
+
+    # Define the behavior of the mocked function to raise the RemoteExecutionException
+    mocked_api_call.side_effect = RemoteExecutionException("The job does not exist!", status_code=400)
+
+    with pytest.raises(RemoteExecutionException, match="The job does not exist!"):
+        # Call the function that should raise the exception
+        mocked_api.get_result(job_id=0)
+
+    # Assert that the mocked function was called with correct arguments
+    mocked_api_call.assert_called_with(self=mocked_api._connection, path=f"{mocked_api.JOBS_CALL_PATH}/{0}")
 
 
 @patch("qiboconnection.connection.Connection.send_get_auth_remote_api_call", autospec=True)
@@ -745,21 +765,6 @@ def test_delete_runcard_ise(mocked_web_call: MagicMock, mocked_api: API):
     mocked_web_call.assert_called_with(self=mocked_api._connection, path=f"{mocked_api.RUNCARDS_CALL_PATH}/1")
 
 
-@patch("qiboconnection.connection.Connection.send_get_auth_remote_api_call", autospec=True)
-def test_get_job_exception(mocked_api_call: MagicMock, mocked_api: API):
-    """Tests API.get_result() method with non-existent job id"""
-
-    # Define the behavior of the mocked function to raise the RemoteExecutionException
-    mocked_api_call.side_effect = RemoteExecutionException("The job does not exist!", status_code=400)
-
-    with pytest.raises(RemoteExecutionException, match="The job does not exist!"):
-        # Call the function that should raise the exception
-        mocked_api.get_result(job_id=0)
-
-    # Assert that the mocked function was called with correct arguments
-    mocked_api_call.assert_called_with(self=mocked_api._connection, path=f"{mocked_api.JOBS_CALL_PATH}/{0}")
-
-
 @patch("qiboconnection.connection.Connection.send_get_auth_remote_api_call_all_pages", autospec=True)
 def test_no_devices_selected_exception(mocked_api_call: MagicMock, mocked_api: API):
     """Tests API.execute() method with no devices selected"""
@@ -773,13 +778,3 @@ def test_no_devices_selected_exception(mocked_api_call: MagicMock, mocked_api: A
 
     # Check that the mocked function was not called
     mocked_api_call.assert_not_called()
-
-
-def test_set_device_to_online():
-    """unit test for set_device_to_online"""
-    assert 2 + 2 == 4
-
-
-def test_set_device_to_maintenance():
-    """'unit test for set_device_to_maintenace"""
-    assert 2 + 2 == 4
