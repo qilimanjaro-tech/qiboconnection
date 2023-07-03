@@ -1,10 +1,13 @@
-### Feat (2023-07-03)
+## v.0.12.0 (2023-07-03)
 
-- Delete a job by its ID using the endpoint of the public api.(#80)
+### Feat
 
-### Feat (2023-06-29)
-
-- Return an exception if the user want to retrieve a job that doesn't exist or execute without any device selected.(#73)
+- Delete a job by its ID using the endpoint of the public api.
+  [#80](https://github.com/qilimanjaro-tech/qiboconnection/pull/80)
+- Return an exception if the user want to retrieve a job that doesn't exist or execute without any device selected
+  [#73](https://github.com/qilimanjaro-tech/qiboconnection/pull/73)
+- Parsed description in API's get_job()
+  [#79](https://github.com/qilimanjaro-tech/qiboconnection/pull/79)
 
 ## v0.11.0 (2023-06-29)
 
