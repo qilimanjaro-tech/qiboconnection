@@ -1,4 +1,5 @@
 """ Test methods for Connection """
+import json
 from copy import deepcopy
 from unittest.mock import MagicMock, patch
 
@@ -10,7 +11,11 @@ from qiboconnection.connection import (
     ConnectionEstablished,
     refresh_token_if_unauthorised,
 )
-from qiboconnection.errors import ConnectionException, HTTPError
+from qiboconnection.errors import (
+    ConnectionException,
+    HTTPError,
+    RemoteExecutionException,
+)
 from qiboconnection.user import User
 
 from .data import web_responses
@@ -175,6 +180,17 @@ def test_send_get_auth_remote_api_call(mocked_rest_call: MagicMock, mocked_conne
     )
     assert response == web_responses.raw.response_200.json()
     assert code == web_responses.raw.response_200.status_code
+
+
+@patch("qiboconnection.connection.requests.get", autospec=True)
+def test_send_get_auth_remote_api_call_exception(mocked_rest_call: MagicMock, mocked_connection: Connection):
+    """tests send_get_auth_remote_api_call"""
+
+    mocked_rest_call.return_value = web_responses.job_listing.retrieve_job_response_400_raw()
+
+    with pytest.raises(RemoteExecutionException, match="The job does not exist!"):
+        # Call the function that should raise the exception
+        mocked_connection.send_get_auth_remote_api_call(path="/PATH", params={"demo": "demo"})
 
 
 @patch("qiboconnection.connection.requests.delete", autospec=True)

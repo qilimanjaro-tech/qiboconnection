@@ -106,7 +106,7 @@ class ListingJobResponse:
 
 @dataclass(slots=True)
 class JobFullData:
-    """Data shown to the user when get_job() method is used. It includes job result and
+    """Data shown to the user when get_job() method is used. It includes job human-readable results and
     metadata.
     """
 
