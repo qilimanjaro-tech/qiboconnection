@@ -128,7 +128,7 @@ class LivePlotPoints(ABC):
         Raises:
             ValueError: Arguments provided must be of the same type: floats or lists
         """
-        if all(isinstance(arg, (int, float, None)) for arg in [x, y, z]):
+        if all(isinstance(arg, int | float | None) for arg in [x, y, z]):
             point = UnitPoint(x=cast(float, x), y=cast(float, y), z=None, idx=None, idy=None)
             if z is not None:
                 point["z"] = cast(float, z)

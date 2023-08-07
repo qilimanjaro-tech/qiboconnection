@@ -6,7 +6,7 @@ from qiboconnection.devices.device_details import DeviceDetails
 from qiboconnection.typings.device import CalibrationDetailsInput
 
 
-class CalibrationDetails(DeviceDetails):
+class CalibrationDetails(DeviceDetails):  # pylint: disable=too-few-public-methods
     """Class representation of Quantum Calibration Details"""
 
     @typechecked
