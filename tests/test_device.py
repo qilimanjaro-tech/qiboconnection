@@ -12,14 +12,8 @@ from qiboconnection.devices.quantum_device_characteristics import (
     QuantumDeviceCharacteristicsInput,
 )
 from qiboconnection.devices.simulator_device import SimulatorDevice
-from qiboconnection.devices.simulator_device_characteristics import (
-    SimulatorDeviceCharacteristics,
-)
-from qiboconnection.devices.util import (
-    create_device,
-    is_offline_device_input,
-    is_quantum_device_input,
-)
+from qiboconnection.devices.simulator_device_characteristics import SimulatorDeviceCharacteristics
+from qiboconnection.devices.util import create_device, is_offline_device_input, is_quantum_device_input
 from qiboconnection.typings.device import (
     DeviceInput,
     DeviceStatus,

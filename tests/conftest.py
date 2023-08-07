@@ -10,10 +10,7 @@ from requests import Response
 
 from qiboconnection.api import API
 from qiboconnection.connection import Connection
-from qiboconnection.typings.connection import (
-    ConnectionConfiguration,
-    ConnectionEstablished,
-)
+from qiboconnection.typings.connection import ConnectionConfiguration, ConnectionEstablished
 
 
 @pytest.fixture(scope="session", name="mocked_connection_configuration")

@@ -2,10 +2,7 @@
 from dataclasses import dataclass, field
 from datetime import datetime
 
-from qiboconnection.typings.saved_experiment import (
-    SavedExperimentRequest,
-    SavedExperimentResponse,
-)
+from qiboconnection.typings.saved_experiment import SavedExperimentRequest, SavedExperimentResponse
 from qiboconnection.util import decode_jsonified_dict, jsonify_dict_and_base64_encode
 
 

@@ -8,12 +8,7 @@ import websockets
 
 from qiboconnection.live_plot import LivePlot
 from qiboconnection.live_plots import LivePlots
-from qiboconnection.typings.live_plot import (
-    LivePlotAxis,
-    LivePlotLabels,
-    LivePlotPacket,
-    LivePlotType,
-)
+from qiboconnection.typings.live_plot import LivePlotAxis, LivePlotLabels, LivePlotPacket, LivePlotType
 
 from .utils import get_current_event_loop_or_create
 

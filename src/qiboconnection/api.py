@@ -13,11 +13,7 @@ from qibo.states import CircuitResult
 from requests import HTTPError
 from typeguard import typechecked
 
-from qiboconnection.api_utils import (
-    deserialize_job_description,
-    log_job_status_info,
-    parse_job_responses_to_results,
-)
+from qiboconnection.api_utils import deserialize_job_description, log_job_status_info, parse_job_responses_to_results
 from qiboconnection.config import logger
 from qiboconnection.connection import Connection
 from qiboconnection.constants import API_CONSTANTS, REST, REST_ERROR
@@ -35,23 +31,10 @@ from qiboconnection.runcard import Runcard
 from qiboconnection.saved_experiment import SavedExperiment
 from qiboconnection.saved_experiment_listing import SavedExperimentListing
 from qiboconnection.typings.connection import ConnectionConfiguration
-from qiboconnection.typings.job import (
-    JobData,
-    JobResponse,
-    JobStatus,
-    ListingJobResponse,
-)
-from qiboconnection.typings.live_plot import (
-    LivePlotAxis,
-    LivePlotLabels,
-    LivePlotType,
-    PlottingResponse,
-)
+from qiboconnection.typings.job import JobData, JobResponse, JobStatus, ListingJobResponse
+from qiboconnection.typings.live_plot import LivePlotAxis, LivePlotLabels, LivePlotType, PlottingResponse
 from qiboconnection.typings.runcard import RuncardResponse
-from qiboconnection.typings.saved_experiment import (
-    SavedExperimentListingItemResponse,
-    SavedExperimentResponse,
-)
+from qiboconnection.typings.saved_experiment import SavedExperimentListingItemResponse, SavedExperimentResponse
 from qiboconnection.util import unzip
 
 

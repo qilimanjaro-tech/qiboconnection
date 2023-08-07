@@ -3,11 +3,7 @@
 import pytest
 from requests.models import HTTPError, Response
 
-from qiboconnection.errors import (
-    ConnectionException,
-    RemoteExecutionException,
-    custom_raise_for_status,
-)
+from qiboconnection.errors import ConnectionException, RemoteExecutionException, custom_raise_for_status
 
 
 @pytest.fixture(name="response_400")

@@ -3,10 +3,7 @@ import datetime
 
 import pandas as pd
 
-from qiboconnection.saved_experiment_listing import (
-    SavedExperimentListing,
-    SavedExperimentListingItem,
-)
+from qiboconnection.saved_experiment_listing import SavedExperimentListing, SavedExperimentListingItem
 from qiboconnection.typings.saved_experiment import SavedExperimentListingItemResponse
 
 

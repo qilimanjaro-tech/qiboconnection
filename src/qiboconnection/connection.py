@@ -11,23 +11,11 @@ import requests
 from typeguard import typechecked
 
 from qiboconnection.config import get_environment, logger
-from qiboconnection.errors import (
-    ConnectionException,
-    HTTPError,
-    RemoteExecutionException,
-)
+from qiboconnection.errors import ConnectionException, HTTPError, RemoteExecutionException
 from qiboconnection.typings.auth_config import AccessTokenResponse, AssertionPayload
-from qiboconnection.typings.connection import (
-    ConnectionConfiguration,
-    ConnectionEstablished,
-)
+from qiboconnection.typings.connection import ConnectionConfiguration, ConnectionEstablished
 from qiboconnection.user import User
-from qiboconnection.util import (
-    base64url_encode,
-    load_config_file_to_disk,
-    process_response,
-    write_config_file_to_disk,
-)
+from qiboconnection.util import base64url_encode, load_config_file_to_disk, process_response, write_config_file_to_disk
 
 
 def refresh_token_if_unauthorised(func):

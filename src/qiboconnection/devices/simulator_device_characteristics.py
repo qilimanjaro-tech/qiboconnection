@@ -5,10 +5,7 @@ from typeguard import typechecked
 
 from qiboconnection.devices.device_characteristics_util import create_device_type
 from qiboconnection.devices.device_details import DeviceDetails
-from qiboconnection.typings.device import (
-    DeviceType,
-    SimulatorDeviceCharacteristicsInput,
-)
+from qiboconnection.typings.device import DeviceType, SimulatorDeviceCharacteristicsInput
 
 
 class SimulatorDeviceCharacteristics(DeviceDetails):

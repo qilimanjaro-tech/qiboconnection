@@ -3,10 +3,7 @@
 import datetime
 
 from qiboconnection.saved_experiment import SavedExperiment
-from qiboconnection.typings.saved_experiment import (
-    SavedExperimentRequest,
-    SavedExperimentResponse,
-)
+from qiboconnection.typings.saved_experiment import SavedExperimentRequest, SavedExperimentResponse
 
 
 def test_saved_experiment_creation():

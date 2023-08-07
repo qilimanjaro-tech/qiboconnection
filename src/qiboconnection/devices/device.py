@@ -6,10 +6,7 @@ from typeguard import typechecked
 
 from qiboconnection.config import logger
 from qiboconnection.connection import Connection
-from qiboconnection.devices.device_characteristics_util import (
-    set_device_availability,
-    set_device_status,
-)
+from qiboconnection.devices.device_characteristics_util import set_device_availability, set_device_status
 from qiboconnection.devices.device_details import DeviceDetails
 from qiboconnection.typings.device import DeviceAvailability, DeviceInput, DeviceStatus
 

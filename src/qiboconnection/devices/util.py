@@ -10,12 +10,7 @@ from qiboconnection.devices.device import Device
 from qiboconnection.devices.offline_device import OfflineDevice
 from qiboconnection.devices.quantum_device import QuantumDevice
 from qiboconnection.devices.simulator_device import SimulatorDevice
-from qiboconnection.typings.device import (
-    DeviceStatus,
-    OfflineDeviceInput,
-    QuantumDeviceInput,
-    SimulatorDeviceInput,
-)
+from qiboconnection.typings.device import DeviceStatus, OfflineDeviceInput, QuantumDeviceInput, SimulatorDeviceInput
 
 
 def block_device(connection: Connection, device: Device) -> None:

@@ -6,16 +6,8 @@ from unittest.mock import MagicMock, patch
 import pytest
 from requests import Response, delete, get, post, put
 
-from qiboconnection.connection import (
-    Connection,
-    ConnectionEstablished,
-    refresh_token_if_unauthorised,
-)
-from qiboconnection.errors import (
-    ConnectionException,
-    HTTPError,
-    RemoteExecutionException,
-)
+from qiboconnection.connection import Connection, ConnectionEstablished, refresh_token_if_unauthorised
+from qiboconnection.errors import ConnectionException, HTTPError, RemoteExecutionException
 from qiboconnection.user import User
 
 from .data import web_responses

@@ -13,10 +13,7 @@ from qiboconnection.job_result import JobResult
 from qiboconnection.typings.algorithm import ProgramDefinition
 from qiboconnection.typings.job import JobRequest, JobResponse, JobStatus, JobType
 from qiboconnection.user import User
-from qiboconnection.util import (
-    jsonify_dict_and_base64_encode,
-    jsonify_str_and_base64_encode,
-)
+from qiboconnection.util import jsonify_dict_and_base64_encode, jsonify_str_and_base64_encode
 
 
 @dataclass

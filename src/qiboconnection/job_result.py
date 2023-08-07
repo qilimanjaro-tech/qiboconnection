@@ -8,10 +8,7 @@ from numpy import typing as npt
 from qibo.states import CircuitResult
 
 from qiboconnection.typings.job import JobType
-from qiboconnection.util import (
-    decode_results_from_circuit,
-    decode_results_from_experiment,
-)
+from qiboconnection.util import decode_results_from_circuit, decode_results_from_experiment
 
 
 @dataclass

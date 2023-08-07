@@ -16,12 +16,7 @@ import websockets
 from websockets.exceptions import ConnectionClosed, WebSocketException
 
 from qiboconnection.config import logger
-from qiboconnection.typings.live_plot import (
-    LivePlotAxis,
-    LivePlotLabels,
-    LivePlotPacket,
-    LivePlotType,
-)
+from qiboconnection.typings.live_plot import LivePlotAxis, LivePlotLabels, LivePlotPacket, LivePlotType
 
 WEBSOCKET_CONNECTION_LIFETIME = int(os.getenv("QIBOCONNECTION_WEBSOCKET_CONNECTION_LIFETIME", default="5"))
 PACKET_POINT_NUMBER_LIMIT = int(os.getenv("QIBOCONNECTION_PACKET_POINT_NUMBER_LIMIT", default="1000"))

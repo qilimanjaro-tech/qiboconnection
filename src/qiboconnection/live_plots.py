@@ -8,12 +8,7 @@ import numpy as np
 import numpy.typing as npt
 
 from qiboconnection.live_plot import LivePlot
-from qiboconnection.typings.live_plot import (
-    LivePlotAxis,
-    LivePlotLabels,
-    LivePlotPacket,
-    LivePlotType,
-)
+from qiboconnection.typings.live_plot import LivePlotAxis, LivePlotLabels, LivePlotPacket, LivePlotType
 
 
 @dataclass
