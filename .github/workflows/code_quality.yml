@@ -36,20 +36,24 @@ jobs:
           python -m pip install -U pip
           python -m pip install -r dev-requirements.txt
 
+      - name: Install library
+        run: |
+          python -m pip install .
+
       - name: Isort
         run: isort . -l 120 --check
 
       - name: Black
         run: black . -l 120 --check
-      
+
       - name: Flake8
         run: flake8
-      
+
       - name: Pylint
         run: |
           pylint src --rcfile .pylintrc
           pylint tests --rcfile tests/.pylintrc
-          
+
       - name: Mypy
         run: mypy src
 
