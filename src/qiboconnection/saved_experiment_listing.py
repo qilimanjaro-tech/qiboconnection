@@ -12,7 +12,7 @@ from qiboconnection.util import decode_jsonified_dict
 
 
 @dataclass
-class SavedExperimentListingItem:
+class SavedExperimentListingItem:  # pylint: disable=too-many-instance-attributes
     """SavedExperimentListing single item representation"""
 
     name: str

@@ -1,6 +1,4 @@
 """ Job class """
-import base64
-import json
 from abc import ABC
 from dataclasses import dataclass, field
 from typing import Any, List
@@ -17,7 +15,7 @@ from qiboconnection.util import jsonify_dict_and_base64_encode, jsonify_str_and_
 
 
 @dataclass
-class Job(ABC):
+class Job(ABC):  # pylint: disable=too-many-instance-attributes
     """Job class to manage the job experiment to be remotely sent"""
 
     user: User
