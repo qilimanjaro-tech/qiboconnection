@@ -38,7 +38,7 @@ from qiboconnection.typings.saved_experiment import SavedExperimentListingItemRe
 from qiboconnection.util import unzip
 
 
-class API(ABC):
+class API(ABC):  # pylint: disable=too-many-instance-attributes, too-many-public-methods
     """Qilimanjaro Client API class to communicate with the Quantum Service"""
 
     API_VERSION = "v1"
@@ -65,7 +65,7 @@ class API(ABC):
         self._saved_experiments_listing: SavedExperimentListing | None = None
         self._runcard: Runcard | None = None
 
-    """ LOCAL INFORMATION """
+    # LOCAL INFORMATION
 
     @property
     def jobs(self) -> List[Job]:
@@ -127,7 +127,7 @@ class API(ABC):
 
         return self._connection.user.user_id
 
-    """ PING """
+    # PING
 
     def ping(self) -> str:
         """Checks if the connection is alive and response OK when it is.
@@ -140,7 +140,7 @@ class API(ABC):
             raise ConnectionException("Error connecting to Qilimanjaro API")
         return response
 
-    """ DEVICES"""
+    # DEVICES
 
     @typechecked
     def list_devices(self) -> Devices:
@@ -292,7 +292,7 @@ class API(ABC):
             logger.error(json.loads(str(ex))[REST_ERROR.DETAIL])
             raise ex
 
-    """ REMOTE EXECUTIONS """
+    # REMOTE EXECUTIONS
 
     @typechecked
     def execute(
@@ -487,7 +487,7 @@ class API(ABC):
         )
         return self._wait_and_return_results(deadline=deadline, interval=interval, job_ids=job_ids)
 
-    """ REMOTE PLOTTING """
+    # REMOTE PLOTTING
 
     @typechecked
     async def create_liveplot(
@@ -556,7 +556,7 @@ class API(ABC):
         """
         return await self._live_plots.send_data(plot_id=plot_id, x=x, y=y, z=z)
 
-    """ SAVED EXPERIMENTS """
+    # SAVED EXPERIMENTS
 
     @typechecked
     def save_experiment(
@@ -712,7 +712,6 @@ class API(ABC):
         """
         jobs_list_response = self._get_list_jobs_response(favourites=favourites)
         jobs_listing = JobListing.from_response(jobs_list_response)
-        self._jobs_listing = jobs_listing
         return jobs_listing
 
     @typechecked
@@ -795,7 +794,7 @@ class API(ABC):
             for saved_experiment_id in saved_experiment_ids
         ]
 
-    """ RUNCARDS """
+    # RUNCARDS
 
     def _create_runcard_response(self, runcard: Runcard):
         """Make the runcard create request and parse the response"""
@@ -985,9 +984,7 @@ class API(ABC):
         """Deletes a job from the database (only for admin users)        Raises:
         RemoteExecutionException: Devices could not be retrieved        Returns:
         """
-        response, status_code = self._connection.send_delete_auth_remote_api_call(
-            path=f"{self.JOBS_CALL_PATH}/{job_id}"
-        )
+        _, status_code = self._connection.send_delete_auth_remote_api_call(path=f"{self.JOBS_CALL_PATH}/{job_id}")
         if status_code != 204:
             raise RemoteExecutionException(message="Job could not be removed.", status_code=status_code)
         logger.info("Job %i deleted successfully")

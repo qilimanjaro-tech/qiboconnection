@@ -40,7 +40,7 @@ def refresh_token_if_unauthorised(func):
 
 
 @dataclass
-class Connection(ABC):
+class Connection(ABC):  # pylint: disable=too-many-instance-attributes
     """Class to create a remote connection to a Qibo server"""
 
     @typechecked
@@ -354,8 +354,7 @@ class Connection(ABC):
             error_details = response.json()
             if "detail" in error_details and "does not exist" in error_details["detail"]:
                 raise RemoteExecutionException("The job does not exist!", status_code=400)
-            else:
-                response.raise_for_status()
+            response.raise_for_status()
 
         return process_response(response)
 

@@ -7,7 +7,7 @@ from qiboconnection.util import decode_jsonified_dict, jsonify_dict_and_base64_e
 
 
 @dataclass
-class Runcard:
+class Runcard:  # pylint: disable=too-many-instance-attributes
     """Runcard representation"""
 
     name: str

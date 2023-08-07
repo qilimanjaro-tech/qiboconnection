@@ -1,19 +1,19 @@
 """CONSTANTS"""
 
 
-class REST:
+class REST:  # pylint: disable=too-few-public-methods
     """REST constants, for rest calls used in many sites"""
 
     ITEMS = "items"
 
 
-class REST_ERROR:
+class REST_ERROR:  # pylint: disable=too-few-public-methods
     """REST error constants"""
 
     DETAIL = "detail"
 
 
-class API_CONSTANTS:
+class API_CONSTANTS:  # pylint: disable=too-few-public-methods
     """API constants"""
 
     JOB_ID = "job_id"

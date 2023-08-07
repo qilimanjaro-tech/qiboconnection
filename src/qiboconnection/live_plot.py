@@ -22,7 +22,7 @@ WEBSOCKET_CONNECTION_LIFETIME = int(os.getenv("QIBOCONNECTION_WEBSOCKET_CONNECTI
 PACKET_POINT_NUMBER_LIMIT = int(os.getenv("QIBOCONNECTION_PACKET_POINT_NUMBER_LIMIT", default="1000"))
 
 
-class LivePlot(ABC):
+class LivePlot(ABC):  # pylint: disable=too-many-instance-attributes
     """Job class to manage the job experiment to be remotely sent"""
 
     def __init__(

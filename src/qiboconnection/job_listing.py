@@ -1,13 +1,11 @@
 """ JobListing class """
 
 from dataclasses import asdict, dataclass, field
-from datetime import datetime
 from typing import List
 
 import pandas as pd
 
 from qiboconnection.typings.job import JobStatus, JobType, ListingJobResponse
-from qiboconnection.util import decode_jsonified_dict
 
 
 @dataclass
