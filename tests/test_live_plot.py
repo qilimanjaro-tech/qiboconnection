@@ -11,9 +11,8 @@ from unittest.mock import MagicMock, patch
 
 import numpy as np
 import pytest
-import websockets
 
-from qiboconnection.live_plot import WEBSOCKET_CONNECTION_LIFETIME, LivePlot
+from qiboconnection.models.live_plot import WEBSOCKET_CONNECTION_LIFETIME, LivePlot
 from qiboconnection.typings.live_plot import (
     LivePlotAxis,
     LivePlotLabels,
@@ -21,7 +20,6 @@ from qiboconnection.typings.live_plot import (
     LivePlotPoints,
     LivePlotType,
     PlottingResponse,
-    _ensure_packet_compatibility,
     _ensure_packet_types,
 )
 
@@ -413,8 +411,8 @@ def test_open_and_close_connection(
     assert live_plot._connection_started_at is None
 
 
-@patch("qiboconnection.live_plot.LivePlot._open_connection", autospec=True)
-@patch("qiboconnection.live_plot.LivePlot._close_connection", autospec=True)
+@patch("qiboconnection.models.live_plot.LivePlot._open_connection", autospec=True)
+@patch("qiboconnection.models.live_plot.LivePlot._close_connection", autospec=True)
 def test_reset_connection(
     mocked_open_connection: MagicMock,
     mocked_close_connection: MagicMock,
@@ -451,7 +449,7 @@ def test_reset_connection(
     mocked_open_connection.assert_called()
 
 
-@patch("qiboconnection.live_plot.LivePlot._close_connection")
+@patch("qiboconnection.models.live_plot.LivePlot._close_connection")
 @patch("websockets.connect", autospec=True)
 def test_send_data(
     mocked_websockets_connect: MagicMock,
@@ -502,7 +500,7 @@ def test_send_data(
     mocked_connection.send.assert_called_with(data_packet.to_json())
 
 
-@patch("qiboconnection.live_plot.LivePlot._reset_connection", autospec=True)
+@patch("qiboconnection.models.live_plot.LivePlot._reset_connection", autospec=True)
 @patch("websockets.connect", autospec=True)
 def test_send_data_with_too_log_lived_connection(
     mocked_websockets_connect: MagicMock,
@@ -564,7 +562,7 @@ def test_send_data_with_too_log_lived_connection(
     mocked_connection.send.assert_called_with(data_packet.to_json())
 
 
-@patch("qiboconnection.live_plot.LivePlot._reset_connection", autospec=True)
+@patch("qiboconnection.models.live_plot.LivePlot._reset_connection", autospec=True)
 @patch("websockets.connect", autospec=True)
 def test_send_data_with_closed_connection(
     mocked_websockets_connect: MagicMock,
@@ -620,7 +618,7 @@ def test_send_data_with_closed_connection(
     mocked_reset_connection.assert_called()
 
 
-@patch("qiboconnection.live_plot.LivePlot._setup_queue", autospec=True)
+@patch("qiboconnection.models.live_plot.LivePlot._setup_queue", autospec=True)
 @patch("websockets.connect", autospec=True)
 def test_send_data_with_missbehaving_queue(
     mocked_websockets_connect: MagicMock,

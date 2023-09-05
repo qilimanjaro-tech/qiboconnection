@@ -16,12 +16,13 @@ from qiboconnection.errors import (
     HTTPError,
     RemoteExecutionException,
 )
-from qiboconnection.typings.auth_config import AccessTokenResponse, AssertionPayload
+from qiboconnection.models import User
 from qiboconnection.typings.connection import (
     ConnectionConfiguration,
     ConnectionEstablished,
 )
-from qiboconnection.user import User
+from qiboconnection.typings.requests import AssertionPayload
+from qiboconnection.typings.responses import AccessTokenResponse
 from qiboconnection.util import (
     base64url_encode,
     load_config_file_to_disk,
