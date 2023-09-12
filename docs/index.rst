@@ -3,18 +3,28 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to Qiboconnection's documentation!
-==========================================
+Qiboconnection Documentation
+=====================
+
+.. rst-class:: lead grey-text ml-2
+
+    :Release: |release|
+
+.. rst-class:: lead center
+
+    Qiboconnection is amazing!
+
+
+Get started
+-----------
+
+.. warning::
+
+   This documentation is currently under construction.
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+   :caption: API
+   :maxdepth: 1
+   :hidden:
 
-   modules
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+   code/api
