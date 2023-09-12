@@ -5,5 +5,5 @@ numpy==1.24.1
 qibo==0.1.12
 PyJWT==2.6.0
 pandas~=1.5.3
-
+sphinxawesome_theme~=4.1.0
 websockets~=10.4

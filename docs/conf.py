@@ -17,7 +17,9 @@ copyright = "2023, Qilimanjaro"
 author = "Qilimanjaro"
 
 # TODO: set the right value
-release = "1.0.0"
+import qiboconnection  # pylint: disable=wrong-import-position  # noqa: E402
+
+release = qiboconnection.__version__
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
