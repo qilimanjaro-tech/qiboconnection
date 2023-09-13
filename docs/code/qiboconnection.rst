@@ -1,10 +1,7 @@
-qiboconnection
-===============
+Qiboconnection API Class
+=========================
 
 .. currentmodule:: qiboconnection
 
-.. automodapi:: qiboconnection
-    :no-heading:
-    :no-inheritance-diagram:
-    :include-all-objects:
-    :skip:
+.. autoclass:: qiboconnection.api.API
+    :members: list_devices

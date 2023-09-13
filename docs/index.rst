@@ -21,6 +21,20 @@ Get started
 .. warning::
 
    This documentation is currently under construction.
+.. toctree::
+   :caption: Using Qiboconnection
+   :maxdepth: 1
+   :hidden:
+
+   introduction/what_is_qiboconnection
+   introduction/qiboconnection_api
+
+.. toctree::
+   :caption: Development
+   :maxdepth: 1
+   :hidden:
+
+   development/guide
 
 .. toctree::
    :caption: API
