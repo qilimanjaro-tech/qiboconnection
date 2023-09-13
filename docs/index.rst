@@ -4,7 +4,7 @@
    contain the root `toctree` directive.
 
 Qiboconnection Documentation
-=====================
+==============================
 
 .. rst-class:: lead grey-text ml-2
 
@@ -27,4 +27,4 @@ Get started
    :maxdepth: 1
    :hidden:
 
-   code/api
+   code/qiboconnection

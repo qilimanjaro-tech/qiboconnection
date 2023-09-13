@@ -15,17 +15,18 @@
 """
 This module contains all needed classes needed for intacting with Qilimanjaro's QaaS via Qiboconnection SDK.
 
-.. currentmodule:: qiboconnection.api
+
 
 API Class
 ~~~~~~~~~~
 
+.. currentmodule:: qiboconnection
 
 .. autosummary::
     :toctree: api
-    :members:
 
     ~API
 """
+
 __version__ = "1.0.0"
 from .api import API
