@@ -133,3 +133,4 @@ qibo_configuration
 .qibo_configuratio
 .qibo_configuration
 _build
+tests/setenv.sh

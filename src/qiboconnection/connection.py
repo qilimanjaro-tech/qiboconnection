@@ -11,7 +11,11 @@ import requests
 from typeguard import typechecked
 
 from qiboconnection.config import get_environment, logger
-from qiboconnection.errors import ConnectionException, HTTPError
+from qiboconnection.errors import (
+    ConnectionException,
+    HTTPError,
+    RemoteExecutionException,
+)
 from qiboconnection.typings.auth_config import AccessTokenResponse, AssertionPayload
 from qiboconnection.typings.connection import (
     ConnectionConfiguration,
@@ -166,9 +170,12 @@ class Connection(ABC):
             raise ValueError("API path not specified")
         if self._authorisation_access_token is None:
             raise ValueError("Authorisation access token not specified")
+        if self._authorisation_refresh_token is None:
+            raise ValueError("Authorisation refresh token not specified")
         config_data = ConnectionEstablished(
             **self._user.__dict__,
             authorisation_access_token=self._authorisation_access_token,
+            authorisation_refresh_token=self._authorisation_refresh_token,
             api_path=self._api_path,
         )
 
@@ -181,7 +188,7 @@ class Connection(ABC):
     ) -> None:
         if input_configuration is None:
             try:
-                self._register_configuration_with_authorisation_access_token(load_config_file_to_disk())
+                self._register_configuration_with_authorisation_tokens(load_config_file_to_disk())
                 return
             except FileNotFoundError as ex:
                 raise ConnectionException(
@@ -205,7 +212,7 @@ class Connection(ABC):
         self._register_connection_configuration(configuration)
         self._authorisation_access_token, self._authorisation_refresh_token = self._request_authorisation_token()
 
-    def _register_configuration_with_authorisation_access_token(self, configuration: ConnectionEstablished):
+    def _register_configuration_with_authorisation_tokens(self, configuration: ConnectionEstablished):
         """
         Saves the connection info of user and calls urls, and saves to self._authorisation_access_token the access
          token.
@@ -215,6 +222,7 @@ class Connection(ABC):
         logger.debug("Configuration loaded successfully.")
         self._register_connection_established(configuration)
         self._authorisation_access_token = configuration.authorisation_access_token
+        self._authorisation_refresh_token = configuration.authorisation_refresh_token
 
     def _register_connection_established(self, configuration: ConnectionEstablished):
         """
@@ -353,6 +361,14 @@ class Connection(ABC):
         logger.debug("Calling: %s%s", self._remote_server_api_url, path)
         header = {"Authorization": f"Bearer {self._authorisation_access_token}"}
         response = requests.get(f"{self._remote_server_api_url}{path}", headers=header, params=params)
+
+        if response.status_code != 200:
+            error_details = response.json()
+            if "detail" in error_details and "does not exist" in error_details["detail"]:
+                raise RemoteExecutionException("The job does not exist!", status_code=400)
+            else:
+                response.raise_for_status()
+
         return process_response(response)
 
     @refresh_token_if_unauthorised
@@ -392,7 +408,15 @@ class Connection(ABC):
         logger.debug("Calling: %s%s", self._remote_server_api_url, path)
         header = {"Authorization": f"Bearer {self._authorisation_access_token}"}
         response = requests.delete(f"{self._remote_server_api_url}{path}", headers=header)
-        return process_response(response)
+
+        if response.status_code != 204:
+            error_details = response.json()
+            if "detail" in error_details and "does not exist" in error_details["detail"]:
+                raise RemoteExecutionException("The job does not exist!", status_code=400)
+            else:
+                response.raise_for_status()
+
+        return ("", 204)
 
     @refresh_token_if_unauthorised
     @typechecked
@@ -413,6 +437,7 @@ class Connection(ABC):
         """
         Builds assertion payload with user info, encodes it and uses it to POST the server for a new Access Token.
         Returns: str tuple with new Access  and Refresh Tokens.
+        Returns: str tuple with new Access  and Refresh Tokens.
         """
         assertion_payload = AssertionPayload(
             **self._user.__dict__,  # type: ignore
@@ -420,7 +445,7 @@ class Connection(ABC):
             iat=int(datetime.now(timezone.utc).timestamp()),
         )
 
-        encoded_assertion_payload = base64url_encode(json.dumps(asdict(assertion_payload), indent=2))
+        encoded_assertion_payload = base64url_encode(json.dumps(asdict(asdict(assertion_payload)), indent=2))
 
         authorisation_request_payload = {
             "grantType": "urn:ietf:params:oauth:grant-type:jwt-bearer",
