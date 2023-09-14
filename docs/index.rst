@@ -27,7 +27,6 @@ Get started
    :hidden:
 
    introduction/what_is_qiboconnection
-   introduction/qiboconnection_api
 
 .. toctree::
    :caption: Development

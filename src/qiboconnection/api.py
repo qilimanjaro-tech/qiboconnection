@@ -92,73 +92,57 @@ class API(ABC):
         Now, list all available devices and select the one(s) you want to send your job to:
 
         >>> api.list_devices()
+        <Devices[5]:
+        {
+        "device_id": 16,
+        "device_name": "Sauron 2FQ",
+        "status": "offline",
+        "availability": "available"
+        }
+        {
+        "device_id": 15,
+        "device_name": "Sauron soprano",
+        "status": "offline",
+        "availability": "available"
+        }
+        {
+        "device_id": 14,
+        "device_name": "Sauron Cluster",
+        "status": "offline",
+        "availability": "available"
+        }
+        {
+        "device_id": 9,
+        "device_name": "Galadriel Qblox rack",
+        "status": "maintenance",
+        "availability": "available",
+        "characteristics": {
+        ...
+            "os": "Ubuntu 20.04 focal",
+            "kernel": "x86_64 Linux 5.4.0-80-generic",
+            "ram": "64185MiB"
+        }
+        }
+        >>> api.select_device_id(device_id=9)
+        [qibo-connection] 0.12.0|INFO|2023-09-14 15:04:05]: Storing personal qibo configuration...
 
-        >>> result = platform.execute(program=circuit, num_avg=1000, repetition_duration=6000)
-        >>> result.array
-        array([[5.],
-                [5.]])
-
-        When disabling scope acquisition mode, the array obtained has shape `(#sequencers, 2, #bins)`. In this case,
-        given that we are using only 1 sequencer to acquire the results, we obtain an array with shape `(2, #bins)`.
-
-        .. note::
-
-            Remember that the values obtained correspond to the integral of the I/Q signals received by the
-            digitiser.
-
-        Now let's run the Rabi sequence. We will run this sequence by looping over the gain of the AWG used to
-        create the pi pulse. To do so, we will use the `set_parameter` method with the alias of the bus used to
-        drive qubit 0.
-
-        .. code-block:: python3
-
-            import numpy as np
-
-            results = []
-
-            gain_values = np.arange(0, 1, step=0.1)
-            for gain in gain_values:
-                # We assume the bus used to drive qubit 0 is called "drive_q0"
-                platform.set_parameter(alias="drive_q0", parameter=ql.Parameter.GAIN, value=gain)
-                result = platform.execute(program=circuit, num_avg=1000, repetition_duration=6000)
-                results.append(result.array)
-
-        No we can use `np.hstack` to stack the obtained results horizontally. By doing this, we will obtain an
-        array with shape `(2, N)`, where N is the number of elements inside the loop:
-
-        >>> results = np.hstack(results)
-        >>> results
-        array([[5, 4, 3, 2, 1, 2, 3],
-                [5, 4, 3, 2, 1, 2, 3]])
-
-        We can see how the integrated I/Q values oscillated, meaning that qubit 0 oscillates between ground and
-        excited state!
-
-        Given that we are looping over variables that are independent of the circuit (in this case the gain of the AWG),
-        we can speed up the experiment by translating the circuit into pulses only once, and then executing the obtained
-        pulses inside the loop:
+        Let's build a simple circuit and execute it:
 
         .. code-block:: python3
 
-            from qililab.pulses.circuit_to_pulses import CircuitToPulses
+            circuit = Circuit(1)
+            circuit.add(gates.H(0))
+            circuit.add(gates.M(0))
 
-            pulse_schedule = CircuitToPulses(platform=platform).translate(circuits=[circuit])
+        >>> api.execute(circuit=circuit)
+        [20285]
 
-            results = []
+        Once the execution has finished, you can retrieve all the information related to your job:
 
-            gain_values = np.arange(0, 1, step=0.1)
-            for gain in gain_values:
-                # We assume the bus used to drive qubit 0 is called "drive_q0"
-                platform.set_parameter(alias="drive_q0", parameter=ql.Parameter.GAIN, value=gain)
-                result = platform.execute(program=pulse_schedule, num_avg=1000, repetition_duration=6000)
-                results.append(result.array)
+        >>> api.get_job()
+        [qibo-connection] 0.12.0|WARNING|2023-09-14 15:17:55]: Your job with id 20285 is completed.
+        JobData(status='completed', queue_position=0, user_id=3, device_id=9, job_id=20285, job_type='circuit', number_shots=10, description=<qibo.models.circuit.Circuit object at 0x7f169e56fb50>, result={'state': array([0.70710678+0.j, 0.70710678+0.j]), 'probabilities': array([0.5, 0.5]), 'frequencies': Counter({'0': 7, '1': 3})})
 
-        If we stack and print the results, we see how we obtain similar results, but much faster!
-
-        >>> results = np.hstack(results)
-        >>> results
-        array([[5, 4, 3, 2, 1, 2, 3],
-                [5, 4, 3, 2, 1, 2, 3]])
     """
 
     API_VERSION = "v1"
