@@ -437,7 +437,6 @@ class Connection(ABC):
         """
         Builds assertion payload with user info, encodes it and uses it to POST the server for a new Access Token.
         Returns: str tuple with new Access  and Refresh Tokens.
-        Returns: str tuple with new Access  and Refresh Tokens.
         """
         assertion_payload = AssertionPayload(
             **self._user.__dict__,  # type: ignore
@@ -445,7 +444,7 @@ class Connection(ABC):
             iat=int(datetime.now(timezone.utc).timestamp()),
         )
 
-        encoded_assertion_payload = base64url_encode(json.dumps(asdict(asdict(assertion_payload)), indent=2))
+        encoded_assertion_payload = base64url_encode(json.dumps(asdict(assertion_payload), indent=2))
 
         authorisation_request_payload = {
             "grantType": "urn:ietf:params:oauth:grant-type:jwt-bearer",
@@ -471,7 +470,7 @@ class Connection(ABC):
         """Updates the saved access token sending the request token. For this, it
         builds assertion payload with user info, encodes it and uses it to POST the server for a new Access Token.
         Returns:
-            str with a new Access Token.
+            str with a new Access Token
         """
 
         if self._authorisation_server_refresh_api_call is None:
