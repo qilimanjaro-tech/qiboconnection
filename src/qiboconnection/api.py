@@ -70,7 +70,96 @@ from qiboconnection.util import unzip
 
 
 class API(ABC):
-    """Qilimanjaro Client API class to communicate with the Quantum Service"""
+    """Qilimanjaro Client API class to communicate with the Quantum Service.
+
+    An instance of this class is the entrypoint to Qilimanjaro's Quantum as a Service. Its methods let you send jobs to our Quantum Processing Units.
+
+    .. note::
+
+            You may not be able to call some of the available methods depending on your user role - e.g, only Qilimanjaro users are allowed to set the devices in maintenance mode.
+
+    Examples:
+
+        For instantiating the API Class, you will need a user and an api key:
+
+        .. code-block:: python3
+
+            from qiboconnection.api import API
+            from qiboconnection.connection import ConnectionConfiguration
+
+           api = API(configuration=ConnectionConfiguration(username="", api_key=""))
+
+        Now, list all available devices and select the one(s) you want to send your job to:
+
+        >>> api.list_devices()
+
+        >>> result = platform.execute(program=circuit, num_avg=1000, repetition_duration=6000)
+        >>> result.array
+        array([[5.],
+                [5.]])
+
+        When disabling scope acquisition mode, the array obtained has shape `(#sequencers, 2, #bins)`. In this case,
+        given that we are using only 1 sequencer to acquire the results, we obtain an array with shape `(2, #bins)`.
+
+        .. note::
+
+            Remember that the values obtained correspond to the integral of the I/Q signals received by the
+            digitiser.
+
+        Now let's run the Rabi sequence. We will run this sequence by looping over the gain of the AWG used to
+        create the pi pulse. To do so, we will use the `set_parameter` method with the alias of the bus used to
+        drive qubit 0.
+
+        .. code-block:: python3
+
+            import numpy as np
+
+            results = []
+
+            gain_values = np.arange(0, 1, step=0.1)
+            for gain in gain_values:
+                # We assume the bus used to drive qubit 0 is called "drive_q0"
+                platform.set_parameter(alias="drive_q0", parameter=ql.Parameter.GAIN, value=gain)
+                result = platform.execute(program=circuit, num_avg=1000, repetition_duration=6000)
+                results.append(result.array)
+
+        No we can use `np.hstack` to stack the obtained results horizontally. By doing this, we will obtain an
+        array with shape `(2, N)`, where N is the number of elements inside the loop:
+
+        >>> results = np.hstack(results)
+        >>> results
+        array([[5, 4, 3, 2, 1, 2, 3],
+                [5, 4, 3, 2, 1, 2, 3]])
+
+        We can see how the integrated I/Q values oscillated, meaning that qubit 0 oscillates between ground and
+        excited state!
+
+        Given that we are looping over variables that are independent of the circuit (in this case the gain of the AWG),
+        we can speed up the experiment by translating the circuit into pulses only once, and then executing the obtained
+        pulses inside the loop:
+
+        .. code-block:: python3
+
+            from qililab.pulses.circuit_to_pulses import CircuitToPulses
+
+            pulse_schedule = CircuitToPulses(platform=platform).translate(circuits=[circuit])
+
+            results = []
+
+            gain_values = np.arange(0, 1, step=0.1)
+            for gain in gain_values:
+                # We assume the bus used to drive qubit 0 is called "drive_q0"
+                platform.set_parameter(alias="drive_q0", parameter=ql.Parameter.GAIN, value=gain)
+                result = platform.execute(program=pulse_schedule, num_avg=1000, repetition_duration=6000)
+                results.append(result.array)
+
+        If we stack and print the results, we see how we obtain similar results, but much faster!
+
+        >>> results = np.hstack(results)
+        >>> results
+        array([[5, 4, 3, 2, 1, 2, 3],
+                [5, 4, 3, 2, 1, 2, 3]])
+    """
 
     API_VERSION = "v1"
     API_PATH = f"/api/{API_VERSION}"
