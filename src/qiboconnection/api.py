@@ -395,6 +395,21 @@ class API(ABC):
             job_ids.append(job.id)
         return job_ids
 
+    @typechecked
+    def list_jobs(self, favourites: bool = False) -> JobListing:
+        """List all jobs metadata
+
+        Raises:
+            RemoteExecutionException: Devices could not be retrieved
+
+        Returns:
+            Devices: All Jobs
+        """
+        jobs_list_response = self._get_list_jobs_response(favourites=favourites)
+        jobs_listing = JobListing.from_response(jobs_list_response)
+        self._jobs_listing = jobs_listing
+        return jobs_listing
+
     def _get_job(self, job_id: int) -> JobResponse:
         """Calls the API to get a job from a remote execution.
 
@@ -412,6 +427,41 @@ class API(ABC):
             raise RemoteExecutionException(message="Job could not be retrieved.", status_code=status_code)
 
         return JobResponse(**cast(dict, response))
+
+    @typechecked
+    def get_job(self, job_id: int):
+        """Get metadata, result and the correspondig Qibo circuit or Qililab experiment from a remote job execution.
+
+        Args:
+            job_id (int): Job identifier
+
+        Raises:
+            RemoteExecutionException: Job could not be retrieved.
+            ValueError: Job status not supported.
+            ValueError: Your job failed.
+
+        Returns:
+            dict
+        """
+
+        job_response = self._get_job(job_id=job_id)
+        log_job_status_info(job_response=job_response)
+        parsed_job_result = parse_job_responses_to_results(job_responses=[job_response])[0]
+
+        parsed_job_description = deserialize_job_description(
+            base64_description=job_response.description, job_type=job_response.job_type
+        )
+        return JobData(
+            status=job_response.status,
+            queue_position=job_response.queue_position,
+            user_id=job_response.user_id,
+            device_id=job_response.device_id,
+            job_id=job_response.job_id,
+            job_type=job_response.job_type,
+            number_shots=job_response.number_shots,
+            description=parsed_job_description,
+            result=parsed_job_result,
+        )
 
     @typechecked
     def get_result(self, job_id: int) -> CircuitResult | npt.NDArray | dict | None:
@@ -452,6 +502,18 @@ class API(ABC):
         for job_response in job_responses:
             log_job_status_info(job_response=job_response)
         return parse_job_responses_to_results(job_responses=job_responses)
+
+    @typechecked
+    def delete_job(self, job_id: int) -> None:
+        """Deletes a job from the database (only for admin users)        Raises:
+        RemoteExecutionException: Devices could not be retrieved        Returns:
+        """
+        response, status_code = self._connection.send_delete_auth_remote_api_call(
+            path=f"{self.JOBS_CALL_PATH}/{job_id}"
+        )
+        if status_code != 204:
+            raise RemoteExecutionException(message="Job could not be removed.", status_code=status_code)
+        logger.info("Job %i deleted successfully")
 
     def _wait_and_return_results(
         self, deadline: datetime, interval: int, job_ids: List[int]
@@ -732,21 +794,6 @@ class API(ABC):
         return saved_experiment_listing
 
     @typechecked
-    def list_jobs(self, favourites: bool = False) -> JobListing:
-        """List all jobs metadata
-
-        Raises:
-            RemoteExecutionException: Devices could not be retrieved
-
-        Returns:
-            Devices: All Jobs
-        """
-        jobs_list_response = self._get_list_jobs_response(favourites=favourites)
-        jobs_listing = JobListing.from_response(jobs_list_response)
-        self._jobs_listing = jobs_listing
-        return jobs_listing
-
-    @typechecked
     def _get_saved_experiment_response(self, saved_experiment_id: int):
         """Gets complete information of a single saved experiment
 
@@ -774,41 +821,6 @@ class API(ABC):
         """
         return SavedExperiment.from_response(
             self._get_saved_experiment_response(saved_experiment_id=saved_experiment_id)
-        )
-
-    @typechecked
-    def get_job(self, job_id: int):
-        """Get metadata, result and the correspondig Qibo circuit or Qililab experiment from a remote job execution.
-
-        Args:
-            job_id (int): Job identifier
-
-        Raises:
-            RemoteExecutionException: Job could not be retrieved.
-            ValueError: Job status not supported.
-            ValueError: Your job failed.
-
-        Returns:
-            dict
-        """
-
-        job_response = self._get_job(job_id=job_id)
-        log_job_status_info(job_response=job_response)
-        parsed_job_result = parse_job_responses_to_results(job_responses=[job_response])[0]
-
-        parsed_job_description = deserialize_job_description(
-            base64_description=job_response.description, job_type=job_response.job_type
-        )
-        return JobData(
-            status=job_response.status,
-            queue_position=job_response.queue_position,
-            user_id=job_response.user_id,
-            device_id=job_response.device_id,
-            job_id=job_response.job_id,
-            job_type=job_response.job_type,
-            number_shots=job_response.number_shots,
-            description=parsed_job_description,
-            result=parsed_job_result,
         )
 
     @typechecked
@@ -1010,15 +1022,3 @@ class API(ABC):
         if status_code != 204:
             raise RemoteExecutionException(message="Runcard could not be removed.", status_code=status_code)
         logger.info("Runcard %i deleted successfully with message: %s", runcard_id, response)
-
-    @typechecked
-    def delete_job(self, job_id: int) -> None:
-        """Deletes a job from the database (only for admin users)        Raises:
-        RemoteExecutionException: Devices could not be retrieved        Returns:
-        """
-        response, status_code = self._connection.send_delete_auth_remote_api_call(
-            path=f"{self.JOBS_CALL_PATH}/{job_id}"
-        )
-        if status_code != 204:
-            raise RemoteExecutionException(message="Job could not be removed.", status_code=status_code)
-        logger.info("Job %i deleted successfully")
