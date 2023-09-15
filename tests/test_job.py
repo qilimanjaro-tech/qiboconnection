@@ -7,11 +7,8 @@ import pytest
 from qibo import gates
 from qibo.models.circuit import Circuit
 
-from qiboconnection.devices.device import Device
-from qiboconnection.devices.simulator_device import SimulatorDevice
-from qiboconnection.job import Job
-from qiboconnection.job_result import JobResult
-from qiboconnection.typings.algorithm import (
+from qiboconnection.models import User
+from qiboconnection.models.algorithm import (
     AlgorithmDefinition,
     AlgorithmName,
     AlgorithmOptions,
@@ -19,8 +16,13 @@ from qiboconnection.typings.algorithm import (
     InitialValue,
     ProgramDefinition,
 )
-from qiboconnection.typings.job import JobRequest, JobResponse, JobStatus, JobType
-from qiboconnection.user import User
+from qiboconnection.models.devices import SimulatorDevice
+from qiboconnection.models.devices.device import Device
+from qiboconnection.models.job import Job
+from qiboconnection.models.job_result import JobResult
+from qiboconnection.typings.enums import JobStatus, JobType
+from qiboconnection.typings.requests import JobRequest
+from qiboconnection.typings.responses import JobResponse
 
 from .data import simulator_device_inputs
 

@@ -20,8 +20,9 @@ from typing import Any, List
 from qibo.models.circuit import Circuit
 
 from qiboconnection.config import logger
-from qiboconnection.job_result import JobResult
-from qiboconnection.typings.job import JobResponse, JobStatus, JobType
+from qiboconnection.models import JobResult
+from qiboconnection.typings.enums import JobStatus, JobType
+from qiboconnection.typings.responses import JobResponse
 from qiboconnection.util import base64_decode
 
 

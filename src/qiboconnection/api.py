@@ -35,34 +35,36 @@ from qiboconnection.api_utils import (
 from qiboconnection.config import logger
 from qiboconnection.connection import Connection
 from qiboconnection.constants import API_CONSTANTS, REST, REST_ERROR
-from qiboconnection.devices.device import Device
-from qiboconnection.devices.devices import Devices
-from qiboconnection.devices.offline_device import OfflineDevice
-from qiboconnection.devices.quantum_device import QuantumDevice
-from qiboconnection.devices.simulator_device import SimulatorDevice
-from qiboconnection.devices.util import create_device
 from qiboconnection.errors import ConnectionException, RemoteExecutionException
-from qiboconnection.job import Job
-from qiboconnection.job_listing import JobListing
-from qiboconnection.live_plots import LivePlots
-from qiboconnection.runcard import Runcard
-from qiboconnection.saved_experiment import SavedExperiment
-from qiboconnection.saved_experiment_listing import SavedExperimentListing
-from qiboconnection.typings.connection import ConnectionConfiguration
-from qiboconnection.typings.job import (
+from qiboconnection.models import (
+    Job,
     JobData,
-    JobResponse,
-    JobStatus,
-    ListingJobResponse,
+    JobListing,
+    LivePlots,
+    Runcard,
+    SavedExperiment,
+    SavedExperimentListing,
 )
+from qiboconnection.models.devices import (
+    Device,
+    Devices,
+    OfflineDevice,
+    QuantumDevice,
+    SimulatorDevice,
+    create_device,
+)
+from qiboconnection.typings.connection import ConnectionConfiguration
+from qiboconnection.typings.enums import JobStatus
 from qiboconnection.typings.live_plot import (
     LivePlotAxis,
     LivePlotLabels,
     LivePlotType,
     PlottingResponse,
 )
-from qiboconnection.typings.runcard import RuncardResponse
-from qiboconnection.typings.saved_experiment import (
+from qiboconnection.typings.responses import (
+    JobListingItemResponse,
+    JobResponse,
+    RuncardResponse,
     SavedExperimentListingItemResponse,
     SavedExperimentResponse,
 )
@@ -700,10 +702,10 @@ class API(ABC):
         items = [item for response in responses for item in response[REST.ITEMS]]
         return [SavedExperimentListingItemResponse(**item) for item in items]
 
-    def _get_list_jobs_response(self, favourites: bool = False) -> List[ListingJobResponse]:
+    def _get_list_jobs_response(self, favourites: bool = False) -> List[JobListingItemResponse]:
         """Performs the actual jobs listing request
         Returns
-            List[ListingJobResponse]: list of objects encoding the expected response structure"""
+            List[JobListingItemResponse]: list of objects encoding the expected response structure"""
         responses, status_codes = unzip(
             self._connection.send_get_auth_remote_api_call_all_pages(
                 path=self.JOBS_CALL_PATH, params={API_CONSTANTS.FAVOURITES: favourites}
@@ -714,7 +716,7 @@ class API(ABC):
                 raise RemoteExecutionException(message="Job could not be listed.", status_code=status_code)
 
         items = [item for response in responses for item in response[REST.ITEMS]]
-        return [ListingJobResponse(**item) for item in items]
+        return [JobListingItemResponse(**item) for item in items]
 
     @typechecked
     def list_saved_experiments(self, favourites: bool = False) -> SavedExperimentListing:

@@ -1,16 +1,15 @@
 # data.py
 """ Data to used alongside the test suite. """
 
-from qiboconnection.typings.device import (
-    DeviceAvailability,
+from qiboconnection.typings.devices import (
     DeviceInput,
-    DeviceStatus,
     OfflineDeviceInput,
     QuantumDeviceCharacteristicsInput,
     QuantumDeviceInput,
     SimulatorDeviceCharacteristicsInput,
     SimulatorDeviceInput,
 )
+from qiboconnection.typings.enums import DeviceAvailability, DeviceStatus
 from qiboconnection.typings.live_plot import UnitPoint
 
 from .web_responses import WebResponses

@@ -4,7 +4,7 @@ import json
 
 from requests import Response
 
-from qiboconnection.typings.auth_config import TokenType
+from qiboconnection.typings.enums import TokenType
 
 auth_base_response = {
     "accessToken": (
