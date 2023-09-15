@@ -16,7 +16,7 @@ from qiboconnection.errors import (
     HTTPError,
     RemoteExecutionException,
 )
-from qiboconnection.models import User
+from qiboconnection.models.user import User
 from qiboconnection.typings.connection import (
     ConnectionConfiguration,
     ConnectionEstablished,
