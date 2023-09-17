@@ -130,6 +130,9 @@ class API(ABC):
 
         .. code-block:: python3
 
+            from qibo import gates
+            from qibo.models.circuit import Circuit
+
             circuit = Circuit(1)
             circuit.add(gates.H(0))
             circuit.add(gates.M(0))
@@ -139,7 +142,7 @@ class API(ABC):
 
         Once the execution has finished, you can retrieve all the information related to your job:
 
-        >>> api.get_job()
+        >>> api.get_job(job_id=20285)
         [qibo-connection] 0.12.0|WARNING|2023-09-14 15:17:55]: Your job with id 20285 is completed.
         JobData(status='completed', queue_position=0, user_id=3, device_id=9, job_id=20285, job_type='circuit', number_shots=10, description=<qibo.models.circuit.Circuit object at 0x7f169e56fb50>, result={'state': array([0.70710678+0.j, 0.70710678+0.j]), 'probabilities': array([0.5, 0.5]), 'frequencies': Counter({'0': 7, '1': 3})})
 
