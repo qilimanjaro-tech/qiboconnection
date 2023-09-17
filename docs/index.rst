@@ -29,13 +29,6 @@ Get started
    introduction/what_is_qiboconnection
 
 .. toctree::
-   :caption: Development
-   :maxdepth: 1
-   :hidden:
-
-   development/guide
-
-.. toctree::
    :caption: API
    :maxdepth: 1
    :hidden:
