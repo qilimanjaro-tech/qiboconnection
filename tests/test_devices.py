@@ -4,10 +4,10 @@ from typing import List
 
 import pytest
 
-from qiboconnection.devices.device import Device
-from qiboconnection.devices.devices import Devices
-from qiboconnection.devices.simulator_device import SimulatorDevice
-from qiboconnection.typings.device import SimulatorDeviceInput
+from qiboconnection.models.devices import SimulatorDevice
+from qiboconnection.models.devices.device import Device
+from qiboconnection.models.devices.devices import Devices
+from qiboconnection.typings.devices import SimulatorDeviceInput
 
 from .data import simulator_device_inputs
 

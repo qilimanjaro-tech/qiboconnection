@@ -4,10 +4,9 @@ import asyncio
 from unittest.mock import MagicMock, patch
 
 import pytest
-import websockets
 
-from qiboconnection.live_plot import LivePlot
-from qiboconnection.live_plots import LivePlots
+from qiboconnection.models.live_plot import LivePlot
+from qiboconnection.models.live_plots import LivePlots
 from qiboconnection.typings.live_plot import (
     LivePlotAxis,
     LivePlotLabels,
@@ -88,8 +87,8 @@ def test_live_plots_add_plot(
     assert expected_live_plot == created_live_plot
 
 
-@patch("qiboconnection.live_plot.LivePlot.send_data", autospec=True)
-@patch("qiboconnection.live_plot.websockets.connect", autospec=True)
+@patch("qiboconnection.models.live_plot.LivePlot.send_data", autospec=True)
+@patch("qiboconnection.models.live_plot.websockets.connect", autospec=True)
 def test_live_plots_send_data(
     mocked_websockets_connect: MagicMock,
     live_plot_send_data: MagicMock,

@@ -1,4 +1,5 @@
-from qiboconnection.typings.job import JobData, ListingJobResponse
+from qiboconnection.models.job_data import JobData
+from qiboconnection.typings.responses import JobListingItemResponse
 
 
 def test_JobData_typing():
@@ -18,11 +19,11 @@ def test_JobData_typing():
     assert isinstance(job_full_data, JobData)
 
 
-def test_ListingJobResponse_typing():
-    """Test ListingJobResponse instantation"""
+def test_job_listing_item_response_typing():
+    """Test JobListingItemResponse instantiation"""
 
-    listing_job_response = ListingJobResponse(
+    listing_job_response = JobListingItemResponse(
         status="89", user_id=None, device_id=3, job_type="jaiof", number_shots=84, id=3
     )
 
-    assert isinstance(listing_job_response, ListingJobResponse)
+    assert isinstance(listing_job_response, JobListingItemResponse)

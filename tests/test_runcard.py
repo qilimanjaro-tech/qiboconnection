@@ -2,8 +2,11 @@
 
 from datetime import datetime, timezone
 
-from qiboconnection.runcard import Runcard
-from qiboconnection.typings.runcard import RuncardRequest, RuncardResponse
+from qiboconnection.models.runcard import Runcard
+from qiboconnection.typings.responses.runcard_response import (
+    RuncardRequest,
+    RuncardResponse,
+)
 
 
 def test_runcard_creation():

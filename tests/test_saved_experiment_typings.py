@@ -2,9 +2,9 @@
 
 import datetime
 
-from qiboconnection.typings.saved_experiment import (
+from qiboconnection.typings.requests import SavedExperimentRequest
+from qiboconnection.typings.responses import (
     SavedExperimentListingItemResponse,
-    SavedExperimentRequest,
     SavedExperimentResponse,
 )
 
