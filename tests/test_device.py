@@ -77,7 +77,7 @@ def test_device_dict_representation(device_input: DeviceInput):
     expected_dict = {
         "device_id": device._device_id,
         "device_name": device._device_name,
-        "status": device._status.value,
+        "status": device._status,
         "availability": device._availability.value,
     }
     assert device.__dict__ == expected_dict
@@ -90,7 +90,7 @@ def test_device_json_representation(device_input: DeviceInput):
     expected_dict = {
         "device_id": device._device_id,
         "device_name": device._device_name,
-        "status": device._status.value,
+        "status": device._status,
         "availability": device._availability.value,
     }
     assert json.loads(device.toJSON()) == expected_dict
@@ -111,7 +111,7 @@ def test_simulator_device_dict_representation(simulator_device_input: SimulatorD
     expected_dict = {
         "device_id": device._device_id,
         "device_name": device._device_name,
-        "status": device._status.value,
+        "status": device._status,
         "availability": device._availability.value,
     }
     if device._characteristics:
@@ -126,7 +126,7 @@ def test_simulator_device_json_representation(simulator_device_input: SimulatorD
     expected_dict = {
         "device_id": device._device_id,
         "device_name": device._device_name,
-        "status": device._status.value,
+        "status": device._status,
         "availability": device._availability.value,
     }
     if device._characteristics:
@@ -175,7 +175,7 @@ def test_quantum_device_dict_representation(quantum_device_input: QuantumDeviceI
     expected_dict = {
         "device_id": device._device_id,
         "device_name": device._device_name,
-        "status": device._status.value,
+        "status": device._status,
         "availability": device._availability.value,
     }
     if device._last_calibration_time is not None:
@@ -194,7 +194,7 @@ def test_quantum_device_json_representation(quantum_device_input: QuantumDeviceI
     expected_dict = {
         "device_id": device._device_id,
         "device_name": device._device_name,
-        "status": device._status.value,
+        "status": device._status,
         "availability": device._availability.value,
     }
     if device._last_calibration_time is not None:

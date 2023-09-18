@@ -33,7 +33,7 @@ class OnlineDevice(Device):
         self._str = (
             f"<Online Device: device_id={self._device_id},"
             f" device_name='{self._device_name}',"
-            f" status='{self._status.value}"
+            f" status='{self._status}"
         )
         if self._number_pending_jobs is not None:
             self._str += f", number_pending_jobs={self._number_pending_jobs}"

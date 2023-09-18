@@ -29,7 +29,7 @@ class QuantumDevice(OnlineDevice):
 
         self._str = (
             f"<Quantum Device: device_id={self._device_id}, device_name='{self._device_name}'"
-            f", status='{self._status.value}'"
+            f", status='{self._status}'"
         )
         if self._last_calibration_time:
             self._str += f", last_calibration_time={self._last_calibration_time}"

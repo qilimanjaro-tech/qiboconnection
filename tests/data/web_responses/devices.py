@@ -3,7 +3,7 @@
 device_base_response_a = {
     "device_id": 1,
     "device_name": "AWS Development Simulator",
-    "status": "online",
+    "status": "other",
     "availability": "available",
     "channel_id": 2,
     "number_pending_jobs": 6,
@@ -27,6 +27,15 @@ device_base_response_b = {
     "calibration_details": {"t1": 10, "frequency": 988},
 }
 
+device_base_response_c = {  # since the device is offline, there is not calibration info
+    "device_id": 7,
+    "device_name": "AWS Development Simulator",
+    "status": "offline",
+    "availability": "available",
+    "channel_id": 2,
+    "number_pending_jobs": 6,
+}
+
 
 class Devices:
     """Devices Web Responses"""
@@ -37,7 +46,7 @@ class Devices:
     retrieve_many_response: tuple[tuple[dict, int]] = (
         (
             {
-                "items": [device_base_response_a, device_base_response_b],
+                "items": [device_base_response_a, device_base_response_b, device_base_response_c],
                 "total": 3,
                 "per_page": 5,
                 "self": "https://qilimanjarodev.ddns.net:8080/api/v1/devices?page=1&per_page=5",

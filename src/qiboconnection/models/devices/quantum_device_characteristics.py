@@ -29,10 +29,7 @@ class QuantumDeviceCharacteristics(DeviceDetails):
     @typechecked
     def __init__(self, characteristics_input: QuantumDeviceCharacteristicsInput):
         super().__init__()
-        if (
-            characteristics_input.type is not DeviceType.QUANTUM
-            and characteristics_input.type != DeviceType.QUANTUM.value
-        ):
+        if characteristics_input.type is not DeviceType.QUANTUM and characteristics_input.type != DeviceType.QUANTUM:
             raise TypeError("Characteristics Device not supported")
 
         self._type = create_device_type(device_type=characteristics_input.type)

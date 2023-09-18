@@ -72,9 +72,7 @@ class Device(DeviceDetails):
             HTTPError: Error blocking device
         """
         try:
-            connection.update_device_availability(
-                device_id=self._device_id, availability=DeviceAvailability.BLOCKED.value
-            )
+            connection.update_device_availability(device_id=self._device_id, availability=DeviceAvailability.BLOCKED)
             self._availability = set_device_availability(availability=DeviceAvailability.BLOCKED)
         except HTTPError as ex:
             logger.error("Error blocking device %s.", self._device_name)
@@ -86,9 +84,7 @@ class Device(DeviceDetails):
         Args:
             connection (Connection): Qibo API connection
         """
-        connection.update_device_availability(
-            device_id=self._device_id, availability=DeviceAvailability.AVAILABLE.value
-        )
+        connection.update_device_availability(device_id=self._device_id, availability=DeviceAvailability.AVAILABLE)
         self._availability = set_device_availability(availability=DeviceAvailability.AVAILABLE)
 
     def set_to_online(self, connection: Connection) -> None:
@@ -97,7 +93,7 @@ class Device(DeviceDetails):
         Args:
             connection (Connection): Qibo API connection
         """
-        connection.update_device_status(device_id=self._device_id, status=DeviceStatus.ONLINE.value)
+        connection.update_device_status(device_id=self._device_id, status=DeviceStatus.ONLINE)
         self._status = set_device_status(status=DeviceStatus.ONLINE)
 
     def set_to_maintenance(self, connection: Connection) -> None:
@@ -107,7 +103,7 @@ class Device(DeviceDetails):
         Args:
             connection (Connection): Qibo API connection
         """
-        connection.update_device_status(device_id=self._device_id, status=DeviceStatus.MAINTENANCE.value)
+        connection.update_device_status(device_id=self._device_id, status=DeviceStatus.MAINTENANCE)
         self._status = set_device_status(status=DeviceStatus.MAINTENANCE)
 
     @property
@@ -120,8 +116,8 @@ class Device(DeviceDetails):
         return {
             "device_id": self._device_id,
             "device_name": self._device_name,
-            "status": self._status.value,
-            "availability": self._availability.value,
+            "status": self._status,
+            "availability": self._availability,
         }
 
     def toJSON(self) -> str:  # pylint: disable=invalid-name

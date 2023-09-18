@@ -31,7 +31,7 @@ class SimulatorDeviceCharacteristics(DeviceDetails):
         super().__init__()
         if (
             characteristics_input.type is not DeviceType.SIMULATOR
-            and characteristics_input.type != DeviceType.SIMULATOR.value
+            and characteristics_input.type != DeviceType.SIMULATOR
         ):
             raise TypeError("Characteristics Device not supported")
 

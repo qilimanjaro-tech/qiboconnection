@@ -37,7 +37,7 @@ class SimulatorDevice(OnlineDevice):
 
         self._str = (
             f"<Simulator Device: device_id={self._device_id}, device_name='{self._device_name}'"
-            f", status='{self._status.value}'"
+            f", status='{self._status}'"
         )
         if self._characteristics:
             self._str += f", characteristics={str(self._characteristics)}"
