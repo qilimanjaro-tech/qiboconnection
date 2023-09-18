@@ -1,6 +1,6 @@
 """ Tests methods for Algorithms """
 
-from qiboconnection.typings.algorithm import (
+from qiboconnection.models.algorithm import (
     AlgorithmDefinition,
     AlgorithmName,
     AlgorithmOptions,

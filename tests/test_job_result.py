@@ -2,8 +2,8 @@
 import numpy as np
 import pytest
 
-from qiboconnection.job_result import JobResult
-from qiboconnection.typings.job import JobType
+from qiboconnection.models.job_data import JobType
+from qiboconnection.models.job_result import JobResult
 
 
 def test_job_result_creation():

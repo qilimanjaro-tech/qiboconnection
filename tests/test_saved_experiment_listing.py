@@ -3,11 +3,11 @@ import datetime
 
 import pandas as pd
 
-from qiboconnection.saved_experiment_listing import (
+from qiboconnection.models.saved_experiment_listing import (
     SavedExperimentListing,
     SavedExperimentListingItem,
 )
-from qiboconnection.typings.saved_experiment import SavedExperimentListingItemResponse
+from qiboconnection.typings.responses import SavedExperimentListingItemResponse
 
 
 def test_saved_experiment_listing_item_creation():
