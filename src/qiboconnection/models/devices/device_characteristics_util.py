@@ -37,14 +37,13 @@ def create_device_type(device_type: Union[str, DeviceType]) -> DeviceType:
 
 @typechecked
 def set_device_status(status: str) -> str:
-    """Creates a DeviceStatus object from a string or directly from a DeviceStatus
+    """Checks that the device status is a str
 
     Args:
-        status (Union[str, DeviceStatus]): name corresponding to the device status or
-        directly the DeviceStatus
+        status
 
     Returns:
-        DeviceStatus: Created DeviceStatus object
+        str
     """
     if isinstance(status, str):
         return status
