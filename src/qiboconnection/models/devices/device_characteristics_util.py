@@ -18,7 +18,6 @@ from typing import Union
 
 from typeguard import typechecked
 
-from qiboconnection.typings.device import ReadDeviceStatus
 from qiboconnection.typings.enums import DeviceAvailability, DeviceType
 
 
@@ -37,7 +36,7 @@ def create_device_type(device_type: Union[str, DeviceType]) -> DeviceType:
 
 
 @typechecked
-def set_device_status(status: Union[str, ReadDeviceStatus]) -> str:
+def set_device_status(status: str) -> str:
     """Creates a DeviceStatus object from a string or directly from a DeviceStatus
 
     Args:
@@ -48,7 +47,7 @@ def set_device_status(status: Union[str, ReadDeviceStatus]) -> str:
         DeviceStatus: Created DeviceStatus object
     """
     if isinstance(status, str):
-        return ReadDeviceStatus(status).status
+        return status
     else:
         raise ValueError("Status needs to be str")
 

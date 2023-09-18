@@ -20,13 +20,6 @@ from typing import Literal, Optional
 from qiboconnection.typings.enums.device_type import DeviceType
 
 
-@dataclass(slots=True)
-class ReadDeviceStatus:
-    """Device status typing for reading"""
-
-    status: str
-
-
 @dataclass(kw_only=True)
 class QuantumDeviceCharacteristicsInput:
     """Quantum Device Characteristics Input
