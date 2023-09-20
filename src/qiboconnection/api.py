@@ -1,4 +1,18 @@
-""" Qilimanjaro Client API to communicate with the Qilimanjaro Global Quantum Services """
+# Copyright 2023 Qilimanjaro Quantum Tech
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+"""Qiboconnection API class."""
 import json
 from abc import ABC
 from dataclasses import asdict
@@ -17,29 +31,100 @@ from qiboconnection.api_utils import deserialize_job_description, log_job_status
 from qiboconnection.config import logger
 from qiboconnection.connection import Connection
 from qiboconnection.constants import API_CONSTANTS, REST, REST_ERROR
-from qiboconnection.devices.device import Device
-from qiboconnection.devices.devices import Devices
-from qiboconnection.devices.offline_device import OfflineDevice
-from qiboconnection.devices.quantum_device import QuantumDevice
-from qiboconnection.devices.simulator_device import SimulatorDevice
-from qiboconnection.devices.util import create_device
 from qiboconnection.errors import ConnectionException, RemoteExecutionException
-from qiboconnection.job import Job
-from qiboconnection.job_listing import JobListing
-from qiboconnection.live_plots import LivePlots
-from qiboconnection.runcard import Runcard
-from qiboconnection.saved_experiment import SavedExperiment
-from qiboconnection.saved_experiment_listing import SavedExperimentListing
+from qiboconnection.models import Job, JobData, JobListing, LivePlots, Runcard, SavedExperiment, SavedExperimentListing
+from qiboconnection.models.devices import Device, Devices, OfflineDevice, QuantumDevice, SimulatorDevice, create_device
 from qiboconnection.typings.connection import ConnectionConfiguration
-from qiboconnection.typings.job import JobData, JobResponse, JobStatus, ListingJobResponse
+from qiboconnection.typings.enums import JobStatus
 from qiboconnection.typings.live_plot import LivePlotAxis, LivePlotLabels, LivePlotType, PlottingResponse
-from qiboconnection.typings.runcard import RuncardResponse
-from qiboconnection.typings.saved_experiment import SavedExperimentListingItemResponse, SavedExperimentResponse
+from qiboconnection.typings.responses import (
+    JobListingItemResponse,
+    JobResponse,
+    RuncardResponse,
+    SavedExperimentListingItemResponse,
+    SavedExperimentResponse,
+)
 from qiboconnection.util import unzip
 
 
-class API(ABC):  # pylint: disable=too-many-instance-attributes, too-many-public-methods
-    """Qilimanjaro Client API class to communicate with the Quantum Service"""
+class API(ABC):
+    """Qilimanjaro Client API class to communicate with the Quantum Service.
+
+    An instance of this class is the entrypoint to Qilimanjaro's Quantum as a Service. Its methods let you send jobs to our Quantum Processing Units.
+
+    .. note::
+
+            You may not be able to call some of the available methods depending on your user role - e.g, only Qilimanjaro users are allowed to set the devices in maintenance mode.
+
+    Examples:
+
+        For instantiating the API Class, you will need a user and an api key:
+
+        .. code-block:: python3
+
+            from qiboconnection.api import API
+            from qiboconnection.connection import ConnectionConfiguration
+
+           api = API(configuration=ConnectionConfiguration(username="", api_key=""))
+
+        Now, list all available devices and select the one(s) you want to send your job to:
+
+        >>> api.list_devices()
+        <Devices[5]:
+        {
+        "device_id": 16,
+        "device_name": "Sauron 2FQ",
+        "status": "offline",
+        "availability": "available"
+        }
+        {
+        "device_id": 15,
+        "device_name": "Sauron soprano",
+        "status": "offline",
+        "availability": "available"
+        }
+        {
+        "device_id": 14,
+        "device_name": "Sauron Cluster",
+        "status": "offline",
+        "availability": "available"
+        }
+        {
+        "device_id": 9,
+        "device_name": "Galadriel Qblox rack",
+        "status": "maintenance",
+        "availability": "available",
+        "characteristics": {
+        ...
+            "os": "Ubuntu 20.04 focal",
+            "kernel": "x86_64 Linux 5.4.0-80-generic",
+            "ram": "64185MiB"
+        }
+        }
+        >>> api.select_device_id(device_id=9)
+        [qibo-connection] 0.12.0|INFO|2023-09-14 15:04:05]: Storing personal qibo configuration...
+
+        Let's build a simple circuit and execute it:
+
+        .. code-block:: python3
+
+            from qibo import gates
+            from qibo.models.circuit import Circuit
+
+            circuit = Circuit(1)
+            circuit.add(gates.H(0))
+            circuit.add(gates.M(0))
+
+        >>> api.execute(circuit=circuit)
+        [20285]
+
+        Once the execution has finished, you can retrieve all the information related to your job:
+
+        >>> api.get_job(job_id=20285)
+        [qibo-connection] 0.12.0|WARNING|2023-09-14 15:17:55]: Your job with id 20285 is completed.
+        JobData(status='completed', queue_position=0, user_id=3, device_id=9, job_id=20285, job_type='circuit', number_shots=10, description=<qibo.models.circuit.Circuit object at 0x7f169e56fb50>, result={'state': array([0.70710678+0.j, 0.70710678+0.j]), 'probabilities': array([0.5, 0.5]), 'frequencies': Counter({'0': 7, '1': 3})})
+
+    """
 
     API_VERSION = "v1"
     API_PATH = f"/api/{API_VERSION}"
@@ -364,6 +449,21 @@ class API(ABC):  # pylint: disable=too-many-instance-attributes, too-many-public
             job_ids.append(job.id)
         return job_ids
 
+    @typechecked
+    def list_jobs(self, favourites: bool = False) -> JobListing:
+        """List all jobs metadata
+
+        Raises:
+            RemoteExecutionException: Devices could not be retrieved
+
+        Returns:
+            Devices: All Jobs
+        """
+        jobs_list_response = self._get_list_jobs_response(favourites=favourites)
+        jobs_listing = JobListing.from_response(jobs_list_response)
+        self._jobs_listing = jobs_listing
+        return jobs_listing
+
     def _get_job(self, job_id: int) -> JobResponse:
         """Calls the API to get a job from a remote execution.
 
@@ -381,6 +481,41 @@ class API(ABC):  # pylint: disable=too-many-instance-attributes, too-many-public
             raise RemoteExecutionException(message="Job could not be retrieved.", status_code=status_code)
 
         return JobResponse(**cast(dict, response))
+
+    @typechecked
+    def get_job(self, job_id: int):
+        """Get metadata, result and the correspondig Qibo circuit or Qililab experiment from a remote job execution.
+
+        Args:
+            job_id (int): Job identifier
+
+        Raises:
+            RemoteExecutionException: Job could not be retrieved.
+            ValueError: Job status not supported.
+            ValueError: Your job failed.
+
+        Returns:
+            dict
+        """
+
+        job_response = self._get_job(job_id=job_id)
+        log_job_status_info(job_response=job_response)
+        parsed_job_result = parse_job_responses_to_results(job_responses=[job_response])[0]
+
+        parsed_job_description = deserialize_job_description(
+            base64_description=job_response.description, job_type=job_response.job_type
+        )
+        return JobData(
+            status=job_response.status,
+            queue_position=job_response.queue_position,
+            user_id=job_response.user_id,
+            device_id=job_response.device_id,
+            job_id=job_response.job_id,
+            job_type=job_response.job_type,
+            number_shots=job_response.number_shots,
+            description=parsed_job_description,
+            result=parsed_job_result,
+        )
 
     @typechecked
     def get_result(self, job_id: int) -> CircuitResult | npt.NDArray | dict | None:
@@ -421,6 +556,18 @@ class API(ABC):  # pylint: disable=too-many-instance-attributes, too-many-public
         for job_response in job_responses:
             log_job_status_info(job_response=job_response)
         return parse_job_responses_to_results(job_responses=job_responses)
+
+    @typechecked
+    def delete_job(self, job_id: int) -> None:
+        """Deletes a job from the database (only for admin users)        Raises:
+        RemoteExecutionException: Devices could not be retrieved        Returns:
+        """
+        response, status_code = self._connection.send_delete_auth_remote_api_call(
+            path=f"{self.JOBS_CALL_PATH}/{job_id}"
+        )
+        if status_code != 204:
+            raise RemoteExecutionException(message="Job could not be removed.", status_code=status_code)
+        logger.info("Job %i deleted successfully")
 
     def _wait_and_return_results(
         self, deadline: datetime, interval: int, job_ids: List[int]
@@ -669,10 +816,10 @@ class API(ABC):  # pylint: disable=too-many-instance-attributes, too-many-public
         items = [item for response in responses for item in response[REST.ITEMS]]
         return [SavedExperimentListingItemResponse(**item) for item in items]
 
-    def _get_list_jobs_response(self, favourites: bool = False) -> List[ListingJobResponse]:
+    def _get_list_jobs_response(self, favourites: bool = False) -> List[JobListingItemResponse]:
         """Performs the actual jobs listing request
         Returns
-            List[ListingJobResponse]: list of objects encoding the expected response structure"""
+            List[JobListingItemResponse]: list of objects encoding the expected response structure"""
         responses, status_codes = unzip(
             self._connection.send_get_auth_remote_api_call_all_pages(
                 path=self.JOBS_CALL_PATH, params={API_CONSTANTS.FAVOURITES: favourites}
@@ -683,7 +830,7 @@ class API(ABC):  # pylint: disable=too-many-instance-attributes, too-many-public
                 raise RemoteExecutionException(message="Job could not be listed.", status_code=status_code)
 
         items = [item for response in responses for item in response[REST.ITEMS]]
-        return [ListingJobResponse(**item) for item in items]
+        return [JobListingItemResponse(**item) for item in items]
 
     @typechecked
     def list_saved_experiments(self, favourites: bool = False) -> SavedExperimentListing:
@@ -699,20 +846,6 @@ class API(ABC):  # pylint: disable=too-many-instance-attributes, too-many-public
         saved_experiment_listing = SavedExperimentListing.from_response(saved_experiments_list_response)
         self._saved_experiments_listing = saved_experiment_listing
         return saved_experiment_listing
-
-    @typechecked
-    def list_jobs(self, favourites: bool = False) -> JobListing:
-        """List all jobs metadata
-
-        Raises:
-            RemoteExecutionException: Devices could not be retrieved
-
-        Returns:
-            Devices: All Jobs
-        """
-        jobs_list_response = self._get_list_jobs_response(favourites=favourites)
-        jobs_listing = JobListing.from_response(jobs_list_response)
-        return jobs_listing
 
     @typechecked
     def _get_saved_experiment_response(self, saved_experiment_id: int):
@@ -742,41 +875,6 @@ class API(ABC):  # pylint: disable=too-many-instance-attributes, too-many-public
         """
         return SavedExperiment.from_response(
             self._get_saved_experiment_response(saved_experiment_id=saved_experiment_id)
-        )
-
-    @typechecked
-    def get_job(self, job_id: int):
-        """Get metadata, result and the correspondig Qibo circuit or Qililab experiment from a remote job execution.
-
-        Args:
-            job_id (int): Job identifier
-
-        Raises:
-            RemoteExecutionException: Job could not be retrieved.
-            ValueError: Job status not supported.
-            ValueError: Your job failed.
-
-        Returns:
-            dict
-        """
-
-        job_response = self._get_job(job_id=job_id)
-        log_job_status_info(job_response=job_response)
-        parsed_job_result = parse_job_responses_to_results(job_responses=[job_response])[0]
-
-        parsed_job_description = deserialize_job_description(
-            base64_description=job_response.description, job_type=job_response.job_type
-        )
-        return JobData(
-            status=job_response.status,
-            queue_position=job_response.queue_position,
-            user_id=job_response.user_id,
-            device_id=job_response.device_id,
-            job_id=job_response.job_id,
-            job_type=job_response.job_type,
-            number_shots=job_response.number_shots,
-            description=parsed_job_description,
-            result=parsed_job_result,
         )
 
     @typechecked
@@ -978,13 +1076,3 @@ class API(ABC):  # pylint: disable=too-many-instance-attributes, too-many-public
         if status_code != 204:
             raise RemoteExecutionException(message="Runcard could not be removed.", status_code=status_code)
         logger.info("Runcard %i deleted successfully with message: %s", runcard_id, response)
-
-    @typechecked
-    def delete_job(self, job_id: int) -> None:
-        """Deletes a job from the database (only for admin users)        Raises:
-        RemoteExecutionException: Devices could not be retrieved        Returns:
-        """
-        _, status_code = self._connection.send_delete_auth_remote_api_call(path=f"{self.JOBS_CALL_PATH}/{job_id}")
-        if status_code != 204:
-            raise RemoteExecutionException(message="Job could not be removed.", status_code=status_code)
-        logger.info("Job %i deleted successfully")

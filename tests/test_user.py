@@ -1,6 +1,6 @@
 """ Tests methods for User """
 
-from qiboconnection.user import User
+from qiboconnection.models.user import User
 
 
 def test_user_constructor():

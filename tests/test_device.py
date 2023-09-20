@@ -4,22 +4,24 @@ import json
 
 import pytest
 
-from qiboconnection.devices.device import Device
-from qiboconnection.devices.offline_device import OfflineDevice, OfflineDeviceInput
-from qiboconnection.devices.quantum_device import QuantumDevice, QuantumDeviceInput
-from qiboconnection.devices.quantum_device_characteristics import (
+from qiboconnection.models.devices import (
+    Device,
+    OfflineDevice,
+    QuantumDevice,
     QuantumDeviceCharacteristics,
-    QuantumDeviceCharacteristicsInput,
+    SimulatorDevice,
+    SimulatorDeviceCharacteristics,
 )
-from qiboconnection.devices.simulator_device import SimulatorDevice
-from qiboconnection.devices.simulator_device_characteristics import SimulatorDeviceCharacteristics
-from qiboconnection.devices.util import create_device, is_offline_device_input, is_quantum_device_input
-from qiboconnection.typings.device import (
+from qiboconnection.models.devices.util import create_device, is_offline_device_input, is_quantum_device_input
+from qiboconnection.typings.devices import (
     DeviceInput,
-    DeviceStatus,
+    OfflineDeviceInput,
+    QuantumDeviceCharacteristicsInput,
+    QuantumDeviceInput,
     SimulatorDeviceCharacteristicsInput,
     SimulatorDeviceInput,
 )
+from qiboconnection.typings.enums import DeviceStatus
 
 from .data import (
     device_inputs,

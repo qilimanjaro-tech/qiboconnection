@@ -7,14 +7,14 @@ import pandas as pd
 import pytest
 
 from qiboconnection.api import API
-from qiboconnection.devices.devices import Devices
-from qiboconnection.devices.util import create_device
 from qiboconnection.errors import ConnectionException, RemoteExecutionException
-from qiboconnection.job_listing import JobListing
-from qiboconnection.runcard import Runcard
-from qiboconnection.saved_experiment import SavedExperiment
-from qiboconnection.saved_experiment_listing import SavedExperimentListing
-from qiboconnection.typings.job import JobData
+from qiboconnection.models.devices.devices import Devices
+from qiboconnection.models.devices.util import create_device
+from qiboconnection.models.job_data import JobData
+from qiboconnection.models.job_listing import JobListing
+from qiboconnection.models.runcard import Runcard
+from qiboconnection.models.saved_experiment import SavedExperiment
+from qiboconnection.models.saved_experiment_listing import SavedExperimentListing
 from qiboconnection.typings.live_plot import PlottingResponse
 
 from .data import experiment_dict, results_dict, runcard_dict, web_responses
@@ -222,7 +222,7 @@ def test_create_live_plot_with_unexpected_response(mocked_web_call: MagicMock, m
         _ = asyncio.run(mocked_api.create_liveplot())
 
 
-@patch("qiboconnection.live_plot.LivePlot.send_data", autospec=True)
+@patch("qiboconnection.models.live_plot.LivePlot.send_data", autospec=True)
 @patch("websockets.connect", autospec=True)
 @patch("qiboconnection.connection.Connection.send_post_auth_remote_api_call", autospec=True)
 def test_send_plot_points(

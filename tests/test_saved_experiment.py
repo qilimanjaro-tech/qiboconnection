@@ -2,8 +2,9 @@
 
 import datetime
 
-from qiboconnection.saved_experiment import SavedExperiment
-from qiboconnection.typings.saved_experiment import SavedExperimentRequest, SavedExperimentResponse
+from qiboconnection.models.saved_experiment import SavedExperiment
+from qiboconnection.typings.requests import SavedExperimentRequest
+from qiboconnection.typings.responses import SavedExperimentResponse
 
 
 def test_saved_experiment_creation():
