@@ -6,5 +6,5 @@ flake8==5.0.4
 mypy==1.4.1
 nbqa==1.5.2
 mdformat==0.7.16
-bandit==1.7.4
 pre-commit==2.20.0
+bandit==1.7.4
