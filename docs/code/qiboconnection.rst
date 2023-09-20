@@ -1,4 +1,4 @@
-Qiboconnection
+API Class
 ===============
 
 .. currentmodule:: qiboconnection

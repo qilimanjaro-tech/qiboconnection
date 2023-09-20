@@ -63,7 +63,7 @@ def user_example_experiment_saving() -> None:
     qibo_api.ping()
 
     # List experiments
-    qibo_api.list_saved_experiments()
+    qibo_api._list_saved_experiments()
 
     # Save an experiment
     experiment_dict = {
@@ -541,7 +541,7 @@ def user_example_experiment_saving() -> None:
             },
         ],
     }
-    saved_experiment_id = qibo_api.save_experiment(
+    saved_experiment_id = qibo_api._save_experiment(
         name="MyBelovedSavedExperiment",
         description="Experiment saved from jupyterhub",
         experiment_dict=experiment_dict,
@@ -553,7 +553,7 @@ def user_example_experiment_saving() -> None:
     )
 
     # Retrieve an experiment
-    saved_experiment = qibo_api.get_saved_experiment(saved_experiment_id=saved_experiment_id)
+    saved_experiment = qibo_api._get_saved_experiment(saved_experiment_id=saved_experiment_id)
     print(saved_experiment.results)
 
 

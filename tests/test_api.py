@@ -42,14 +42,14 @@ def test_last_saved_experiment(mocked_web_call: MagicMock, mocked_api: API):
     """Test last_saved_experiment property"""
     mocked_web_call.return_value = web_responses.saved_experiments.create_response
 
-    assert mocked_api.last_saved_experiment is None
+    assert mocked_api._last_saved_experiment is None
     name = "MyDemoExperiment"
     description = "A test saved experiment"
     device_id = 1
     user_id = 1
     qililab_version = "0.0.0"
     favourite = True
-    _ = mocked_api.save_experiment(
+    _ = mocked_api._save_experiment(
         name=name,
         description=description,
         experiment_dict=experiment_dict,
@@ -59,7 +59,7 @@ def test_last_saved_experiment(mocked_web_call: MagicMock, mocked_api: API):
         qililab_version=qililab_version,
         favourite=favourite,
     )
-    assert isinstance(mocked_api.last_saved_experiment, SavedExperiment)
+    assert isinstance(mocked_api._last_saved_experiment, SavedExperiment)
 
 
 @patch("qiboconnection.connection.Connection.send_get_auth_remote_api_call_all_pages", autospec=True)
@@ -67,10 +67,10 @@ def test_last_saved_experiment_listing(mocked_web_call: MagicMock, mocked_api: A
     """Test last_saved_experiment_listing property"""
     mocked_web_call.return_value = web_responses.saved_experiments.retrieve_listing_response
 
-    assert mocked_api.last_saved_experiment_listing is None
-    saved_experiments_list = mocked_api.list_saved_experiments()
-    assert isinstance(mocked_api.last_saved_experiment_listing, SavedExperimentListing)
-    assert mocked_api.last_saved_experiment_listing == saved_experiments_list
+    assert mocked_api._last_saved_experiment_listing is None
+    saved_experiments_list = mocked_api._list_saved_experiments()
+    assert isinstance(mocked_api._last_saved_experiment_listing, SavedExperimentListing)
+    assert mocked_api._last_saved_experiment_listing == saved_experiments_list
 
 
 @patch("qiboconnection.connection.Connection.send_post_auth_remote_api_call", autospec=True)
@@ -107,7 +107,7 @@ def test_ping(mocked_web_call: MagicMock, mocked_api: API):
 
     mocked_api.ping()
 
-    mocked_web_call.assert_called_with(self=mocked_api._connection, path=mocked_api.PING_CALL_PATH)
+    mocked_web_call.assert_called_with(self=mocked_api._connection, path=mocked_api._PING_CALL_PATH)
 
 
 @patch("qiboconnection.connection.Connection.send_get_remote_call", autospec=True)
@@ -118,7 +118,7 @@ def test_ping_ise(mocked_web_call: MagicMock, mocked_api: API):
     with pytest.raises(ConnectionException):
         mocked_api.ping()
 
-    mocked_web_call.assert_called_with(self=mocked_api._connection, path=mocked_api.PING_CALL_PATH)
+    mocked_web_call.assert_called_with(self=mocked_api._connection, path=mocked_api._PING_CALL_PATH)
 
 
 @patch("qiboconnection.connection.Connection.send_get_auth_remote_api_call_all_pages", autospec=True)
@@ -128,7 +128,7 @@ def test_list_devices(mocked_web_call: MagicMock, mocked_api: API):
 
     device_listing = mocked_api.list_devices()
 
-    mocked_web_call.assert_called_with(self=mocked_api._connection, path=mocked_api.DEVICES_CALL_PATH)
+    mocked_web_call.assert_called_with(self=mocked_api._connection, path=mocked_api._DEVICES_CALL_PATH)
     assert isinstance(device_listing, Devices)
 
 
@@ -140,7 +140,7 @@ def test_list_devices_ise(mocked_web_call: MagicMock, mocked_api: API):
     with pytest.raises(RemoteExecutionException):
         _ = mocked_api.list_devices()
 
-    mocked_web_call.assert_called_with(self=mocked_api._connection, path=mocked_api.DEVICES_CALL_PATH)
+    mocked_web_call.assert_called_with(self=mocked_api._connection, path=mocked_api._DEVICES_CALL_PATH)
 
 
 @patch("qiboconnection.connection.Connection.send_get_auth_remote_api_call", autospec=True)
@@ -150,7 +150,7 @@ def test_select_device_id(mocked_web_call: MagicMock, mocked_api: API):
 
     mocked_api.select_device_id(device_id=1)
 
-    mocked_web_call.assert_called_with(self=mocked_api._connection, path=f"{mocked_api.DEVICES_CALL_PATH}/1")
+    mocked_web_call.assert_called_with(self=mocked_api._connection, path=f"{mocked_api._DEVICES_CALL_PATH}/1")
     assert mocked_api._selected_devices is not None
     assert len(mocked_api._selected_devices) == 1
     assert mocked_api._selected_devices[0] == create_device(web_responses.devices.retrieve_response[0])
@@ -164,7 +164,7 @@ def test_select_device_id_ise(mocked_web_call: MagicMock, mocked_api: API):
     with pytest.raises(RemoteExecutionException):
         mocked_api.select_device_id(device_id=1)
 
-    mocked_web_call.assert_called_with(self=mocked_api._connection, path=f"{mocked_api.DEVICES_CALL_PATH}/1")
+    mocked_web_call.assert_called_with(self=mocked_api._connection, path=f"{mocked_api._DEVICES_CALL_PATH}/1")
     assert mocked_api._selected_devices == []
 
 
@@ -175,7 +175,7 @@ def test_select_device_ids(mocked_web_call: MagicMock, mocked_api: API):
 
     mocked_api.select_device_ids(device_ids=[1])
 
-    mocked_web_call.assert_called_with(self=mocked_api._connection, path=f"{mocked_api.DEVICES_CALL_PATH}/1")
+    mocked_web_call.assert_called_with(self=mocked_api._connection, path=f"{mocked_api._DEVICES_CALL_PATH}/1")
     assert mocked_api._selected_devices is not None
     assert len(mocked_api._selected_devices) == 1
     assert mocked_api._selected_devices[0] == create_device(web_responses.devices.retrieve_response[0])
@@ -189,7 +189,7 @@ def test_select_device_ids_ise(mocked_web_call: MagicMock, mocked_api: API):
     with pytest.raises(RemoteExecutionException):
         mocked_api.select_device_ids(device_ids=[1])
 
-    mocked_web_call.assert_called_with(self=mocked_api._connection, path=f"{mocked_api.DEVICES_CALL_PATH}/1")
+    mocked_web_call.assert_called_with(self=mocked_api._connection, path=f"{mocked_api._DEVICES_CALL_PATH}/1")
     assert mocked_api._selected_devices == []
 
 
@@ -207,7 +207,7 @@ def test_create_live_plot(mocked_web_call: MagicMock, mocked_websockets_connect:
 
     plot_id = asyncio.run(mocked_api.create_liveplot())
 
-    mocked_web_call.assert_called_with(self=mocked_api._connection, path=mocked_api.LIVE_PLOTTING_PATH, data={})
+    mocked_web_call.assert_called_with(self=mocked_api._connection, path=mocked_api._LIVE_PLOTTING_PATH, data={})
     mocked_websockets_connect.assert_called_with("test_url")
     assert plot_id == 1
 
@@ -259,7 +259,7 @@ def test_save_experiment(mocked_web_call: MagicMock, mocked_api: API):
     qililab_version = "0.0.0"
     favourite = True
 
-    saved_experiment_id = mocked_api.save_experiment(
+    saved_experiment_id = mocked_api._save_experiment(
         name=name,
         description=description,
         experiment_dict=experiment_dict,
@@ -286,7 +286,7 @@ def test_save_experiment_ise(mocked_web_call: MagicMock, mocked_api: API):
     qililab_version = "0.0.0"
     favourite = True
     with pytest.raises(RemoteExecutionException):
-        _ = mocked_api.save_experiment(
+        _ = mocked_api._save_experiment(
             name=name,
             description=description,
             experiment_dict=experiment_dict,
@@ -308,7 +308,7 @@ def test_list_jobs(mocked_web_call: MagicMock, favourites: bool, mocked_api: API
     jobs_list = mocked_api.list_jobs(favourites=favourites)
 
     mocked_web_call.assert_called_with(
-        self=mocked_api._connection, path=mocked_api.JOBS_CALL_PATH, params={"favourites": favourites}
+        self=mocked_api._connection, path=mocked_api._JOBS_CALL_PATH, params={"favourites": favourites}
     )
     assert isinstance(jobs_list, JobListing)
     assert isinstance(jobs_list.dataframe, pd.DataFrame)
@@ -320,10 +320,10 @@ def test_list_saved_experiments(mocked_web_call: MagicMock, favourites: bool, mo
     """Tests API.list_saved_experiments() method"""
     mocked_web_call.return_value = web_responses.saved_experiments.retrieve_listing_response
 
-    saved_experiments_list = mocked_api.list_saved_experiments(favourites=favourites)
+    saved_experiments_list = mocked_api._list_saved_experiments(favourites=favourites)
 
     mocked_web_call.assert_called_with(
-        self=mocked_api._connection, path=mocked_api.SAVED_EXPERIMENTS_CALL_PATH, params={"favourites": favourites}
+        self=mocked_api._connection, path=mocked_api._SAVED_EXPERIMENTS_CALL_PATH, params={"favourites": favourites}
     )
     assert isinstance(saved_experiments_list, SavedExperimentListing)
     assert isinstance(saved_experiments_list.dataframe, pd.DataFrame)
@@ -336,10 +336,10 @@ def test_list_saved_experiments_ise(mocked_web_call: MagicMock, favourites: bool
     mocked_web_call.return_value = web_responses.saved_experiments.ise_listing_response
 
     with pytest.raises(RemoteExecutionException):
-        _ = mocked_api.list_saved_experiments(favourites=favourites)
+        _ = mocked_api._list_saved_experiments(favourites=favourites)
 
     mocked_web_call.assert_called_with(
-        self=mocked_api._connection, path=mocked_api.SAVED_EXPERIMENTS_CALL_PATH, params={"favourites": favourites}
+        self=mocked_api._connection, path=mocked_api._SAVED_EXPERIMENTS_CALL_PATH, params={"favourites": favourites}
     )
 
 
@@ -348,9 +348,9 @@ def test_get_saved_experiment(mocked_web_call: MagicMock, mocked_api: API):
     """Tests API.get_saved_experiment() method"""
     mocked_web_call.return_value = web_responses.saved_experiments.retrieve_response
 
-    saved_experiment = mocked_api.get_saved_experiment(saved_experiment_id=1)
+    saved_experiment = mocked_api._get_saved_experiment(saved_experiment_id=1)
 
-    mocked_web_call.assert_called_with(self=mocked_api._connection, path=f"{mocked_api.SAVED_EXPERIMENTS_CALL_PATH}/1")
+    mocked_web_call.assert_called_with(self=mocked_api._connection, path=f"{mocked_api._SAVED_EXPERIMENTS_CALL_PATH}/1")
     assert isinstance(saved_experiment, SavedExperiment)
 
 
@@ -361,7 +361,7 @@ def test_get_job(mocked_web_call: MagicMock, mocked_api: API):
 
     job_data = mocked_api.get_job(job_id=1)
 
-    mocked_web_call.assert_called_with(self=mocked_api._connection, path=f"{mocked_api.JOBS_CALL_PATH}/1")
+    mocked_web_call.assert_called_with(self=mocked_api._connection, path=f"{mocked_api._JOBS_CALL_PATH}/1")
     assert isinstance(job_data, JobData)
 
 
@@ -377,7 +377,7 @@ def test_get_job_exception(mocked_api_call: MagicMock, mocked_api: API):
         mocked_api.get_result(job_id=0)
 
     # Assert that the mocked function was called with correct arguments
-    mocked_api_call.assert_called_with(self=mocked_api._connection, path=f"{mocked_api.JOBS_CALL_PATH}/{0}")
+    mocked_api_call.assert_called_with(self=mocked_api._connection, path=f"{mocked_api._JOBS_CALL_PATH}/{0}")
 
 
 @patch("qiboconnection.connection.Connection.send_get_auth_remote_api_call", autospec=True)
@@ -386,9 +386,9 @@ def test_get_saved_experiment_ise(mocked_web_call: MagicMock, mocked_api: API):
     mocked_web_call.return_value = web_responses.saved_experiments.ise_response
 
     with pytest.raises(RemoteExecutionException):
-        _ = mocked_api.get_saved_experiment(saved_experiment_id=1)
+        _ = mocked_api._get_saved_experiment(saved_experiment_id=1)
 
-    mocked_web_call.assert_called_with(self=mocked_api._connection, path=f"{mocked_api.SAVED_EXPERIMENTS_CALL_PATH}/1")
+    mocked_web_call.assert_called_with(self=mocked_api._connection, path=f"{mocked_api._SAVED_EXPERIMENTS_CALL_PATH}/1")
 
 
 @patch("qiboconnection.connection.Connection.send_get_auth_remote_api_call", autospec=True)
@@ -396,9 +396,9 @@ def test_get_saved_experiments(mocked_web_call: MagicMock, mocked_api: API):
     """Tests API.get_saved_experiments() method"""
     mocked_web_call.return_value = web_responses.saved_experiments.retrieve_response
 
-    saved_experiment = mocked_api.get_saved_experiments(saved_experiment_ids=[1])
+    saved_experiment = mocked_api._get_saved_experiments(saved_experiment_ids=[1])
 
-    mocked_web_call.assert_called_with(self=mocked_api._connection, path=f"{mocked_api.SAVED_EXPERIMENTS_CALL_PATH}/1")
+    mocked_web_call.assert_called_with(self=mocked_api._connection, path=f"{mocked_api._SAVED_EXPERIMENTS_CALL_PATH}/1")
     assert isinstance(saved_experiment[0], SavedExperiment)
 
 
@@ -408,9 +408,9 @@ def test_get_saved_experiments_ise(mocked_web_call: MagicMock, mocked_api: API):
     mocked_web_call.return_value = web_responses.saved_experiments.ise_response
 
     with pytest.raises(RemoteExecutionException):
-        _ = mocked_api.get_saved_experiments(saved_experiment_ids=[1])
+        _ = mocked_api._get_saved_experiments(saved_experiment_ids=[1])
 
-    mocked_web_call.assert_called_with(self=mocked_api._connection, path=f"{mocked_api.SAVED_EXPERIMENTS_CALL_PATH}/1")
+    mocked_web_call.assert_called_with(self=mocked_api._connection, path=f"{mocked_api._SAVED_EXPERIMENTS_CALL_PATH}/1")
 
 
 @patch("qiboconnection.connection.Connection.send_put_auth_remote_api_call", autospec=True)
@@ -418,11 +418,11 @@ def test_fav_saved_experiment(mocked_web_call: MagicMock, mocked_api: API):
     """Tests API.fav_saved_experiment() with ONE experiment"""
     mocked_web_call.return_value = web_responses.saved_experiments.update_response
 
-    mocked_api.fav_saved_experiment(saved_experiment_id=1)
+    mocked_api._fav_saved_experiment(saved_experiment_id=1)
 
     mocked_web_call.assert_called_with(
         self=mocked_api._connection,
-        path=f"{mocked_api.SAVED_EXPERIMENTS_CALL_PATH}/1",
+        path=f"{mocked_api._SAVED_EXPERIMENTS_CALL_PATH}/1",
         data={"favourite": True, "user_id": mocked_api.user_id},
     )
 
@@ -433,11 +433,11 @@ def test_fav_saved_experiment_ise(mocked_web_call: MagicMock, mocked_api: API):
     mocked_web_call.return_value = web_responses.saved_experiments.ise_response
 
     with pytest.raises(RemoteExecutionException):
-        mocked_api.fav_saved_experiment(saved_experiment_id=1)
+        mocked_api._fav_saved_experiment(saved_experiment_id=1)
 
     mocked_web_call.assert_called_with(
         self=mocked_api._connection,
-        path=f"{mocked_api.SAVED_EXPERIMENTS_CALL_PATH}/1",
+        path=f"{mocked_api._SAVED_EXPERIMENTS_CALL_PATH}/1",
         data={"favourite": True, "user_id": mocked_api.user_id},
     )
 
@@ -447,11 +447,11 @@ def test_fav_saved_experiments(mocked_web_call: MagicMock, mocked_api: API):
     """Tests API.fav_saved_experiments() method with a LIST of experiments"""
     mocked_web_call.return_value = web_responses.saved_experiments.update_response
 
-    mocked_api.fav_saved_experiments(saved_experiment_ids=[1])
+    mocked_api._fav_saved_experiments(saved_experiment_ids=[1])
 
     mocked_web_call.assert_called_with(
         self=mocked_api._connection,
-        path=f"{mocked_api.SAVED_EXPERIMENTS_CALL_PATH}/1",
+        path=f"{mocked_api._SAVED_EXPERIMENTS_CALL_PATH}/1",
         data={"favourite": True, "user_id": mocked_api.user_id},
     )
 
@@ -462,11 +462,11 @@ def test_fav_saved_experiments_ise(mocked_web_call: MagicMock, mocked_api: API):
     mocked_web_call.return_value = web_responses.saved_experiments.ise_response
 
     with pytest.raises(RemoteExecutionException):
-        mocked_api.fav_saved_experiments(saved_experiment_ids=[1])
+        mocked_api._fav_saved_experiments(saved_experiment_ids=[1])
 
     mocked_web_call.assert_called_with(
         self=mocked_api._connection,
-        path=f"{mocked_api.SAVED_EXPERIMENTS_CALL_PATH}/1",
+        path=f"{mocked_api._SAVED_EXPERIMENTS_CALL_PATH}/1",
         data={"favourite": True, "user_id": mocked_api.user_id},
     )
 
@@ -476,11 +476,11 @@ def test_unfav_saved_experiment(mocked_web_call: MagicMock, mocked_api: API):
     """Tests API.unfav_saved_experiment() method with ONE experiment"""
     mocked_web_call.return_value = web_responses.saved_experiments.update_response
 
-    mocked_api.unfav_saved_experiment(saved_experiment_id=1)
+    mocked_api._unfav_saved_experiment(saved_experiment_id=1)
 
     mocked_web_call.assert_called_with(
         self=mocked_api._connection,
-        path=f"{mocked_api.SAVED_EXPERIMENTS_CALL_PATH}/1",
+        path=f"{mocked_api._SAVED_EXPERIMENTS_CALL_PATH}/1",
         data={"favourite": False, "user_id": mocked_api.user_id},
     )
 
@@ -491,11 +491,11 @@ def test_unfav_saved_experiment_ise(mocked_web_call: MagicMock, mocked_api: API)
     mocked_web_call.return_value = web_responses.saved_experiments.ise_response
 
     with pytest.raises(RemoteExecutionException):
-        mocked_api.unfav_saved_experiment(saved_experiment_id=1)
+        mocked_api._unfav_saved_experiment(saved_experiment_id=1)
 
     mocked_web_call.assert_called_with(
         self=mocked_api._connection,
-        path=f"{mocked_api.SAVED_EXPERIMENTS_CALL_PATH}/1",
+        path=f"{mocked_api._SAVED_EXPERIMENTS_CALL_PATH}/1",
         data={"favourite": False, "user_id": mocked_api.user_id},
     )
 
@@ -505,11 +505,11 @@ def test_unfav_saved_experiments(mocked_web_call: MagicMock, mocked_api: API):
     """Tests API.unfav_saved_experiments() method with a LIST of experiments"""
     mocked_web_call.return_value = web_responses.saved_experiments.update_response
 
-    mocked_api.unfav_saved_experiments(saved_experiment_ids=[1])
+    mocked_api._unfav_saved_experiments(saved_experiment_ids=[1])
 
     mocked_web_call.assert_called_with(
         self=mocked_api._connection,
-        path=f"{mocked_api.SAVED_EXPERIMENTS_CALL_PATH}/1",
+        path=f"{mocked_api._SAVED_EXPERIMENTS_CALL_PATH}/1",
         data={"favourite": False, "user_id": mocked_api.user_id},
     )
 
@@ -520,11 +520,11 @@ def test_unfav_saved_experiments_ise(mocked_web_call: MagicMock, mocked_api: API
     mocked_web_call.return_value = web_responses.saved_experiments.ise_response
 
     with pytest.raises(RemoteExecutionException):
-        mocked_api.unfav_saved_experiments(saved_experiment_ids=[1])
+        mocked_api._unfav_saved_experiments(saved_experiment_ids=[1])
 
     mocked_web_call.assert_called_with(
         self=mocked_api._connection,
-        path=f"{mocked_api.SAVED_EXPERIMENTS_CALL_PATH}/1",
+        path=f"{mocked_api._SAVED_EXPERIMENTS_CALL_PATH}/1",
         data={"favourite": False, "user_id": mocked_api.user_id},
     )
 
@@ -584,7 +584,7 @@ def test_get_runcard(mocked_web_call: MagicMock, mocked_api: API):
 
     runcard = mocked_api.get_runcard(runcard_id=1)
 
-    mocked_web_call.assert_called_with(self=mocked_api._connection, path=f"{mocked_api.RUNCARDS_CALL_PATH}/1")
+    mocked_web_call.assert_called_with(self=mocked_api._connection, path=f"{mocked_api._RUNCARDS_CALL_PATH}/1")
     assert isinstance(runcard, Runcard)
 
 
@@ -596,7 +596,7 @@ def test_get_runcard_by_name(mocked_web_call: MagicMock, mocked_api: API):
     runcard = mocked_api.get_runcard(runcard_name="DEMO_RUNCARD")
 
     mocked_web_call.assert_called_with(
-        self=mocked_api._connection, path=f"{mocked_api.RUNCARDS_CALL_PATH}/by_keys", params={"name": "DEMO_RUNCARD"}
+        self=mocked_api._connection, path=f"{mocked_api._RUNCARDS_CALL_PATH}/by_keys", params={"name": "DEMO_RUNCARD"}
     )
     assert isinstance(runcard, Runcard)
 
@@ -631,7 +631,7 @@ def test_get_runcard_ise(mocked_web_call: MagicMock, mocked_api: API):
     with pytest.raises(RemoteExecutionException):
         _ = mocked_api.get_runcard(runcard_id=1)
 
-    mocked_web_call.assert_called_with(self=mocked_api._connection, path=f"{mocked_api.RUNCARDS_CALL_PATH}/1")
+    mocked_web_call.assert_called_with(self=mocked_api._connection, path=f"{mocked_api._RUNCARDS_CALL_PATH}/1")
 
 
 @patch("qiboconnection.connection.Connection.send_get_auth_remote_api_call_all_pages", autospec=True)
@@ -681,7 +681,7 @@ def test_update_runcard(mocked_web_call: MagicMock, mocked_api: API):
 
     mocked_web_call.assert_called_with(
         self=mocked_api._connection,
-        path=f"{mocked_api.RUNCARDS_CALL_PATH}/1",
+        path=f"{mocked_api._RUNCARDS_CALL_PATH}/1",
         data=asdict(modified_runcard.runcard_request()),
     )
     assert isinstance(updated_runcard, Runcard)
@@ -739,7 +739,7 @@ def test_update_runcard_ise(mocked_web_call: MagicMock, mocked_api: API):
 
     mocked_web_call.assert_called_with(
         self=mocked_api._connection,
-        path=f"{mocked_api.RUNCARDS_CALL_PATH}/1",
+        path=f"{mocked_api._RUNCARDS_CALL_PATH}/1",
         data=asdict(modified_runcard.runcard_request()),
     )
 
@@ -751,7 +751,7 @@ def test_delete_runcard(mocked_web_call: MagicMock, mocked_api: API):
 
     mocked_api.delete_runcard(runcard_id=1)
 
-    mocked_web_call.assert_called_with(self=mocked_api._connection, path=f"{mocked_api.RUNCARDS_CALL_PATH}/1")
+    mocked_web_call.assert_called_with(self=mocked_api._connection, path=f"{mocked_api._RUNCARDS_CALL_PATH}/1")
 
 
 @patch("qiboconnection.connection.Connection.send_delete_auth_remote_api_call", autospec=True)
@@ -762,7 +762,7 @@ def test_delete_runcard_ise(mocked_web_call: MagicMock, mocked_api: API):
     with pytest.raises(RemoteExecutionException):
         mocked_api.delete_runcard(runcard_id=1)
 
-    mocked_web_call.assert_called_with(self=mocked_api._connection, path=f"{mocked_api.RUNCARDS_CALL_PATH}/1")
+    mocked_web_call.assert_called_with(self=mocked_api._connection, path=f"{mocked_api._RUNCARDS_CALL_PATH}/1")
 
 
 @patch("qiboconnection.connection.Connection.send_get_auth_remote_api_call", autospec=True)
@@ -777,7 +777,7 @@ def test_get_result_exception(mocked_api_call: MagicMock, mocked_api: API):
         mocked_api.get_result(job_id=0)
 
     # Assert that the mocked function was called with correct arguments
-    mocked_api_call.assert_called_with(self=mocked_api._connection, path=f"{mocked_api.JOBS_CALL_PATH}/{0}")
+    mocked_api_call.assert_called_with(self=mocked_api._connection, path=f"{mocked_api._JOBS_CALL_PATH}/{0}")
 
 
 @patch("qiboconnection.connection.Connection.send_get_auth_remote_api_call_all_pages", autospec=True)
@@ -801,7 +801,7 @@ def test_delete_job(mocked_api_call: MagicMock, mocked_api: API):
     mocked_api_call.return_value = web_responses.job_response.delete_job_response
     mocked_api.delete_job(job_id=0)
 
-    mocked_api_call.assert_called_with(self=mocked_api._connection, path=f"{mocked_api.JOBS_CALL_PATH}/{0}")
+    mocked_api_call.assert_called_with(self=mocked_api._connection, path=f"{mocked_api._JOBS_CALL_PATH}/{0}")
 
 
 @patch("qiboconnection.connection.Connection.send_delete_auth_remote_api_call", autospec=True)
@@ -813,4 +813,4 @@ def test_delete_job_exception(mocked_api_call: MagicMock, mocked_api: API):
         # Call the function that should raise the exception
         mocked_api.delete_job(job_id=0)
     # Assert that the mocked function was called with correct arguments
-    mocked_api_call.assert_called_with(self=mocked_api._connection, path=f"{mocked_api.JOBS_CALL_PATH}/{0}")
+    mocked_api_call.assert_called_with(self=mocked_api._connection, path=f"{mocked_api._JOBS_CALL_PATH}/{0}")

@@ -16,8 +16,8 @@ This module contains all needed classes needed for interacting with Qilimanjaro'
 
 .. currentmodule:: qiboconnection
 
-API Class
-~~~~~~~~~
+Qiboconnection API
+~~~~~~~~~~~~~~~~~~
 
 .. autosummary::
     :toctree: API
