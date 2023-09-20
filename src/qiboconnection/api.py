@@ -174,6 +174,20 @@ class API(ABC):
         self._saved_experiments_listing: SavedExperimentListing | None = None
         self._runcard: Runcard | None = None
 
+    @classmethod
+    def login(cls, username: str, api_key: str):
+        """Log into QaaS using your username and api_key
+
+        Args:
+            username: username of your account
+            api_key: you access key
+
+        Returns:
+            Authenticated API instance
+        """
+        _configuration = ConnectionConfiguration(username=username, api_key=api_key)
+        return cls(configuration=_configuration)
+
     """ LOCAL INFORMATION """
 
     @property
