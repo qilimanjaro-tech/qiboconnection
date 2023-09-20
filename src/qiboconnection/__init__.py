@@ -11,6 +11,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+"""
+This module contains all needed classes needed for intacting with Qilimanjaro's QaaS via Qiboconnection SDK.
 
-""" Qibo Connection Library """
+.. currentmodule:: qiboconnection
+
+"""
+
 __version__ = "0.12.0"
+
+
+from .api import API
