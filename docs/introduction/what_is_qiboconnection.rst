@@ -1,2 +1,2 @@
-What is Qiboconnection?
-=========================
+Quickstart
+==========
