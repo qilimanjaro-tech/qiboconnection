@@ -153,7 +153,7 @@ class API(ABC):
     _API_VERSION = "v1"
     _API_PATH = f"/api/{_API_VERSION}"
     _JOBS_CALL_PATH = "/jobs"
-    _CIRCUIT_CALL_PATH = "/circuits"
+    _CIRCUITS_CALL_PATH = "/circuits"
     _DEVICES_CALL_PATH = "/devices"
     _SAVED_EXPERIMENTS_CALL_PATH = "/saved_experiments"
     _RUNCARDS_CALL_PATH = "/runcards"
@@ -491,7 +491,7 @@ class API(ABC):
         logger.debug("Sending qibo circuits for a remote execution...")
         for job in jobs:
             response, status_code = self._connection.send_post_auth_remote_api_call(
-                path=self._CIRCUIT_CALL_PATH, data=asdict(job.job_request)
+                path=self._CIRCUITS_CALL_PATH, data=asdict(job.job_request)
             )
             if status_code != 201:
                 raise RemoteExecutionException(
