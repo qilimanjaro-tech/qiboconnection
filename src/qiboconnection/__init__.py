@@ -12,10 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """
-This module contains all needed classes needed for intacting with Qilimanjaro's QaaS via Qiboconnection SDK.
+This module contains all needed classes needed for interacting with Qilimanjaro's QaaS via Qiboconnection SDK.
 
 .. currentmodule:: qiboconnection
 
+Qiboconnection API
+~~~~~~~~~~~~~~~~~~
+
+.. autosummary::
+    :toctree: API
+
+    ~API
 """
 
 __version__ = "0.12.0"
