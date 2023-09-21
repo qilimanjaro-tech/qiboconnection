@@ -28,6 +28,14 @@ job_listing_item_response_c = {
     "status": 400,
     "detail": "Requested job with 'job_id': 8310, does not exist.",
 }
+job_listing_item_response_d = {
+    "user_id": 12,
+    "device_id": 7,
+    "status": "canceled",
+    "job_type": JobType.EXPERIMENT,
+    "number_shots": 45,
+    "id": 45,
+}
 
 
 class JobResponse:
@@ -45,7 +53,7 @@ class JobResponse:
     retrieve_job_listing_response: tuple[tuple[dict, int]] = (
         (
             {
-                "items": [job_listing_item_response_a, job_listing_item_response_b],
+                "items": [job_listing_item_response_a, job_listing_item_response_b, job_listing_item_response_d],
                 "total": 2,
                 "per_page": 5,
                 "self": "https://qilimanjarodev.ddns.net:8080/api/v1/jobs?page=1&per_page=5",

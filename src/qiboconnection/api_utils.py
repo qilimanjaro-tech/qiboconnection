@@ -77,27 +77,25 @@ def log_job_status_info(job_response: JobResponse):
     Returns:
 
     """
-    status = job_response.status if isinstance(job_response.status, JobStatus) else JobStatus(job_response.status)
-    if status == JobStatus.PENDING:
+    if job_response.status == JobStatus.PENDING:
         logger.warning(
             "Your job with id %i is still pending. Job queue position: %s",
             job_response.job_id,
             job_response.queue_position,
         )
         return None
-    if status == JobStatus.RUNNING:
+    if job_response.status == JobStatus.RUNNING:
         logger.warning("Your job with id %i is still running.", job_response.job_id)
         return None
-    if status == JobStatus.NOT_SENT:
+    if job_response.status == JobStatus.NOT_SENT:
         logger.warning("Your job with id %i has not been sent.", job_response.job_id)
         return None
-    if status == JobStatus.ERROR:
+    if job_response.status == JobStatus.ERROR:
         logger.error("Your job with id %i failed.", job_response.job_id)
         return None
-    if status == JobStatus.COMPLETED:
+    if job_response.status == JobStatus.COMPLETED:
         logger.warning("Your job with id %i is completed.", job_response.job_id)
         return None
-
-    raise ValueError(
-        f"Job status for job with id {job_response.job_id} is not supported: status is {job_response.status}"
-    )
+    else:
+        logger.warning(f"Your job with id %i is {job_response.status}.", job_response.job_id)
+        return None

@@ -87,14 +87,14 @@ class JobResponse(JobRequest):
         description (str): Description of the job
         job_id (int): Job identifier
         queue_position (int): Job queue position
-        status (str | JobStatus): Status of the job
+        status (str): Status of the job
         result (str): Job result
     """
 
     job_id: int
     queue_position: int
     result: str
-    status: str | JobStatus
+    status: str
 
 
 @dataclass(slots=True)
@@ -108,10 +108,10 @@ class ListingJobResponse:
 
         id (int): Job identifier
         queue_position (int): Job queue position
-        status (str | JobStatus): Status of the job
+        status (str): Status of the job
     """
 
-    status: str | JobStatus
+    status: str
     user_id: int
     device_id: int
     job_type: str | JobType
@@ -125,12 +125,12 @@ class JobData:
     metadata.
     """
 
-    status: str | JobStatus
+    status: str
     queue_position: int
     user_id: int | None
     device_id: int
     job_id: int
-    job_type: str | JobType
+    job_type: str
     number_shots: int
     description: Circuit | dict
     result: dict | None

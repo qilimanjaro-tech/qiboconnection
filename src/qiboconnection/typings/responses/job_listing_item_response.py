@@ -2,8 +2,6 @@
 
 from dataclasses import dataclass, field
 
-from ..enums import JobStatus, JobType
-
 
 @dataclass(slots=True)
 class JobListingItemResponse:
@@ -15,12 +13,12 @@ class JobListingItemResponse:
         device_id (int): Device identifier
 
         id (int): Job identifier
-        status (str | JobStatus): Status of the job
+        status (str): Status of the job
     """
 
-    status: str | JobStatus
+    status: str
     user_id: int
     device_id: int
-    job_type: str | JobType
+    job_type: str
     number_shots: int
     id: int | None = field(default=None)
