@@ -1,5 +1,5 @@
-API Class
-===============
+Qiboconnection API
+===================
 
 .. currentmodule:: qiboconnection
 
