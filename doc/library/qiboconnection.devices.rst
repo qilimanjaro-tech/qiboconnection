@@ -12,14 +12,6 @@ qiboconnection.devices.device module
    :undoc-members:
    :show-inheritance:
 
-qiboconnection.devices.device\_characteristics\_util module
------------------------------------------------------------
-
-.. automodule:: qiboconnection.devices.device_characteristics_util
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 qiboconnection.devices.device\_details module
 ---------------------------------------------
 

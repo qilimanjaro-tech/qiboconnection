@@ -23,7 +23,6 @@ from qiboconnection.connection import Connection
 from qiboconnection.typings.devices import DeviceInput
 from qiboconnection.typings.enums import DeviceAvailability, DeviceStatus
 
-from .device_characteristics_util import set_device_availability, set_device_status
 from .device_details import DeviceDetails
 
 
@@ -35,8 +34,8 @@ class Device(DeviceDetails):
         super().__init__()
         self._device_id = device_input.device_id
         self._device_name = device_input.device_name
-        self._status = set_device_status(status=device_input.status)
-        self._availability = set_device_availability(availability=device_input.availability)
+        self._status = device_input.status
+        self._availability = device_input.availability
         self._channel_id = device_input.channel_id
 
         self._str = (
@@ -73,7 +72,7 @@ class Device(DeviceDetails):
         """
         try:
             connection.update_device_availability(device_id=self._device_id, availability=DeviceAvailability.BLOCKED)
-            self._availability = set_device_availability(availability=DeviceAvailability.BLOCKED)
+            self._availability = DeviceAvailability.BLOCKED
         except HTTPError as ex:
             logger.error("Error blocking device %s.", self._device_name)
             raise ex
@@ -85,7 +84,7 @@ class Device(DeviceDetails):
             connection (Connection): Qibo API connection
         """
         connection.update_device_availability(device_id=self._device_id, availability=DeviceAvailability.AVAILABLE)
-        self._availability = set_device_availability(availability=DeviceAvailability.AVAILABLE)
+        self._availability = DeviceAvailability.AVAILABLE
 
     def set_to_online(self, connection: Connection) -> None:
         """Updates a device status so that it can accept remote jobs. Local jobs will be blocked.
@@ -94,7 +93,7 @@ class Device(DeviceDetails):
             connection (Connection): Qibo API connection
         """
         connection.update_device_status(device_id=self._device_id, status=DeviceStatus.ONLINE)
-        self._status = set_device_status(status=DeviceStatus.ONLINE)
+        self._status = DeviceStatus.ONLINE
 
     def set_to_maintenance(self, connection: Connection) -> None:
         """Puts a device in maintenance mode, so that it can only accept local jobs.
@@ -104,7 +103,7 @@ class Device(DeviceDetails):
             connection (Connection): Qibo API connection
         """
         connection.update_device_status(device_id=self._device_id, status=DeviceStatus.MAINTENANCE)
-        self._status = set_device_status(status=DeviceStatus.MAINTENANCE)
+        self._status = DeviceStatus.MAINTENANCE
 
     @property
     def __dict__(self):

@@ -150,7 +150,7 @@ def test_simulator_device_characteristics_json_representation(
     """Tests SimulatorDeviceCharacteristics().toJSON() method"""
     characteristics = SimulatorDeviceCharacteristics(characteristics_input=simulator_device_characteristics_input)
     expected_dict = {
-        "type": characteristics._type.value,
+        "type": characteristics._type,
         "cpu": characteristics._cpu,
         "gpu": characteristics._gpu,
         "os": characteristics._os,
@@ -222,7 +222,7 @@ def test_quantum_device_characteristics_json_representation(
     """Tests QuantumDeviceCharacteristics().toJSON() method"""
     characteristics = QuantumDeviceCharacteristics(characteristics_input=quantum_device_characteristics_input)
     expected_dict = {
-        "type": characteristics._type.value,
+        "type": characteristics._type,
     }
     assert json.loads(characteristics.toJSON()) == expected_dict
 

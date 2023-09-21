@@ -17,7 +17,6 @@ import json
 
 from typeguard import typechecked
 
-from qiboconnection.models.devices.device_characteristics_util import create_device_type
 from qiboconnection.models.devices.device_details import DeviceDetails
 from qiboconnection.typings.devices import SimulatorDeviceCharacteristicsInput
 from qiboconnection.typings.enums import DeviceType
@@ -35,14 +34,14 @@ class SimulatorDeviceCharacteristics(DeviceDetails):
         ):
             raise TypeError("Characteristics Device not supported")
 
-        self._type = create_device_type(device_type=characteristics_input.type)
+        self._type = characteristics_input.type
         self._cpu = characteristics_input.cpu
         self._gpu = characteristics_input.gpu
         self._os = characteristics_input.os
         self._kernel = characteristics_input.kernel
         self._ram = characteristics_input.ram
 
-        self._str = f"<SimulatorDeviceCharacteristics: type='{self._type.value}'"
+        self._str = f"<SimulatorDeviceCharacteristics: type='{self._type}'"
         self._str += f" cpu='{self._cpu}'"
         self._str += f" gpu='{self._gpu}'"
         self._str += f" os='{self._os}'"
@@ -58,7 +57,7 @@ class SimulatorDeviceCharacteristics(DeviceDetails):
             dict: Output dictionary of SimulatorDeviceCharacteristics object
         """
         return {
-            "type": self._type.value,
+            "type": self._type,
             "cpu": self._cpu,
             "gpu": self._gpu,
             "os": self._os,

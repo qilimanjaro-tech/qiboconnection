@@ -20,7 +20,7 @@ device_base_response_a = {
 device_base_response_b = {
     "device_id": 9,
     "device_name": "AWS Development Quantum",
-    "status": "online",
+    "status": 2,
     "availability": "available",
     "channel_id": 2,
     "characteristics": {"type": "quantum"},
