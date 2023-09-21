@@ -362,6 +362,10 @@ class API(ABC):
     def set_device_to_online(self, device_id: int) -> None:
         """Sets a device into online mode, allowing external traffic and blocking manual manipulation.
 
+        .. warning::
+
+            This method is only available for admin members.
+
         Args:
             device_id (int): Device identifier
         """
@@ -375,6 +379,10 @@ class API(ABC):
     @typechecked
     def set_device_to_maintenance(self, device_id: int) -> None:
         """Sets a device in maintenance mode, blocking external traffic and allowing for manual manipulation.
+
+        .. warning::
+
+            This method is only available for admin members.
 
         Args:
             device_id (int): Device identifier
@@ -391,6 +399,10 @@ class API(ABC):
     def block_device_id(self, device_id: int) -> None:
         """Blocks a device to avoid others to manually use it.
 
+        .. warning::
+
+            This method is only available for Qilimanjaro members.
+
         Args:
             device_id (int): Device identifier
         """
@@ -404,6 +416,10 @@ class API(ABC):
     @typechecked
     def release_device(self, device_id: int) -> None:
         """Releases a device to let others manually using it.
+
+        .. warning::
+
+            This method is only available for Qilimanjaro members.
 
         Args:
             device_id (int): Device identifier
@@ -597,8 +613,14 @@ class API(ABC):
 
     @typechecked
     def delete_job(self, job_id: int) -> None:
-        """Deletes a job from the database (only for admin users)        Raises:
-        RemoteExecutionException: Devices could not be retrieved        Returns:
+        """Deletes a job from the database.
+
+        .. warning::
+
+            This method is only available for admin members.
+
+        Raises:
+            RemoteExecutionException: Devices could not be retrieved
         """
         response, status_code = self._connection.send_delete_auth_remote_api_call(
             path=f"{self._JOBS_CALL_PATH}/{job_id}"
@@ -675,7 +697,7 @@ class API(ABC):
     """ REMOTE PLOTTING """
 
     @typechecked
-    async def create_liveplot(
+    async def _create_liveplot(
         self,
         plot_type: str = LivePlotType.LINES.value,
         title: str | None = None,
@@ -722,7 +744,7 @@ class API(ABC):
         return plotting_response.plot_id
 
     @typechecked
-    async def send_plot_points(
+    async def _send_plot_points(
         self,
         plot_id: int,
         x: npt.NDArray[np.float_ | np.int_] | list[float] | list[int] | float | int,
@@ -955,6 +977,10 @@ class API(ABC):
     ):
         """Save a runcard into the database af our servers, for it to be easily recovered when needed.
 
+        .. warning::
+
+            This method is only available for Qilimanjaro members.
+
         Args:
             name: Name the experiment is going to be saved with.
             description: Short descriptive text to more easily identify this specific experiment instance.
@@ -1022,6 +1048,10 @@ class API(ABC):
     def get_runcard(self, runcard_id: int | None = None, runcard_name: str | None = None) -> Runcard:
         """Get full information of a specific runcard
 
+        .. warning::
+
+            This method is only available for Qilimanjaro members.
+
         Args:
             runcard_id(int, optional): id of the runcard to retrieve. Incompatible with providing a name.
             runcard_name(str, optional): name of the runcard to retrieve. Incompatible with providing an id.
@@ -1060,6 +1090,10 @@ class API(ABC):
     def list_runcards(self) -> List[Runcard]:
         """List all saved experiments
 
+        .. warning::
+
+            This method is only available for Qilimanjaro members.
+
         Raises:
             RemoteExecutionException: Devices could not be retrieved
 
@@ -1072,6 +1106,10 @@ class API(ABC):
     @typechecked
     def update_runcard(self, runcard: Runcard) -> Runcard:
         """Update the info of a runcard in the database
+
+        .. warning::
+
+            This method is only available for Qilimanjaro members.
 
         Raises:
             RemoteExecutionException: Runcard could not be retrieved
@@ -1102,6 +1140,10 @@ class API(ABC):
     @typechecked
     def delete_runcard(self, runcard_id: int) -> None:
         """Deletes a runcard from the database
+
+        .. warning::
+
+            This method is only available for Qilimanjaro members.
 
         Raises:
             RemoteExecutionException: Devices could not be retrieved

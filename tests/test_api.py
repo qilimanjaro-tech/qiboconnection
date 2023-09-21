@@ -221,7 +221,7 @@ def test_create_live_plot(mocked_web_call: MagicMock, mocked_websockets_connect:
 
     mocked_web_call.return_value = PlottingResponse(websocket_url="test_url", plot_id=1).to_dict(), 200
 
-    plot_id = asyncio.run(mocked_api.create_liveplot())
+    plot_id = asyncio.run(mocked_api._create_liveplot())
 
     mocked_web_call.assert_called_with(self=mocked_api._connection, path=mocked_api._LIVE_PLOTTING_PATH, data={})
     mocked_websockets_connect.assert_called_with("test_url")
@@ -235,7 +235,7 @@ def test_create_live_plot_with_unexpected_response(mocked_web_call: MagicMock, m
     mocked_web_call.return_value = {}, 400
 
     with pytest.raises(RemoteExecutionException):
-        _ = asyncio.run(mocked_api.create_liveplot())
+        _ = asyncio.run(mocked_api._create_liveplot())
 
 
 @patch("qiboconnection.models.live_plot.LivePlot.send_data", autospec=True)
@@ -256,9 +256,9 @@ def test_send_plot_points(
 
     mocked_web_call.return_value = PlottingResponse(websocket_url="test_url", plot_id=1).to_dict(), 200
 
-    plot_id = asyncio.run(mocked_api.create_liveplot())
+    plot_id = asyncio.run(mocked_api._create_liveplot())
 
-    asyncio.run(mocked_api.send_plot_points(plot_id=plot_id, x=0, y=0))
+    asyncio.run(mocked_api._send_plot_points(plot_id=plot_id, x=0, y=0))
 
     mocked_live_plot_send_data.assert_called()
 
