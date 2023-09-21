@@ -126,7 +126,7 @@ class API(ABC):
         }
         }
         >>> api.select_device_id(device_id=9)
-        [qibo-connection] 0.12.0|INFO|2023-09-14 15:04:05]: Storing personal qibo configuration...
+        [qibo-connection] 0.12.0|INFO|2023-09-21 18:21:29]: Device Galadriel Qblox rack selected.
 
         Let's build a simple circuit and execute it:
 

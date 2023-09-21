@@ -17,7 +17,7 @@ Qiboconnection Documentation
 .. grid:: 2
 
    .. grid-item-card:: Getting Started
-      :link: introduction/what_is_qiboconnection.html
+      :link: introduction/quickstart.html
       :text-align: center
       :img-top: _static/rocket.png
 
@@ -37,7 +37,7 @@ Qiboconnection Documentation
    :maxdepth: 1
    :hidden:
 
-   introduction/what_is_qiboconnection
+   introduction/quickstart
 
 .. toctree::
    :caption: API
