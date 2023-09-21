@@ -78,7 +78,7 @@ def test_device_dict_representation(device_input: DeviceInput):
         "device_id": device._device_id,
         "device_name": device._device_name,
         "status": device._status,
-        "availability": device._availability.value,
+        "availability": device._availability,
     }
     assert device.__dict__ == expected_dict
 
@@ -91,7 +91,7 @@ def test_device_json_representation(device_input: DeviceInput):
         "device_id": device._device_id,
         "device_name": device._device_name,
         "status": device._status,
-        "availability": device._availability.value,
+        "availability": device._availability,
     }
     assert json.loads(device.toJSON()) == expected_dict
 
@@ -112,7 +112,7 @@ def test_simulator_device_dict_representation(simulator_device_input: SimulatorD
         "device_id": device._device_id,
         "device_name": device._device_name,
         "status": device._status,
-        "availability": device._availability.value,
+        "availability": device._availability,
     }
     if device._characteristics:
         expected_dict |= {"characteristics": device._characteristics.__dict__}
@@ -127,7 +127,7 @@ def test_simulator_device_json_representation(simulator_device_input: SimulatorD
         "device_id": device._device_id,
         "device_name": device._device_name,
         "status": device._status,
-        "availability": device._availability.value,
+        "availability": device._availability,
     }
     if device._characteristics:
         expected_dict |= {"characteristics": device._characteristics.__dict__}
@@ -176,7 +176,7 @@ def test_quantum_device_dict_representation(quantum_device_input: QuantumDeviceI
         "device_id": device._device_id,
         "device_name": device._device_name,
         "status": device._status,
-        "availability": device._availability.value,
+        "availability": device._availability,
     }
     if device._last_calibration_time is not None:
         expected_dict |= {"last_calibration_time": device._last_calibration_time.__str__()}
@@ -195,7 +195,7 @@ def test_quantum_device_json_representation(quantum_device_input: QuantumDeviceI
         "device_id": device._device_id,
         "device_name": device._device_name,
         "status": device._status,
-        "availability": device._availability.value,
+        "availability": device._availability,
     }
     if device._last_calibration_time is not None:
         expected_dict |= {"last_calibration_time": device._last_calibration_time.__str__()}

@@ -40,7 +40,7 @@ def set_device_status(status: str) -> str:
     """Checks that the device status is a str
 
     Args:
-        status
+        status: str
 
     Returns:
         str
@@ -52,14 +52,16 @@ def set_device_status(status: str) -> str:
 
 
 @typechecked
-def set_device_availability(availability: Union[str, DeviceAvailability]) -> DeviceAvailability:
-    """Creates a DeviceAvailability object from a string or directly from a DeviceStatus
+def set_device_availability(availability: str) -> str:
+    """Checks that device availability is a str
 
     Args:
-        availability (Union[str, DeviceAvailability]): name corresponding to the device status or
-        directly the DeviceStatus
+        availability: str
 
     Returns:
-        DeviceAvailability: Created DeviceAvailability object
+        str
     """
-    return DeviceAvailability(availability) if isinstance(availability, str) else availability
+    if isinstance(availability, str):
+        return availability
+    else:
+        raise ValueError("Availability needs to be a str")

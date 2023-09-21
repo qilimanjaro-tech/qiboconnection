@@ -4,7 +4,7 @@ device_base_response_a = {
     "device_id": 1,
     "device_name": "AWS Development Simulator",
     "status": "other",
-    "availability": "available",
+    "availability": "other",
     "channel_id": 2,
     "number_pending_jobs": 6,
     "characteristics": {
