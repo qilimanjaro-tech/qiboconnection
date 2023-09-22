@@ -12,7 +12,7 @@ Qiboconnection Documentation
 
 .. rst-class:: lead center
 
-   Qiboconnection is a python library that allows you to execute quantum programs on Qilimanjaro's QPUs and simulators.
+   Qiboconnection is a python-based library that allows you to execute quantum programs on Qilimanjaro's QPUs and simulators.
 
 .. grid:: 2
 
