@@ -1,7 +1,7 @@
 # Qiboconnection
 
 [![codecov](https://codecov.io/gh/qilimanjaro-tech/qiboconnection/graph/badge.svg?token=VBR7YDSZW5)](https://codecov.io/gh/qilimanjaro-tech/qiboconnection)
-[![Documentation Status](https://readthedocs.org/projects/qiboconnection/badge/?version=latest)](https://qiboconnection.readthedocs.io/en/latest/?badge=latest)
+[![Documentation Status](https://readthedocs.org/projects/qiboconnection/badge/?version=latest)](https://qaas.readthedocs.io/projects/qiboconnection/en/latest/?badge=latest)
 
 Python library that allows you to execute quantum programs on Qilimanjaro's QPUs and simulators.
 
