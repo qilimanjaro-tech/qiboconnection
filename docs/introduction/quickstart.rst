@@ -63,7 +63,8 @@ execute:
 
 .. code-block:: python3
 
-    from qibo import Circuit, gates
+    from qibo import gates
+    from qibo.models import Circuit
 
     c = Circuit(2)
     c.add(gates.X(0))
