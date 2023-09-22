@@ -7,6 +7,7 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 import os
 import sys
+from urllib.parse import quote
 
 from sphinxawesome_theme.postprocess import Icons  # pylint: disable=import-error
 
@@ -27,6 +28,7 @@ release = qiboconnection.__version__
 extensions = [
     "sphinx_design",
     "sphinx.ext.autodoc",
+    "sphinx.ext.linkcode",
     "sphinx_mdinclude",  # allows the mdinclude directive to add Markdown files
     "sphinx.ext.napoleon",  # converts Google docstrings into rst
     "sphinx_automodapi.automodapi",
@@ -97,3 +99,21 @@ html_theme_options = {
 }
 html_static_path = ["_static"]
 html_css_files = ["custom.css"]
+
+
+def linkcode_resolve(domain, info):
+    # print(f"domain={domain}, info={info}")
+    if domain != "py":
+        return None
+    if not info["module"]:
+        return None
+    filename = quote(info["module"].replace(".", "/"))
+    if not filename.startswith("tests"):
+        filename = f"src/{filename}"
+    if "fullname" in info:
+        anchor = info["fullname"]
+        anchor = "#:~:text=" + quote(anchor.split(".")[-1])
+    else:
+        anchor = ""
+
+    return f"https://github.com/qilimanjaro-tech/qiboconnection/blob/main/{filename}.py{anchor}"

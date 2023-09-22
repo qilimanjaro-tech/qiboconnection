@@ -19,7 +19,7 @@ This module contains all needed classes needed for interacting with Qilimanjaro'
 .. autosummary::
     :toctree: API
 
-    ~API
+    ~api.API
 """
 
 __version__ = "0.12.0"
