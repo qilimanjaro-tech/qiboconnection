@@ -3,7 +3,7 @@ Quickstart
 
 .. note::
 
-    If you don't already have a QaaS account, please request one by sending an email to: FILL EMAIL
+    If you don't already have a QaaS account, please request one by sending an email to: qilimanjaro@qilimanjaro.tech
 
 To start using ``qiboconnection``, you just need to install the package using PyPi:
 
