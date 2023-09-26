@@ -4,8 +4,8 @@ This document contains the changes of the current release.
 
 ### New features since last release
 
-Skeleton of Sphinx documentation
-[#85](https://github.com/qilimanjaro-tech/qiboconnection/pull/85)
+- Added API `login` constructor for user convenience.
+  [#88](https://github.com/qilimanjaro-tech/qiboconnection/pull/88)
 
 ### Improvements
 
@@ -14,5 +14,11 @@ Skeleton of Sphinx documentation
 ### Deprecations / Removals
 
 ### Documentation
+
+- Skeleton of Sphinx documentation
+  [#85](https://github.com/qilimanjaro-tech/qiboconnection/pull/85)
+
+- Improvements on the documentation main page.
+  [#89](https://github.com/qilimanjaro-tech/qiboconnection/pull/89)
 
 ### Bug fixes

@@ -7,6 +7,7 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 import os
 import sys
+from urllib.parse import quote
 
 from sphinxawesome_theme.postprocess import Icons  # pylint: disable=import-error
 
@@ -27,6 +28,7 @@ release = qiboconnection.__version__
 extensions = [
     "sphinx_design",
     "sphinx.ext.autodoc",
+    "sphinx.ext.linkcode",
     "sphinx_mdinclude",  # allows the mdinclude directive to add Markdown files
     "sphinx.ext.napoleon",  # converts Google docstrings into rst
     "sphinx_automodapi.automodapi",
@@ -48,6 +50,9 @@ automodapi_toctreedirnm = "code/api"  # location where the automodapi rst files 
 
 autoclass_content = "class"  # only show class docstrings (hide init docstrings)
 
+autodoc_typehints = "none"
+autodoc_member_order = "bysource"
+
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
@@ -61,7 +66,11 @@ html_theme_options = {
     "logo_dark": "_static/q_dark.jpeg",
     "show_prev_next": True,
     "awesome_external_links": True,
-    "main_nav_links": {"Docs": "index", "Changelog": "changelog"},
+    "main_nav_links": {
+        "QaaS": "https://qaas.readthedocs.io/en/latest/",
+        "Qiboconnection": "index",
+        "Qililab": "https://qaas.readthedocs.io/projects/qililab/en/latest/",
+    },
     "extra_header_link_icons": {
         "repository on GitHub": {
             "link": "https://github.com/qilimanjaro-tech/qiboconnection",
@@ -94,3 +103,21 @@ html_theme_options = {
 }
 html_static_path = ["_static"]
 html_css_files = ["custom.css"]
+
+
+def linkcode_resolve(domain, info):
+    # print(f"domain={domain}, info={info}")
+    if domain != "py":
+        return None
+    if not info["module"]:
+        return None
+    filename = quote(info["module"].replace(".", "/"))
+    if not filename.startswith("tests"):
+        filename = f"src/{filename}"
+    if "fullname" in info:
+        anchor = info["fullname"]
+        anchor = "#:~:text=" + quote(anchor.split(".")[-1])
+    else:
+        anchor = ""
+
+    return f"https://github.com/qilimanjaro-tech/qiboconnection/blob/main/{filename}.py{anchor}"

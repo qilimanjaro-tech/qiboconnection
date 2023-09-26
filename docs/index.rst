@@ -12,21 +12,32 @@ Qiboconnection Documentation
 
 .. rst-class:: lead center
 
-    Qiboconnection is amazing!
+   Qiboconnection is a Python library that allows you to execute quantum programs on Qilimanjaro's QPUs and simulators.
 
+.. grid:: 2
 
-Get started
------------
+   .. grid-item-card:: Getting Started
+      :link: introduction/quickstart.html
+      :text-align: center
+      :img-top: _static/rocket.png
 
-.. warning::
+      New to Qiboconnection? Here you will find a description of Qiboconnection's main concepts, together
+      with some tutorials on how to install and start using Qiboconnection!
 
-   This documentation is currently under construction.
+   .. grid-item-card:: API Reference
+      :link: code/qiboconnection.html
+      :text-align: center
+      :img-top: _static/code.png
+
+      The API reference contains a detailed description of the functions, modules
+      and classes included in Qiboconnection.
+
 .. toctree::
    :caption: Using Qiboconnection
    :maxdepth: 1
    :hidden:
 
-   introduction/what_is_qiboconnection
+   introduction/quickstart
 
 .. toctree::
    :caption: API
