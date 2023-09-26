@@ -18,7 +18,7 @@ import logging
 import os
 from typing import Literal, Union
 
-from qiboconnection import __version__
+from qiboconnection import __version__  # pylint: disable=cyclic-import
 
 # Logging level from 0 (NOT SET) to 50 (critical) (see https://docs.python.org/3/library/logging.html#logging-levels)
 QIBO_CLIENT_LOG_LEVEL = int(os.environ.get("QIBO_CLIENT_LOG_LEVEL", 20))

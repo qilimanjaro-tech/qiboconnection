@@ -36,10 +36,11 @@ from qiboconnection.models import Job, JobData, JobListing, LivePlots, Runcard, 
 from qiboconnection.models.devices import Device, Devices, OfflineDevice, QuantumDevice, SimulatorDevice, create_device
 from qiboconnection.typings.connection import ConnectionConfiguration
 from qiboconnection.typings.enums import JobStatus
-from qiboconnection.typings.live_plot import LivePlotAxis, LivePlotLabels, LivePlotType, PlottingResponse
+from qiboconnection.typings.live_plot import LivePlotAxis, LivePlotLabels, LivePlotType
 from qiboconnection.typings.responses import (
     JobListingItemResponse,
     JobResponse,
+    PlottingResponse,
     RuncardResponse,
     SavedExperimentListingItemResponse,
     SavedExperimentResponse,
