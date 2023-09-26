@@ -93,25 +93,6 @@ def load_config_file_to_disk() -> ConnectionEstablished:
         return ConnectionEstablished(**json.load(fp=config_file))
 
 
-# def decode_results_from_program(http_response: str) -> List[CircuitResult | float]:
-#     """Decode the results from the program execution
-
-#     Args:
-#         http_response (str): the execution results as an Http Response
-
-#     Returns:
-#         List[CircuitResult]: a Qibo CircuitResult
-#     """
-#     decoded_results = base64_decode(http_response)
-#     if not isinstance(decoded_results, list):
-#         raise ValueError(f"decoded results is not a list. type: {type(decoded_results)}")
-#     if len(decoded_results) <= 0:
-#         raise ValueError("decoded results does not contain results.")
-#     if isinstance(decoded_results[0], float):
-#         return decoded_results
-#     return [np.load(urlsafe_b64decode(decoded_result)) for decoded_result in decoded_results]
-
-
 def decode_jsonified_dict(http_response: str) -> dict:
     """Decodes results that have been jsonified and base64 encoded."""
     return json.loads(urlsafe_b64decode(http_response))
