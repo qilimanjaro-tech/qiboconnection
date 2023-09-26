@@ -9,6 +9,9 @@ This document contains the changes of the current release.
 
 ### Improvements
 
+- Removed `qiboconnection`'s own logging configuration
+  [#91](https://github.com/qilimanjaro-tech/qiboconnection/pull/91)
+
 ### Breaking changes
 
 ### Deprecations / Removals
