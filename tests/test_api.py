@@ -364,6 +364,7 @@ def test_get_job(mocked_web_call: MagicMock, mocked_api: API, web_job_response: 
     job_data = mocked_api.get_job(job_id=1)
 
     mocked_web_call.assert_called_with(self=mocked_api._connection, path=f"{mocked_api.JOBS_CALL_PATH}/1")
+    print(job_data)
     assert isinstance(job_data, JobData)
 
 

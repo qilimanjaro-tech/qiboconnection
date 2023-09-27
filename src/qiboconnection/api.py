@@ -413,7 +413,7 @@ class API(ABC):
         if status_code != 200:
             raise RemoteExecutionException(message="Job could not be retrieved.", status_code=status_code)
 
-        return JobResponse(**cast(dict, response))
+        return JobResponse.from_kwargs(**cast(dict, response))
 
     @typechecked
     def get_result(self, job_id: int) -> CircuitResult | npt.NDArray | dict | None:
@@ -801,14 +801,13 @@ class API(ABC):
         parsed_job_description = deserialize_job_description(
             base64_description=job_response.description, job_type=job_response.job_type
         )
-        return JobData(
-            status=job_response.status,
-            queue_position=job_response.queue_position,
-            user_id=job_response.user_id,
-            device_id=job_response.device_id,
-            job_id=job_response.job_id,
-            job_type=job_response.job_type,
-            number_shots=job_response.number_shots,
+        job_response_dict = asdict(job_response)
+        if "result" in job_response_dict.keys():
+            del job_response_dict["result"]
+        if "description" in job_response_dict.keys():
+            del job_response_dict["description"]
+        return JobData.from_kwargs(
+            **job_response_dict,
             description=parsed_job_description,
             result=parsed_job_result,
         )

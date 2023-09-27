@@ -21,6 +21,7 @@ from qibo.models.circuit import Circuit
 
 from qiboconnection.config import logger
 from qiboconnection.models import JobResult
+from qiboconnection.models.job import Job
 from qiboconnection.typings.enums import JobStatus, JobType
 from qiboconnection.typings.responses import JobResponse
 from qiboconnection.util import base64_decode
@@ -65,7 +66,8 @@ def deserialize_job_description(base64_description: str, job_type: str) -> Circu
     if job_type == JobType.EXPERIMENT:
         return json.loads(base64_decode(encoded_data=base64_description))
 
-    return "JobType not supported!"  # this will be developed in the future. No exception needs to be risen here because we are reading past resulls here.
+    logger.warning(f"JobType {job_type} not supported!")
+    return None
 
 
 def log_job_status_info(job_response: JobResponse):
