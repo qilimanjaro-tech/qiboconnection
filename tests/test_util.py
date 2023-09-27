@@ -88,5 +88,4 @@ def test_deserialize_job_description(base64_qibo_circuit: str, base64_qililab_ex
         deserialize_job_description(base64_description=base64_qililab_experiment, job_type=JobType.EXPERIMENT), dict
     )
 
-    with pytest.raises(ValueError):
-        deserialize_job_description(base64_description=base64_qibo_circuit, job_type="qiskit")
+    assert isinstance(deserialize_job_description(base64_description=base64_qibo_circuit, job_type="qiskit"), str)

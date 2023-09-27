@@ -26,7 +26,5 @@ def test_job_result_creation():
 def test_job_result_program_raises_error():
     """Test we are rising exceptions to inform correctly that PROGRAMS are not currently supported."""
 
-    with pytest.raises(ValueError) as e_info:
-        _ = JobResult(job_id=0, http_response="WzAuMSwgMC4xLCAwLjEsIDAuMSwgMC4xXQ==", job_type=JobType.PROGRAM)
-
-    assert e_info.value.args[0] == f"Job type {JobType.PROGRAM} not supported."
+    job_result = JobResult(job_id=0, http_response="WzAuMSwgMC4xLCAwLjEsIDAuMSwgMC4xXQ==", job_type="program")
+    assert isinstance(job_result.data, str)

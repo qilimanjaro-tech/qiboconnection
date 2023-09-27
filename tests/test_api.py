@@ -16,6 +16,7 @@ from qiboconnection.models.runcard import Runcard
 from qiboconnection.models.saved_experiment import SavedExperiment
 from qiboconnection.models.saved_experiment_listing import SavedExperimentListing
 from qiboconnection.typings.live_plot import PlottingResponse
+from tests.data.web_responses.job import JobResponse
 
 from .data import experiment_dict, results_dict, runcard_dict, web_responses
 from .utils import get_current_event_loop_or_create
@@ -354,10 +355,11 @@ def test_get_saved_experiment(mocked_web_call: MagicMock, mocked_api: API):
     assert isinstance(saved_experiment, SavedExperiment)
 
 
+@pytest.mark.parametrize("web_job_response", [JobResponse.retrieve_job_response_1, JobResponse.retrieve_job_response_2])
 @patch("qiboconnection.connection.Connection.send_get_auth_remote_api_call", autospec=True)
-def test_get_job(mocked_web_call: MagicMock, mocked_api: API):
+def test_get_job(mocked_web_call: MagicMock, mocked_api: API, web_job_response: dict):
     """Tests API.get_job() method."""
-    mocked_web_call.return_value = web_responses.job_response.retrieve_job_response
+    mocked_web_call.return_value = web_job_response
 
     job_data = mocked_api.get_job(job_id=1)
 

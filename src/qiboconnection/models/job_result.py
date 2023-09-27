@@ -20,7 +20,7 @@ class JobResult(ABC):
 
     job_id: int
     http_response: str
-    job_type: str | JobType
+    job_type: str
     data: List[CircuitResult] | CircuitResult | npt.NDArray | List[int] | List[float] | dict | List[
         dict
     ] | None = field(init=False)
@@ -33,9 +33,10 @@ class JobResult(ABC):
 
         if self.job_type == JobType.CIRCUIT:
             self.data = decode_results_from_circuit(self.http_response)
-            return
+            return None
         if self.job_type == JobType.EXPERIMENT:
             self.data = decode_results_from_experiment(self.http_response)
-            return
-        if self.job_type == JobType.PROGRAM:
-            raise ValueError(f"Job type {JobType.PROGRAM} not supported.")
+            return None
+        else:
+            self.data = f"JobType {self.job_type} not supported!"
+            return None
