@@ -25,3 +25,5 @@ This document contains the changes of the current release.
   [#89](https://github.com/qilimanjaro-tech/qiboconnection/pull/89)
 
 ### Bug fixes
+
+- `update_runcard` now uses `PUT` method [#91](https://github.com/qilimanjaro-tech/qiboconnection/pull/92)
