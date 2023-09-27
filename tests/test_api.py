@@ -16,7 +16,7 @@ from qiboconnection.models.job_listing import JobListing
 from qiboconnection.models.runcard import Runcard
 from qiboconnection.models.saved_experiment import SavedExperiment
 from qiboconnection.models.saved_experiment_listing import SavedExperimentListing
-from qiboconnection.typings.live_plot import PlottingResponse
+from qiboconnection.typings.responses import PlottingResponse
 
 from .data import experiment_dict, results_dict, runcard_dict, web_responses
 from .utils import get_current_event_loop_or_create

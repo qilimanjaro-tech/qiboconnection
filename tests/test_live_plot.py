@@ -19,9 +19,9 @@ from qiboconnection.typings.live_plot import (
     LivePlotPacket,
     LivePlotPoints,
     LivePlotType,
-    PlottingResponse,
     _ensure_packet_types,
 )
+from qiboconnection.typings.responses import PlottingResponse
 
 from .data import heatmap_unit_plot_points, unit_plot_point
 from .utils import get_current_event_loop_or_create
