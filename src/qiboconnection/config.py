@@ -20,26 +20,7 @@ from typing import Literal, Union
 
 from qiboconnection import __version__  # pylint: disable=cyclic-import
 
-# Logging level from 0 (NOT SET) to 50 (critical) (see https://docs.python.org/3/library/logging.html#logging-levels)
-QIBO_CLIENT_LOG_LEVEL = int(os.environ.get("QIBO_CLIENT_LOG_LEVEL", 20))
-
-# Configuration for logging mechanism
-
-
-class CustomHandler(logging.StreamHandler):
-    """Custom handler for logging algorithm."""
-
-    def format(self, record):
-        """Format the record with specific format."""
-        fmt = f"[qibo-connection] {__version__}|%(levelname)s|%(asctime)s]: %(message)s"
-        return logging.Formatter(fmt, datefmt="%Y-%m-%d %H:%M:%S").format(record)
-
-
-# allocate logger object
 logger = logging.getLogger(__name__)
-logger.setLevel(QIBO_CLIENT_LOG_LEVEL)
-logger.addHandler(CustomHandler())
-
 
 QUANTUM_SERVICE_URL = {
     "local": "http://localhost:8080",
