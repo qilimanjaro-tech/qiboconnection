@@ -1128,7 +1128,7 @@ class API(ABC):
 
     def _update_runcard_response(self, runcard: Runcard):
         """Make the runcard update request and parse the response"""
-        response, status_code = self._connection.send_post_auth_remote_api_call(
+        response, status_code = self._connection.send_put_auth_remote_api_call(
             path=f"{self._RUNCARDS_CALL_PATH}/{runcard.id}",
             data=asdict(runcard.runcard_request()),
         )

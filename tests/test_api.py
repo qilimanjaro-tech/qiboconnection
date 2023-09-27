@@ -672,7 +672,7 @@ def test_list_runcards_ise(mocked_web_call: MagicMock, mocked_api: API):
     mocked_web_call.assert_called()
 
 
-@patch("qiboconnection.connection.Connection.send_post_auth_remote_api_call", autospec=True)
+@patch("qiboconnection.connection.Connection.send_put_auth_remote_api_call", autospec=True)
 def test_update_runcard(mocked_web_call: MagicMock, mocked_api: API):
     """Tests API.update_runcard() method"""
     mocked_web_call.return_value = web_responses.runcards.update_response
@@ -703,7 +703,7 @@ def test_update_runcard(mocked_web_call: MagicMock, mocked_api: API):
     assert isinstance(updated_runcard, Runcard)
 
 
-@patch("qiboconnection.connection.Connection.send_post_auth_remote_api_call", autospec=True)
+@patch("qiboconnection.connection.Connection.send_put_auth_remote_api_call", autospec=True)
 def test_update_runcard_with_no_id(mocked_web_call: MagicMock, mocked_api: API):
     """Tests API.update_runcard() method"""
     mocked_web_call.return_value = web_responses.runcards.update_response
@@ -729,7 +729,7 @@ def test_update_runcard_with_no_id(mocked_web_call: MagicMock, mocked_api: API):
     mocked_web_call.assert_not_called()
 
 
-@patch("qiboconnection.connection.Connection.send_post_auth_remote_api_call", autospec=True)
+@patch("qiboconnection.connection.Connection.send_put_auth_remote_api_call", autospec=True)
 def test_update_runcard_ise(mocked_web_call: MagicMock, mocked_api: API):
     """Tests API.update_runcard() method"""
     mocked_web_call.return_value = web_responses.runcards.ise_response
