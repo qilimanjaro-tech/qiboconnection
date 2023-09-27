@@ -13,6 +13,11 @@
 # limitations under the License.
 
 """Qiboconnection API class."""
+
+# pylint: disable=too-many-lines
+# pylint: disable=too-many-instance-attributes
+# pylint: disable=too-many-public-methods
+
 import json
 from abc import ABC
 from dataclasses import asdict
@@ -145,6 +150,7 @@ class API(ABC):
         self._connection = Connection(configuration=configuration, api_path=self._API_PATH)
         self._devices: Devices | None = None
         self._jobs: List[Job] = []
+        self._jobs_listing: JobListing | None = None
         self._selected_devices: List[Device] | None = None
         self._live_plots: LivePlots = LivePlots()
         self._saved_experiment: SavedExperiment | None = None
@@ -599,9 +605,7 @@ class API(ABC):
         Raises:
             RemoteExecutionException: Devices could not be retrieved
         """
-        response, status_code = self._connection.send_delete_auth_remote_api_call(
-            path=f"{self._JOBS_CALL_PATH}/{job_id}"
-        )
+        _, status_code = self._connection.send_delete_auth_remote_api_call(path=f"{self._JOBS_CALL_PATH}/{job_id}")
         if status_code != 204:
             raise RemoteExecutionException(message="Job could not be removed.", status_code=status_code)
         logger.info("Job %i deleted successfully")
