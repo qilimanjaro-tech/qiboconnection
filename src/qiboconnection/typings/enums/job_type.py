@@ -12,5 +12,4 @@ class JobType(StrEnum):
     """
 
     CIRCUIT = "circuit"
-    PROGRAM = "program"
     EXPERIMENT = "experiment"
