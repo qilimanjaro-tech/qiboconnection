@@ -213,7 +213,7 @@ def test_send_delete_auth_remote_api_call_not_204_not_job_details(
     """tests send_delete_auth_remote_api_call raise"""
     mocked_rest_call.return_value = web_responses.raw.response_500
     with pytest.raises(HTTPError):
-        response, code = mocked_connection.send_delete_auth_remote_api_call(path="/PATH", timeout=10)
+        _, _ = mocked_connection.send_delete_auth_remote_api_call(path="/PATH", timeout=10)
 
     mocked_rest_call.assert_called_with(
         f"{mocked_connection._remote_server_api_url}/PATH",
@@ -233,7 +233,7 @@ def test_send_delete_auth_remote_api_call_not_204_with_job_details(
     """tests send_delete_auth_remote_api_call raise"""
     mocked_rest_call.return_value = web_responses.job_response.retrieve_job_response_400_raw()
     with pytest.raises(RemoteExecutionException, match="The job does not exist!"):
-        response, code = mocked_connection.send_delete_auth_remote_api_call(path="/PATH", timeout=10)
+        _, _ = mocked_connection.send_delete_auth_remote_api_call(path="/PATH", timeout=10)
 
     mocked_rest_call.assert_called_with(
         f"{mocked_connection._remote_server_api_url}/PATH",

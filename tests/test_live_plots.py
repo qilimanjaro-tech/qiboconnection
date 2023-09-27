@@ -12,7 +12,7 @@ from qiboconnection.typings.live_plot import LivePlotAxis, LivePlotLabels, LiveP
 from .utils import get_current_event_loop_or_create
 
 
-def ok_method(*args, **kwargs):
+def ok_method(*_, **__):
     """returns `'ok'`"""
     return "OK"
 
@@ -48,7 +48,6 @@ def test_live_plots_add_plot(
     live_plot_labels: LivePlotLabels,
     live_plot_axis: LivePlotAxis,
 ):
-    """test live plot `create_live_plot`"""
     """Tests LivePlots add plot functionality"""
 
     loop = get_current_event_loop_or_create()
@@ -141,20 +140,18 @@ def test_check_data_and_plot_type_compatibility_with_ok_case(
         axis=live_plot_axis,
     )
 
-    test_result = LivePlots.CheckDataAndPlotTypeCompatibility(method=ok_method).__call__(
+    test_result = LivePlots.CheckDataAndPlotTypeCompatibility(method=ok_method)(
         live_plot=live_plot, data_packet=data_packet
     )
 
     assert test_result == "OK"
 
 
-def test_check_data_and_plot_type_compatibility_rises_attribute_error(
-    live_plot_type: LivePlotType, live_plot_labels: LivePlotLabels, live_plot_axis: LivePlotAxis
-):
+def test_check_data_and_plot_type_compatibility_rises_attribute_error():
     """test live plot `CheckDataAndPlotTypeCompatibility` works as expected in wrong attr err case"""
 
     with pytest.raises(AttributeError) as e_info:
-        _ = LivePlots.CheckDataAndPlotTypeCompatibility(method=ok_method).__call__(live_plot=None, data_packet=None)
+        _ = LivePlots.CheckDataAndPlotTypeCompatibility(method=ok_method)(live_plot=None, data_packet=None)
 
     assert e_info.value.args[0] == "live_plot and point info are required."
 
@@ -182,9 +179,7 @@ def test_check_data_and_plot_type_compatibility_rises_value_error_for_lines(
     )
 
     with pytest.raises(ValueError) as e_info:
-        _ = LivePlots.CheckDataAndPlotTypeCompatibility(method=ok_method).__call__(
-            live_plot=live_plot, data_packet=data_packet
-        )
+        _ = LivePlots.CheckDataAndPlotTypeCompatibility(method=ok_method)(live_plot=live_plot, data_packet=data_packet)
 
     assert e_info.value.args[0] == "LINES and SCATTER plots accept exactly x and y values."
 
@@ -212,9 +207,7 @@ def test_check_data_and_plot_type_compatibility_rises_value_error_for_scatter3d(
     )
 
     with pytest.raises(ValueError) as e_info:
-        _ = LivePlots.CheckDataAndPlotTypeCompatibility(method=ok_method).__call__(
-            live_plot=live_plot, data_packet=data_packet
-        )
+        _ = LivePlots.CheckDataAndPlotTypeCompatibility(method=ok_method)(live_plot=live_plot, data_packet=data_packet)
 
     assert e_info.value.args[0] == "SCATTER3D plots accept exactly x, y and z values."
 
@@ -242,9 +235,7 @@ def test_check_data_and_plot_type_compatibility_rises_value_error_for_heatmap(
     )
 
     with pytest.raises(ValueError) as e_info:
-        _ = LivePlots.CheckDataAndPlotTypeCompatibility(method=ok_method).__call__(
-            live_plot=live_plot, data_packet=data_packet
-        )
+        _ = LivePlots.CheckDataAndPlotTypeCompatibility(method=ok_method)(live_plot=live_plot, data_packet=data_packet)
 
     assert e_info.value.args[0] == "HEATMAP plots accept exactly x, y and z values."
 
@@ -272,8 +263,6 @@ def test_check_data_and_plot_type_compatibility_rises_value_error_for_heatmap_ax
     )
 
     with pytest.raises(ValueError) as e_info:
-        _ = LivePlots.CheckDataAndPlotTypeCompatibility(method=ok_method).__call__(
-            live_plot=live_plot, data_packet=data_packet
-        )
+        _ = LivePlots.CheckDataAndPlotTypeCompatibility(method=ok_method)(live_plot=live_plot, data_packet=data_packet)
 
     assert e_info.value.args[0] == "HEATMAP plots need to have axis provided on live-plot creation."

@@ -73,8 +73,7 @@ def test_devices_select_device(simulator_device_input: SimulatorDeviceInput):
     assert selected_device.toJSON() == simulator_device.toJSON()
 
 
-@pytest.mark.parametrize("simulator_device_input", simulator_device_inputs)
-def test_devices_select_device_raises_value_error_for_nonexistent_devices(simulator_device_input: SimulatorDeviceInput):
+def test_devices_select_device_raises_value_error_for_nonexistent_devices():
     """Test Devices().select_device() method providing it an id of a non-existing device."""
     devices = Devices()
     with pytest.raises(ValueError) as e_info:

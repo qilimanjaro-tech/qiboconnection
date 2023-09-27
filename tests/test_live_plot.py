@@ -119,7 +119,7 @@ def test_live_plot_points_constructor(live_plot_points: LivePlotPoints):
     assert live_plot_points.to_scatter() == [unit_plot_point[0]]
 
 
-def test_live_plot_points_equality(live_plot_points: LivePlotPoints):
+def test_live_plot_points_equality():
     """test live plots `__eq__`"""
 
     live_plot_points_1 = LivePlotPoints(x=0, y=0)
@@ -510,6 +510,7 @@ def test_send_data_with_too_log_lived_connection(
     live_plot_axis: LivePlotAxis,
 ):
     """Tests start-up method for the initialisation of a LivePlot"""
+    # pylint: disable=too-many-locals
 
     loop = get_current_event_loop_or_create()
 

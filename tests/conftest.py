@@ -5,7 +5,6 @@ from dataclasses import asdict
 from unittest.mock import patch
 
 import pytest
-import websockets
 from requests import Response
 
 from qiboconnection.api import API
