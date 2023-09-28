@@ -9,10 +9,7 @@ from typeguard import typechecked
 from qiboconnection.models.job_response import JobResponse
 from qiboconnection.typings.enums import JobStatus, JobType
 from qiboconnection.typings.requests import JobRequest
-from qiboconnection.util import (
-    jsonify_dict_and_base64_encode,
-    jsonify_str_and_base64_encode,
-)
+from qiboconnection.util import jsonify_dict_and_base64_encode, jsonify_str_and_base64_encode
 
 from .algorithm import ProgramDefinition
 from .devices.device import Device
@@ -21,7 +18,7 @@ from .user import User
 
 
 @dataclass
-class Job(ABC):
+class Job(ABC):  # pylint: disable=too-many-instance-attributes
     """Job class to manage the job experiment to be remotely sent"""
 
     user: User

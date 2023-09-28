@@ -23,7 +23,6 @@ import numpy as np
 import numpy.typing as npt
 
 from .enums import LivePlotType
-from .responses import PlottingResponse
 
 
 class UnitPoint(TypedDict):
@@ -128,6 +127,7 @@ class LivePlotPoints(ABC):
         elif all(isinstance(arg, np.ndarray | list | None) for arg in [x, y, z]):
             x, y = cast(list, x), cast(list, y)
             for i, _ in enumerate(x):
+                # pylint: disable=unnecessary-list-index-lookup
                 point = UnitPoint(x=x[i], y=y[i], z=None, idx=None, idy=None)
                 if z is not None:
                     point["z"] = cast(list, z)[i]

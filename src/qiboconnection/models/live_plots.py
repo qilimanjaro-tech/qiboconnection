@@ -21,12 +21,7 @@ from typing import Callable
 import numpy as np
 import numpy.typing as npt
 
-from qiboconnection.typings.live_plot import (
-    LivePlotAxis,
-    LivePlotLabels,
-    LivePlotPacket,
-    LivePlotType,
-)
+from qiboconnection.typings.live_plot import LivePlotAxis, LivePlotLabels, LivePlotPacket, LivePlotType
 
 from .live_plot import LivePlot
 

@@ -1,14 +1,10 @@
 """ Job Data Typing """
-
-from qiboconnection.api_utils import (
-    deserialize_job_description,
-    parse_job_responses_to_results,
-)
+# pylint: disable=too-many-instance-attributes
+# pylint: disable=E1101
+from qiboconnection.api_utils import deserialize_job_description, parse_job_responses_to_results
 from qiboconnection.models.job_response import JobResponse
 
 
-# disabling no-member error
-# pylint: disable=E1101
 class JobData:
     """Data shown to the user when get_job() method is used. It includes job human-readable results and metadata."""
 

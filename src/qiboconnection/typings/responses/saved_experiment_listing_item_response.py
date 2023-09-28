@@ -1,4 +1,5 @@
 """ SavedExperimentListingItemResponse typing """
+# pylint: disable=too-many-instance-attributes
 from dataclasses import dataclass
 from datetime import datetime
 

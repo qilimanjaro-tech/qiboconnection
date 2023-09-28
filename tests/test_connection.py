@@ -4,11 +4,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from qiboconnection.connection import (
-    Connection,
-    ConnectionEstablished,
-    refresh_token_if_unauthorised,
-)
+from qiboconnection.connection import Connection, ConnectionEstablished, refresh_token_if_unauthorised
 from qiboconnection.errors import HTTPError, RemoteExecutionException
 from qiboconnection.models.user import User
 
@@ -121,7 +117,7 @@ def test_send_put_auth_remote_api_call(mocked_rest_call: MagicMock, mocked_conne
     """tests send_put_auth_remote_api_call"""
     mocked_rest_call.return_value = web_responses.raw.response_200
 
-    response, code = mocked_connection.send_put_auth_remote_api_call(path="/PATH", data={"demo": "demo"})
+    response, code = mocked_connection.send_put_auth_remote_api_call(path="/PATH", data={"demo": "demo"}, timeout=10)
 
     mocked_rest_call.assert_called_with(
         f"{mocked_connection._remote_server_api_url}/PATH",
@@ -131,6 +127,7 @@ def test_send_put_auth_remote_api_call(mocked_rest_call: MagicMock, mocked_conne
             ".eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ"
             ".SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
         },
+        timeout=10,
     )
     assert response == web_responses.raw.response_200.json()
     assert code == web_responses.raw.response_200.status_code
@@ -141,7 +138,7 @@ def test_send_post_auth_remote_api_call(mocked_rest_call: MagicMock, mocked_conn
     """tests send_post_auth_remote_api_call"""
     mocked_rest_call.return_value = web_responses.raw.response_201
 
-    response, code = mocked_connection.send_post_auth_remote_api_call(path="/PATH", data={"demo": "demo"})
+    response, code = mocked_connection.send_post_auth_remote_api_call(path="/PATH", data={"demo": "demo"}, timeout=10)
 
     mocked_rest_call.assert_called_with(
         f"{mocked_connection._remote_server_api_url}/PATH",
@@ -151,6 +148,7 @@ def test_send_post_auth_remote_api_call(mocked_rest_call: MagicMock, mocked_conn
             ".eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ"
             ".SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
         },
+        timeout=10,
     )
     assert response == web_responses.raw.response_201.json()
     assert code == web_responses.raw.response_201.status_code
@@ -161,7 +159,7 @@ def test_send_get_auth_remote_api_call(mocked_rest_call: MagicMock, mocked_conne
     """tests send_get_auth_remote_api_call"""
     mocked_rest_call.return_value = web_responses.raw.response_200
 
-    response, code = mocked_connection.send_get_auth_remote_api_call(path="/PATH", params={"demo": "demo"})
+    response, code = mocked_connection.send_get_auth_remote_api_call(path="/PATH", params={"demo": "demo"}, timeout=10)
 
     mocked_rest_call.assert_called_with(
         f"{mocked_connection._remote_server_api_url}/PATH",
@@ -171,6 +169,7 @@ def test_send_get_auth_remote_api_call(mocked_rest_call: MagicMock, mocked_conne
             ".eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ"
             ".SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
         },
+        timeout=10,
     )
     assert response == web_responses.raw.response_200.json()
     assert code == web_responses.raw.response_200.status_code
@@ -192,7 +191,7 @@ def test_send_delete_auth_remote_api_call(mocked_rest_call: MagicMock, mocked_co
     """tests send_delete_auth_remote_api_call"""
     mocked_rest_call.return_value = web_responses.raw.response_204
 
-    response, code = mocked_connection.send_delete_auth_remote_api_call(path="/PATH")
+    response, code = mocked_connection.send_delete_auth_remote_api_call(path="/PATH", timeout=10)
 
     mocked_rest_call.assert_called_with(
         f"{mocked_connection._remote_server_api_url}/PATH",
@@ -201,6 +200,7 @@ def test_send_delete_auth_remote_api_call(mocked_rest_call: MagicMock, mocked_co
             ".eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ"
             ".SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
         },
+        timeout=10,
     )
     assert response == web_responses.raw.response_204.json()
     assert code == web_responses.raw.response_204.status_code
@@ -213,7 +213,7 @@ def test_send_delete_auth_remote_api_call_not_204_not_job_details(
     """tests send_delete_auth_remote_api_call raise"""
     mocked_rest_call.return_value = web_responses.raw.response_500
     with pytest.raises(HTTPError):
-        response, code = mocked_connection.send_delete_auth_remote_api_call(path="/PATH")
+        _, _ = mocked_connection.send_delete_auth_remote_api_call(path="/PATH", timeout=10)
 
     mocked_rest_call.assert_called_with(
         f"{mocked_connection._remote_server_api_url}/PATH",
@@ -222,6 +222,7 @@ def test_send_delete_auth_remote_api_call_not_204_not_job_details(
             ".eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ"
             ".SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
         },
+        timeout=10,
     )
 
 
@@ -232,7 +233,7 @@ def test_send_delete_auth_remote_api_call_not_204_with_job_details(
     """tests send_delete_auth_remote_api_call raise"""
     mocked_rest_call.return_value = web_responses.job_response.retrieve_job_response_400_raw()
     with pytest.raises(RemoteExecutionException, match="The job does not exist!"):
-        response, code = mocked_connection.send_delete_auth_remote_api_call(path="/PATH")
+        _, _ = mocked_connection.send_delete_auth_remote_api_call(path="/PATH", timeout=10)
 
     mocked_rest_call.assert_called_with(
         f"{mocked_connection._remote_server_api_url}/PATH",
@@ -241,6 +242,7 @@ def test_send_delete_auth_remote_api_call_not_204_with_job_details(
             ".eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ"
             ".SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
         },
+        timeout=10,
     )
 
 
@@ -249,11 +251,9 @@ def test_send_get_remote_call(mocked_rest_call: MagicMock, mocked_connection: Co
     """tests send_get_remote_call"""
     mocked_rest_call.return_value = web_responses.raw.response_200
 
-    response, code = mocked_connection.send_get_remote_call(path="/PATH")
+    response, code = mocked_connection.send_get_remote_call(path="/PATH", timeout=10)
 
-    mocked_rest_call.assert_called_with(
-        f"{mocked_connection._remote_server_base_url}/PATH",
-    )
+    mocked_rest_call.assert_called_with(f"{mocked_connection._remote_server_base_url}/PATH", timeout=10)
     assert response == web_responses.raw.response_200.json()
     assert code == web_responses.raw.response_200.status_code
 
@@ -399,7 +399,7 @@ def test_update_authorisation_using_refresh_token(mocked_rest_call: MagicMock, m
         + ".4oSyRW9Ia7C-50x2yZxQAEXDZp-TLkFkPOtHBR4cCi9LnkREtYrJpDXufep_EYoRwDSJL_2z20moYMuMHy0QCg"
     )
 
-    mocked_connection.update_authorisation_using_refresh_token()
+    mocked_connection.update_authorisation_using_refresh_token(timeout=10)
 
     mocked_rest_call.assert_called_with(
         mocked_connection._authorisation_server_refresh_api_call,
@@ -415,6 +415,7 @@ def test_update_authorisation_using_refresh_token(mocked_rest_call: MagicMock, m
                 + ".4oSyRW9Ia7C-50x2yZxQAEXDZp-TLkFkPOtHBR4cCi9LnkREtYrJpDXufep_EYoRwDSJL_2z20moYMuMHy0QCg"
             )
         },
+        timeout=10,
     )
     assert (
         mocked_connection._authorisation_access_token == web_responses.auth.raw_retrieve_response.json()["accessToken"]

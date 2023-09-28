@@ -7,6 +7,7 @@ import pandas as pd
 import pytest
 
 from qiboconnection.api import API
+from qiboconnection.connection import ConnectionConfiguration
 from qiboconnection.errors import ConnectionException, RemoteExecutionException
 from qiboconnection.models.devices.devices import Devices
 from qiboconnection.models.devices.util import create_device
@@ -15,7 +16,7 @@ from qiboconnection.models.job_listing import JobListing
 from qiboconnection.models.runcard import Runcard
 from qiboconnection.models.saved_experiment import SavedExperiment
 from qiboconnection.models.saved_experiment_listing import SavedExperimentListing
-from qiboconnection.typings.live_plot import PlottingResponse
+from qiboconnection.typings.responses import PlottingResponse
 from tests.data.web_responses.job import JobResponse
 
 from .data import experiment_dict, results_dict, runcard_dict, web_responses
@@ -25,6 +26,21 @@ from .utils import get_current_event_loop_or_create
 def test_api_constructor(mocked_api: API):
     """Test API class constructor"""
     assert isinstance(mocked_api, API)
+
+
+@patch("qiboconnection.api.API.__init__", autospec=True)
+def test_api_login(mocked_api_init: MagicMock):
+    """Tests user utility constructor Login calls __init__ with the correct information,"""
+    mocked_api_init.return_value = None
+    _USERNAME = "test-name"
+    _API_KEY = "test-key"
+
+    _ = API.login(username=_USERNAME, api_key=_API_KEY)
+
+    provided_user_info = mocked_api_init.call_args_list[0][1]["configuration"]
+    assert type(provided_user_info) is ConnectionConfiguration
+    assert provided_user_info.username == _USERNAME
+    assert provided_user_info.api_key == _API_KEY
 
 
 def test_jobs(mocked_api: API):

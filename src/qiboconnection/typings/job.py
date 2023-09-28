@@ -13,14 +13,10 @@
 # limitations under the License.
 
 """ Job Typing """
-import collections
 import enum
 from abc import ABC
 from dataclasses import dataclass, field
-from datetime import datetime
-from typing import Any
 
-import numpy
 from qibo.models.circuit import Circuit
 
 
@@ -120,7 +116,7 @@ class ListingJobResponse:
 
 
 @dataclass(slots=True)
-class JobData:
+class JobData:  # pylint: disable=too-many-instance-attributes
     """Data shown to the user when get_job() method is used. It includes job human-readable results and
     metadata.
     """

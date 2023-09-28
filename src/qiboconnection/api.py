@@ -12,6 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
+# pylint: disable=too-many-lines
+# pylint: disable=too-many-instance-attributes
+# pylint: disable=too-many-public-methods
+
 """ Qilimanjaro Client API to communicate with the Qilimanjaro Global Quantum Services """
 import json
 from abc import ABC
@@ -27,47 +32,25 @@ from qibo.states import CircuitResult
 from requests import HTTPError
 from typeguard import typechecked
 
-from qiboconnection.api_utils import (
-    deserialize_job_description,
-    log_job_status_info,
-    parse_job_responses_to_results,
-)
+from qiboconnection.api_utils import deserialize_job_description, log_job_status_info, parse_job_responses_to_results
 from qiboconnection.config import logger
 from qiboconnection.connection import Connection
 from qiboconnection.constants import API_CONSTANTS, REST, REST_ERROR
 from qiboconnection.errors import ConnectionException, RemoteExecutionException
-from qiboconnection.models import (
-    Job,
-    JobListing,
-    LivePlots,
-    Runcard,
-    SavedExperiment,
-    SavedExperimentListing,
-)
-from qiboconnection.models.devices import (
-    Device,
-    Devices,
-    OfflineDevice,
-    QuantumDevice,
-    SimulatorDevice,
-    create_device,
-)
+from qiboconnection.models import Job, JobListing, LivePlots, Runcard, SavedExperiment, SavedExperimentListing
+from qiboconnection.models.devices import Device, Devices, OfflineDevice, QuantumDevice, SimulatorDevice, create_device
 from qiboconnection.models.job_data import JobData
 from qiboconnection.models.job_response import JobResponse
 from qiboconnection.typings.connection import ConnectionConfiguration
 from qiboconnection.typings.enums import JobStatus
-from qiboconnection.typings.live_plot import (
-    LivePlotAxis,
-    LivePlotLabels,
-    LivePlotType,
-    PlottingResponse,
-)
+from qiboconnection.typings.live_plot import LivePlotAxis, LivePlotLabels, LivePlotType
 from qiboconnection.typings.responses import (
     JobListingItemResponse,
     RuncardResponse,
     SavedExperimentListingItemResponse,
     SavedExperimentResponse,
 )
+from qiboconnection.typings.responses.plotting_response import PlottingResponse
 from qiboconnection.util import unzip
 
 
@@ -92,13 +75,28 @@ class API(ABC):
         self._connection = Connection(configuration=configuration, api_path=self.API_PATH)
         self._devices: Devices | None = None
         self._jobs: List[Job] = []
+        self._jobs_listing: JobListing | None = None
         self._selected_devices: List[Device] | None = None
         self._live_plots: LivePlots = LivePlots()
         self._saved_experiment: SavedExperiment | None = None
         self._saved_experiments_listing: SavedExperimentListing | None = None
         self._runcard: Runcard | None = None
 
-    """ LOCAL INFORMATION """
+    @classmethod
+    def login(cls, username: str, api_key: str):
+        """Log into QaaS using your username and api_key
+
+        Args:
+            username: username of your account
+            api_key: you access key
+
+        Returns:
+            Authenticated API instance
+        """
+        _configuration = ConnectionConfiguration(username=username, api_key=api_key)
+        return cls(configuration=_configuration)
+
+    # LOCAL INFORMATION
 
     @property
     def jobs(self) -> List[Job]:
@@ -160,7 +158,7 @@ class API(ABC):
 
         return self._connection.user.user_id
 
-    """ PING """
+    # PING
 
     def ping(self) -> str:
         """Checks if the connection is alive and response OK when it is.
@@ -173,7 +171,7 @@ class API(ABC):
             raise ConnectionException("Error connecting to Qilimanjaro API")
         return response
 
-    """ DEVICES"""
+    # DEVICES
 
     @typechecked
     def list_devices(self) -> Devices:
@@ -325,7 +323,7 @@ class API(ABC):
             logger.error(json.loads(str(ex))[REST_ERROR.DETAIL])
             raise ex
 
-    """ REMOTE EXECUTIONS """
+    # REMOTE EXECUTIONS
 
     @typechecked
     def execute(
@@ -520,7 +518,7 @@ class API(ABC):
         )
         return self._wait_and_return_results(deadline=deadline, interval=interval, job_ids=job_ids)
 
-    """ REMOTE PLOTTING """
+    # REMOTE PLOTTING
 
     @typechecked
     async def create_liveplot(
@@ -589,7 +587,7 @@ class API(ABC):
         """
         return await self._live_plots.send_data(plot_id=plot_id, x=x, y=y, z=z)
 
-    """ SAVED EXPERIMENTS """
+    # SAVED EXPERIMENTS
 
     @typechecked
     def save_experiment(
@@ -815,7 +813,7 @@ class API(ABC):
             for saved_experiment_id in saved_experiment_ids
         ]
 
-    """ RUNCARDS """
+    # RUNCARDS
 
     def _create_runcard_response(self, runcard: Runcard):
         """Make the runcard create request and parse the response"""
