@@ -1,45 +1,29 @@
 """ Job Data Typing """
 
-from dataclasses import dataclass
-from inspect import signature
+from qiboconnection.api_utils import (
+    deserialize_job_description,
+    parse_job_responses_to_results,
+)
+from qiboconnection.models.job_response import JobResponse
 
-from qibo.models.circuit import Circuit
 
-from qiboconnection.typings.enums import JobStatus, JobType
-
-
-@dataclass(slots=True)
+# disabling no-member error
+# pylint: disable=E1101
 class JobData:
-    """Data shown to the user when get_job() method is used. It includes job human-readable results and
-    metadata.
-    """
+    """Data shown to the user when get_job() method is used. It includes job human-readable results and metadata."""
 
-    status: str | JobStatus
-    queue_position: int
-    user_id: int | None
-    device_id: int
-    job_id: int
-    job_type: str | JobType
-    number_shots: int
-    description: Circuit | dict
-    result: dict | None
+    def __init__(self, **kwargs):
+        for k, v in kwargs.items():
+            setattr(self, k, v)
 
-    @classmethod
-    def from_kwargs(cls, **kwargs):
-        # fetch the constructor's signature
-        cls_fields = set(signature(cls).parameters)
-        # split the kwargs into native ones and new ones
-        native_args, new_args = {}, {}
-        for name, val in kwargs.items():
-            if name in cls_fields:
-                native_args[name] = val
-            else:
-                new_args[name] = val
+        self.result = parse_job_responses_to_results(job_responses=[JobResponse.from_kwargs(**kwargs)])[0]
+        self.description = deserialize_job_description(base64_description=self.description, job_type=self.job_type)
 
-        # use the native ones to create the class ...
-        ret = cls(**native_args)
-
-        # add the new ones by hand
-        for new_name, new_val in new_args.items():
-            setattr(ret, new_name, new_val)
-        return ret
+    def __repr__(self):
+        # Use dataclass-like formatting
+        attributes = [
+            f"{attr}={getattr(self, attr)!r}"
+            for attr in dir(self)
+            if not callable(getattr(self, attr)) and not attr.startswith("__")
+        ]
+        return f"JobData({', '.join(attributes)})"

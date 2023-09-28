@@ -1,7 +1,6 @@
 """ Models: things the api acts with / upon. """
 
 from .job import Job
-from .job_data import JobData
 from .job_listing import JobListing
 from .job_listing_item import JobListingItem
 from .job_result import JobResult

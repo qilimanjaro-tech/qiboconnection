@@ -22,8 +22,8 @@ from qibo.models.circuit import Circuit
 from qiboconnection.config import logger
 from qiboconnection.models import JobResult
 from qiboconnection.models.job import Job
+from qiboconnection.models.job_response import JobResponse
 from qiboconnection.typings.enums import JobStatus, JobType
-from qiboconnection.typings.responses import JobResponse
 from qiboconnection.util import base64_decode
 
 

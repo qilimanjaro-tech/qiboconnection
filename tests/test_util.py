@@ -8,7 +8,7 @@ from requests.models import Response
 
 from qiboconnection.api_utils import deserialize_job_description
 from qiboconnection.connection import ConnectionEstablished
-from qiboconnection.models.job_data import JobType
+from qiboconnection.typings.job import JobType
 from qiboconnection.util import (
     base64_decode,
     base64url_encode,
@@ -88,4 +88,4 @@ def test_deserialize_job_description(base64_qibo_circuit: str, base64_qililab_ex
         deserialize_job_description(base64_description=base64_qililab_experiment, job_type=JobType.EXPERIMENT), dict
     )
 
-    assert isinstance(deserialize_job_description(base64_description=base64_qibo_circuit, job_type="qiskit"), str)
+    assert deserialize_job_description(base64_description=base64_qibo_circuit, job_type="qiskit") is None

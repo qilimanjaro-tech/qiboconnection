@@ -4,7 +4,7 @@ import json
 
 from requests import Response
 
-from qiboconnection.models.job_data import JobStatus, JobType
+from qiboconnection.typings.job import JobStatus, JobType
 
 job_listing_item_response_a = {
     "user_id": 1,

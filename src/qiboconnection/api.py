@@ -38,7 +38,6 @@ from qiboconnection.constants import API_CONSTANTS, REST, REST_ERROR
 from qiboconnection.errors import ConnectionException, RemoteExecutionException
 from qiboconnection.models import (
     Job,
-    JobData,
     JobListing,
     LivePlots,
     Runcard,
@@ -53,6 +52,8 @@ from qiboconnection.models.devices import (
     SimulatorDevice,
     create_device,
 )
+from qiboconnection.models.job_data import JobData
+from qiboconnection.models.job_response import JobResponse
 from qiboconnection.typings.connection import ConnectionConfiguration
 from qiboconnection.typings.enums import JobStatus
 from qiboconnection.typings.live_plot import (
@@ -63,7 +64,6 @@ from qiboconnection.typings.live_plot import (
 )
 from qiboconnection.typings.responses import (
     JobListingItemResponse,
-    JobResponse,
     RuncardResponse,
     SavedExperimentListingItemResponse,
     SavedExperimentResponse,
@@ -424,7 +424,7 @@ class API(ABC):
 
         Raises:
             RemoteExecutionException: Job could not be retrieved.
-            ValueError: Job status not supported.
+            ValueError: Job status not supported.s
             ValueError: Your job failed.
 
         Returns:
@@ -493,7 +493,7 @@ class API(ABC):
 
         Args:
             circuit (Circuit): a Qibo circuit to execute
-            experiment (dict): an Experiment description, result of Qililab's Experiment().to_dict() function.
+            experiment (dict): an Experiment description, results of Qililab's Experiment().to_dict() function.
             nshots (int): number of times the execution is to be done.
             device_ids (List[int]): list of devices where the execution should be performed. If set, any device set
              using API.select_device_id() will not be used. This will not update the selected
@@ -791,25 +791,13 @@ class API(ABC):
             ValueError: Your job failed.
 
         Returns:
-            dict
+            JobData
         """
 
         job_response = self._get_job(job_id=job_id)
         log_job_status_info(job_response=job_response)
-        parsed_job_result = parse_job_responses_to_results(job_responses=[job_response])[0]
-
-        parsed_job_description = deserialize_job_description(
-            base64_description=job_response.description, job_type=job_response.job_type
-        )
-        job_response_dict = asdict(job_response)
-        if "result" in job_response_dict.keys():
-            del job_response_dict["result"]
-        if "description" in job_response_dict.keys():
-            del job_response_dict["description"]
-        return JobData.from_kwargs(
-            **job_response_dict,
-            description=parsed_job_description,
-            result=parsed_job_result,
+        return JobData(
+            **vars(job_response),
         )
 
     @typechecked

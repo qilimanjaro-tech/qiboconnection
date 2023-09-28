@@ -1,8 +1,8 @@
 """ JobResponse """
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from inspect import signature
 
-from ..requests import JobRequest
+from ..typings.requests import JobRequest
 
 
 @dataclass
