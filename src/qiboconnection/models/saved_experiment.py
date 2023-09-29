@@ -22,7 +22,7 @@ from qiboconnection.util import decode_jsonified_dict, jsonify_dict_and_base64_e
 
 
 @dataclass
-class SavedExperiment:
+class SavedExperiment:  # pylint: disable=too-many-instance-attributes
     """SavedExperiment representation"""
 
     name: str

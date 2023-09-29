@@ -14,6 +14,7 @@
 
 """ Remote Connection """
 import json
+import os
 from abc import ABC
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
@@ -25,24 +26,17 @@ import requests
 from typeguard import typechecked
 
 from qiboconnection.config import get_environment, logger
-from qiboconnection.errors import (
-    ConnectionException,
-    HTTPError,
-    RemoteExecutionException,
-)
+from qiboconnection.errors import ConnectionException, HTTPError, RemoteExecutionException
 from qiboconnection.models.user import User
-from qiboconnection.typings.connection import (
-    ConnectionConfiguration,
-    ConnectionEstablished,
-)
+from qiboconnection.typings.connection import ConnectionConfiguration, ConnectionEstablished
 from qiboconnection.typings.requests import AssertionPayload
 from qiboconnection.typings.responses import AccessTokenResponse
-from qiboconnection.util import (
-    base64url_encode,
-    load_config_file_to_disk,
-    process_response,
-    write_config_file_to_disk,
-)
+from qiboconnection.util import base64url_encode, load_config_file_to_disk, process_response, write_config_file_to_disk
+
+
+def TIMEOUT():
+    """Returns always the last TIMEOUT env var that the user might have set."""
+    return int(os.getenv("QIBOCONNECTION_TIMEOUT", "10"))
 
 
 def refresh_token_if_unauthorised(func):
@@ -67,7 +61,7 @@ def refresh_token_if_unauthorised(func):
 
 
 @dataclass
-class Connection(ABC):
+class Connection(ABC):  # pylint: disable=too-many-instance-attributes
     """Class to create a remote connection to a Qibo server"""
 
     @typechecked
@@ -293,57 +287,68 @@ class Connection(ABC):
 
     @refresh_token_if_unauthorised
     @typechecked
-    def send_post_auth_remote_api_call(self, path: str, data: Any) -> Tuple[Any, int]:
+    def send_post_auth_remote_api_call(self, path: str, data: Any, timeout: int | None = None) -> Tuple[Any, int]:
         """HTTP POST REST API authenticated call to remote server
 
         Args:
             path (str): path to add to the remote server api url
             data (Any): data to send
+            timeout (int): time to wait. If not provided, a default will be used.
 
         Returns:
             Tuple[Any, int]: Http response
         """
+        timeout = timeout or TIMEOUT()
         logger.debug("Calling: %s%s", self._remote_server_api_url, path)
         header = {"Authorization": f"Bearer {self._authorisation_access_token}"}
-        response = requests.post(f"{self._remote_server_api_url}{path}", json=data.copy(), headers=header)
+        response = requests.post(
+            f"{self._remote_server_api_url}{path}", json=data.copy(), headers=header, timeout=timeout
+        )
         return process_response(response)
 
-    def send_file(self, channel_id: int, file: TextIOWrapper, filename: str) -> Tuple[Any, int]:
+    def send_file(
+        self, channel_id: int, file: TextIOWrapper, filename: str, timeout: int | None = None
+    ) -> Tuple[Any, int]:
         """Sends a file to a channel registered in the system
 
         Args:
             channel_id (int): channel identifier
             file (TextIOWrapper): file to send
             filename (str): file name
+            timeout (int): time to wait. If not provided, a default will be used.
 
         Returns:
             Tuple[Any, int]: Http response
         """
         return self.send_post_file_auth_remote_api_call(
-            path=f"/files?channel={channel_id}", file=file, filename=filename
+            path=f"/files?channel={channel_id}", file=file, filename=filename, timeout=timeout
         )
 
     @refresh_token_if_unauthorised
     @typechecked
-    def send_put_auth_remote_api_call(self, path: str, data: Any) -> Tuple[Any, int]:
+    def send_put_auth_remote_api_call(self, path: str, data: Any, timeout: int | None = None) -> Tuple[Any, int]:
         """HTTP PUT REST API authenticated call to remote server
 
         Args:
             path (str): path to add to the remote server api url
             data (Any): data to send
+            timeout (int): time to wait. If not provided, a default will be used.
 
         Returns:
             Tuple[Any, int]: Http response
         """
+        timeout = timeout or TIMEOUT()
         logger.debug("Calling: %s%s", self._remote_server_api_url, path)
         header = {"Authorization": f"Bearer {self._authorisation_access_token}"}
-        response = requests.put(f"{self._remote_server_api_url}{path}", json=data.copy(), headers=header)
+        response = requests.put(
+            f"{self._remote_server_api_url}{path}", json=data.copy(), headers=header, timeout=timeout
+        )
         return process_response(response)
 
     @refresh_token_if_unauthorised
     @typechecked
     def send_post_file_auth_remote_api_call(
-        self, path: str, file: Union[TextIOWrapper, TextIO], filename: str
+        self, path: str, file: Union[TextIOWrapper, TextIO], filename: str, timeout: int | None = None
     ) -> Tuple[Any, int]:
         """HTTP POST REST API authenticated call to send a file to remote server
 
@@ -351,59 +356,70 @@ class Connection(ABC):
             path (str): path to add to the remote server api url
             file (Union[TextIOWrapper, TextIO]): file to send
             filename (str): file to send
+            timeout (int): time to wait. If not provided, a default will be used.
 
         Returns:
             Tuple[Any, int]: Http response
         """
+        timeout = timeout or TIMEOUT()
         logger.debug("Calling: %s%s", self._remote_server_api_url, path)
         header = {"Authorization": f"Bearer {self._authorisation_access_token}"}
         packed_file = {"file": (filename, file)}
-        response = requests.post(f"{self._remote_server_api_url}{path}", files=packed_file, headers=header)
+        response = requests.post(
+            f"{self._remote_server_api_url}{path}", files=packed_file, headers=header, timeout=timeout
+        )
         return process_response(response)
 
     @refresh_token_if_unauthorised
     @typechecked
-    def send_get_auth_remote_api_call(self, path: str, params: dict | None = None) -> Tuple[Any, int]:
+    def send_get_auth_remote_api_call(
+        self, path: str, params: dict | None = None, timeout: int | None = None
+    ) -> Tuple[Any, int]:
         """HTTP GET REST API authenticated call to remote server
 
         Args:
             path (str): path to add to the remote server api url
             params (str): dict of parameters to be encoded as url query params
+            timeout (int): time to wait. If not provided, a default will be used.
 
         Returns:
             Tuple[Any, int]: Http response
         """
+        timeout = timeout or TIMEOUT()
         logger.debug("Calling: %s%s", self._remote_server_api_url, path)
         header = {"Authorization": f"Bearer {self._authorisation_access_token}"}
-        response = requests.get(f"{self._remote_server_api_url}{path}", headers=header, params=params)
+        response = requests.get(f"{self._remote_server_api_url}{path}", headers=header, params=params, timeout=timeout)
 
         if response.status_code != 200:
             error_details = response.json()
             if "detail" in error_details and "does not exist" in error_details["detail"]:
                 raise RemoteExecutionException("The job does not exist!", status_code=400)
-            else:
-                response.raise_for_status()
+            response.raise_for_status()
 
         return process_response(response)
 
     @refresh_token_if_unauthorised
     @typechecked
-    def send_get_auth_remote_api_call_all_pages(self, path: str, params: dict | None = None) -> List[Tuple[Any, int]]:
+    def send_get_auth_remote_api_call_all_pages(
+        self, path: str, params: dict | None = None, timeout: int | None = None
+    ) -> List[Tuple[Any, int]]:
         """HTTP GET REST API authenticated call to remote server
 
         Args:
             path (str): path to add to the remote server api url
             params (str): dict of parameters to be encoded as url query params
+            timeout (int): time to wait. If not provided, a default will be used.
 
         Returns:
             Tuple[Any, int]: Http response
         """
+        timeout = timeout or TIMEOUT()
         logger.debug("Calling: %s%s", self._remote_server_api_url, path)
         header = {"Authorization": f"Bearer {self._authorisation_access_token}"}
         next_url = f"{self._remote_server_api_url}{path}"
         responses = []
         while "None" not in next_url:
-            response = requests.get(next_url, headers=header, params=params)
+            response = requests.get(next_url, headers=header, params=params, timeout=timeout)
             json_content, status_code = process_response(response)
             next_url = json_content["links"]["next"]
             responses.append((json_content, status_code))
@@ -411,48 +427,54 @@ class Connection(ABC):
 
     @refresh_token_if_unauthorised
     @typechecked
-    def send_delete_auth_remote_api_call(self, path: str) -> Tuple[Any, int]:
+    def send_delete_auth_remote_api_call(self, path: str, timeout: int | None = None) -> Tuple[Any, int]:
         """HTTP DELETE REST API authenticated call to remote server
 
         Args:
             path (str): path to add to the remote server api url
+            timeout (int): time to wait. If not provided, a default will be used.
 
         Returns:
             Tuple[Any, int]: Http response
         """
+        timeout = timeout or TIMEOUT()
         logger.debug("Calling: %s%s", self._remote_server_api_url, path)
         header = {"Authorization": f"Bearer {self._authorisation_access_token}"}
-        response = requests.delete(f"{self._remote_server_api_url}{path}", headers=header)
+        response = requests.delete(f"{self._remote_server_api_url}{path}", headers=header, timeout=timeout)
 
         if response.status_code != 204:
             error_details = response.json()
             if "detail" in error_details and "does not exist" in error_details["detail"]:
                 raise RemoteExecutionException("The job does not exist!", status_code=400)
-            else:
-                response.raise_for_status()
+            response.raise_for_status()
 
         return ("", 204)
 
     @refresh_token_if_unauthorised
     @typechecked
-    def send_get_remote_call(self, path: str) -> Tuple[Any, int]:
+    def send_get_remote_call(self, path: str, timeout: int | None = None) -> Tuple[Any, int]:
         """HTTP GET REST API call to remote server (without authentication)
 
         Args:
             path (str): path to add to the remote server api url
+            timeout (int): time to wait. If not provided, a default will be used.
 
         Returns:
             Tuple[Any, int]: Http response
         """
+        timeout = timeout or TIMEOUT()
         logger.debug("Calling: %s%s", self._remote_server_api_url, path)
-        response = requests.get(f"{self._remote_server_base_url}{path}")
+        response = requests.get(f"{self._remote_server_base_url}{path}", timeout=timeout)
         return process_response(response)
 
-    def _request_authorisation_token(self):
+    def _request_authorisation_token(self, timeout: int | None = None):
         """
         Builds assertion payload with user info, encodes it and uses it to POST the server for a new Access Token.
+        Args:
+            timeout (int): time to wait. If not provided, a default will be used.
         Returns: str tuple with new Access  and Refresh Tokens.
         """
+        timeout = timeout or TIMEOUT()
         assertion_payload = AssertionPayload(
             **self._user.__dict__,  # type: ignore
             audience=self._audience_url,
@@ -471,7 +493,7 @@ class Connection(ABC):
             raise ValueError("Authorisation server api call is required")
         logger.debug("Calling: %s", self._authorisation_server_api_call)
         response: requests.Response = requests.post(
-            self._authorisation_server_api_call, json=authorisation_request_payload
+            self._authorisation_server_api_call, json=authorisation_request_payload, timeout=timeout
         )
         if response.status_code not in [200, 201]:
             raise ValueError(f"Authorisation request failed: {response.reason}")
@@ -481,12 +503,15 @@ class Connection(ABC):
 
         return access_token_response.accessToken, access_token_response.refreshToken
 
-    def update_authorisation_using_refresh_token(self):
+    def update_authorisation_using_refresh_token(self, timeout: int | None = None):
         """Updates the saved access token sending the request token. For this, it
         builds assertion payload with user info, encodes it and uses it to POST the server for a new Access Token.
+        Args:
+            timeout (int): time to wait. If not provided, a default will be used.
         Returns:
             str with a new Access Token
         """
+        timeout = timeout or TIMEOUT()
 
         if self._authorisation_server_refresh_api_call is None:
             raise ValueError("Authorisation server api call is required")
@@ -495,6 +520,7 @@ class Connection(ABC):
             self._authorisation_server_refresh_api_call,
             json={},
             headers={"Authorization": f"Bearer {self._authorisation_refresh_token}"},
+            timeout=timeout,
         )
         if response.status_code not in [200, 201]:
             raise ValueError(f"Authorisation request failed: {response.reason}")

@@ -12,11 +12,7 @@ from qiboconnection.models.devices import (
     SimulatorDevice,
     SimulatorDeviceCharacteristics,
 )
-from qiboconnection.models.devices.util import (
-    create_device,
-    is_offline_device_input,
-    is_quantum_device_input,
-)
+from qiboconnection.models.devices.util import create_device, is_offline_device_input, is_quantum_device_input
 from qiboconnection.typings.devices import (
     DeviceInput,
     OfflineDeviceInput,
@@ -50,7 +46,7 @@ def test_device_constructor(device_input: DeviceInput):
 def test_device_string_representation(device_input: DeviceInput):
     """Tests Device().__str__() method"""
     device = Device(device_input=device_input)
-    print(device.__str__())
+    print(str(device))
     print(
         f"<Device: device_id={device._device_id},"
         f" device_name='{device._device_name}',"
@@ -61,7 +57,7 @@ def test_device_string_representation(device_input: DeviceInput):
     )
 
     assert (
-        device.__str__() == f"<Device: device_id={device._device_id},"
+        str(device) == f"<Device: device_id={device._device_id},"
         f" device_name='{device._device_name}',"
         f" status='{device._status}',"
         f" availability='{device._availability}',"
@@ -179,7 +175,7 @@ def test_quantum_device_dict_representation(quantum_device_input: QuantumDeviceI
         "availability": device._availability.value,
     }
     if device._last_calibration_time is not None:
-        expected_dict |= {"last_calibration_time": device._last_calibration_time.__str__()}
+        expected_dict |= {"last_calibration_time": str(device._last_calibration_time)}
     if device._characteristics is not None:
         expected_dict |= {"characteristics": device._characteristics.__dict__}
     if device._calibration_details is not None:
@@ -198,7 +194,7 @@ def test_quantum_device_json_representation(quantum_device_input: QuantumDeviceI
         "availability": device._availability.value,
     }
     if device._last_calibration_time is not None:
-        expected_dict |= {"last_calibration_time": device._last_calibration_time.__str__()}
+        expected_dict |= {"last_calibration_time": str(device._last_calibration_time)}
     if device._characteristics is not None:
         expected_dict |= {"characteristics": device._characteristics.__dict__}
     if device._calibration_details is not None:
