@@ -16,7 +16,7 @@ from qiboconnection.models.job_listing import JobListing
 from qiboconnection.models.runcard import Runcard
 from qiboconnection.models.saved_experiment import SavedExperiment
 from qiboconnection.models.saved_experiment_listing import SavedExperimentListing
-from qiboconnection.typings.live_plot import PlottingResponse
+from qiboconnection.typings.responses import PlottingResponse
 
 from .data import experiment_dict, results_dict, runcard_dict, web_responses
 from .utils import get_current_event_loop_or_create
@@ -37,7 +37,7 @@ def test_api_login(mocked_api_init: MagicMock):
     _ = API.login(username=_USERNAME, api_key=_API_KEY)
 
     provided_user_info = mocked_api_init.call_args_list[0][1]["configuration"]
-    assert type(provided_user_info) is ConnectionConfiguration
+    assert isinstance(provided_user_info, ConnectionConfiguration)
     assert provided_user_info.username == _USERNAME
     assert provided_user_info.api_key == _API_KEY
 

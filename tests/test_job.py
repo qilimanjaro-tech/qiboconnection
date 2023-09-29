@@ -149,11 +149,10 @@ def test_jobs_job_type_raises_value_error(circuit: Circuit, user: User, simulato
     assert e_info.value.args[0] == "Could not determine JobType"
 
 
-def test_job_creation_experiment(circuit: Circuit, user: User, simulator_device: SimulatorDevice):
+def test_job_creation_experiment(user: User, simulator_device: SimulatorDevice):
     """test job creation using an experiment instead of a circuit
 
     Args:
-        circuit (Circuit): circuit
         user (User): User
         simulator_device (SimulatorDevice): SimulatorDevice
     """
@@ -181,12 +180,11 @@ def test_job_creation_experiment_raises_value_error_when_both_circuit_and_experi
 
 
 def test_job_creation_experiment_raises_value_error_when_neither_of_circuit_and_experiment_are_defined(
-    circuit: Circuit, user: User, simulator_device: SimulatorDevice
+    user: User, simulator_device: SimulatorDevice
 ):
     """test job creation using neither experiment nor circuit
 
     Args:
-        circuit (Circuit): ProgramDefinition
         user (User): User
         simulator_device (SimulatorDevice): SimulatorDevice
     """

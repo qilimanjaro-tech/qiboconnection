@@ -18,7 +18,7 @@ import logging
 import os
 from typing import Literal, Union
 
-from qiboconnection import __version__
+from qiboconnection import __version__  # pylint: disable=cyclic-import
 
 logger = logging.getLogger(__name__)
 

@@ -1,4 +1,5 @@
 """ SavedExperiment request"""
+# pylint: disable=too-many-instance-attributes
 from dataclasses import dataclass
 
 

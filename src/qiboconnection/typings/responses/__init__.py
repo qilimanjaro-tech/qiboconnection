@@ -1,4 +1,4 @@
-""" """
+""" ""Responses typings module """
 from .access_token_response import AccessTokenResponse
 from .job_listing_item_response import JobListingItemResponse
 from .job_response import JobResponse
