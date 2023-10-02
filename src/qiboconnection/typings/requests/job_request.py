@@ -19,5 +19,5 @@ class JobRequest(ABC):
     user_id: int | None
     device_id: int
     number_shots: int
-    job_type: str | JobType
+    job_type: str
     description: str

@@ -9,6 +9,7 @@ from requests import Response
 
 from qiboconnection.api import API
 from qiboconnection.connection import Connection
+from qiboconnection.models.job_response import JobResponse
 from qiboconnection.typings.connection import ConnectionConfiguration, ConnectionEstablished
 
 

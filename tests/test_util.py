@@ -8,10 +8,12 @@ from requests.models import Response
 
 from qiboconnection.api_utils import deserialize_job_description
 from qiboconnection.connection import ConnectionEstablished
+from qiboconnection.models.job_response import JobResponse
 from qiboconnection.typings.job import JobType
 from qiboconnection.util import (
     base64_decode,
     base64url_encode,
+    from_kwargs,
     load_config_file_to_disk,
     process_response,
     write_config_file_to_disk,
@@ -89,3 +91,33 @@ def test_deserialize_job_description(base64_qibo_circuit: str, base64_qililab_ex
     )
 
     assert deserialize_job_description(base64_description=base64_qibo_circuit, job_type="qiskit") is None
+
+
+def test_from_kwargs():
+    "Test of from_kwargs methods requires all explicitly typed attributes but accepts new ones."
+    assert isinstance(
+        from_kwargs(
+            JobResponse,
+            **{
+                "user_id": 1,
+                "device_id": 2,
+                "description": "Job Description",
+                "job_id": 1001,
+                "queue_position": 5,
+                "status": "Completed",
+                "result": "Job Result",
+                "number_shots": 10,
+                "job_type": "whatever",
+                "extra_arg": "Extra Argument",
+            }
+        ),
+        JobResponse,
+    )
+
+    with pytest.raises(TypeError):
+        isinstance(
+            from_kwargs(
+                JobResponse, **{"user_id": 1, "device_id": 2, "number_shots": 10, "extra_arg": "Extra Argument"}
+            ),
+            JobResponse,
+        )
