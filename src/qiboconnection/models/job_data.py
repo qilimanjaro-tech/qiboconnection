@@ -5,7 +5,7 @@ from qiboconnection.api_utils import deserialize_job_description, parse_job_resp
 from qiboconnection.models.job_response import JobResponse
 
 
-class JobData:
+class JobData(JobResponse):
     """Data shown to the user when get_job() method is used. It includes job human-readable results and metadata."""
 
     def __init__(self, **kwargs):
@@ -16,10 +16,10 @@ class JobData:
         self.description = deserialize_job_description(base64_description=self.description, job_type=self.job_type)
 
     def __repr__(self):
-        # Use dataclass-like formatting
+        # Use dataclass-like formatting, excluding attributes starting with an underscore
         attributes = [
             f"{attr}={getattr(self, attr)!r}"
             for attr in dir(self)
-            if not callable(getattr(self, attr)) and not attr.startswith("__")
+            if not callable(getattr(self, attr)) and not attr.startswith("__") and attr != "_abc_impl"
         ]
         return f"JobData({', '.join(attributes)})"

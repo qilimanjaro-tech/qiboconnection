@@ -794,9 +794,7 @@ class API(ABC):
 
         job_response = self._get_job(job_id=job_id)
         log_job_status_info(job_response=job_response)
-        return JobData(
-            **vars(job_response),
-        )
+        return JobData(**vars(job_response))
 
     @typechecked
     def get_saved_experiments(self, saved_experiment_ids: List[int] | npt.NDArray[np.int_]) -> List[SavedExperiment]:
