@@ -191,7 +191,6 @@ class API(ABC):
                 raise RemoteExecutionException(message="Devices could not be retrieved.", status_code=status_code)
 
         items = [item for response in responses for item in response[REST.ITEMS]]
-
         self._devices = Devices([create_device(device_input=device_input) for device_input in items])
         return self._devices
 
@@ -213,7 +212,6 @@ class API(ABC):
         response, status_code = self._connection.send_get_auth_remote_api_call(
             path=f"{self.DEVICES_CALL_PATH}/{device_id}"
         )
-
         if status_code != 200:
             raise RemoteExecutionException(message="Devices could not be retrieved.", status_code=status_code)
 

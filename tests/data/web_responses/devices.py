@@ -26,6 +26,7 @@ device_base_response_b = {
     "channel_id": 2,
     "characteristics": {"type": "quantum"},
     "calibration_details": {"t1": 10, "frequency": 988},
+    "provider": "iqm",
 }
 
 device_base_response_c = {  # since the device is offline, there is not calibration info

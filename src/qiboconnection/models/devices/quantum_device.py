@@ -70,4 +70,5 @@ class QuantumDevice(OnlineDevice):
             device_dict |= {"characteristics": self._characteristics.__dict__}
         if self._calibration_details:
             device_dict |= {"calibration_details": self._calibration_details.__dict__}
+
         return device_dict

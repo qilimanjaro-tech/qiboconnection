@@ -146,6 +146,7 @@ def test_list_devices(mocked_web_call: MagicMock, mocked_api: API):
     device_listing = mocked_api.list_devices()
 
     mocked_web_call.assert_called_with(self=mocked_api._connection, path=mocked_api.DEVICES_CALL_PATH)
+    print(device_listing)
     assert isinstance(device_listing, Devices)
 
 
