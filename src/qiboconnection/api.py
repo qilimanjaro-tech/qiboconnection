@@ -997,8 +997,12 @@ class API(ABC):
 
     @typechecked
     def delete_job(self, job_id: int) -> None:
-        """Deletes a job from the database (only for admin users)        Raises:
-        RemoteExecutionException: Devices could not be retrieved        Returns:
+        """Deletes a job from the database (only for admin users)
+
+        Raises:
+            RemoteExecutionException: Devices could not be retrieved
+
+
         """
         response, status_code = self._connection.send_delete_auth_remote_api_call(
             path=f"{self.JOBS_CALL_PATH}/{job_id}"
