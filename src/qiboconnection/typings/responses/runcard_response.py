@@ -16,6 +16,8 @@
 from dataclasses import dataclass
 from datetime import datetime
 
+from qiboconnection.util import from_kwargs
+
 from ..requests import RuncardRequest
 
 
@@ -26,3 +28,7 @@ class RuncardResponse(RuncardRequest):
     runcard_id: int
     created_at: datetime
     updated_at: datetime
+
+    @classmethod
+    def from_kwargs(cls, **kwargs):
+        return from_kwargs(cls, **kwargs)

@@ -17,6 +17,7 @@
 # pylint: disable=too-many-lines
 # pylint: disable=too-many-instance-attributes
 # pylint: disable=too-many-public-methods
+# pylint: disable=no-member
 
 import json
 from abc import ABC
@@ -820,7 +821,7 @@ class API(ABC):
         if status_code not in [200, 201]:
             raise RemoteExecutionException(message="Runcard could not be saved.", status_code=status_code)
         logger.debug("Experiment saved successfully.")
-        return RuncardResponse(**response)
+        return RuncardResponse.from_kwargs(**response)
 
     @typechecked
     def save_runcard(
@@ -861,7 +862,7 @@ class API(ABC):
         created_runcard = Runcard.from_response(response=runcard_response)
 
         self._runcard = created_runcard
-        return created_runcard.id
+        return created_runcard.id  # type: ignore[attr-defined]
 
     @typechecked
     def _get_runcard_response(self, runcard_id: int):
@@ -877,7 +878,7 @@ class API(ABC):
         )
         if status_code != 200:
             raise RemoteExecutionException(message="Runcard could not be retrieved.", status_code=status_code)
-        return RuncardResponse(**response)
+        return RuncardResponse.from_kwargs(**response)
 
     @typechecked
     def _get_runcard_by_name_response(self, runcard_name: str):
@@ -895,7 +896,7 @@ class API(ABC):
         if status_code != 200:
             raise RemoteExecutionException(message="Runcard could not be retrieved.", status_code=status_code)
 
-        return RuncardResponse(**response)
+        return RuncardResponse.from_kwargs(**response)
 
     @typechecked
     def get_runcard(self, runcard_id: int | None = None, runcard_name: str | None = None) -> Runcard:
@@ -933,7 +934,7 @@ class API(ABC):
                 raise RemoteExecutionException(message="Runcards could not be listed.", status_code=status_code)
 
         items = [item for response in responses for item in response[REST.ITEMS]]
-        return [RuncardResponse(**item) for item in items]
+        return [RuncardResponse.from_kwargs(**item) for item in items]
 
     @typechecked
     def list_runcards(self) -> List[Runcard]:
@@ -958,7 +959,7 @@ class API(ABC):
         Returns:
             Runcard: serialized runcard dictionary
         """
-        if runcard.id is None:
+        if runcard.id is None:  # type: ignore[attr-defined]
             raise ValueError("Runcard id must be defined for updating its info in the database.")
 
         runcard_response = self._update_runcard_response(runcard=runcard)
@@ -970,13 +971,13 @@ class API(ABC):
     def _update_runcard_response(self, runcard: Runcard):
         """Make the runcard update request and parse the response"""
         response, status_code = self._connection.send_put_auth_remote_api_call(
-            path=f"{self.RUNCARDS_CALL_PATH}/{runcard.id}",
+            path=f"{self.RUNCARDS_CALL_PATH}/{runcard.id}",  # type: ignore[attr-defined]
             data=asdict(runcard.runcard_request()),
         )
         if status_code != 200:
             raise RemoteExecutionException(message="Runcard could not be saved.", status_code=status_code)
         logger.debug("Runcard updated successfully.")
-        return RuncardResponse(**response)
+        return RuncardResponse.from_kwargs(**response)
 
     @typechecked
     def delete_runcard(self, runcard_id: int) -> None:
