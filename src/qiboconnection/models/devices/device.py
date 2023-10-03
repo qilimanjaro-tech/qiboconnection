@@ -22,8 +22,11 @@ from qiboconnection.config import logger
 from qiboconnection.connection import Connection
 from qiboconnection.typings.devices import DeviceInput
 from qiboconnection.typings.enums import DeviceAvailability, DeviceStatus
+from qiboconnection.util import from_kwargs
 
 from .device_details import DeviceDetails
+
+# pylint: disable=no-member
 
 
 class Device(DeviceDetails):
@@ -32,15 +35,11 @@ class Device(DeviceDetails):
     @typechecked
     def __init__(self, device_input: DeviceInput):
         super().__init__()
-        self._device_id = device_input.device_id
-        self._device_name = device_input.device_name
-        self._status = device_input.status
-        self._availability = device_input.availability
-        self._channel_id = device_input.channel_id
-
+        for k, v in vars(device_input).items():
+            setattr(self, f"_{k}", v)
         self._str = (
-            f"<Device: device_id={self._device_id}, device_name='{self._device_name}', "
-            + f"status='{self._status}', availability='{self._availability}', channel_id={self._channel_id}>"
+            f"<Device: device_id={self._device_id}, device_name='{self._device_name}', "  # type: ignore[attr-defined]
+            + f"status='{self._status}', availability='{self._availability}', channel_id={self._channel_id}>"  # type: ignore[attr-defined]
         )
 
     @property
@@ -50,7 +49,7 @@ class Device(DeviceDetails):
         Returns:
             int: device identifier
         """
-        return self._device_id
+        return self._device_id  # type: ignore[attr-defined]
 
     @property
     def name(self) -> str:
@@ -59,7 +58,7 @@ class Device(DeviceDetails):
         Returns:
             str: device name
         """
-        return self._device_name
+        return self._device_name  # type: ignore[attr-defined]
 
     def block_device(self, connection: Connection) -> None:
         """Blocks a device to avoid others to use it
@@ -71,10 +70,10 @@ class Device(DeviceDetails):
             HTTPError: Error blocking device
         """
         try:
-            connection.update_device_availability(device_id=self._device_id, availability=DeviceAvailability.BLOCKED)
+            connection.update_device_availability(device_id=self._device_id, availability=DeviceAvailability.BLOCKED)  # type: ignore[attr-defined]
             self._availability = DeviceAvailability.BLOCKED
         except HTTPError as ex:
-            logger.error("Error blocking device %s.", self._device_name)
+            logger.error("Error blocking device %s.", self._device_name)  # type: ignore[attr-defined]
             raise ex
 
     def release_device(self, connection: Connection) -> None:
@@ -83,7 +82,7 @@ class Device(DeviceDetails):
         Args:
             connection (Connection): Qibo API connection
         """
-        connection.update_device_availability(device_id=self._device_id, availability=DeviceAvailability.AVAILABLE)
+        connection.update_device_availability(device_id=self._device_id, availability=DeviceAvailability.AVAILABLE)  # type: ignore[attr-defined]
         self._availability = DeviceAvailability.AVAILABLE
 
     def set_to_online(self, connection: Connection) -> None:
@@ -92,7 +91,7 @@ class Device(DeviceDetails):
         Args:
             connection (Connection): Qibo API connection
         """
-        connection.update_device_status(device_id=self._device_id, status=DeviceStatus.ONLINE)
+        connection.update_device_status(device_id=self._device_id, status=DeviceStatus.ONLINE)  # type: ignore[attr-defined]
         self._status = DeviceStatus.ONLINE
 
     def set_to_maintenance(self, connection: Connection) -> None:
@@ -102,7 +101,7 @@ class Device(DeviceDetails):
         Args:
             connection (Connection): Qibo API connection
         """
-        connection.update_device_status(device_id=self._device_id, status=DeviceStatus.MAINTENANCE)
+        connection.update_device_status(device_id=self._device_id, status=DeviceStatus.MAINTENANCE)  # type: ignore[attr-defined]
         self._status = DeviceStatus.MAINTENANCE
 
     @property
@@ -113,8 +112,8 @@ class Device(DeviceDetails):
             dict: Output dictionary of a Device object
         """
         return {
-            "device_id": self._device_id,
-            "device_name": self._device_name,
+            "device_id": self._device_id,  # type: ignore[attr-defined]
+            "device_name": self._device_name,  # type: ignore[attr-defined]
             "status": self._status,
             "availability": self._availability,
         }

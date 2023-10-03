@@ -20,6 +20,8 @@ from qiboconnection.typings.devices import OnlineDeviceInput
 
 from .device import Device
 
+# pylint: disable=no-member
+
 
 class OnlineDevice(Device):
     """Online Device class"""
@@ -31,8 +33,8 @@ class OnlineDevice(Device):
         super().__init__(device_input)
 
         self._str = (
-            f"<Online Device: device_id={self._device_id},"
-            f" device_name='{self._device_name}',"
+            f"<Online Device: device_id={self._device_id},"  # type: ignore[attr-defined]
+            f" device_name='{self._device_name}',"  # type: ignore[attr-defined]
             f" status='{self._status}"
         )
         if self._number_pending_jobs is not None:

@@ -1,8 +1,6 @@
 from abc import ABC
 from dataclasses import dataclass
 
-from ..enums import JobType
-
 
 @dataclass
 class JobRequest(ABC):

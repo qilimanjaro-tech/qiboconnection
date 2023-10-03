@@ -17,8 +17,11 @@
 from typeguard import typechecked
 
 from qiboconnection.typings.devices import OfflineDeviceInput
+from qiboconnection.util import from_kwargs
 
 from .device import Device
+
+# pylint: disable=no-member
 
 
 class OfflineDevice(Device):
@@ -29,7 +32,7 @@ class OfflineDevice(Device):
         super().__init__(device_input)
 
         self._str = (
-            f"<Offline Device: device_id={self._device_id},"
-            f" device_name='{self._device_name}',"
+            f"<Offline Device: device_id={self._device_id},"  # type: ignore[attr-defined]
+            f" device_name='{self._device_name}',"  # type: ignore[attr-defined]
             f" status='{self._status}>"
         )

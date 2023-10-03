@@ -2,6 +2,8 @@
 from dataclasses import dataclass
 from typing import Optional
 
+from qiboconnection.util import from_kwargs
+
 
 @dataclass(kw_only=True)
 class DeviceInput:
@@ -19,3 +21,7 @@ class DeviceInput:
     availability: str
     channel_id: int | None
     number_pending_jobs: Optional[int] = 0
+
+    @classmethod
+    def from_kwargs(cls, **kwargs):
+        return from_kwargs(cls, **kwargs)

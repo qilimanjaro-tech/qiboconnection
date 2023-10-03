@@ -15,6 +15,7 @@ device_base_response_a = {
         "kernel": "x86_64 Linux 5.4.0-80-generic",
         "ram": "4096MiB",
     },
+    "new_field": "yes",
 }
 
 device_base_response_b = {
@@ -34,6 +35,7 @@ device_base_response_c = {  # since the device is offline, there is not calibrat
     "availability": "available",
     "channel_id": 2,
     "number_pending_jobs": 6,
+    "new_field": 8969,
 }
 
 

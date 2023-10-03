@@ -7,6 +7,8 @@ from .online_device import OnlineDevice
 from .quantum_device_calibration_details import CalibrationDetails
 from .quantum_device_characteristics import QuantumDeviceCharacteristics
 
+# pylint: disable=no-member
+
 
 class QuantumDevice(OnlineDevice):
     """Quantum Device class"""
@@ -28,7 +30,7 @@ class QuantumDevice(OnlineDevice):
         super().__init__(device_input)
 
         self._str = (
-            f"<Quantum Device: device_id={self._device_id}, device_name='{self._device_name}'"
+            f"<Quantum Device: device_id={self._device_id}, device_name='{self._device_name}'"  # type: ignore[attr-defined]
             f", status='{self._status}'"
         )
         if self._last_calibration_time:
