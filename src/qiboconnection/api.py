@@ -12,12 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Qiboconnection API class."""
 
 # pylint: disable=too-many-lines
 # pylint: disable=too-many-instance-attributes
 # pylint: disable=too-many-public-methods
 
-""" Qilimanjaro Client API to communicate with the Qilimanjaro Global Quantum Services """
 import json
 from abc import ABC
 from dataclasses import asdict
@@ -971,7 +971,7 @@ class API(ABC):
 
     def _update_runcard_response(self, runcard: Runcard):
         """Make the runcard update request and parse the response"""
-        response, status_code = self._connection.send_post_auth_remote_api_call(
+        response, status_code = self._connection.send_put_auth_remote_api_call(
             path=f"{self.RUNCARDS_CALL_PATH}/{runcard.id}",
             data=asdict(runcard.runcard_request()),
         )
