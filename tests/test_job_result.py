@@ -1,6 +1,5 @@
 """ Tests methods for job result """
 import numpy as np
-import pytest
 
 from qiboconnection.models.job_result import JobResult
 from qiboconnection.typings.job import JobType

@@ -32,6 +32,8 @@ from .data import (
     simulator_device_inputs,
 )
 
+# pylint: disable=no-member
+
 
 @pytest.mark.parametrize("device_input", device_inputs)
 def test_device_constructor(device_input: DeviceInput):
