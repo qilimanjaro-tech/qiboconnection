@@ -13,7 +13,6 @@
 # limitations under the License.
 
 """ Runcard class"""
-from datetime import datetime
 
 from qiboconnection.typings.requests import RuncardRequest
 from qiboconnection.typings.responses import RuncardResponse
