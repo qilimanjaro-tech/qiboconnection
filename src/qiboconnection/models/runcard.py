@@ -20,7 +20,9 @@ from qiboconnection.typings.responses import RuncardResponse
 from qiboconnection.util import decode_jsonified_dict, jsonify_dict_and_base64_encode
 
 
-class Runcard(RuncardResponse):  # pylint: disable=too-many-instance-attributes
+# pylint: disable=too-many-instance-attributes
+# pylint: disable=no-member
+class Runcard:
     """Runcard representation"""
 
     def __init__(self, **kwargs):
