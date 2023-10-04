@@ -13,7 +13,6 @@
 # limitations under the License.
 
 """ Device Typing """
-import enum
 from dataclasses import InitVar, dataclass
 from typing import Literal, Optional
 

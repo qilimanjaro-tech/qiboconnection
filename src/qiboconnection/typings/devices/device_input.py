@@ -38,4 +38,5 @@ class DeviceInput:
 
     @classmethod
     def from_kwargs(cls, **kwargs):
+        "Returns an instance of DeviceInput including non-typed attributes"
         return from_kwargs(cls, **kwargs)

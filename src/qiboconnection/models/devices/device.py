@@ -22,11 +22,11 @@ from qiboconnection.config import logger
 from qiboconnection.connection import Connection
 from qiboconnection.typings.devices import DeviceInput
 from qiboconnection.typings.enums import DeviceAvailability, DeviceStatus
-from qiboconnection.util import from_kwargs
 
 from .device_details import DeviceDetails
 
 # pylint: disable=no-member
+# pylint: disable=attribute-defined-outside-init
 
 
 class Device(DeviceDetails):

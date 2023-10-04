@@ -20,6 +20,8 @@ from qibo.models import Circuit
 from qiboconnection.api_utils import deserialize_job_description, parse_job_responses_to_results
 from qiboconnection.models.job_response import JobResponse
 
+# pylint: disable=super-init-not-called
+
 
 class JobData(JobResponse):
     """Data shown to the user when get_job() method is used. It includes job human-readable results and metadata."""

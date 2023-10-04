@@ -33,7 +33,7 @@ from qibo.states import CircuitResult
 from requests import HTTPError
 from typeguard import typechecked
 
-from qiboconnection.api_utils import deserialize_job_description, log_job_status_info, parse_job_responses_to_results
+from qiboconnection.api_utils import log_job_status_info, parse_job_responses_to_results
 from qiboconnection.config import logger
 from qiboconnection.connection import Connection
 from qiboconnection.constants import API_CONSTANTS, REST, REST_ERROR
@@ -1004,7 +1004,7 @@ class API(ABC):
 
 
         """
-        response, status_code = self._connection.send_delete_auth_remote_api_call(
+        response, status_code = self._connection.send_delete_auth_remote_api_call(  # pylint: disable=unused-variable
             path=f"{self.JOBS_CALL_PATH}/{job_id}"
         )
         if status_code != 204:

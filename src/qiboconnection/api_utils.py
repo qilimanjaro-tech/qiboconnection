@@ -21,7 +21,6 @@ from qibo.models.circuit import Circuit
 
 from qiboconnection.config import logger
 from qiboconnection.models import JobResult
-from qiboconnection.models.job import Job
 from qiboconnection.models.job_response import JobResponse
 from qiboconnection.typings.enums import JobStatus, JobType
 from qiboconnection.util import base64_decode
@@ -98,6 +97,6 @@ def log_job_status_info(job_response: JobResponse):
     if job_response.status == JobStatus.COMPLETED:
         logger.warning("Your job with id %i is completed.", job_response.job_id)
         return None
-    else:
-        logger.warning(f"Your job with id %i is {job_response.status}.", job_response.job_id)
-        return None
+
+    logger.warning(f"Your job with id %i is {job_response.status}.", job_response.job_id)
+    return None

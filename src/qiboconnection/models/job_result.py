@@ -47,6 +47,6 @@ class JobResult(ABC):
         if self.job_type == JobType.EXPERIMENT:
             self.data = decode_results_from_experiment(self.http_response)
             return None
-        else:
-            self.data = f"JobType {self.job_type} not supported!"
-            return None
+
+        self.data = f"JobType {self.job_type} not supported!"
+        return None

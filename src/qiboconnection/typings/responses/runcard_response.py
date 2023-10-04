@@ -31,4 +31,5 @@ class RuncardResponse(RuncardRequest):
 
     @classmethod
     def from_kwargs(cls, **kwargs):
+        "Returns an instance of RuncardResponse including non-typed attributes"
         return from_kwargs(cls, **kwargs)

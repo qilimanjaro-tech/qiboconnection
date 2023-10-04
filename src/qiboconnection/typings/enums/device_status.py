@@ -13,8 +13,6 @@
 # limitations under the License.
 
 """ DeviceStatus enum """
-from dataclasses import dataclass
-
 from .str_enum import StrEnum
 
 

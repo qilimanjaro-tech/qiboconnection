@@ -17,7 +17,6 @@
 from typeguard import typechecked
 
 from qiboconnection.typings.devices import OfflineDeviceInput
-from qiboconnection.util import from_kwargs
 
 from .device import Device
 
