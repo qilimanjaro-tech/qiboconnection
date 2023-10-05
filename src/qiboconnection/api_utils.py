@@ -60,7 +60,13 @@ def deserialize_job_description(base64_description: str, job_type: str) -> Circu
         Circuit | dict: _description_
     """
     if job_type == JobType.CIRCUIT:
-        return Circuit.from_qasm(base64_decode(encoded_data=base64_description))
+        try:
+            import ast
+
+            circuits_descriptions = ast.literal_eval(base64_description)
+            return [Circuit.from_qasm(base64_decode(encoded_data=description)) for description in circuits_descriptions]
+        except ValueError:
+            return Circuit.from_qasm(base64_decode(encoded_data=base64_description))
 
     if job_type == JobType.EXPERIMENT:
         return json.loads(base64_decode(encoded_data=base64_description))
