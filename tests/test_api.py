@@ -372,7 +372,10 @@ def test_get_saved_experiment(mocked_web_call: MagicMock, mocked_api: API):
     assert isinstance(saved_experiment, SavedExperiment)
 
 
-@pytest.mark.parametrize("web_job_response", [JobResponse.retrieve_job_response_1, JobResponse.retrieve_job_response_2])
+@pytest.mark.parametrize(
+    "web_job_response",
+    [JobResponse.retrieve_job_response_1, JobResponse.retrieve_job_response_2, JobResponse.retrieve_job_response_3],
+)
 @patch("qiboconnection.connection.Connection.send_get_auth_remote_api_call", autospec=True)
 def test_get_job(mocked_web_call: MagicMock, mocked_api: API, web_job_response: dict):
     """Tests API.get_job() method."""
@@ -381,7 +384,6 @@ def test_get_job(mocked_web_call: MagicMock, mocked_api: API, web_job_response: 
     job_data = mocked_api.get_job(job_id=1)
 
     mocked_web_call.assert_called_with(self=mocked_api._connection, path=f"{mocked_api.JOBS_CALL_PATH}/1")
-    print(job_data)
     assert isinstance(job_data, JobData)
 
 
