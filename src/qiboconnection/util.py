@@ -161,6 +161,11 @@ def jsonify_str_and_base64_encode(object_to_encode: str):
     return str(base64.urlsafe_b64encode(object_to_encode.encode("utf-8")), "utf-8")
 
 
+def jsonify_List_with_str_and_base64_encode(object_to_encode: List[str]):
+    """Encodes a given list of strings to bytes assuming utf-8, and encodes that byte-array to an url-save base64 str"""
+    return str([str(base64.urlsafe_b64encode(s.encode("utf-8")), "utf-8") for s in object_to_encode])
+
+
 def unzip(zipped_list: List[Tuple[Any, Any]]):
     """Inverse of the python builtin `zip` operation"""
     return tuple(zip(*zipped_list))

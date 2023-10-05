@@ -419,16 +419,16 @@ class API(ABC):
     @typechecked
     def execute(
         self,
-        circuit: Circuit | None = None,
+        circuit: Circuit | List[Circuit] | None = None,
         experiment: dict | None = None,
         nshots: int = 10,
         device_ids: List[int] | None = None,
     ) -> List[int]:
-        """Send a Qibo circuit to be executed on the remote service API. User should define either a *circuit* or an
+        """Send a Qibo circuit(s) to be executed on the remote service API. User should define either a *circuit* or an
         *experiment*. If both are provided, the function will fail.
 
         Args:
-            circuit (Circuit): a Qibo circuit to execute
+            circuit (Circuit or List[Circuit]): a Qibo circuit to execute
             experiment (dict): an Experiment description, result of Qililab's Experiment().to_dict() function.
             nshots (int): number of times the execution is to be done.
             device_ids (List[int]): list of devices where the execution should be performed. If set, any device set
