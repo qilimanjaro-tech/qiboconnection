@@ -17,8 +17,6 @@ import enum
 from abc import ABC
 from dataclasses import dataclass, field
 
-from qibo.models.circuit import Circuit
-
 
 class JobType(str, enum.Enum):
     """Job Type
