@@ -713,7 +713,7 @@ class API(ABC):
                 raise RemoteExecutionException(message="Job could not be listed.", status_code=status_code)
 
         items = [item for response in responses for item in response[REST.ITEMS]]
-        return [JobListingItemResponse(**item) for item in items]
+        return [JobListingItemResponse.from_kwargs(**item) for item in items]
 
     @typechecked
     def list_saved_experiments(self, favourites: bool = False) -> SavedExperimentListing:

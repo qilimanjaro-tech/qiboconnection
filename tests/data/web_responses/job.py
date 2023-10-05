@@ -13,6 +13,8 @@ job_listing_item_response_a = {
     "job_type": JobType.CIRCUIT,
     "number_shots": 45,
     "id": None,
+    "whatever": "newfield",
+    "more_strange_fields": 79,
 }
 job_listing_item_response_b = {
     "user_id": 12,

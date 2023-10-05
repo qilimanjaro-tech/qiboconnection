@@ -16,8 +16,10 @@
 
 from dataclasses import dataclass, field
 
+from qiboconnection.util import from_kwargs
 
-@dataclass(slots=True)
+
+@dataclass
 class JobListingItemResponse:
     """Job Response without the results. Includes all jobs metadata so that
     the user can identify the id from the job he is interested to retrieve the results.
@@ -36,3 +38,8 @@ class JobListingItemResponse:
     job_type: str
     number_shots: int
     id: int | None = field(default=None)
+
+    @classmethod
+    def from_kwargs(cls, **kwargs):
+        "Returns an instance of the class including non-typed attributes"
+        return from_kwargs(cls, **kwargs)
