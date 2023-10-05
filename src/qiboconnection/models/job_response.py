@@ -11,25 +11,35 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-from abc import ABC
+""" JobResponse """
 from dataclasses import dataclass
+
+from qiboconnection.util import from_kwargs
+
+from ..typings.requests import JobRequest
 
 
 @dataclass
-class JobRequest(ABC):
-    """Job Request
+class JobResponse(JobRequest):
+    """Full Job Response. Includes job results which may
+    be weight a few GB.
 
     Attributes:
         user_id (int): User identifier
         device_id (int): Device identifier
         description (str): Description of the job
-        job_type (str | JobType): Type of the job
-        number_shots (int): number of times the job is to be executed
+        job_id (int): Job identifier
+        queue_position (int): Job queue position
+        status (str): Status of the job
+        result (str): Job result
     """
 
-    user_id: int | None
-    device_id: int
-    number_shots: int
-    job_type: str
-    description: str
+    job_id: int
+    queue_position: int
+    result: str
+    status: str
+
+    @classmethod
+    def from_kwargs(cls, **kwargs):
+        "Returns an instance of JobResponse including non-typed attributes"
+        return from_kwargs(cls, **kwargs)

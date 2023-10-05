@@ -13,27 +13,20 @@
 # limitations under the License.
 
 """ Runcard class"""
-from dataclasses import dataclass, field
-from datetime import datetime
 
 from qiboconnection.typings.requests import RuncardRequest
 from qiboconnection.typings.responses import RuncardResponse
 from qiboconnection.util import decode_jsonified_dict, jsonify_dict_and_base64_encode
 
 
-@dataclass
-class Runcard:  # pylint: disable=too-many-instance-attributes
+# pylint: disable=too-many-instance-attributes
+# pylint: disable=no-member
+class Runcard:
     """Runcard representation"""
 
-    name: str
-    user_id: int
-    device_id: int
-    description: str
-    runcard: dict
-    qililab_version: str
-    id: int | None = field(default=None)
-    created_at: datetime | None = field(default=None)
-    updated_at: datetime | None = field(default=None)
+    def __init__(self, **kwargs):
+        for k, v in kwargs.items():
+            setattr(self, k, v)
 
     @property
     def _encoded_runcard(self):
