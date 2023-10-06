@@ -367,6 +367,8 @@ class API(ABC):
         if not selected_devices:
             raise ValueError("No devices were selected for execution.")
 
+        if type(circuit) is not list:
+            circuit = [circuit]
         jobs = [
             Job(
                 circuit=circuit,
@@ -384,7 +386,6 @@ class API(ABC):
             response, status_code = self._connection.send_post_auth_remote_api_call(
                 path=self.CIRCUITS_CALL_PATH, data=asdict(job.job_request)
             )
-            print("Description sent to /circuits in data", asdict(job.job_request)["description"])
             if status_code != 201:
                 raise RemoteExecutionException(
                     message=f"Circuit {job.job_id} could not be executed.", status_code=status_code

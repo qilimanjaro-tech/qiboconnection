@@ -33,10 +33,10 @@ class JobData(JobResponse):
         self.result = parse_job_responses_to_results(job_responses=[JobResponse.from_kwargs(**kwargs)])[0]
         self.description = deserialize_job_description(base64_description=self.description, job_type=self.job_type)
 
-        if not isinstance(self.result, (dict, type(None))):
+        if not isinstance(self.result, (dict, type(None), list)):
             raise ValueError("Job result needs to be a dict!")
 
-        if not isinstance(self.description, (dict, type(None), Circuit)):
+        if not isinstance(self.description, (dict, list, type(None), Circuit)):
             raise ValueError("Job description needs to be a dict of a Qibo Circuit!")
 
     def __repr__(self):

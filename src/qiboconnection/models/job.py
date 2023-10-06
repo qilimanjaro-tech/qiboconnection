@@ -23,11 +23,7 @@ from typeguard import typechecked
 from qiboconnection.models.job_response import JobResponse
 from qiboconnection.typings.enums import JobStatus, JobType
 from qiboconnection.typings.requests import JobRequest
-from qiboconnection.util import (
-    jsonify_dict_and_base64_encode,
-    jsonify_List_with_str_and_base64_encode,
-    jsonify_str_and_base64_encode,
-)
+from qiboconnection.util import jsonify_dict_and_base64_encode, jsonify_list_with_str_and_base64_encode
 
 from .algorithm import ProgramDefinition
 from .devices.device import Device
@@ -42,7 +38,7 @@ class Job(ABC):  # pylint: disable=too-many-instance-attributes
     user: User
     device: Device
     program: ProgramDefinition | None = field(default=None)
-    circuit: Circuit | List[Circuit] | None = None
+    circuit: list[Circuit] | None = None
     experiment: dict | None = None
     nshots: int = 10
     job_status: JobStatus = JobStatus.NOT_SENT
@@ -134,12 +130,11 @@ class Job(ABC):  # pylint: disable=too-many-instance-attributes
 
         if self.experiment is not None:
             return jsonify_dict_and_base64_encode(object_to_encode=self.experiment)
-        if type(self.circuit) is Circuit:
-            return jsonify_str_and_base64_encode(object_to_encode=self.circuit.to_qasm())
-        if type(self.circuit) is list:
-            return jsonify_List_with_str_and_base64_encode(object_to_encode=[c.to_qasm() for c in self.circuit])
 
-        raise ValueError("Something failed when serializing your executable")
+        if self.circuit is not None:
+            return jsonify_list_with_str_and_base64_encode(object_to_encode=[c.to_qasm() for c in self.circuit])
+
+        raise ValueError("Something failed when serializing your circuit")
 
     @property
     def result(self) -> Any:

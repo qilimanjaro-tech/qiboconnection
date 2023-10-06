@@ -43,7 +43,7 @@ def parse_job_responses_to_results(job_responses: List[JobResponse]) -> List[dic
         else None
         for job_response in job_responses
     ]
-    return [raw_result[0] if isinstance(raw_result, List) else raw_result for raw_result in raw_results]
+    return list(raw_results)
 
 
 def deserialize_job_description(base64_description: str, job_type: str) -> Circuit | dict | str:
@@ -65,7 +65,7 @@ def deserialize_job_description(base64_description: str, job_type: str) -> Circu
 
             circuits_descriptions = ast.literal_eval(base64_description)
             return [Circuit.from_qasm(base64_decode(encoded_data=description)) for description in circuits_descriptions]
-        except ValueError:
+        except SyntaxError:
             return Circuit.from_qasm(base64_decode(encoded_data=base64_description))
 
     if job_type == JobType.EXPERIMENT:

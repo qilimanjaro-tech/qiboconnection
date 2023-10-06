@@ -204,7 +204,7 @@ def test_job_request(circuit: Circuit, user: User, simulator_device: SimulatorDe
     job_status = JobStatus.COMPLETED
     user_id = user.user_id
     job = Job(
-        circuit=circuit,
+        circuit=[circuit],
         user=user,
         device=cast(Device, simulator_device),
         job_status=job_status,
@@ -214,10 +214,11 @@ def test_job_request(circuit: Circuit, user: User, simulator_device: SimulatorDe
     expected_job_request = JobRequest(
         user_id=user_id,
         device_id=simulator_device.id,
-        description="Ly8gR2VuZXJhdGVkIGJ5IFFJQk8gMC4xLjEyLmRldjAKT1BFTlFBU00gMi4wOwppbmNsdWRlICJxZWxpYjEuaW5jIjsKcXJlZyBxWzFdOwpjcmVnIHJlZ2lzdGVyMFsxXTsKaCBxWzBdOwptZWFzdXJlIHFbMF0gLT4gcmVnaXN0ZXIwWzBdOw==",
+        description="['Ly8gR2VuZXJhdGVkIGJ5IFFJQk8gMC4xLjEyLmRldjAKT1BFTlFBU00gMi4wOwppbmNsdWRlICJxZWxpYjEuaW5jIjsKcXJlZyBxWzFdOwpjcmVnIHJlZ2lzdGVyMFsxXTsKaCBxWzBdOwptZWFzdXJlIHFbMF0gLT4gcmVnaXN0ZXIwWzBdOw==']",
         number_shots=10,
         job_type=JobType.CIRCUIT,
     )
+
     assert isinstance(job, Job)
     assert job.job_request == expected_job_request
 
