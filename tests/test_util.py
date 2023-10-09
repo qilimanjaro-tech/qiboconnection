@@ -93,7 +93,9 @@ def test_deserialize_job_description(
     )
 
     assert deserialize_job_description(base64_description=base64_qibo_circuit, job_type="qiskit") is None
-    assert deserialize_job_description(base64_description=base64_qibo_circuits, job_type=JobType.CIRCUIT) is list
+    assert isinstance(
+        deserialize_job_description(base64_description=base64_qibo_circuits, job_type=JobType.CIRCUIT), list
+    )
 
 
 def test_from_kwargs():
