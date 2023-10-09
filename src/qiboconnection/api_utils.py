@@ -14,6 +14,7 @@
 
 """ Util Functions used by the API module """
 
+import ast
 import json
 from typing import Any, List
 
@@ -61,10 +62,9 @@ def deserialize_job_description(base64_description: str, job_type: str) -> Circu
     """
     if job_type == JobType.CIRCUIT:
         try:
-            import ast
-
             circuits_descriptions = ast.literal_eval(base64_description)
             return [Circuit.from_qasm(base64_decode(encoded_data=description)) for description in circuits_descriptions]
+
         except SyntaxError:
             return Circuit.from_qasm(base64_decode(encoded_data=base64_description))
 
@@ -101,7 +101,7 @@ def log_job_status_info(job_response: JobResponse):
         logger.error("Your job with id %i failed.", job_response.job_id)
         return None
     if job_response.status == JobStatus.COMPLETED:
-        logger.warning("Your job with id %i is completed.", job_response.job_id)
+        logger.info("Your job with id %i is completed.", job_response.job_id)
         return None
 
     logger.warning(f"Your job with id %i is {job_response.status}.", job_response.job_id)
