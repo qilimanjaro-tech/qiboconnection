@@ -5,11 +5,21 @@ from dataclasses import asdict
 from unittest.mock import patch
 
 import pytest
+import qibo
 from requests import Response
 
 from qiboconnection.api import API
 from qiboconnection.connection import Connection
 from qiboconnection.typings.connection import ConnectionConfiguration, ConnectionEstablished
+
+
+@pytest.fixture(name="qibo_circuit")
+def qibo_circuit():
+    "Elementary qibo circuit"
+    c = qibo.models.Circuit(1)
+    c.add(qibo.gates.X(0))
+    c.add(qibo.gates.M(0))
+    return c
 
 
 @pytest.fixture(scope="session", name="mocked_connection_configuration")
