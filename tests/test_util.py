@@ -80,7 +80,9 @@ def test_process_response(response: Response):
     assert processed_response[1] == response.status_code
 
 
-def test_deserialize_job_description(base64_qibo_circuit: str, base64_qililab_experiment: str):
+def test_deserialize_job_description(
+    base64_qibo_circuit: str, base64_qibo_circuits: str, base64_qililab_experiment: str
+):
     """Unit test of deserialize_job_description()"""
 
     assert isinstance(
@@ -91,6 +93,7 @@ def test_deserialize_job_description(base64_qibo_circuit: str, base64_qililab_ex
     )
 
     assert deserialize_job_description(base64_description=base64_qibo_circuit, job_type="qiskit") is None
+    assert deserialize_job_description(base64_description=base64_qibo_circuits, job_type=JobType.CIRCUIT) is list
 
 
 def test_from_kwargs():

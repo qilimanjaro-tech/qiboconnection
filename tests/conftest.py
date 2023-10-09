@@ -114,6 +114,12 @@ def fixture_connection_established() -> ConnectionEstablished:
     )
 
 
+@pytest.fixture(name="base64_qibo_circuits")
+def base64_qibo_circuits():
+    """qibo circuit base64 encoding"""
+    return "['Ly8gR2VuZXJhdGVkIGJ5IFFJQk8gMC4xLjEyLmRldjAKT1BFTlFBU00gMi4wOwppbmNsdWRlICJxZWxpYjEuaW5jIjsKcXJlZyBxWzJdOwpjcmVnIHJlZ2lzdGVyMFsxXTsKaCBxWzBdOwpjeCBxWzBdLHFbMV07CnggcVsxXTsKbWVhc3VyZSBxWzBdIC0-IHJlZ2lzdGVyMFswXTs=', 'Ly8gR2VuZXJhdGVkIGJ5IFFJQk8gMC4xLjEyLmRldjAKT1BFTlFBU00gMi4wOwppbmNsdWRlICJxZWxpYjEuaW5jIjsKcXJlZyBxWzFdOwpjcmVnIHJlZ2lzdGVyMFsxXTsKeCBxWzBdOwptZWFzdXJlIHFbMF0gLT4gcmVnaXN0ZXIwWzBdOw==']"
+
+
 @pytest.fixture(name="base64_qibo_circuit")
 def base64_qibo_circuit():
     """qibo circuit base64 encoding"""
