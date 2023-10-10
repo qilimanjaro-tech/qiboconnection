@@ -69,9 +69,8 @@ class API(ABC):
         .. code-block:: python3
 
             from qiboconnection.api import API
-            from qiboconnection.connection import ConnectionConfiguration
 
-           api = API(configuration=ConnectionConfiguration(username="", api_key=""))
+           api = API.login(username="", api_key="")
 
         Now, list all available devices and select the one(s) you want to send your job to:
 
@@ -1068,18 +1067,24 @@ class API(ABC):
         return [RuncardResponse(**item) for item in items]
 
     @typechecked
-    def list_runcards(self) -> List[Runcard]:
-        """List all saved experiments
+    def list_runcards(self) -> list[Runcard]:
+        """List all saved runcards.
 
         .. warning::
 
             This method is only available for Qilimanjaro members.
 
         Raises:
-            RemoteExecutionException: Devices could not be retrieved
+            RemoteExecutionException: Runcards could not be listed
 
         Returns:
-            Devices: All SavedExperiments
+            list[Runcard]
+
+        Examples:
+
+        >>> api.list_runcards()
+        [Runcard(name='sauron_cluster', user_id=3, device_id=1, description='', runcard={'settings': {'id_': 0, 'category': 'platform', 'alias': None, 'name': 'sauron_cluster'...,
+        Runcard(name='demo_runcard', user_id=3, device_id=1, description='for demo purposes', runcard={'dummmy': 'dict'}, qililab_version='0.14.0', id=2, created_at='Fri, 27 Jan 2023 14:34:05 GMT', updated_at='Fri, 27 Jan 2023 14:34:18 GMT'),...]
         """
         runcards_response = self._get_list_runcard_response()
         return [Runcard.from_response(response=response) for response in runcards_response]
