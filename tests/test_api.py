@@ -844,7 +844,7 @@ def test_delete_job_exception(mocked_api_call: MagicMock, mocked_api: API):
 
 
 @responses.activate
-def test_execute_with_one_circuit():
+def test_execute_with_one_circuit(mocked_api: API):
     responses.add(
         method="GET",
         url="https://qilimanjaroqaas.ddns.net:8080/api/v1/devices/9",
@@ -865,9 +865,7 @@ def test_execute_with_one_circuit():
     circuit.add(gates.H(4))
     circuit.add(gates.M(0, 1, 2, 3, 4))
 
-    api = API()
-
-    job_ids = api.execute(circuit=circuit, nshots=1000, device_ids=[9])
+    job_ids = mocked_api.execute(circuit=circuit, nshots=1000, device_ids=[9])
     assert job_ids == [0]  # test that the return job ids are correct
 
     assert len(responses.calls) == 2  # make sure only 2 requests calls are made
