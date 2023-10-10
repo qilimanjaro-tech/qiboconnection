@@ -13,8 +13,6 @@
 # limitations under the License.
 
 """ Job Data Typing """
-from inspect import signature
-
 # pylint: disable=too-many-instance-attributes
 # pylint: disable=E1101
 from qibo.models import Circuit
@@ -29,7 +27,6 @@ class JobData(JobResponse):
     """Data shown to the user when get_job() method is used. It includes job human-readable results and metadata."""
 
     def __init__(self, **kwargs):
-        super().__init__(**{key: kwargs[key] for key in set(signature(JobResponse).parameters)})
         for k, v in kwargs.items():
             setattr(self, k, v)
 
