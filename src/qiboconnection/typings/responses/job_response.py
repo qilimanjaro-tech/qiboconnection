@@ -16,7 +16,7 @@ from dataclasses import dataclass
 
 from qiboconnection.util import from_kwargs
 
-from ..typings.requests import JobRequest
+from ..requests import JobRequest
 
 
 @dataclass

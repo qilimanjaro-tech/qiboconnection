@@ -14,6 +14,8 @@
 
 """ Runcard class"""
 
+from dataclasses import field
+
 from qiboconnection.typings.requests import RuncardRequest
 from qiboconnection.typings.responses import RuncardResponse
 from qiboconnection.util import decode_jsonified_dict, jsonify_dict_and_base64_encode
@@ -23,6 +25,10 @@ from qiboconnection.util import decode_jsonified_dict, jsonify_dict_and_base64_e
 # pylint: disable=no-member
 class Runcard:
     """Runcard representation"""
+
+    name: str
+    runcard: dict
+    id: int | None = field(default=None)
 
     def __init__(self, **kwargs):
         for k, v in kwargs.items():
