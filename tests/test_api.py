@@ -1,16 +1,10 @@
 """API testing"""
-import ast
 import asyncio
-import base64
-import json
 from dataclasses import asdict
 from unittest.mock import MagicMock, patch
 
 import pandas as pd
 import pytest
-import responses  # pylint: disable=import-error
-from qibo import gates
-from qibo.models import Circuit
 
 from qiboconnection.api import API
 from qiboconnection.connection import ConnectionConfiguration
