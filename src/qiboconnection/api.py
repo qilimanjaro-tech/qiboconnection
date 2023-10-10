@@ -40,9 +40,9 @@ from qiboconnection.constants import API_CONSTANTS, REST, REST_ERROR
 from qiboconnection.errors import ConnectionException, RemoteExecutionException
 from qiboconnection.models import Job, JobListing, LivePlots, Runcard, SavedExperiment, SavedExperimentListing
 from qiboconnection.models.devices import Device, Devices, OfflineDevice, QuantumDevice, SimulatorDevice, create_device
-from qiboconnection.models.job_data import JobData
 from qiboconnection.typings.connection import ConnectionConfiguration
 from qiboconnection.typings.enums import JobStatus
+from qiboconnection.typings.job_data import JobData
 from qiboconnection.typings.live_plot import LivePlotAxis, LivePlotLabels, LivePlotType
 from qiboconnection.typings.responses import (
     JobListingItemResponse,

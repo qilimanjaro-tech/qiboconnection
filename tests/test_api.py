@@ -8,7 +8,7 @@ from unittest.mock import MagicMock, patch
 
 import pandas as pd
 import pytest
-import responses
+import responses  # pylint: disable=import-error
 from qibo import gates
 from qibo.models import Circuit
 
@@ -17,11 +17,11 @@ from qiboconnection.connection import ConnectionConfiguration
 from qiboconnection.errors import ConnectionException, RemoteExecutionException
 from qiboconnection.models.devices.devices import Devices
 from qiboconnection.models.devices.util import create_device
-from qiboconnection.models.job_data import JobData
 from qiboconnection.models.job_listing import JobListing
 from qiboconnection.models.runcard import Runcard
 from qiboconnection.models.saved_experiment import SavedExperiment
 from qiboconnection.models.saved_experiment_listing import SavedExperimentListing
+from qiboconnection.typings.job_data import JobData
 from qiboconnection.typings.responses import PlottingResponse
 from tests.data.web_responses.job import JobResponse
 
