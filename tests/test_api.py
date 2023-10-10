@@ -1,21 +1,27 @@
 """API testing"""
+import ast
 import asyncio
+import base64
+import json
 from dataclasses import asdict
 from unittest.mock import MagicMock, patch
 
 import pandas as pd
 import pytest
+import responses  # pylint: disable=import-error
+from qibo import gates
+from qibo.models import Circuit
 
 from qiboconnection.api import API
 from qiboconnection.connection import ConnectionConfiguration
 from qiboconnection.errors import ConnectionException, RemoteExecutionException
 from qiboconnection.models.devices.devices import Devices
 from qiboconnection.models.devices.util import create_device
-from qiboconnection.models.job_data import JobData
 from qiboconnection.models.job_listing import JobListing
 from qiboconnection.models.runcard import Runcard
 from qiboconnection.models.saved_experiment import SavedExperiment
 from qiboconnection.models.saved_experiment_listing import SavedExperimentListing
+from qiboconnection.typings.job_data import JobData
 from qiboconnection.typings.responses import PlottingResponse
 from tests.data.web_responses.job import JobResponse
 
@@ -146,7 +152,6 @@ def test_list_devices(mocked_web_call: MagicMock, mocked_api: API):
     device_listing = mocked_api.list_devices()
 
     mocked_web_call.assert_called_with(self=mocked_api._connection, path=mocked_api.DEVICES_CALL_PATH)
-    print(device_listing)
     assert isinstance(device_listing, Devices)
 
 
@@ -836,3 +841,78 @@ def test_delete_job_exception(mocked_api_call: MagicMock, mocked_api: API):
         mocked_api.delete_job(job_id=0)
     # Assert that the mocked function was called with correct arguments
     mocked_api_call.assert_called_with(self=mocked_api._connection, path=f"{mocked_api.JOBS_CALL_PATH}/{0}")
+
+
+class TestExecute:
+    """Unit tests for the `API.execute` method."""
+
+    r_mock: responses.RequestsMock
+
+    circuit = Circuit(5)
+    circuit.add(gates.X(0))
+    circuit.add(gates.H(4))
+    circuit.add(gates.M(0, 1, 2, 3, 4))
+
+    def setup_method(self):
+        """Method executed before each test contained in this class.
+
+        This method mocks the `requests` calls used inside the API.execute method.
+        """
+        self.r_mock = responses.RequestsMock(assert_all_requests_are_fired=True)
+        self.r_mock.start()
+        self.r_mock.add(
+            method="GET",
+            url="https://qilimanjaroqaas.ddns.net:8080/api/v1/devices/9",
+            status=200,
+            json={
+                "status": "offline",
+                "device_id": 9,
+                "device_name": "Dummy Device",
+                "availability": "available",
+                "channel_id": 0,
+            },
+        )
+        self.r_mock.add(
+            method="POST", url="https://qilimanjaroqaas.ddns.net:8080/api/v1/circuits", status=201, json={"job_id": 0}
+        )
+
+    def teardown_method(self):
+        """Method executed at the end of each test contained in this class.
+
+        Stops and resets RequestsMock instance. If ``assert_all_requests_are_fired`` is set to ``True``, will raise an
+        error if some requests were not processed.
+        """
+        self.r_mock.stop()
+        self.r_mock.reset()
+
+    def test_execute_with_one_circuit(self, mocked_api: API):
+        """Test the API.execute method for a single circuit."""
+        job_ids = mocked_api.execute(circuit=self.circuit, nshots=1000, device_ids=[9])
+
+        assert job_ids == [0]
+        assert len(self.r_mock.calls) == 2
+        body = json.loads(self.r_mock.calls[1].request.body.decode())
+        assert body["device_id"] == 9
+        assert body["number_shots"] == 1000
+        assert body["job_type"] == "circuit"
+        description = ast.literal_eval(body["description"])
+        assert len(description) == 1
+        assert (
+            base64.urlsafe_b64decode(description[0]).decode() == self.circuit.to_qasm()
+        )  # make sure we posted the correct circuit
+
+    def test_execute_with_multiple_circuits(self, mocked_api: API):
+        """Test the API.execute method for multiple circuits."""
+        job_ids = mocked_api.execute(circuit=[self.circuit] * 10, nshots=1000, device_ids=[9])
+
+        assert job_ids == [0]
+        assert len(self.r_mock.calls) == 2
+        body = json.loads(self.r_mock.calls[1].request.body.decode())
+        assert body["device_id"] == 9
+        assert body["number_shots"] == 1000
+        assert body["job_type"] == "circuit"
+        description = ast.literal_eval(body["description"])
+        assert len(description) == 10
+        assert all(
+            base64.urlsafe_b64decode(d).decode() == self.circuit.to_qasm() for d in description
+        )  # make sure we posted the correct circuits

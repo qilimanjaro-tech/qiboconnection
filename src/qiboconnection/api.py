@@ -40,9 +40,9 @@ from qiboconnection.constants import API_CONSTANTS, REST, REST_ERROR
 from qiboconnection.errors import ConnectionException, RemoteExecutionException
 from qiboconnection.models import Job, JobListing, LivePlots, Runcard, SavedExperiment, SavedExperimentListing
 from qiboconnection.models.devices import Device, Devices, OfflineDevice, QuantumDevice, SimulatorDevice, create_device
-from qiboconnection.models.job_data import JobData
 from qiboconnection.typings.connection import ConnectionConfiguration
 from qiboconnection.typings.enums import JobStatus
+from qiboconnection.typings.job_data import JobData
 from qiboconnection.typings.live_plot import LivePlotAxis, LivePlotLabels, LivePlotType
 from qiboconnection.typings.responses import (
     JobListingItemResponse,
@@ -327,16 +327,16 @@ class API(ABC):
     @typechecked
     def execute(
         self,
-        circuit: Circuit | None = None,
+        circuit: Circuit | List[Circuit] | None = None,
         experiment: dict | None = None,
         nshots: int = 10,
         device_ids: List[int] | None = None,
     ) -> List[int]:
-        """Send a Qibo circuit to be executed on the remote service API. User should define either a *circuit* or an
+        """Send a Qibo circuit(s) to be executed on the remote service API. User should define either a *circuit* or an
         *experiment*. If both are provided, the function will fail.
 
         Args:
-            circuit (Circuit): a Qibo circuit to execute
+            circuit (Circuit or List[Circuit]): a Qibo circuit to execute
             experiment (dict): an Experiment description, result of Qililab's Experiment().to_dict() function.
             nshots (int): number of times the execution is to be done.
             device_ids (List[int]): list of devices where the execution should be performed. If set, any device set
@@ -367,6 +367,8 @@ class API(ABC):
         if not selected_devices:
             raise ValueError("No devices were selected for execution.")
 
+        if not isinstance(circuit, list):
+            circuit = [circuit]
         jobs = [
             Job(
                 circuit=circuit,

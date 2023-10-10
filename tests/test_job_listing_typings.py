@@ -1,4 +1,4 @@
-from qiboconnection.models.job_data import JobData
+from qiboconnection.typings.job_data import JobData
 from qiboconnection.typings.responses import JobListingItemResponse
 
 
