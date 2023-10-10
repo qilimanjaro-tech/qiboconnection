@@ -846,6 +846,8 @@ def test_delete_job_exception(mocked_api_call: MagicMock, mocked_api: API):
 class TestExecute:
     """Unit tests for the `API.execute` method."""
 
+    r_mock: responses.RequestsMock
+
     circuit = Circuit(5)
     circuit.add(gates.X(0))
     circuit.add(gates.H(4))
