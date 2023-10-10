@@ -6,3 +6,4 @@ qibo==0.1.12
 PyJWT==2.6.0
 pandas~=1.5.3
 websockets~=10.4
+responses~=0.23.3
