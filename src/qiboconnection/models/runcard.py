@@ -27,6 +27,7 @@ class Runcard:
     """Runcard representation"""
 
     name: str
+    description: str
     runcard: dict
     id: int | None = field(default=None)
 
@@ -41,7 +42,7 @@ class Runcard:
 
     @classmethod
     def from_response(cls, response: RuncardResponse):
-        """SavedExperiment constructor that takes in an instance from a SavedExperimentResponse"""
+        """Runcard constructor that takes in an instance from a RuncardResponse"""
         return cls(
             id=response.runcard_id,
             created_at=response.created_at,
@@ -55,7 +56,7 @@ class Runcard:
         )
 
     def runcard_request(self):
-        """Created a SavedExperimentRequest instance"""
+        """Created a Request instance"""
         return RuncardRequest(
             name=self.name,
             user_id=self.user_id,
@@ -64,3 +65,8 @@ class Runcard:
             runcard=self._encoded_runcard,
             qililab_version=self.qililab_version,
         )
+
+    def __repr__(self):
+        # Use dataclass-like formatting, excluding attributes starting with an underscore
+
+        return f"Runcard(name={self.name},id={self.id},description={self.description},runcard={self.runcard})"
