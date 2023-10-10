@@ -852,8 +852,10 @@ class TestExecute:
     circuit.add(gates.M(0, 1, 2, 3, 4))
 
     def setup_method(self):
-        """Method executed once at the beginning when running the tests in this class. This method mocks the calls
-        used in the API.execute method."""
+        """Method executed before each test contained in this class.
+
+        This method mocks the `requests` calls used inside the API.execute method.
+        """
         self.r_mock = responses.RequestsMock(assert_all_requests_are_fired=True)
         self.r_mock.start()
         self.r_mock.add(
@@ -873,10 +875,10 @@ class TestExecute:
         )
 
     def teardown_method(self):
-        """Stops and resets RequestsMock instance.
+        """Method executed at the end of each test contained in this class.
 
-        If ``assert_all_requests_are_fired`` is set to ``True``, will raise an error
-        if some requests were not processed.
+        Stops and resets RequestsMock instance. If ``assert_all_requests_are_fired`` is set to ``True``, will raise an
+        error if some requests were not processed.
         """
         self.r_mock.stop()
         self.r_mock.reset()
