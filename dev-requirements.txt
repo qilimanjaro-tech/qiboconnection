@@ -8,4 +8,4 @@ nbqa==1.5.2
 mdformat==0.7.16
 pre-commit==2.20.0
 bandit==1.7.4
-responses~=0.23.3
+responses
