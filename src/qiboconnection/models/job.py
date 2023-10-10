@@ -20,10 +20,10 @@ from typing import Any, List
 from qibo.models.circuit import Circuit
 from typeguard import typechecked
 
-from qiboconnection.models.job_response import JobResponse
 from qiboconnection.typings.enums import JobStatus, JobType
 from qiboconnection.typings.requests import JobRequest
-from qiboconnection.util import jsonify_dict_and_base64_encode, jsonify_list_with_str_and_base64_encode
+from qiboconnection.typings.responses.job_response import JobResponse
+from qiboconnection.util import jsonify_dict_and_base64_encode, jsonify_str_and_base64_encode
 
 from .algorithm import ProgramDefinition
 from .devices.device import Device

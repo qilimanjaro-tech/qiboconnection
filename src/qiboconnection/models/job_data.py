@@ -18,7 +18,7 @@
 from qibo.models import Circuit
 
 from qiboconnection.api_utils import deserialize_job_description, parse_job_responses_to_results
-from qiboconnection.models.job_response import JobResponse
+from qiboconnection.typings.responses.job_response import JobResponse
 
 # pylint: disable=super-init-not-called
 
