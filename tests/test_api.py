@@ -1,10 +1,16 @@
 """API testing"""
+import ast
 import asyncio
+import base64
+import json
 from dataclasses import asdict
 from unittest.mock import MagicMock, patch
 
 import pandas as pd
 import pytest
+import responses
+from qibo import gates
+from qibo.models import Circuit
 
 from qiboconnection.api import API
 from qiboconnection.connection import ConnectionConfiguration
@@ -835,3 +841,43 @@ def test_delete_job_exception(mocked_api_call: MagicMock, mocked_api: API):
         mocked_api.delete_job(job_id=0)
     # Assert that the mocked function was called with correct arguments
     mocked_api_call.assert_called_with(self=mocked_api._connection, path=f"{mocked_api.JOBS_CALL_PATH}/{0}")
+
+
+@responses.activate
+def test_execute_with_one_circuit():
+    responses.add(
+        method="GET",
+        url="https://qilimanjaroqaas.ddns.net:8080/api/v1/devices/9",
+        status=200,
+        json={
+            "status": "offline",
+            "device_id": 9,
+            "device_name": "Dummy Device",
+            "availability": "available",
+            "channel_id": 0,
+        },
+    )
+    responses.add(
+        method="POST", url="https://qilimanjaroqaas.ddns.net:8080/api/v1/circuits", status=201, json={"job_id": 0}
+    )
+    circuit = Circuit(5)
+    circuit.add(gates.X(0))
+    circuit.add(gates.H(4))
+    circuit.add(gates.M(0, 1, 2, 3, 4))
+
+    api = API()
+
+    job_ids = api.execute(circuit=circuit, nshots=1000, device_ids=[9])
+    assert job_ids == [0]  # test that the return job ids are correct
+
+    assert len(responses.calls) == 2  # make sure only 2 requests calls are made
+
+    body = json.loads(responses.calls[1].request.body.decode())
+    assert body["device_id"] == 9
+    assert body["number_shots"] == 1000
+    assert body["job_type"] == "circuit"
+    description = ast.literal_eval(body["description"])
+    assert len(description) == 1  # make sure we have a list of ONE circuit
+    assert (
+        base64.urlsafe_b64decode(description[0]).decode() == circuit.to_qasm()
+    )  # make sure we posted the correct circuit
