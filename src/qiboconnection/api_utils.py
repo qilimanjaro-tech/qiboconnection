@@ -27,13 +27,6 @@ from qiboconnection.typings.enums import JobStatus, JobType
 from qiboconnection.util import base64_decode
 
 
-def return_list_of_circuits(circuit: Circuit) -> list[Circuit]:
-    "Retruns a list of circuits if a circuit is given by the user"
-    if not isinstance(circuit, list):
-        return [circuit]
-    return circuit
-
-
 def parse_job_responses_to_results(job_responses: List[JobResponse]) -> List[dict | Any | None]:
     """Parse a list of job_responses to a list of dict with the content of each job. If the job is not COMPLETED,
     put a None in its place. For this, we build a JobResult instance for each COMPLETED job, and then we keep its

@@ -6,7 +6,7 @@ import pytest
 from qibo.models.circuit import Circuit
 from requests.models import Response
 
-from qiboconnection.api_utils import deserialize_job_description, return_list_of_circuits
+from qiboconnection.api_utils import deserialize_job_description
 from qiboconnection.connection import ConnectionEstablished
 from qiboconnection.models.job_response import JobResponse
 from qiboconnection.typings.job import JobType
@@ -126,9 +126,3 @@ def test_from_kwargs():
             ),
             JobResponse,
         )
-
-
-def test_return_list_of_circuits(qibo_circuit: Circuit):
-    "Unit test for return_list_of_circuits"
-
-    assert isinstance(return_list_of_circuits(qibo_circuit), list)

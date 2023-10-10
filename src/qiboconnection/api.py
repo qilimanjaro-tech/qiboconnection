@@ -33,7 +33,7 @@ from qibo.states import CircuitResult
 from requests import HTTPError
 from typeguard import typechecked
 
-from qiboconnection.api_utils import log_job_status_info, parse_job_responses_to_results, return_list_of_circuits
+from qiboconnection.api_utils import log_job_status_info, parse_job_responses_to_results
 from qiboconnection.config import logger
 from qiboconnection.connection import Connection
 from qiboconnection.constants import API_CONSTANTS, REST, REST_ERROR
@@ -366,9 +366,12 @@ class API(ABC):
 
         if not selected_devices:
             raise ValueError("No devices were selected for execution.")
+
+        if not isinstance(circuit, list):
+            circuit = [circuit]
         jobs = [
             Job(
-                circuit=return_list_of_circuits(circuit),
+                circuit=circuit,
                 experiment=experiment,
                 nshots=nshots,
                 user=self._connection.user,
