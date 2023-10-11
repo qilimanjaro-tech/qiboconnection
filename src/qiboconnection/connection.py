@@ -34,6 +34,7 @@ from qiboconnection.typings.responses import AccessTokenResponse
 from qiboconnection.util import base64url_encode, load_config_file_to_disk, process_response, write_config_file_to_disk
 from qiboconnection import __version__ as VERSION
 
+
 def TIMEOUT():
     """Returns always the last TIMEOUT env var that the user might have set."""
     return int(os.getenv("QIBOCONNECTION_TIMEOUT", "10"))
