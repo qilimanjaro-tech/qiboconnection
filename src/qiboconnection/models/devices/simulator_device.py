@@ -21,6 +21,8 @@ from qiboconnection.typings.devices import SimulatorDeviceInput
 from .online_device import OnlineDevice
 from .simulator_device_characteristics import SimulatorDeviceCharacteristics
 
+# pylint: disable=no-member
+
 
 class SimulatorDevice(OnlineDevice):
     """Simulator Device class"""
@@ -36,8 +38,8 @@ class SimulatorDevice(OnlineDevice):
         super().__init__(device_input=device_input)
 
         self._str = (
-            f"<Simulator Device: device_id={self._device_id}, device_name='{self._device_name}'"
-            f", status='{self._status.value}'"
+            f"<Simulator Device: device_id={self._device_id}, device_name='{self._device_name}'"  # type: ignore[attr-defined]
+            f", status='{self._status}'"
         )
         if self._characteristics:
             self._str += f", characteristics={str(self._characteristics)}"

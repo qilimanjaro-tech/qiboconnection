@@ -21,6 +21,7 @@ import os
 import pickle  # nosec - temporary bandit ignore
 from base64 import urlsafe_b64decode, urlsafe_b64encode
 from dataclasses import asdict
+from inspect import signature
 from json.decoder import JSONDecodeError
 from typing import Any, List, Tuple
 
@@ -164,3 +165,36 @@ def jsonify_str_and_base64_encode(object_to_encode: str):
 def unzip(zipped_list: List[Tuple[Any, Any]]):
     """Inverse of the python builtin `zip` operation"""
     return tuple(zip(*zipped_list))
+
+
+def from_kwargs(cls, **kwargs: dict):
+    """
+    Create an instance of the class by extracting attributes from keyword arguments.
+
+    This method takes keyword arguments and initializes an instance of the class
+    with attributes that match the class's constructor parameters. Any additional
+    keyword arguments that don't correspond to class attributes are assigned as
+    attributes to the created instance.
+
+    Args:
+        cls: The class (typically, the class that defines this method).
+        **kwargs: Keyword arguments to initialize the instance.
+
+    Returns:
+        An instance of the class with attributes initialized from the keyword
+        arguments.
+    """
+    cls_fields = set(signature(cls).parameters)
+    native_args, new_args = {}, {}
+
+    for name, val in kwargs.items():
+        if name in cls_fields:
+            native_args[name] = val
+        else:
+            new_args[name] = val
+
+    ret = cls(**native_args)
+
+    for new_name, new_val in new_args.items():
+        setattr(ret, new_name, new_val)
+    return ret

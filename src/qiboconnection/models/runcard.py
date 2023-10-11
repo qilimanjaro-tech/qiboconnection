@@ -13,27 +13,27 @@
 # limitations under the License.
 
 """ Runcard class"""
-from dataclasses import dataclass, field
-from datetime import datetime
+
+from dataclasses import field
 
 from qiboconnection.typings.requests import RuncardRequest
 from qiboconnection.typings.responses import RuncardResponse
 from qiboconnection.util import decode_jsonified_dict, jsonify_dict_and_base64_encode
 
 
-@dataclass
-class Runcard:  # pylint: disable=too-many-instance-attributes
+# pylint: disable=too-many-instance-attributes
+# pylint: disable=no-member
+class Runcard:
     """Runcard representation"""
 
     name: str
-    user_id: int
-    device_id: int
     description: str
     runcard: dict
-    qililab_version: str
     id: int | None = field(default=None)
-    created_at: datetime | None = field(default=None)
-    updated_at: datetime | None = field(default=None)
+
+    def __init__(self, **kwargs):
+        for k, v in kwargs.items():
+            setattr(self, k, v)
 
     @property
     def _encoded_runcard(self):
@@ -42,7 +42,7 @@ class Runcard:  # pylint: disable=too-many-instance-attributes
 
     @classmethod
     def from_response(cls, response: RuncardResponse):
-        """SavedExperiment constructor that takes in an instance from a SavedExperimentResponse"""
+        """Runcard constructor that takes in an instance from a RuncardResponse"""
         return cls(
             id=response.runcard_id,
             created_at=response.created_at,
@@ -56,7 +56,7 @@ class Runcard:  # pylint: disable=too-many-instance-attributes
         )
 
     def runcard_request(self):
-        """Created a SavedExperimentRequest instance"""
+        """Created a Request instance"""
         return RuncardRequest(
             name=self.name,
             user_id=self.user_id,
@@ -65,3 +65,8 @@ class Runcard:  # pylint: disable=too-many-instance-attributes
             runcard=self._encoded_runcard,
             qililab_version=self.qililab_version,
         )
+
+    def __repr__(self):
+        # Use dataclass-like formatting, excluding attributes starting with an underscore
+
+        return f"Runcard(name={self.name},id={self.id},description={self.description},runcard={self.runcard})"
