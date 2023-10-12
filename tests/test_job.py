@@ -22,7 +22,7 @@ from qiboconnection.models.job import Job
 from qiboconnection.models.job_result import JobResult
 from qiboconnection.typings.enums import JobStatus, JobType
 from qiboconnection.typings.requests import JobRequest
-from qiboconnection.typings.responses import JobResponse
+from qiboconnection.typings.responses.job_response import JobResponse
 
 from .data import simulator_device_inputs
 

@@ -533,6 +533,6 @@ class Connection(ABC):  # pylint: disable=too-many-instance-attributes
             timeout=timeout,
         )
         if response.status_code not in [200, 201]:
-            raise ValueError(f"Authorisation request failed: {response.reason}")
+            raise ValueError(f"Authorisation request failed: {response.reason},{response.status_code}")
         logger.debug("Connection successfully renewed.")
         self._authorisation_access_token = AccessTokenResponse(**response.json()).accessToken

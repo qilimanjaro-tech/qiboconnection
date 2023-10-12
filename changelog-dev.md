@@ -6,6 +6,8 @@ This document contains the changes of the current release.
 
 - Added API `login` constructor for user convenience.
   [#88](https://github.com/qilimanjaro-tech/qiboconnection/pull/88)
+- Qiboconnection is type-permissive at read. This decouples backend and qiboconnection versions compatibility.
+  [#86](https://github.com/qilimanjaro-tech/qiboconnection/pull/86)
 
 ### Improvements
 

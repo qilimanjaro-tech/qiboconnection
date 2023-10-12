@@ -13,37 +13,10 @@
 # limitations under the License.
 
 """ Device Typing """
-import enum
 from dataclasses import InitVar, dataclass
 from typing import Literal, Optional
 
-
-class DeviceStatus(str, enum.Enum):
-    """Device status"""
-
-    ONLINE = "online"
-    MAINTENANCE = "maintenance"
-    OFFLINE = "offline"
-
-
-class DeviceAvailability(str, enum.Enum):
-    """Device availability"""
-
-    AVAILABLE = "available"
-    BLOCKED = "blocked"
-
-
-class DeviceType(str, enum.Enum):
-    """Device Type
-
-    Args:
-        enum (str): Device type options available:
-        * quantum
-        * simulator
-    """
-
-    QUANTUM = "quantum"
-    SIMULATOR = "simulator"
+from qiboconnection.typings.enums.device_type import DeviceType
 
 
 @dataclass(kw_only=True)
@@ -94,8 +67,8 @@ class DeviceInput:
 
     device_id: int
     device_name: str
-    status: str | DeviceStatus
-    availability: str | DeviceAvailability
+    status: str
+    availability: str
     channel_id: int | None
     number_pending_jobs: Optional[int] = 0
 

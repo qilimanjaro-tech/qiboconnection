@@ -5,6 +5,8 @@ from datetime import datetime, timezone
 from qiboconnection.models.runcard import Runcard
 from qiboconnection.typings.responses.runcard_response import RuncardRequest, RuncardResponse
 
+# pylint: disable=no-member
+
 
 def test_runcard_creation():
     """Tests Runcard Creation"""

@@ -52,10 +52,7 @@ def is_offline_device_input(device_input: dict) -> bool:
     """
     if "status" not in device_input or device_input["status"] is None:
         raise ValueError("'status' missing in device_input keys")
-    return device_input["status"] in [
-        DeviceStatus.OFFLINE,
-        DeviceStatus.OFFLINE.value,
-    ]
+    return device_input["status"] == DeviceStatus.OFFLINE
 
 
 @typechecked
@@ -82,7 +79,7 @@ def create_device(device_input: dict) -> Union[QuantumDevice, SimulatorDevice, O
         Union[QuantumDevice, SimulatorDevice, OfflineDevice]: The constructed Device Object
     """
     if is_offline_device_input(device_input=device_input):
-        return OfflineDevice(device_input=OfflineDeviceInput(**device_input))
+        return OfflineDevice(device_input=OfflineDeviceInput.from_kwargs(**device_input))
     if is_quantum_device_input(device_input=device_input):
-        return QuantumDevice(device_input=QuantumDeviceInput(**device_input))
-    return SimulatorDevice(device_input=SimulatorDeviceInput(**device_input))
+        return QuantumDevice(device_input=QuantumDeviceInput.from_kwargs(**device_input))
+    return SimulatorDevice(device_input=SimulatorDeviceInput.from_kwargs(**device_input))
