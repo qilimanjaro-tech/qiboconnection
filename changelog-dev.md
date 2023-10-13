@@ -13,6 +13,7 @@ This document contains the changes of the current release.
 
 - Removed `qiboconnection`'s own logging configuration
   [#91](https://github.com/qilimanjaro-tech/qiboconnection/pull/91)
+- Removed session caching at login. [#101](https://github.com/qilimanjaro-tech/qiboconnection/pull/101)
 
 ### Breaking changes
 
