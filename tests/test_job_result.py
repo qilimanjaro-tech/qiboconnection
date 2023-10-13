@@ -2,7 +2,7 @@
 import numpy as np
 
 from qiboconnection.models.job_result import JobResult
-from qiboconnection.typings.job import JobType
+from qiboconnection.typings.enums import JobType
 
 
 def test_job_result_creation():
