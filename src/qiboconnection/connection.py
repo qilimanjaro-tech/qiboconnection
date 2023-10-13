@@ -67,7 +67,7 @@ class Connection(ABC):  # pylint: disable=too-many-instance-attributes
     @typechecked
     def __init__(
         self,
-        configuration: Optional[ConnectionConfiguration | None] = None,
+        configuration: ConnectionConfiguration,
         api_path: Optional[str] = None,
     ):
         self._environment = get_environment()
