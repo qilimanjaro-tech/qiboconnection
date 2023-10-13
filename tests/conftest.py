@@ -33,17 +33,36 @@ def fixture_create_mocked_connection_established(
     )
 
 
-def _create_mocked_connection(mocked_connection_established: ConnectionEstablished) -> Connection:
+def _create_mocked_connection(
+    mocked_connection_established: ConnectionEstablished,
+) -> Connection:
     """Create a mocked connection
     Returns:
         Connection: mocked connection
     """
-    with patch(
-        "qiboconnection.connection.load_config_file_to_disk",
-        autospec=True,
-        return_value=mocked_connection_established,
-    ) as mock_config:
-        connection = Connection(api_path="/mocked")
+    with (
+        patch(
+            "qiboconnection.connection.Connection._request_authorisation_token",
+            autospec=True,
+            return_value=[
+                mocked_connection_established.authorisation_access_token,
+                mocked_connection_established.authorisation_refresh_token,
+            ],
+        ) as mock_config,
+        patch(
+            "qiboconnection.connection.Connection._load_user_id_from_token",
+            autospec=True,
+            return_value=mocked_connection_established.user_id,
+        ) as _,
+    ):
+        connection = Connection(
+            api_path="/mocked",
+            configuration=ConnectionConfiguration(
+                username=mocked_connection_established.username,
+                user_id=mocked_connection_established.user_id,
+                api_key=mocked_connection_established.api_key,
+            ),
+        )
         mock_config.assert_called()
         return connection
 
@@ -69,17 +88,29 @@ def fixture_create_mocked_connection_with_no_user(mocked_connection_established:
 
 
 @pytest.fixture(scope="session", name="mocked_api")
-def fixture_create_mocked_api_connection(mocked_connection_established: ConnectionEstablished) -> API:
+def fixture_create_mocked_api_connection(
+    mocked_connection_established: ConnectionEstablished, mocked_connection_configuration: ConnectionConfiguration
+) -> API:
     """Create a mocked api connection
     Returns:
         API: API mocked connection
     """
-    with patch(
-        "qiboconnection.connection.load_config_file_to_disk",
-        autospec=True,
-        return_value=mocked_connection_established,
-    ) as mock_config:
-        api = API()
+    with (
+        patch(
+            "qiboconnection.connection.Connection._request_authorisation_token",
+            autospec=True,
+            return_value=[
+                mocked_connection_established.authorisation_access_token,
+                mocked_connection_established.authorisation_refresh_token,
+            ],
+        ) as mock_config,
+        patch(
+            "qiboconnection.connection.Connection._load_user_id_from_token",
+            autospec=True,
+            return_value=mocked_connection_established.user_id,
+        ) as _,
+    ):
+        api = API(configuration=mocked_connection_configuration)
         mock_config.assert_called()
         return api
 

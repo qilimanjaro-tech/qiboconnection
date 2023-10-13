@@ -71,7 +71,7 @@ class API(ABC):
     @typechecked
     def __init__(
         self,
-        configuration: Optional[ConnectionConfiguration] = None,
+        configuration: ConnectionConfiguration,
     ):
         self._connection = Connection(configuration=configuration, api_path=self.API_PATH)
         self._devices: Devices | None = None
