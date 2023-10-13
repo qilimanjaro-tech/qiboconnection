@@ -129,6 +129,20 @@ def fixture_response() -> Response:
     return response
 
 
+@pytest.fixture(name="response_plain_text")
+def fixture_response_plain_text() -> Response:
+    """Creates an status_code 200 Response object with demo values
+
+    Returns:
+        Response: response object
+    """
+    response = Response()
+    response.status_code = 200
+    response.url = "server/api"
+    response._content = "Custom plain message".encode("utf8")
+    return response
+
+
 @pytest.fixture(name="connection_established")
 def fixture_connection_established() -> ConnectionEstablished:
     """Creates a ConnectionEstablished object with demo values

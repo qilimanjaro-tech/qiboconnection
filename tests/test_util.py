@@ -66,6 +66,15 @@ def test_process_response(response: Response):
     assert processed_response[1] == response.status_code
 
 
+def test_process_response_non_json(response_plain_text: Response):
+    """Test that process_response() recovers the correct parameters (text and status_code)."""
+
+    processed_response = process_response(response=response_plain_text)
+
+    assert processed_response[0] == response_plain_text.text
+    assert processed_response[1] == response_plain_text.status_code
+
+
 def test_deserialize_job_description(base64_qibo_circuit: str, base64_qililab_experiment: str):
     """Unit test of deserialize_job_description()"""
 

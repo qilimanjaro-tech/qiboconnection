@@ -17,10 +17,8 @@ import base64
 import binascii
 import io
 import json
-import os
 import pickle  # nosec - temporary bandit ignore
 from base64 import urlsafe_b64decode, urlsafe_b64encode
-from dataclasses import asdict
 from inspect import signature
 from json.decoder import JSONDecodeError
 from typing import Any, List, Tuple
