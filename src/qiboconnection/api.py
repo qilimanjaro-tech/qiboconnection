@@ -976,7 +976,7 @@ class API(ABC):
             path=f"{self.RUNCARDS_CALL_PATH}/{runcard.id}",  # type: ignore[attr-defined]
             data=asdict(runcard.runcard_request()),
         )
-        if status_code != 200:
+        if status_code != 201:
             raise RemoteExecutionException(message="Runcard could not be saved.", status_code=status_code)
         logger.debug("Runcard updated successfully.")
         return RuncardResponse.from_kwargs(**response)
