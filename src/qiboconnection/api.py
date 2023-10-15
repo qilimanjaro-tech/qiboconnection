@@ -327,7 +327,7 @@ class API(ABC):
     @typechecked
     def execute(
         self,
-        circuit: Circuit | List[Circuit] | None = None,
+        circuit: Circuit | None = None,
         experiment: dict | None = None,
         nshots: int = 10,
         device_ids: List[int] | None = None,
@@ -366,9 +366,6 @@ class API(ABC):
 
         if not selected_devices:
             raise ValueError("No devices were selected for execution.")
-
-        if not isinstance(circuit, list):
-            circuit = [circuit]
         jobs = [
             Job(
                 circuit=circuit,
