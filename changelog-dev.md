@@ -9,8 +9,6 @@ This document contains the changes of the current release.
 
 ### Improvements
 
-- Removed redundant typings. [#103](https://github.com/qilimanjaro-tech/qiboconnection/pull/103/files)
-
 ### Breaking changes
 
 ### Deprecations / Removals
