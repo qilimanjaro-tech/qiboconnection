@@ -22,7 +22,7 @@ This module contains all needed classes needed for interacting with Qilimanjaro'
     ~api.API
 """
 
-__version__ = "0.13.0"
+__version__ = "0.13.1"
 
 
 from .api import API

@@ -1,3 +1,9 @@
+## 0.13.1
+
+### Improvements
+
+- Removed redundant typings. [#103](https://github.com/qilimanjaro-tech/qiboconnection/pull/103/files)
+
 ## 0.13.0
 
 ### New features since last release
@@ -34,7 +40,7 @@
 
 ## v0.11.0 (2023-06-29)
 
-- Release 0.11.0 \[#77\] (https://github.com/qilimanjaro-tech/qiboconnection/pull/77)
+- Release 0.11.0 [#77](https://github.com/qilimanjaro-tech/qiboconnection/pull/77)
 
 ### Feat (2023-06-13)
 
