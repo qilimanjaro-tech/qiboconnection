@@ -56,24 +56,24 @@ from qiboconnection.util import unzip
 
 
 class API(ABC):
-    """Qilimanjaro Client API class to communicate with the Quantum Service"""
+    """Qilimanjaro Client API class to communicate with the Quantum Service."""
 
-    API_VERSION = "v1"
-    API_PATH = f"/api/{API_VERSION}"
-    JOBS_CALL_PATH = "/jobs"
-    CIRCUITS_CALL_PATH = "/circuits"
-    DEVICES_CALL_PATH = "/devices"
-    SAVED_EXPERIMENTS_CALL_PATH = "/saved_experiments"
-    RUNCARDS_CALL_PATH = "/runcards"
-    PING_CALL_PATH = "/status"
-    LIVE_PLOTTING_PATH = "/live-plotting"
+    _API_VERSION = "v1"
+    _API_PATH = f"/api/{_API_VERSION}"
+    _JOBS_CALL_PATH = "/jobs"
+    _CIRCUITS_CALL_PATH = "/circuits"
+    _DEVICES_CALL_PATH = "/devices"
+    _SAVED_EXPERIMENTS_CALL_PATH = "/saved_experiments"
+    _RUNCARDS_CALL_PATH = "/runcards"
+    _PING_CALL_PATH = "/status"
+    _LIVE_PLOTTING_PATH = "/live-plotting"
 
     @typechecked
     def __init__(
         self,
         configuration: Optional[ConnectionConfiguration] = None,
     ):
-        self._connection = Connection(configuration=configuration, api_path=self.API_PATH)
+        self._connection = Connection(configuration=configuration, api_path=self._API_PATH)
         self._devices: Devices | None = None
         self._jobs: List[Job] = []
         self._jobs_listing: JobListing | None = None
@@ -118,7 +118,7 @@ class API(ABC):
         return self._jobs[-1]
 
     @property
-    def last_saved_experiment(self) -> SavedExperiment | None:
+    def _last_saved_experiment(self) -> SavedExperiment | None:
         """Returns the last saved experiment of the current session, in case there has been one.
 
         Returns:
@@ -127,7 +127,7 @@ class API(ABC):
         return self._saved_experiment
 
     @property
-    def last_saved_experiment_listing(self) -> SavedExperimentListing | None:
+    def _last_saved_experiment_listing(self) -> SavedExperimentListing | None:
         """Returns the last experiment listing downloaded in the current session, in case there has been one.
 
         Returns:
@@ -167,7 +167,7 @@ class API(ABC):
         Returns:
             str: OK when connection is alive or raise Connection Error.
         """
-        response, status_code = self._connection.send_get_remote_call(path=self.PING_CALL_PATH)
+        response, status_code = self._connection.send_get_remote_call(path=self._PING_CALL_PATH)
         if status_code != 200:
             raise ConnectionException("Error connecting to Qilimanjaro API")
         return response
@@ -185,7 +185,7 @@ class API(ABC):
             Devices: All available Devices
         """
         responses, status_codes = unzip(
-            self._connection.send_get_auth_remote_api_call_all_pages(path=self.DEVICES_CALL_PATH)
+            self._connection.send_get_auth_remote_api_call_all_pages(path=self._DEVICES_CALL_PATH)
         )
         for status_code in status_codes:
             if status_code != 200:
@@ -211,7 +211,7 @@ class API(ABC):
             ValueError: Unexpected object in API._devices.
         """
         response, status_code = self._connection.send_get_auth_remote_api_call(
-            path=f"{self.DEVICES_CALL_PATH}/{device_id}"
+            path=f"{self._DEVICES_CALL_PATH}/{device_id}"
         )
         if status_code != 200:
             raise RemoteExecutionException(message="Devices could not be retrieved.", status_code=status_code)
@@ -268,6 +268,9 @@ class API(ABC):
     @typechecked
     def set_device_to_online(self, device_id: int) -> None:
         """Sets a device into online mode, allowing external traffic and blocking manual manipulation.
+        .. warning::
+
+            This method is only available for admin members.
 
         Args:
             device_id (int): Device identifier
@@ -283,6 +286,10 @@ class API(ABC):
     def set_device_to_maintenance(self, device_id: int) -> None:
         """Sets a device in maintenance mode, blocking external traffic and allowing for manual manipulation.
 
+        .. warning::
+
+            This method is only available for admin members.
+
         Args:
             device_id (int): Device identifier
 
@@ -297,6 +304,9 @@ class API(ABC):
     @typechecked
     def block_device_id(self, device_id: int) -> None:
         """Blocks a device to avoid others to manually use it.
+         .. warning::
+
+            This method is only available for Qilimanjaro members.
 
         Args:
             device_id (int): Device identifier
@@ -311,6 +321,10 @@ class API(ABC):
     @typechecked
     def release_device(self, device_id: int) -> None:
         """Releases a device to let others manually using it.
+
+        .. warning::
+
+            This method is only available for Qilimanjaro members.
 
         Args:
             device_id (int): Device identifier
@@ -327,7 +341,7 @@ class API(ABC):
     @typechecked
     def execute(
         self,
-        circuit: Circuit | List[Circuit] | None = None,
+        circuit: Circuit | None = None,
         experiment: dict | None = None,
         nshots: int = 10,
         device_ids: List[int] | None = None,
@@ -367,8 +381,6 @@ class API(ABC):
         if not selected_devices:
             raise ValueError("No devices were selected for execution.")
 
-        if not isinstance(circuit, list):
-            circuit = [circuit]
         jobs = [
             Job(
                 circuit=circuit,
@@ -384,7 +396,7 @@ class API(ABC):
         logger.debug("Sending qibo circuits for a remote execution...")
         for job in jobs:
             response, status_code = self._connection.send_post_auth_remote_api_call(
-                path=self.CIRCUITS_CALL_PATH, data=asdict(job.job_request)
+                path=self._CIRCUITS_CALL_PATH, data=asdict(job.job_request)
             )
             if status_code != 201:
                 raise RemoteExecutionException(
@@ -408,7 +420,7 @@ class API(ABC):
         Returns:
             JobResponse: type-casted backend response with the job info.
         """
-        response, status_code = self._connection.send_get_auth_remote_api_call(path=f"{self.JOBS_CALL_PATH}/{job_id}")
+        response, status_code = self._connection.send_get_auth_remote_api_call(path=f"{self._JOBS_CALL_PATH}/{job_id}")
         if status_code != 200:
             raise RemoteExecutionException(message="Job could not be retrieved.", status_code=status_code)
 
@@ -522,7 +534,7 @@ class API(ABC):
     # REMOTE PLOTTING
 
     @typechecked
-    async def create_liveplot(
+    async def _create_liveplot(
         self,
         plot_type: str = LivePlotType.LINES.value,
         title: str | None = None,
@@ -552,7 +564,7 @@ class API(ABC):
         """
         # Get info from PublicAPI
         response, status_code = self._connection.send_post_auth_remote_api_call(
-            path=f"{self.LIVE_PLOTTING_PATH}", data={}
+            path=f"{self._LIVE_PLOTTING_PATH}", data={}
         )
         if status_code != 200:
             raise RemoteExecutionException(
@@ -569,7 +581,7 @@ class API(ABC):
         return plotting_response.plot_id
 
     @typechecked
-    async def send_plot_points(
+    async def _send_plot_points(
         self,
         plot_id: int,
         x: npt.NDArray[np.float_ | np.int_] | list[float] | list[int] | float | int,
@@ -591,7 +603,7 @@ class API(ABC):
     # SAVED EXPERIMENTS
 
     @typechecked
-    def save_experiment(
+    def _save_experiment(
         self,
         name: str,
         description: str,
@@ -634,7 +646,7 @@ class API(ABC):
         )
 
         response, status_code = self._connection.send_post_auth_remote_api_call(
-            path=self.SAVED_EXPERIMENTS_CALL_PATH,
+            path=self._SAVED_EXPERIMENTS_CALL_PATH,
             data=asdict(saved_experiment.saved_experiment_request(favourite=favourite)),
         )
         if status_code != 201:
@@ -651,7 +663,7 @@ class API(ABC):
         experiment's endpoint"""
 
         response, status_code = self._connection.send_put_auth_remote_api_call(
-            path=f"{self.SAVED_EXPERIMENTS_CALL_PATH}/{saved_experiment_id}",
+            path=f"{self._SAVED_EXPERIMENTS_CALL_PATH}/{saved_experiment_id}",
             data={API_CONSTANTS.FAVOURITE: favourite, API_CONSTANTS.USER_ID: self._connection.user.user_id},
         )
 
@@ -665,20 +677,20 @@ class API(ABC):
             response[API_CONSTANTS.SAVED_EXPERIMENT_ID],
         )
 
-    def fav_saved_experiment(self, saved_experiment_id: int):
+    def _fav_saved_experiment(self, saved_experiment_id: int):
         """Adds a saved experiment to the list of favourite saved experiments"""
         return self._update_favourite_saved_experiment(saved_experiment_id=saved_experiment_id, favourite=True)
 
-    def fav_saved_experiments(self, saved_experiment_ids: List[int] | npt.NDArray[np.int_]):
+    def _fav_saved_experiments(self, saved_experiment_ids: List[int] | npt.NDArray[np.int_]):
         """Adds a list of saved experiments to the list of favourite saved experiments"""
         for saved_experiment_id in saved_experiment_ids:
             self._update_favourite_saved_experiment(saved_experiment_id=saved_experiment_id, favourite=True)
 
-    def unfav_saved_experiment(self, saved_experiment_id: int):
+    def _unfav_saved_experiment(self, saved_experiment_id: int):
         """Removes a saved experiment from the list of favourite saved experiments"""
         return self._update_favourite_saved_experiment(saved_experiment_id=saved_experiment_id, favourite=False)
 
-    def unfav_saved_experiments(self, saved_experiment_ids: List[int] | npt.NDArray[np.int_]):
+    def _unfav_saved_experiments(self, saved_experiment_ids: List[int] | npt.NDArray[np.int_]):
         """Removes a list of saved experiments from the list of favourite saved experiments"""
         for saved_experiment_id in saved_experiment_ids:
             self._update_favourite_saved_experiment(saved_experiment_id=saved_experiment_id, favourite=False)
@@ -691,7 +703,7 @@ class API(ABC):
             List[SavedExperimentListingItemResponse]: list of objects encoding the expected response structure"""
         responses, status_codes = unzip(
             self._connection.send_get_auth_remote_api_call_all_pages(
-                path=self.SAVED_EXPERIMENTS_CALL_PATH, params={API_CONSTANTS.FAVOURITES: favourites}
+                path=self._SAVED_EXPERIMENTS_CALL_PATH, params={API_CONSTANTS.FAVOURITES: favourites}
             )
         )
         for status_code in status_codes:
@@ -707,7 +719,7 @@ class API(ABC):
             List[JobListingItemResponse]: list of objects encoding the expected response structure"""
         responses, status_codes = unzip(
             self._connection.send_get_auth_remote_api_call_all_pages(
-                path=self.JOBS_CALL_PATH, params={API_CONSTANTS.FAVOURITES: favourites}
+                path=self._JOBS_CALL_PATH, params={API_CONSTANTS.FAVOURITES: favourites}
             )
         )
         for status_code in status_codes:
@@ -718,7 +730,7 @@ class API(ABC):
         return [JobListingItemResponse.from_kwargs(**item) for item in items]
 
     @typechecked
-    def list_saved_experiments(self, favourites: bool = False) -> SavedExperimentListing:
+    def _list_saved_experiments(self, favourites: bool = False) -> SavedExperimentListing:
         """List all saved experiments
 
         Raises:
@@ -757,14 +769,14 @@ class API(ABC):
         Returns:
             SavedExperimentResponse: response with the info of the requested saved experiment"""
         response, status_code = self._connection.send_get_auth_remote_api_call(
-            path=f"{self.SAVED_EXPERIMENTS_CALL_PATH}/{saved_experiment_id}"
+            path=f"{self._SAVED_EXPERIMENTS_CALL_PATH}/{saved_experiment_id}"
         )
         if status_code != 200:
             raise RemoteExecutionException(message="SavedExperiment could not be retrieved.", status_code=status_code)
         return SavedExperimentResponse(**response)
 
     @typechecked
-    def get_saved_experiment(self, saved_experiment_id: int) -> SavedExperiment:
+    def _get_saved_experiment(self, saved_experiment_id: int) -> SavedExperiment:
         """Get full information of a single experiment
 
         Raises:
@@ -817,7 +829,7 @@ class API(ABC):
     def _create_runcard_response(self, runcard: Runcard):
         """Make the runcard create request and parse the response"""
         response, status_code = self._connection.send_post_auth_remote_api_call(
-            path=self.RUNCARDS_CALL_PATH,
+            path=self._RUNCARDS_CALL_PATH,
             data=asdict(runcard.runcard_request()),
         )
         if status_code not in [200, 201]:
@@ -836,6 +848,10 @@ class API(ABC):
         qililab_version: str,
     ):
         """Save a runcard into the database af our servers, for it to be easily recovered when needed.
+
+          .. warning::
+
+            This method is only available for Qilimanjaro members.
 
         Args:
             name: Name the experiment is going to be saved with.
@@ -876,7 +892,7 @@ class API(ABC):
         Returns:
             RuncardResponse: response with the info of the requested runcard"""
         response, status_code = self._connection.send_get_auth_remote_api_call(
-            path=f"{self.RUNCARDS_CALL_PATH}/{runcard_id}"
+            path=f"{self._RUNCARDS_CALL_PATH}/{runcard_id}"
         )
         if status_code != 200:
             raise RemoteExecutionException(message="Runcard could not be retrieved.", status_code=status_code)
@@ -892,7 +908,7 @@ class API(ABC):
         Returns:
             RuncardResponse: response with the info of the requested runcard"""
         response, status_code = self._connection.send_get_auth_remote_api_call(
-            path=f"{self.RUNCARDS_CALL_PATH}/by_keys", params={"name": runcard_name}
+            path=f"{self._RUNCARDS_CALL_PATH}/by_keys", params={"name": runcard_name}
         )
 
         if status_code != 200:
@@ -903,6 +919,10 @@ class API(ABC):
     @typechecked
     def get_runcard(self, runcard_id: int | None = None, runcard_name: str | None = None) -> Runcard:
         """Get full information of a specific runcard
+
+          .. warning::
+
+            This method is only available for Qilimanjaro members.
 
         Args:
             runcard_id(int, optional): id of the runcard to retrieve. Incompatible with providing a name.
@@ -929,7 +949,7 @@ class API(ABC):
         Returns
             List[RuncardResponse]: list of objects encoding the expected response structure"""
         responses, status_codes = unzip(
-            self._connection.send_get_auth_remote_api_call_all_pages(path=self.RUNCARDS_CALL_PATH)
+            self._connection.send_get_auth_remote_api_call_all_pages(path=self._RUNCARDS_CALL_PATH)
         )
         for status_code in status_codes:
             if status_code != 200:
@@ -955,6 +975,10 @@ class API(ABC):
     def update_runcard(self, runcard: Runcard) -> Runcard:
         """Update the info of a runcard in the database
 
+          .. warning::
+
+            This method is only available for Qilimanjaro members.
+
         Raises:
             RemoteExecutionException: Runcard could not be retrieved
 
@@ -973,7 +997,7 @@ class API(ABC):
     def _update_runcard_response(self, runcard: Runcard):
         """Make the runcard update request and parse the response"""
         response, status_code = self._connection.send_put_auth_remote_api_call(
-            path=f"{self.RUNCARDS_CALL_PATH}/{runcard.id}",  # type: ignore[attr-defined]
+            path=f"{self._RUNCARDS_CALL_PATH}/{runcard.id}",  # type: ignore[attr-defined]
             data=asdict(runcard.runcard_request()),
         )
         if status_code != 200:
@@ -983,15 +1007,17 @@ class API(ABC):
 
     @typechecked
     def delete_runcard(self, runcard_id: int) -> None:
-        """Deletes a runcard from the database
+        """Deletes a job from the database.
+
+          .. warning::
+
+            This method is only available for Qilimanjaro members.
 
         Raises:
             RemoteExecutionException: Devices could not be retrieved
-
-        Returns:
         """
         response, status_code = self._connection.send_delete_auth_remote_api_call(
-            path=f"{self.RUNCARDS_CALL_PATH}/{runcard_id}"
+            path=f"{self._RUNCARDS_CALL_PATH}/{runcard_id}"
         )
         if status_code != 204:
             raise RemoteExecutionException(message="Runcard could not be removed.", status_code=status_code)
@@ -999,15 +1025,17 @@ class API(ABC):
 
     @typechecked
     def delete_job(self, job_id: int) -> None:
-        """Deletes a job from the database (only for admin users)
+        """Deletes a job from the database.
+
+        .. warning::
+
+            This method is only available for admin members.
 
         Raises:
             RemoteExecutionException: Devices could not be retrieved
-
-
         """
         response, status_code = self._connection.send_delete_auth_remote_api_call(  # pylint: disable=unused-variable
-            path=f"{self.JOBS_CALL_PATH}/{job_id}"
+            path=f"{self._JOBS_CALL_PATH}/{job_id}"
         )
         if status_code != 204:
             raise RemoteExecutionException(message="Job could not be removed.", status_code=status_code)
