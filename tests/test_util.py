@@ -8,7 +8,7 @@ from requests.models import Response
 
 from qiboconnection.api_utils import deserialize_job_description
 from qiboconnection.connection import ConnectionEstablished
-from qiboconnection.typings.job import JobType
+from qiboconnection.typings.enums import JobType
 from qiboconnection.typings.responses.job_response import JobResponse
 from qiboconnection.util import (
     base64_decode,
