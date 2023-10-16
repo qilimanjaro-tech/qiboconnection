@@ -1,3 +1,29 @@
+## 0.13.0
+
+### New features since last release
+
+- Added API `login` constructor for user convenience.
+  [#88](https://github.com/qilimanjaro-tech/qiboconnection/pull/88)
+- Qiboconnection is type-permissive at read. This decouples backend and qiboconnection versions compatibility.
+  [#86](https://github.com/qilimanjaro-tech/qiboconnection/pull/86)
+
+### Improvements
+
+- Removed `qiboconnection`'s own logging configuration
+  [#91](https://github.com/qilimanjaro-tech/qiboconnection/pull/91)
+
+### Documentation
+
+- Skeleton of Sphinx documentation
+  [#85](https://github.com/qilimanjaro-tech/qiboconnection/pull/85)
+
+- Improvements on the documentation main page.
+  [#89](https://github.com/qilimanjaro-tech/qiboconnection/pull/89)
+
+### Bug fixes
+
+- `update_runcard` now uses `PUT` method [#92](https://github.com/qilimanjaro-tech/qiboconnection/pull/92)
+
 ### Feat (2023-07-03)
 
 - Delete a job by its ID using the endpoint of the public api.(#80)
@@ -8,8 +34,7 @@
 
 ## v0.11.0 (2023-06-29)
 
-- Release 0.11.0
-  \[#77\] (https://github.com/qilimanjaro-tech/qiboconnection/pull/77)
+- Release 0.11.0 \[#77\] (https://github.com/qilimanjaro-tech/qiboconnection/pull/77)
 
 ### Feat (2023-06-13)
 
