@@ -267,6 +267,30 @@ def test_send_delete_auth_remote_api_call_not_204_with_job_details(
     )
 
 
+@patch("qiboconnection.connection.requests.post", autospec=True)
+def test_send_post_file_auth_remote_api_call(mocked_rest_call: MagicMock, mocked_connection: Connection):
+    mocked_rest_call.return_value = web_responses.raw.response_200
+
+    _PATH = "/PATH"
+    _FILE = io.StringIO()
+    _FILENAME = "filename"
+    _TIMEOUT = 10
+
+    mocked_connection.send_post_file_auth_remote_api_call(path=_PATH, file=_FILE, filename=_FILENAME, timeout=_TIMEOUT)
+
+    mocked_rest_call.assert_called_with(
+        f"{mocked_connection._remote_server_api_url}{_PATH}",
+        files={"file": (_FILENAME, _FILE)},
+        headers={
+            "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
+            ".eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ"
+            ".SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
+            "X-Client-Version": __version__,
+        },
+        timeout=_TIMEOUT,
+    )
+
+
 @patch("qiboconnection.connection.requests.get", autospec=True)
 def test_send_get_remote_call(mocked_rest_call: MagicMock, mocked_connection: Connection):
     """tests send_get_remote_call"""
