@@ -1,4 +1,5 @@
 """ Test methods for Connection """
+import io
 from copy import deepcopy
 from unittest.mock import MagicMock, patch
 
@@ -88,6 +89,19 @@ def test_user_slack_id(mocked_web_call: MagicMock, mocked_connection: Connection
 
     mocked_web_call.assert_called_with(self=connection, path=f"/users/{connection.user.user_id}")
     assert slack_id == web_responses.users.retrieve_response[0]["slack_id"]
+
+
+@patch("qiboconnection.connection.Connection.send_get_auth_remote_api_call", autospec=True)
+def test_user_slack_id_without_slack_id(mocked_web_call: MagicMock, mocked_connection: Connection):
+    """Test Connection user_slack_id property"""
+    mocked_web_call.return_value = web_responses.users.retrieve_response_without_slack_id
+    connection = deepcopy(mocked_connection)
+    connection._user_slack_id = None
+
+    slack_id = connection.user_slack_id
+
+    mocked_web_call.assert_called_with(self=connection, path=f"/users/{connection.user.user_id}")
+    assert slack_id == ""
 
 
 @patch("qiboconnection.connection.Connection.send_get_auth_remote_api_call", autospec=True)
@@ -469,3 +483,53 @@ def test_refresh_token_if_unauthorised_when_other_error():
 
     func.assert_called_once_with(connection)
     connection.update_authorisation_using_refresh_token.assert_not_called()
+
+
+@patch("qiboconnection.connection.Connection.send_put_auth_remote_api_call", autospec=True)
+def test_update_device_status(mocked_rest_call: MagicMock, mocked_connection: Connection):
+    """Asserts correct put function is called for updating a device status"""
+
+    _DEVICE_ID = 1
+    _NEW_STATUS = "new_status"
+
+    mocked_connection.update_device_status(device_id=1, status=_NEW_STATUS)
+    mocked_rest_call.assert_called_with(mocked_connection, path=f"/devices/{_DEVICE_ID}", data={"status": _NEW_STATUS})
+
+
+@patch("qiboconnection.connection.Connection.send_put_auth_remote_api_call", autospec=True)
+def test_update_device_availability(mocked_rest_call: MagicMock, mocked_connection: Connection):
+    """Asserts correct put function is called for updating a device status"""
+
+    _DEVICE_ID = 1
+    _NEW_AVAILABILITY = "new_status"
+
+    mocked_connection.update_device_availability(device_id=1, availability=_NEW_AVAILABILITY)
+    mocked_rest_call.assert_called_with(
+        mocked_connection, path=f"/devices/{_DEVICE_ID}", data={"availability": _NEW_AVAILABILITY}
+    )
+
+
+@patch("qiboconnection.connection.Connection.send_post_auth_remote_api_call", autospec=True)
+def test_send_message(mocked_rest_call: MagicMock, mocked_connection: Connection):
+    """Asserts correct put function is called for updating a device status"""
+
+    _CHANNEL_ID = 1
+    _MESSAGE = {"block": "message"}
+
+    mocked_connection.send_message(channel_id=_CHANNEL_ID, message=_MESSAGE)
+    mocked_rest_call.assert_called_with(mocked_connection, path=f"/messages?channel={_CHANNEL_ID}", data=_MESSAGE)
+
+
+@patch("qiboconnection.connection.Connection.send_post_file_auth_remote_api_call", autospec=True)
+def test_send_file(mocked_rest_call: MagicMock, mocked_connection: Connection):
+    """Asserts correct put function is called for updating a device status"""
+
+    _CHANNEL_ID = 1
+    _FILE = io.TextIOWrapper(buffer=io.BytesIO())
+    _FILENAME = "filename"
+    _TIMEOUT = 10
+
+    mocked_connection.send_file(channel_id=_CHANNEL_ID, file=_FILE, filename=_FILENAME, timeout=_TIMEOUT)
+    mocked_rest_call.assert_called_with(
+        mocked_connection, path=f"/files?channel={_CHANNEL_ID}", file=_FILE, filename=_FILENAME, timeout=_TIMEOUT
+    )
