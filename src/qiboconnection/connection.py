@@ -25,7 +25,7 @@ import jwt
 import requests
 from typeguard import typechecked
 
-from qiboconnection import __version__ as VERSION
+from qiboconnection import __version__ as VERSION  # pylint: disable=cyclic-import
 from qiboconnection.config import get_environment, logger
 from qiboconnection.errors import ConnectionException, HTTPError, RemoteExecutionException
 from qiboconnection.models.user import User
