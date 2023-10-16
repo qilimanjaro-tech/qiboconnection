@@ -17,6 +17,48 @@ class ResponsesRaw:
         return response
 
     @property
+    def response_200_paginated(self):
+        """Builds a 200 OK response"""
+        response = Response()
+        response.status_code = 200
+        response._content = json.dumps(
+            {
+                "items": [{"key": "value"}],
+                "total": 2,
+                "per_page": 5,
+                "self": "https://qilimanjarodev.ddns.net:8080/api/v1/path?page=1&per_page=5",
+                "links": {
+                    "first": "https://qilimanjarodev.ddns.net:8080/api/v1/path?page=1&per_page=5",
+                    "prev": "https://qilimanjarodev.ddns.net:8080/api/v1/path?page=None&per_page=5",
+                    "next": "https://qilimanjarodev.ddns.net:8080/api/v1/path?page=None&per_page=5",
+                    "last": "https://qilimanjarodev.ddns.net:8080/api/v1/path?page=1&per_page=5",
+                },
+            }
+        ).encode("utf-8")
+        return response
+
+    @property
+    def response_200_paginated_last(self):
+        """Builds a 200 OK response"""
+        response = Response()
+        response.status_code = 200
+        response._content = json.dumps(
+            {
+                "items": [{"key": "value"}],
+                "total": 2,
+                "per_page": 5,
+                "self": "https://qilimanjarodev.ddns.net:8080/api/v1/path?page=1&per_page=5",
+                "links": {
+                    "first": "https://qilimanjarodev.ddns.net:8080/api/v1/path?page=1&per_page=5",
+                    "prev": "https://qilimanjarodev.ddns.net:8080/api/v1/path?page=None&per_page=5",
+                    "next": "https://qilimanjarodev.ddns.net:8080/api/v1/path?page=None&per_page=None",
+                    "last": "https://qilimanjarodev.ddns.net:8080/api/v1/path?page=1&per_page=None",
+                },
+            }
+        ).encode("utf-8")
+        return response
+
+    @property
     def response_201(self):
         """Builds a 201 CREATED response"""
         response = Response()
