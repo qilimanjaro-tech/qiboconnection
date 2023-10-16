@@ -1,7 +1,7 @@
 """ Test methods for Connection """
 import io
 from copy import deepcopy
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock, call, patch
 
 import pytest
 
@@ -289,6 +289,39 @@ def test_send_post_file_auth_remote_api_call(mocked_rest_call: MagicMock, mocked
         },
         timeout=_TIMEOUT,
     )
+
+
+@patch("qiboconnection.connection.requests.get", autospec=True)
+def test_send_get_auth_remote_api_call_all_pages(mocked_rest_call: MagicMock, mocked_connection: Connection):
+    mocked_rest_call.side_effect = [
+        web_responses.raw.response_200_paginated,
+        web_responses.raw.response_200_paginated_last,
+    ]
+
+    _PATH = "/path"
+    _PARAMS = {"param": "value"}
+    _TIMEOUT = 10
+
+    responses = mocked_connection.send_get_auth_remote_api_call_all_pages(path=_PATH, params=_PARAMS, timeout=_TIMEOUT)
+
+    mocked_rest_call.assert_called()
+    assert responses == [
+        (
+            {
+                "items": [{"key": "value"}],
+                "total": 2,
+                "per_page": 5,
+                "self": "https://qilimanjarodev.ddns.net:8080/api/v1/path?page=1&per_page=5",
+                "links": {
+                    "first": "https://qilimanjarodev.ddns.net:8080/api/v1/path?page=1&per_page=5",
+                    "prev": "https://qilimanjarodev.ddns.net:8080/api/v1/path?page=None&per_page=5",
+                    "next": "https://qilimanjarodev.ddns.net:8080/api/v1/path?page=None&per_page=5",
+                    "last": "https://qilimanjarodev.ddns.net:8080/api/v1/path?page=1&per_page=5",
+                },
+            },
+            200,
+        )
+    ]
 
 
 @patch("qiboconnection.connection.requests.get", autospec=True)
