@@ -22,7 +22,7 @@
 
 ### Bug fixes
 
-- `update_runcard` now uses `PUT` method [#91](https://github.com/qilimanjaro-tech/qiboconnection/pull/92)
+- `update_runcard` now uses `PUT` method [#92](https://github.com/qilimanjaro-tech/qiboconnection/pull/92)
 
 ### Feat (2023-07-03)
 
