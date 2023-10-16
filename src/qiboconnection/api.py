@@ -380,7 +380,7 @@ class API(ABC):
 
         if not selected_devices:
             raise ValueError("No devices were selected for execution.")
-            
+
         jobs = [
             Job(
                 circuit=circuit,
