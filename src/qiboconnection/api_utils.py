@@ -101,7 +101,7 @@ def log_job_status_info(job_response: JobResponse):
         logger.error("Your job with id %i failed.", job_response.job_id)
         return None
     if job_response.status == JobStatus.COMPLETED:
-        logger.info("Your job with id %i is completed.", job_response.job_id)
+        logger.warning("Your job with id %i is completed.", job_response.job_id)
         return None
 
     logger.warning(f"Your job with id %i is {job_response.status}.", job_response.job_id)

@@ -10,6 +10,8 @@ This document contains the changes of the current release.
   [#88](https://github.com/qilimanjaro-tech/qiboconnection/pull/88)
 - Qiboconnection is type-permissive at read. This decouples backend and qiboconnection versions compatibility.
   [#86](https://github.com/qilimanjaro-tech/qiboconnection/pull/86)
+  - Qiboconnection adds in the header the field **X-Client-Version** that can be echecked by the API.
+    [#100](https://github.com/qilimanjaro-tech/qiboconnection/pull/100)
 
 ### Improvements
 

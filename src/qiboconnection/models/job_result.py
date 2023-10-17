@@ -31,7 +31,7 @@ class JobResult(ABC):
     job_id: int
     http_response: str
     job_type: str
-    data: List[CircuitResult] | CircuitResult | npt.NDArray | List[int] | List[float] | dict | list[
+    data: List[CircuitResult] | CircuitResult | npt.NDArray | List[int] | List[float] | dict | List[
         dict
     ] | None = field(init=False)
 
