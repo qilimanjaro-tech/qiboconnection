@@ -1,6 +1,5 @@
 """ Tests methods for Job """
 
-from pickle import NONE
 from typing import cast
 
 import numpy as np
