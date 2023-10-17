@@ -73,6 +73,7 @@ class Job(ABC):  # pylint: disable=too-many-instance-attributes
     def algorithms(self) -> List[dict]:
         """Get all algorithms described
 
+
         Returns:
             List[dict]: a list of all algorithms as a dictionary
         """
