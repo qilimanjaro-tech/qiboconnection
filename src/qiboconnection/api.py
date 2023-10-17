@@ -348,18 +348,22 @@ class API(ABC):
     ) -> List[int]:
         """Send a Qibo circuit(s) to be executed on the remote service API. User should define either a *circuit* or an
         *experiment*. If both are provided, the function will fail.
+
         Args:
             circuit (Circuit or List[Circuit]): a Qibo circuit to execute
             experiment (dict): an Experiment description, result of Qililab's Experiment().to_dict() function.
             nshots (int): number of times the execution is to be done.
             device_ids (List[int]): list of devices where the execution should be performed. If set, any device set
-             using API.select_device_id() will not be used. This will not update the selected devices.
+            using API.select_device_id() will not be used. This will not update the selected devices.
+
         Returns:
             List[int]: list of job ids
+
         Raises:
             ValueError: Both circuit and experiment were provided, but execute() only takes at most of them.
             ValueError: Neither of experiment or circuit were provided, but execute() only takes at least one of them.
         """
+
         # Ensure provided selected_devices are valid. If not provided, use the ones selected by API.select_device_id.
         selected_devices: List[Device | QuantumDevice | SimulatorDevice | OfflineDevice] = []
         if device_ids is not None:
