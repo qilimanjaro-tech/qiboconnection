@@ -1,3 +1,7 @@
+## 0.13.3
+
+- Removed session caching at login. [#101](https://github.com/qilimanjaro-tech/qiboconnection/pull/101)
+
 ## 0.13.2
 
 ### New features since last release
