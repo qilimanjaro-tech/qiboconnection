@@ -1,3 +1,8 @@
+## 0.14.0
+
+- Allow execution of multiple circuits in a single job
+  [#95](https://github.com/qilimanjaro-tech/qiboconnection/pull/95)
+
 ## 0.13.3
 
 - Removed session caching at login. [#101](https://github.com/qilimanjaro-tech/qiboconnection/pull/101)
