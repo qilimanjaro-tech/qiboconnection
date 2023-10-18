@@ -1,3 +1,14 @@
+## 0.13.3
+
+- Removed session caching at login. [#101](https://github.com/qilimanjaro-tech/qiboconnection/pull/101)
+
+## 0.13.2
+
+### New features since last release
+
+- Qiboconnection adds in the header the field **X-Client-Version** that can be checked by the API.
+  [#100](https://github.com/qilimanjaro-tech/qiboconnection/pull/100)
+
 ## 0.13.1
 
 ### Improvements

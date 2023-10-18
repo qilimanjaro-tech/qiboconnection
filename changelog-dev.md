@@ -6,8 +6,6 @@ This document contains the changes of the current release.
 
 ### Improvements
 
-- Removed session caching at login. [#101](https://github.com/qilimanjaro-tech/qiboconnection/pull/101)
-
 ### Breaking changes
 
 ### Deprecations / Removals
