@@ -32,7 +32,7 @@ from qiboconnection.models.user import User
 from qiboconnection.typings.connection import ConnectionConfiguration, ConnectionEstablished
 from qiboconnection.typings.requests import AssertionPayload
 from qiboconnection.typings.responses import AccessTokenResponse
-from qiboconnection.util import base64url_encode, load_config_file_to_disk, process_response, write_config_file_to_disk
+from qiboconnection.util import base64url_encode, process_response
 
 
 def TIMEOUT():
@@ -68,7 +68,7 @@ class Connection(ABC):  # pylint: disable=too-many-instance-attributes
     @typechecked
     def __init__(
         self,
-        configuration: Optional[ConnectionConfiguration | None] = None,
+        configuration: ConnectionConfiguration,
         api_path: Optional[str] = None,
     ):
         self._environment = get_environment()
@@ -171,50 +171,20 @@ class Connection(ABC):  # pylint: disable=too-many-instance-attributes
         self._authorisation_server_api_call = f"{self._remote_server_api_url}/authorisation-tokens"
         self._authorisation_server_refresh_api_call = f"{self._remote_server_api_url}/authorisation-tokens/refresh"
 
-    def _store_configuration(self) -> None:
-        """
-        Saves the provided info in the Connection() instance creation to a file.
-        """
-        logger.info("Storing personal qibo configuration...")
-        if self._api_path is None:
-            raise ValueError("API path not specified")
-        if self._authorisation_access_token is None:
-            raise ValueError("Authorisation access token not specified")
-        if self._authorisation_refresh_token is None:
-            raise ValueError("Authorisation refresh token not specified")
-        config_data = ConnectionEstablished(
-            **self._user.__dict__,
-            authorisation_access_token=self._authorisation_access_token,
-            authorisation_refresh_token=self._authorisation_refresh_token,
-            api_path=self._api_path,
-        )
-
-        write_config_file_to_disk(config_data=config_data)
-
     def _add_version_header(self, header):
         header["X-Client-Version"] = VERSION
         return header
 
     def _load_configuration(
         self,
-        input_configuration: Optional[ConnectionConfiguration] = None,
+        input_configuration: ConnectionConfiguration,
         api_path: Optional[str] = None,
     ) -> None:
-        if input_configuration is None:
-            try:
-                self._register_configuration_with_authorisation_tokens(load_config_file_to_disk())
-                return
-            except FileNotFoundError as ex:
-                raise ConnectionException(
-                    "No connection configuration found. Please provide a new configuration."
-                ) from ex
-
         if api_path is None:
             raise ConnectionException("No api path provided.")
         self._set_api_calls(api_path=api_path)
         self._register_configuration_and_request_authorisation_access_token(input_configuration)
         self._load_user_id_from_token(access_token=self._authorisation_access_token)
-        self._store_configuration()
 
     def _register_configuration_and_request_authorisation_access_token(self, configuration: ConnectionConfiguration):
         """

@@ -7,17 +7,9 @@ from qibo.models.circuit import Circuit
 from requests.models import Response
 
 from qiboconnection.api_utils import deserialize_job_description
-from qiboconnection.connection import ConnectionEstablished
 from qiboconnection.typings.enums import JobType
 from qiboconnection.typings.responses.job_response import JobResponse
-from qiboconnection.util import (
-    base64_decode,
-    base64url_encode,
-    from_kwargs,
-    load_config_file_to_disk,
-    process_response,
-    write_config_file_to_disk,
-)
+from qiboconnection.util import base64_decode, base64url_encode, from_kwargs, process_response
 
 
 def test_base64url_encode():
@@ -64,13 +56,6 @@ def test_base64url_decode_list():
     assert json.loads(base64_decode(data)) == expected_decoded
 
 
-def test_save_and_load_config_to_disk(connection_established: ConnectionEstablished):
-    """Test write_config_file_to_disk() loads the correct ConnectionEstablished object."""
-    write_config_file_to_disk(config_data=connection_established)
-    recovered_config_data = load_config_file_to_disk()
-    assert connection_established == recovered_config_data
-
-
 def test_process_response(response: Response):
     """Test that process_response() recovers the correct parameters (text and status_code)."""
 
@@ -78,6 +63,15 @@ def test_process_response(response: Response):
 
     assert processed_response[0] == json.loads(response.text)
     assert processed_response[1] == response.status_code
+
+
+def test_process_response_non_json(response_plain_text: Response):
+    """Test that process_response() recovers the correct parameters (text and status_code)."""
+
+    processed_response = process_response(response=response_plain_text)
+
+    assert processed_response[0] == response_plain_text.text
+    assert processed_response[1] == response_plain_text.status_code
 
 
 def test_deserialize_job_description(base64_qibo_circuit: str, base64_qililab_experiment: str):
