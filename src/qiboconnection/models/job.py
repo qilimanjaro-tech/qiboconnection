@@ -126,10 +126,10 @@ class Job(ABC):  # pylint: disable=too-many-instance-attributes
     def _get_job_description(self) -> str:
         "Serialize either circuit or experiment to obtain job description"
 
-        if self.experiment is not None:
+        if self.circuit is None:
             return jsonify_dict_and_base64_encode(object_to_encode=self.experiment)
-        else:
-            return jsonify_list_with_str_and_base64_encode(object_to_encode=[c.to_qasm() for c in self.circuit])
+
+        return jsonify_list_with_str_and_base64_encode(object_to_encode=[c.to_qasm() for c in self.circuit])
 
     @property
     def result(self) -> Any:
