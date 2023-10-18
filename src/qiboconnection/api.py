@@ -24,7 +24,7 @@ from abc import ABC
 from dataclasses import asdict
 from datetime import datetime, timedelta
 from time import sleep
-from typing import Any, List, Optional, cast
+from typing import Any, List, cast
 
 import numpy as np
 from numpy import typing as npt
@@ -71,7 +71,7 @@ class API(ABC):
     @typechecked
     def __init__(
         self,
-        configuration: Optional[ConnectionConfiguration] = None,
+        configuration: ConnectionConfiguration,
     ):
         self._connection = Connection(configuration=configuration, api_path=self._API_PATH)
         self._devices: Devices | None = None

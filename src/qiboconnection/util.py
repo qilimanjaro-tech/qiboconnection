@@ -17,10 +17,8 @@ import base64
 import binascii
 import io
 import json
-import os
 import pickle  # nosec - temporary bandit ignore
 from base64 import urlsafe_b64decode, urlsafe_b64encode
-from dataclasses import asdict
 from inspect import signature
 from json.decoder import JSONDecodeError
 from typing import Any, List, Tuple
@@ -29,10 +27,6 @@ import requests
 from qibo.states import CircuitResult
 
 from qiboconnection.errors import custom_raise_for_status
-from qiboconnection.typings.connection import ConnectionEstablished
-
-QIBO_CONFIG_DIR = ".qibo_configuration"
-QIBO_CONFIG_FILE = ".user_configuration.json"
 
 
 def base64url_encode(payload: dict | bytes | str) -> str:
@@ -61,37 +55,6 @@ def base64_decode(encoded_data: str) -> str:
         Any: The data decoded
     """
     return urlsafe_b64decode(encoded_data).decode("utf-8")
-
-
-def write_config_file_to_disk(config_data: ConnectionEstablished) -> None:
-    """Write the Connection configuration data to a local file
-
-    Args:
-        config_data (ConnectionEstablished): Connection configuration data
-    """
-    current_dir = os.getcwd()
-    os.chdir(current_dir)
-    if not os.path.isdir(QIBO_CONFIG_DIR):
-        os.mkdir(QIBO_CONFIG_DIR)
-    os.chdir(QIBO_CONFIG_DIR)
-
-    with open(QIBO_CONFIG_FILE, "w", encoding="utf-8") as config_file:
-        json.dump(obj=asdict(config_data), fp=config_file, indent=2)
-    os.chdir("..")
-
-
-def load_config_file_to_disk() -> ConnectionEstablished:
-    """Load a Connection configuration data from a local file
-
-    Returns:
-        ConnectionEstablished: Connection configuration data
-    """
-    current_dir = os.getcwd()
-    os.chdir(current_dir)
-    os.chdir(QIBO_CONFIG_DIR)
-    with open(QIBO_CONFIG_FILE, encoding="utf-8") as config_file:
-        os.chdir("..")
-        return ConnectionEstablished(**json.load(fp=config_file))
 
 
 def decode_jsonified_dict(http_response: str) -> dict:

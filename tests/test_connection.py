@@ -6,7 +6,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from qiboconnection import __version__
-from qiboconnection.connection import Connection, ConnectionEstablished, refresh_token_if_unauthorised
+from qiboconnection.connection import Connection, refresh_token_if_unauthorised
 from qiboconnection.errors import HTTPError, RemoteExecutionException
 from qiboconnection.models.user import User
 
@@ -375,58 +375,6 @@ def test_request_authorisation_token_with_ise(mocked_rest_call: MagicMock, mocke
 
     with pytest.raises(ValueError, match=f"Authorisation request failed: {web_responses.raw.response_500.reason}"):
         _, _ = mocked_connection._request_authorisation_token()
-
-
-@patch("qiboconnection.connection.write_config_file_to_disk", autospec=True)
-def test_store_configuration_nominal(mocked_write_call: MagicMock, mocked_connection: Connection):
-    """Tests that store configuration does the pertinent checks and calls the corresponding utils function"""
-
-    mocked_connection._store_configuration()
-
-    mocked_write_call.assert_called_with(
-        config_data=ConnectionEstablished(
-            **mocked_connection.user.__dict__,
-            authorisation_access_token=mocked_connection._authorisation_access_token,  # type: ignore[arg-type]
-            authorisation_refresh_token=mocked_connection._authorisation_refresh_token,  # type: ignore[arg-type]
-            api_path=mocked_connection._api_path,  # type: ignore[arg-type]
-        )
-    )
-
-
-@patch("qiboconnection.connection.write_config_file_to_disk", autospec=True)
-def test_store_configuration_with_no_api_path(mocked_write_call: MagicMock, mocked_connection: Connection):
-    """Tests that store configuration fails if no api path is defined"""
-
-    mocked_connection_copy = deepcopy(mocked_connection)
-    mocked_connection_copy._api_path = None
-
-    with pytest.raises(ValueError, match="API path not specified"):
-        mocked_connection_copy._store_configuration()
-        mocked_write_call.assert_not_called()
-
-
-@patch("qiboconnection.connection.write_config_file_to_disk", autospec=True)
-def test_store_configuration_with_no_access_token(mocked_write_call: MagicMock, mocked_connection: Connection):
-    """Tests that store configuration fails if there is no access token stored"""
-
-    mocked_connection_copy = deepcopy(mocked_connection)
-    mocked_connection_copy._authorisation_access_token = None
-
-    with pytest.raises(ValueError, match="Authorisation access token not specified"):
-        mocked_connection_copy._store_configuration()
-        mocked_write_call.assert_not_called()
-
-
-@patch("qiboconnection.connection.write_config_file_to_disk", autospec=True)
-def test_store_configuration_with_no_refresh_token(mocked_write_call: MagicMock, mocked_connection: Connection):
-    """Tests that store configuration fails if there is no refresh token stored"""
-
-    mocked_connection_copy = deepcopy(mocked_connection)
-    mocked_connection_copy._authorisation_refresh_token = None
-
-    with pytest.raises(ValueError, match="Authorisation refresh token not specified"):
-        mocked_connection_copy._store_configuration()
-        mocked_write_call.assert_not_called()
 
 
 @patch("qiboconnection.connection.requests.post", autospec=True)

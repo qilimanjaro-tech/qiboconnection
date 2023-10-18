@@ -58,6 +58,10 @@ class ConnectionEstablished(ConnectionConfiguration, _ConnectionEstablishedBase)
     """Connection Established
 
     Attributes:
+        user_id (int): The user id
+        username (str): The user name
+        api_key (str): The API key associated to the user
         authorisation_access_token (str): access token associated
+        authorisation_refresh_token (str): refresh token associated
         api_path (str): API path to use the token
     """
