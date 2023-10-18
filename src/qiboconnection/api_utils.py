@@ -47,7 +47,7 @@ def parse_job_responses_to_results(job_responses: List[JobResponse]) -> List[dic
     return list(raw_results)
 
 
-def deserialize_job_description(base64_description: str, job_type: str) -> Circuit | dict | list:
+def deserialize_job_description(base64_description: str, job_type: str) -> list[Circuit] | Circuit | dict:
     """Convert base64 job description to its corresponding Qibo Circuit or Qililab experiment
 
     Args:
