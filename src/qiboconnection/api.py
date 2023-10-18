@@ -341,7 +341,7 @@ class API(ABC):
     @typechecked
     def execute(
         self,
-        circuit: Circuit | None = None,
+        circuit: Circuit | List[Circuit] | None = None,
         experiment: dict | None = None,
         nshots: int = 10,
         device_ids: List[int] | None = None,
@@ -354,10 +354,11 @@ class API(ABC):
             experiment (dict): an Experiment description, result of Qililab's Experiment().to_dict() function.
             nshots (int): number of times the execution is to be done.
             device_ids (List[int]): list of devices where the execution should be performed. If set, any device set
-             using API.select_device_id() will not be used. This will not update the selected devices.
+            using API.select_device_id() will not be used. This will not update the selected devices.
 
         Returns:
             List[int]: list of job ids
+
         Raises:
             ValueError: Both circuit and experiment were provided, but execute() only takes at most of them.
             ValueError: Neither of experiment or circuit were provided, but execute() only takes at least one of them.
@@ -377,10 +378,10 @@ class API(ABC):
             selected_devices = cast(
                 List[Device | QuantumDevice | SimulatorDevice | OfflineDevice], self._selected_devices
             )
-
         if not selected_devices:
             raise ValueError("No devices were selected for execution.")
-
+        if not isinstance(circuit, list):
+            circuit = [circuit]
         jobs = [
             Job(
                 circuit=circuit,
@@ -391,7 +392,6 @@ class API(ABC):
             )
             for device in selected_devices
         ]
-
         job_ids = []
         logger.debug("Sending qibo circuits for a remote execution...")
         for job in jobs:
@@ -810,7 +810,7 @@ class API(ABC):
         return JobData(**vars(job_response))
 
     @typechecked
-    def get_saved_experiments(self, saved_experiment_ids: List[int] | npt.NDArray[np.int_]) -> List[SavedExperiment]:
+    def _get_saved_experiments(self, saved_experiment_ids: List[int] | npt.NDArray[np.int_]) -> List[SavedExperiment]:
         """Get full information of the chosen experiments
 
         Raises:

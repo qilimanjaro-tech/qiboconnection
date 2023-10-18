@@ -152,11 +152,17 @@ def fixture_connection_established() -> ConnectionEstablished:
     """
     return ConnectionEstablished(
         api_key="DEMO_KEY",
-        api_path="DEMO_PATH",
+        api_path="/DEMO_PATH",
         authorisation_access_token="DEMO_TOKEN",
         authorisation_refresh_token="DEMO_TOKEN",
         username="DEMO_USERNAME",
     )
+
+
+@pytest.fixture(name="base64_qibo_circuits")
+def base64_qibo_circuits():
+    """qibo circuit base64 encoding"""
+    return "['Ly8gR2VuZXJhdGVkIGJ5IFFJQk8gMC4xLjEyLmRldjAKT1BFTlFBU00gMi4wOwppbmNsdWRlICJxZWxpYjEuaW5jIjsKcXJlZyBxWzJdOwpjcmVnIHJlZ2lzdGVyMFsxXTsKaCBxWzBdOwpjeCBxWzBdLHFbMV07CnggcVsxXTsKbWVhc3VyZSBxWzBdIC0-IHJlZ2lzdGVyMFswXTs=', 'Ly8gR2VuZXJhdGVkIGJ5IFFJQk8gMC4xLjEyLmRldjAKT1BFTlFBU00gMi4wOwppbmNsdWRlICJxZWxpYjEuaW5jIjsKcXJlZyBxWzFdOwpjcmVnIHJlZ2lzdGVyMFsxXTsKeCBxWzBdOwptZWFzdXJlIHFbMF0gLT4gcmVnaXN0ZXIwWzBdOw==']"
 
 
 @pytest.fixture(name="base64_qibo_circuit")
