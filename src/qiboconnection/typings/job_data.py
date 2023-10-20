@@ -39,9 +39,9 @@ class JobData(JobResponse):
         )
 
         if not isinstance(self.result, (dict, list, type(None))):
-            raise ValueError("Job result needs to be a dict!")
+            raise ValueError("Job result needs to be a dict, a list or a None!")
         if not isinstance(self.description, (dict, type(None), Circuit, list)):
-            raise ValueError("Job description needs to be a dict of a Qibo Circuit!")
+            raise ValueError("Job description needs to be a Qibo Circuit, a dict, a list or a None!")
 
     def __repr__(self):
         # Use dataclass-like formatting, excluding attributes starting with an underscore
