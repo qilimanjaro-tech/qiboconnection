@@ -1,3 +1,9 @@
+## 0.14.2
+
+### Bug fixes
+
+- Job result retrieving errors
+
 ## 0.14.0
 
 ### New features since last release
