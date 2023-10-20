@@ -38,7 +38,7 @@ class JobData(JobResponse):
             base64_description=self.description, job_type=self.job_type
         )
 
-        if not isinstance(self.result, (dict, type(None))):
+        if not isinstance(self.result, (dict, list, type(None))):
             raise ValueError("Job result needs to be a dict!")
         if not isinstance(self.description, (dict, type(None), Circuit, list)):
             raise ValueError("Job description needs to be a dict of a Qibo Circuit!")
