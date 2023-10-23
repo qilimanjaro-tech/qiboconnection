@@ -1,3 +1,10 @@
+## 0.14.3
+
+### Buf fixes
+
+- Fix issue with circuit parsing when no circuit was provided
+  [#108](https://github.com/qilimanjaro-tech/qiboconnection/pull/108)
+
 ## 0.14.2
 
 ### Bug fixes
