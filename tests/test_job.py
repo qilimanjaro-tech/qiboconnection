@@ -174,9 +174,7 @@ def test_job_creation_experiment_raises_value_error_when_both_circuit_and_experi
 
     with pytest.raises(ValueError) as e_info:
         _ = Job(experiment={}, circuit=circuit, user=user, device=cast(Device, simulator_device))
-    assert (
-        e_info.value.args[0] == "Both circuit and experiment were provided, but execute() only takes at most of them."
-    )
+    assert e_info.value.args[0] == "Both circuit and experiment were provided, but execute() only takes one of them."
 
 
 def test_job_creation_experiment_raises_value_error_when_neither_of_circuit_and_experiment_are_defined(
