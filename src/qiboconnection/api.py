@@ -380,7 +380,7 @@ class API(ABC):
             )
         if not selected_devices:
             raise ValueError("No devices were selected for execution.")
-        if not isinstance(circuit, list):
+        if isinstance(circuit, Circuit):
             circuit = [circuit]
         jobs = [
             Job(

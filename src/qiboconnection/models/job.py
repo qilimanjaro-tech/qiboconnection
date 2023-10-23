@@ -47,7 +47,7 @@ class Job(ABC):  # pylint: disable=too-many-instance-attributes
 
     def __post_init__(self):
         if self.experiment is not None and self.circuit is not None:
-            raise ValueError("Both circuit and experiment were provided, but execute() only takes at most of them.")
+            raise ValueError("Both circuit and experiment were provided, but execute() only takes one of them.")
         if self.experiment is None and self.circuit is None:
             raise ValueError("Neither of experiment or circuit were provided,")
 
