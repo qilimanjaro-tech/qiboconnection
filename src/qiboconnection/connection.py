@@ -369,7 +369,6 @@ class Connection(ABC):  # pylint: disable=too-many-instance-attributes
             error_details = response.json()
             if "detail" in error_details and "does not exist" in error_details["detail"]:
                 raise RemoteExecutionException("The job does not exist!", status_code=400)
-            response.raise_for_status()
 
         return process_response(response)
 
