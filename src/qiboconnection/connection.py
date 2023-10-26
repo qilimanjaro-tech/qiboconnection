@@ -475,7 +475,14 @@ class Connection(ABC):  # pylint: disable=too-many-instance-attributes
             headers=self._add_version_header({}),
         )
         if response.status_code not in [200, 201]:
-            raise ValueError(f"Authorisation request failed: {response.reason}")
+            try:
+                json_content = json.loads(response.content)
+                detail = json_content["detail"]
+            except (TypeError, KeyError, json.JSONDecodeError):
+                detail = ""
+            reason_text = f" Reason: {response.reason}." if response.reason else ""
+            details_text = f" Details: {detail}." if detail else ""
+            raise ValueError(f"Authorisation request failed.{reason_text}{details_text}")
 
         access_token_response: AccessTokenResponse = AccessTokenResponse(**response.json())
         logger.debug("Connection successfully established.")
