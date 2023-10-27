@@ -373,7 +373,7 @@ def test_request_authorisation_token_with_ise(mocked_rest_call: MagicMock, mocke
     """tests send_get_remote_call"""
     mocked_rest_call.return_value = web_responses.raw.response_500
 
-    with pytest.raises(ValueError, match=f"Authorisation request failed: {web_responses.raw.response_500.reason}"):
+    with pytest.raises(ValueError, match="Authorisation request failed."):
         _, _ = mocked_connection._request_authorisation_token()
 
 
