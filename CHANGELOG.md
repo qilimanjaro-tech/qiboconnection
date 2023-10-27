@@ -1,3 +1,8 @@
+## 0.14.4
+
+- Show more information at errors coming from login calls
+  [#110](https://github.com/qilimanjaro-tech/qiboconnection/pull/110)
+
 ## 0.14.3
 
 ### Buf fixes
