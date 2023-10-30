@@ -1,4 +1,31 @@
+## 0.14.4
+
+- Show more information at errors coming from login calls
+  [#110](https://github.com/qilimanjaro-tech/qiboconnection/pull/110)
+
+## 0.14.3
+
+### Buf fixes
+
+- Fix issue with circuit parsing when no circuit was provided
+  [#108](https://github.com/qilimanjaro-tech/qiboconnection/pull/108)
+
+## 0.14.2
+
+### Bug fixes
+
+- Job result retrieving errors
+
+## 0.14.0
+
+### New features since last release
+
+- Allow execution of multiple circuits in a single job
+  [#95](https://github.com/qilimanjaro-tech/qiboconnection/pull/95)
+
 ## 0.13.3
+
+### Improvements
 
 - Removed session caching at login. [#101](https://github.com/qilimanjaro-tech/qiboconnection/pull/101)
 
