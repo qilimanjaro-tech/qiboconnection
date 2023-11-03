@@ -141,7 +141,7 @@ def test_send_put_auth_remote_api_call(mocked_rest_call: MagicMock, mocked_conne
             "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
             ".eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ"
             ".SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
-            "X-Client-Version": __version__,
+            "ClientVersion": __version__,
         },
         timeout=10,
     )
@@ -163,7 +163,7 @@ def test_send_post_auth_remote_api_call(mocked_rest_call: MagicMock, mocked_conn
             "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
             ".eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ"
             ".SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
-            "X-Client-Version": __version__,
+            "ClientVersion": __version__,
         },
         timeout=10,
     )
@@ -185,7 +185,7 @@ def test_send_get_auth_remote_api_call(mocked_rest_call: MagicMock, mocked_conne
             "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
             ".eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ"
             ".SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
-            "X-Client-Version": __version__,
+            "ClientVersion": __version__,
         },
         timeout=10,
     )
@@ -217,7 +217,7 @@ def test_send_delete_auth_remote_api_call(mocked_rest_call: MagicMock, mocked_co
             "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
             ".eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ"
             ".SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
-            "X-Client-Version": __version__,
+            "ClientVersion": __version__,
         },
         timeout=10,
     )
@@ -240,7 +240,7 @@ def test_send_delete_auth_remote_api_call_not_204_not_job_details(
             "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
             ".eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ"
             ".SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
-            "X-Client-Version": __version__,
+            "ClientVersion": __version__,
         },
         timeout=10,
     )
@@ -261,7 +261,7 @@ def test_send_delete_auth_remote_api_call_not_204_with_job_details(
             "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
             ".eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ"
             ".SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
-            "X-Client-Version": __version__,
+            "ClientVersion": __version__,
         },
         timeout=10,
     )
@@ -285,7 +285,7 @@ def test_send_post_file_auth_remote_api_call(mocked_rest_call: MagicMock, mocked
             "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
             ".eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ"
             ".SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
-            "X-Client-Version": __version__,
+            "ClientVersion": __version__,
         },
         timeout=_TIMEOUT,
     )
@@ -332,7 +332,7 @@ def test_send_get_remote_call(mocked_rest_call: MagicMock, mocked_connection: Co
     response, code = mocked_connection.send_get_remote_call(path="/PATH", timeout=10)
 
     mocked_rest_call.assert_called_with(
-        f"{mocked_connection._remote_server_base_url}/PATH", timeout=10, headers={"X-Client-Version": __version__}
+        f"{mocked_connection._remote_server_base_url}/PATH", timeout=10, headers={"ClientVersion": __version__}
     )
     assert response == web_responses.raw.response_200.json()
     assert code == web_responses.raw.response_200.status_code
@@ -442,7 +442,7 @@ def test_update_authorisation_using_refresh_token(mocked_rest_call: MagicMock, m
                 + "LCJ0eXBlIjoicmVmcmVzaCIsInVzZXJfaWQiOjMsInVzZXJfcm9sZSI6ImFkbWluIn0"
                 + ".4oSyRW9Ia7C-50x2yZxQAEXDZp-TLkFkPOtHBR4cCi9LnkREtYrJpDXufep_EYoRwDSJL_2z20moYMuMHy0QCg"
             ),
-            "X-Client-Version": __version__,
+            "ClientVersion": __version__,
         },
         timeout=10,
     )
