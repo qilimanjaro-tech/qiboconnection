@@ -172,7 +172,7 @@ class Connection(ABC):  # pylint: disable=too-many-instance-attributes
         self._authorisation_server_refresh_api_call = f"{self._remote_server_api_url}/authorisation-tokens/refresh"
 
     def _add_version_header(self, header):
-        header["X-Client-Version"] = VERSION
+        header["ClientVersion"] = VERSION
         return header
 
     def _load_configuration(
