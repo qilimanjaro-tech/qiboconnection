@@ -15,10 +15,14 @@ from qiboconnection.models.devices import Device, QuantumDevice
 from qiboconnection.typings.connection import ConnectionConfiguration
 from qiboconnection.typings.enums import JobStatus
 
-from .errors import MissingCredentialsException
 from .http import get_api, get_logging_conf
 from .operations import is_development
 from .typings import DeviceAvailability, DeviceStatus, UserRole
+
+
+class MissingCredentialsException(ValueError):
+    pass
+
 
 TIMEOUT = 100
 CALL_EVERY_SECONDS = 5

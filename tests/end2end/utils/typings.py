@@ -2,15 +2,6 @@ from dataclasses import dataclass
 from enum import Enum
 
 
-@dataclass
-class LoginInfo:
-    """Login info"""
-
-    user_id: int
-    username: str
-    api_key: str
-
-
 class UserRole(str, Enum):
     """User roles with different permissions. admin is allowed to change device status and availability. qilimanjaro_user can only change availability provided that device status is maintenance. bsc_user can change none."""
 
