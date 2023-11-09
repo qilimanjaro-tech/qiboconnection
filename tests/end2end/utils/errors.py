@@ -1,0 +1,2 @@
+class MissingCredentialsException(ValueError):
+    pass
