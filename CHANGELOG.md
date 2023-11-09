@@ -1,3 +1,73 @@
+## 0.14.4
+
+- Show more information at errors coming from login calls
+  [#110](https://github.com/qilimanjaro-tech/qiboconnection/pull/110)
+
+## 0.14.3
+
+### Buf fixes
+
+- Fix issue with circuit parsing when no circuit was provided
+  [#108](https://github.com/qilimanjaro-tech/qiboconnection/pull/108)
+
+## 0.14.2
+
+### Bug fixes
+
+- Job result retrieving errors
+
+## 0.14.0
+
+### New features since last release
+
+- Allow execution of multiple circuits in a single job
+  [#95](https://github.com/qilimanjaro-tech/qiboconnection/pull/95)
+
+## 0.13.3
+
+### Improvements
+
+- Removed session caching at login. [#101](https://github.com/qilimanjaro-tech/qiboconnection/pull/101)
+
+## 0.13.2
+
+### New features since last release
+
+- Qiboconnection adds in the header the field **X-Client-Version** that can be checked by the API.
+  [#100](https://github.com/qilimanjaro-tech/qiboconnection/pull/100)
+
+## 0.13.1
+
+### Improvements
+
+- Removed redundant typings. [#103](https://github.com/qilimanjaro-tech/qiboconnection/pull/103/files)
+
+## 0.13.0
+
+### New features since last release
+
+- Added API `login` constructor for user convenience.
+  [#88](https://github.com/qilimanjaro-tech/qiboconnection/pull/88)
+- Qiboconnection is type-permissive at read. This decouples backend and qiboconnection versions compatibility.
+  [#86](https://github.com/qilimanjaro-tech/qiboconnection/pull/86)
+
+### Improvements
+
+- Removed `qiboconnection`'s own logging configuration
+  [#91](https://github.com/qilimanjaro-tech/qiboconnection/pull/91)
+
+### Documentation
+
+- Skeleton of Sphinx documentation
+  [#85](https://github.com/qilimanjaro-tech/qiboconnection/pull/85)
+
+- Improvements on the documentation main page.
+  [#89](https://github.com/qilimanjaro-tech/qiboconnection/pull/89)
+
+### Bug fixes
+
+- `update_runcard` now uses `PUT` method [#92](https://github.com/qilimanjaro-tech/qiboconnection/pull/92)
+
 ### Feat (2023-07-03)
 
 - Delete a job by its ID using the endpoint of the public api.(#80)
@@ -8,8 +78,7 @@
 
 ## v0.11.0 (2023-06-29)
 
-- Release 0.11.0
-  \[#77\] (https://github.com/qilimanjaro-tech/qiboconnection/pull/77)
+- Release 0.11.0 [#77](https://github.com/qilimanjaro-tech/qiboconnection/pull/77)
 
 ### Feat (2023-06-13)
 

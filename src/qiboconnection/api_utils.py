@@ -14,6 +14,7 @@
 
 """ Util Functions used by the API module """
 
+import ast
 import json
 from typing import Any, List
 
@@ -22,7 +23,7 @@ from qibo.models.circuit import Circuit
 from qiboconnection.config import logger
 from qiboconnection.models import JobResult
 from qiboconnection.typings.enums import JobStatus, JobType
-from qiboconnection.typings.responses import JobResponse
+from qiboconnection.typings.responses.job_response import JobResponse
 from qiboconnection.util import base64_decode
 
 
@@ -43,10 +44,10 @@ def parse_job_responses_to_results(job_responses: List[JobResponse]) -> List[dic
         else None
         for job_response in job_responses
     ]
-    return [raw_result[0] if isinstance(raw_result, List) else raw_result for raw_result in raw_results]
+    return list(raw_results)
 
 
-def deserialize_job_description(base64_description: str, job_type: str) -> Circuit | dict:
+def deserialize_job_description(base64_description: str, job_type: str) -> list[Circuit] | Circuit | dict:
     """Convert base64 job description to its corresponding Qibo Circuit or Qililab experiment
 
     Args:
@@ -60,12 +61,18 @@ def deserialize_job_description(base64_description: str, job_type: str) -> Circu
         Circuit | dict: _description_
     """
     if job_type == JobType.CIRCUIT:
-        return Circuit.from_qasm(base64_decode(encoded_data=base64_description))
+        try:
+            circuits_descriptions = ast.literal_eval(base64_description)
+            return [Circuit.from_qasm(base64_decode(encoded_data=description)) for description in circuits_descriptions]
+
+        except SyntaxError:
+            return Circuit.from_qasm(base64_decode(encoded_data=base64_description))
 
     if job_type == JobType.EXPERIMENT:
         return json.loads(base64_decode(encoded_data=base64_description))
 
-    raise ValueError(f"{job_type} not supported, it needs to be either {JobType.CIRCUIT} or {JobType.EXPERIMENT}")
+    logger.warning(f"JobType {job_type} not supported!")
+    return None
 
 
 def log_job_status_info(job_response: JobResponse):
@@ -77,27 +84,25 @@ def log_job_status_info(job_response: JobResponse):
     Returns:
 
     """
-    status = job_response.status if isinstance(job_response.status, JobStatus) else JobStatus(job_response.status)
-    if status == JobStatus.PENDING:
+    if job_response.status == JobStatus.PENDING:
         logger.warning(
             "Your job with id %i is still pending. Job queue position: %s",
             job_response.job_id,
             job_response.queue_position,
         )
         return None
-    if status == JobStatus.RUNNING:
+    if job_response.status == JobStatus.RUNNING:
         logger.warning("Your job with id %i is still running.", job_response.job_id)
         return None
-    if status == JobStatus.NOT_SENT:
+    if job_response.status == JobStatus.NOT_SENT:
         logger.warning("Your job with id %i has not been sent.", job_response.job_id)
         return None
-    if status == JobStatus.ERROR:
+    if job_response.status == JobStatus.ERROR:
         logger.error("Your job with id %i failed.", job_response.job_id)
         return None
-    if status == JobStatus.COMPLETED:
+    if job_response.status == JobStatus.COMPLETED:
         logger.warning("Your job with id %i is completed.", job_response.job_id)
         return None
 
-    raise ValueError(
-        f"Job status for job with id {job_response.job_id} is not supported: status is {job_response.status}"
-    )
+    logger.warning(f"Your job with id %i is {job_response.status}.", job_response.job_id)
+    return None

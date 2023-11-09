@@ -1,3 +1,17 @@
+# Copyright 2023 Qilimanjaro Quantum Tech
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 """ Job Typing """
 from abc import ABC
 from dataclasses import dataclass, field
@@ -8,8 +22,8 @@ from typeguard import typechecked
 
 from qiboconnection.typings.enums import JobStatus, JobType
 from qiboconnection.typings.requests import JobRequest
-from qiboconnection.typings.responses import JobResponse
-from qiboconnection.util import jsonify_dict_and_base64_encode, jsonify_str_and_base64_encode
+from qiboconnection.typings.responses.job_response import JobResponse
+from qiboconnection.util import jsonify_dict_and_base64_encode, jsonify_list_with_str_and_base64_encode
 
 from .algorithm import ProgramDefinition
 from .devices.device import Device
@@ -24,7 +38,7 @@ class Job(ABC):  # pylint: disable=too-many-instance-attributes
     user: User
     device: Device
     program: ProgramDefinition | None = field(default=None)
-    circuit: Circuit | None = None
+    circuit: list[Circuit] | None = None
     experiment: dict | None = None
     nshots: int = 10
     job_status: JobStatus = JobStatus.NOT_SENT
@@ -33,7 +47,7 @@ class Job(ABC):  # pylint: disable=too-many-instance-attributes
 
     def __post_init__(self):
         if self.experiment is not None and self.circuit is not None:
-            raise ValueError("Both circuit and experiment were provided, but execute() only takes at most of them.")
+            raise ValueError("Both circuit and experiment were provided, but execute() only takes one of them.")
         if self.experiment is None and self.circuit is None:
             raise ValueError("Neither of experiment or circuit were provided,")
 
@@ -58,6 +72,7 @@ class Job(ABC):  # pylint: disable=too-many-instance-attributes
     @property
     def algorithms(self) -> List[dict]:
         """Get all algorithms described
+
 
         Returns:
             List[dict]: a list of all algorithms as a dictionary
@@ -109,17 +124,12 @@ class Job(ABC):  # pylint: disable=too-many-instance-attributes
         raise ValueError("Could not determine JobType")
 
     def _get_job_description(self) -> str:
-        if self.experiment is None and self.circuit is None:
-            raise ValueError("Job requires either a program or a circuit")
-        if self.experiment is not None and self.circuit is not None:
-            raise ValueError("Job cannot allow to have both circuit and experiment")
+        "Serialize either circuit or experiment to obtain job description"
 
-        if self.experiment is not None:
-            return jsonify_dict_and_base64_encode(object_to_encode=self.experiment)
-        if self.circuit is not None:
-            return jsonify_str_and_base64_encode(object_to_encode=self.circuit.to_qasm())
+        if self.circuit is None:
+            return jsonify_dict_and_base64_encode(object_to_encode=self.experiment)  # type: ignore[arg-type]
 
-        raise ValueError("Something failed.")
+        return jsonify_list_with_str_and_base64_encode(object_to_encode=[c.to_qasm() for c in self.circuit])
 
     @property
     def result(self) -> Any:

@@ -33,17 +33,36 @@ def fixture_create_mocked_connection_established(
     )
 
 
-def _create_mocked_connection(mocked_connection_established: ConnectionEstablished) -> Connection:
+def _create_mocked_connection(
+    mocked_connection_established: ConnectionEstablished,
+) -> Connection:
     """Create a mocked connection
     Returns:
         Connection: mocked connection
     """
-    with patch(
-        "qiboconnection.connection.load_config_file_to_disk",
-        autospec=True,
-        return_value=mocked_connection_established,
-    ) as mock_config:
-        connection = Connection(api_path="/mocked")
+    with (
+        patch(
+            "qiboconnection.connection.Connection._request_authorisation_token",
+            autospec=True,
+            return_value=[
+                mocked_connection_established.authorisation_access_token,
+                mocked_connection_established.authorisation_refresh_token,
+            ],
+        ) as mock_config,
+        patch(
+            "qiboconnection.connection.Connection._load_user_id_from_token",
+            autospec=True,
+            return_value=mocked_connection_established.user_id,
+        ) as _,
+    ):
+        connection = Connection(
+            api_path="/mocked",
+            configuration=ConnectionConfiguration(
+                username=mocked_connection_established.username,
+                user_id=mocked_connection_established.user_id,
+                api_key=mocked_connection_established.api_key,
+            ),
+        )
         mock_config.assert_called()
         return connection
 
@@ -69,17 +88,29 @@ def fixture_create_mocked_connection_with_no_user(mocked_connection_established:
 
 
 @pytest.fixture(scope="session", name="mocked_api")
-def fixture_create_mocked_api_connection(mocked_connection_established: ConnectionEstablished) -> API:
+def fixture_create_mocked_api_connection(
+    mocked_connection_established: ConnectionEstablished, mocked_connection_configuration: ConnectionConfiguration
+) -> API:
     """Create a mocked api connection
     Returns:
         API: API mocked connection
     """
-    with patch(
-        "qiboconnection.connection.load_config_file_to_disk",
-        autospec=True,
-        return_value=mocked_connection_established,
-    ) as mock_config:
-        api = API()
+    with (
+        patch(
+            "qiboconnection.connection.Connection._request_authorisation_token",
+            autospec=True,
+            return_value=[
+                mocked_connection_established.authorisation_access_token,
+                mocked_connection_established.authorisation_refresh_token,
+            ],
+        ) as mock_config,
+        patch(
+            "qiboconnection.connection.Connection._load_user_id_from_token",
+            autospec=True,
+            return_value=mocked_connection_established.user_id,
+        ) as _,
+    ):
+        api = API(configuration=mocked_connection_configuration)
         mock_config.assert_called()
         return api
 
@@ -98,6 +129,20 @@ def fixture_response() -> Response:
     return response
 
 
+@pytest.fixture(name="response_plain_text")
+def fixture_response_plain_text() -> Response:
+    """Creates an status_code 200 Response object with demo values
+
+    Returns:
+        Response: response object
+    """
+    response = Response()
+    response.status_code = 200
+    response.url = "server/api"
+    response._content = "Custom plain message".encode("utf8")
+    return response
+
+
 @pytest.fixture(name="connection_established")
 def fixture_connection_established() -> ConnectionEstablished:
     """Creates a ConnectionEstablished object with demo values
@@ -107,11 +152,17 @@ def fixture_connection_established() -> ConnectionEstablished:
     """
     return ConnectionEstablished(
         api_key="DEMO_KEY",
-        api_path="DEMO_PATH",
+        api_path="/DEMO_PATH",
         authorisation_access_token="DEMO_TOKEN",
         authorisation_refresh_token="DEMO_TOKEN",
         username="DEMO_USERNAME",
     )
+
+
+@pytest.fixture(name="base64_qibo_circuits")
+def base64_qibo_circuits():
+    """qibo circuit base64 encoding"""
+    return "['Ly8gR2VuZXJhdGVkIGJ5IFFJQk8gMC4xLjEyLmRldjAKT1BFTlFBU00gMi4wOwppbmNsdWRlICJxZWxpYjEuaW5jIjsKcXJlZyBxWzJdOwpjcmVnIHJlZ2lzdGVyMFsxXTsKaCBxWzBdOwpjeCBxWzBdLHFbMV07CnggcVsxXTsKbWVhc3VyZSBxWzBdIC0-IHJlZ2lzdGVyMFswXTs=', 'Ly8gR2VuZXJhdGVkIGJ5IFFJQk8gMC4xLjEyLmRldjAKT1BFTlFBU00gMi4wOwppbmNsdWRlICJxZWxpYjEuaW5jIjsKcXJlZyBxWzFdOwpjcmVnIHJlZ2lzdGVyMFsxXTsKeCBxWzBdOwptZWFzdXJlIHFbMF0gLT4gcmVnaXN0ZXIwWzBdOw==']"
 
 
 @pytest.fixture(name="base64_qibo_circuit")

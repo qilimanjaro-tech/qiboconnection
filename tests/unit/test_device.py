@@ -32,6 +32,8 @@ from .data import (
     simulator_device_inputs,
 )
 
+# pylint: disable=no-member
+
 
 @pytest.mark.parametrize("device_input", device_inputs)
 def test_device_constructor(device_input: DeviceInput):
@@ -73,8 +75,8 @@ def test_device_dict_representation(device_input: DeviceInput):
     expected_dict = {
         "device_id": device._device_id,
         "device_name": device._device_name,
-        "status": device._status.value,
-        "availability": device._availability.value,
+        "status": device._status,
+        "availability": device._availability,
     }
     assert device.__dict__ == expected_dict
 
@@ -86,8 +88,8 @@ def test_device_json_representation(device_input: DeviceInput):
     expected_dict = {
         "device_id": device._device_id,
         "device_name": device._device_name,
-        "status": device._status.value,
-        "availability": device._availability.value,
+        "status": device._status,
+        "availability": device._availability,
     }
     assert json.loads(device.toJSON()) == expected_dict
 
@@ -107,8 +109,8 @@ def test_simulator_device_dict_representation(simulator_device_input: SimulatorD
     expected_dict = {
         "device_id": device._device_id,
         "device_name": device._device_name,
-        "status": device._status.value,
-        "availability": device._availability.value,
+        "status": device._status,
+        "availability": device._availability,
     }
     if device._characteristics:
         expected_dict |= {"characteristics": device._characteristics.__dict__}
@@ -122,8 +124,8 @@ def test_simulator_device_json_representation(simulator_device_input: SimulatorD
     expected_dict = {
         "device_id": device._device_id,
         "device_name": device._device_name,
-        "status": device._status.value,
-        "availability": device._availability.value,
+        "status": device._status,
+        "availability": device._availability,
     }
     if device._characteristics:
         expected_dict |= {"characteristics": device._characteristics.__dict__}
@@ -146,7 +148,7 @@ def test_simulator_device_characteristics_json_representation(
     """Tests SimulatorDeviceCharacteristics().toJSON() method"""
     characteristics = SimulatorDeviceCharacteristics(characteristics_input=simulator_device_characteristics_input)
     expected_dict = {
-        "type": characteristics._type.value,
+        "type": characteristics._type,
         "cpu": characteristics._cpu,
         "gpu": characteristics._gpu,
         "os": characteristics._os,
@@ -171,8 +173,8 @@ def test_quantum_device_dict_representation(quantum_device_input: QuantumDeviceI
     expected_dict = {
         "device_id": device._device_id,
         "device_name": device._device_name,
-        "status": device._status.value,
-        "availability": device._availability.value,
+        "status": device._status,
+        "availability": device._availability,
     }
     if device._last_calibration_time is not None:
         expected_dict |= {"last_calibration_time": str(device._last_calibration_time)}
@@ -190,8 +192,8 @@ def test_quantum_device_json_representation(quantum_device_input: QuantumDeviceI
     expected_dict = {
         "device_id": device._device_id,
         "device_name": device._device_name,
-        "status": device._status.value,
-        "availability": device._availability.value,
+        "status": device._status,
+        "availability": device._availability,
     }
     if device._last_calibration_time is not None:
         expected_dict |= {"last_calibration_time": str(device._last_calibration_time)}
@@ -218,7 +220,7 @@ def test_quantum_device_characteristics_json_representation(
     """Tests QuantumDeviceCharacteristics().toJSON() method"""
     characteristics = QuantumDeviceCharacteristics(characteristics_input=quantum_device_characteristics_input)
     expected_dict = {
-        "type": characteristics._type.value,
+        "type": characteristics._type,
     }
     assert json.loads(characteristics.toJSON()) == expected_dict
 

@@ -17,10 +17,9 @@ import base64
 import binascii
 import io
 import json
-import os
 import pickle  # nosec - temporary bandit ignore
 from base64 import urlsafe_b64decode, urlsafe_b64encode
-from dataclasses import asdict
+from inspect import signature
 from json.decoder import JSONDecodeError
 from typing import Any, List, Tuple
 
@@ -28,10 +27,6 @@ import requests
 from qibo.states import CircuitResult
 
 from qiboconnection.errors import custom_raise_for_status
-from qiboconnection.typings.connection import ConnectionEstablished
-
-QIBO_CONFIG_DIR = ".qibo_configuration"
-QIBO_CONFIG_FILE = ".user_configuration.json"
 
 
 def base64url_encode(payload: dict | bytes | str) -> str:
@@ -60,37 +55,6 @@ def base64_decode(encoded_data: str) -> str:
         Any: The data decoded
     """
     return urlsafe_b64decode(encoded_data).decode("utf-8")
-
-
-def write_config_file_to_disk(config_data: ConnectionEstablished) -> None:
-    """Write the Connection configuration data to a local file
-
-    Args:
-        config_data (ConnectionEstablished): Connection configuration data
-    """
-    current_dir = os.getcwd()
-    os.chdir(current_dir)
-    if not os.path.isdir(QIBO_CONFIG_DIR):
-        os.mkdir(QIBO_CONFIG_DIR)
-    os.chdir(QIBO_CONFIG_DIR)
-
-    with open(QIBO_CONFIG_FILE, "w", encoding="utf-8") as config_file:
-        json.dump(obj=asdict(config_data), fp=config_file, indent=2)
-    os.chdir("..")
-
-
-def load_config_file_to_disk() -> ConnectionEstablished:
-    """Load a Connection configuration data from a local file
-
-    Returns:
-        ConnectionEstablished: Connection configuration data
-    """
-    current_dir = os.getcwd()
-    os.chdir(current_dir)
-    os.chdir(QIBO_CONFIG_DIR)
-    with open(QIBO_CONFIG_FILE, encoding="utf-8") as config_file:
-        os.chdir("..")
-        return ConnectionEstablished(**json.load(fp=config_file))
 
 
 def decode_jsonified_dict(http_response: str) -> dict:
@@ -149,18 +113,51 @@ def process_response(response: requests.Response) -> Tuple[Any, int]:
         return response.text, response.status_code
 
 
-def jsonify_dict_and_base64_encode(object_to_encode: dict):
+def jsonify_dict_and_base64_encode(object_to_encode: dict) -> str:
     """
     Jsonifies a given dict, encodes it to bytes assuming utf-8, and encodes that byte obj to an url-save base64 str
     """
     return str(base64.urlsafe_b64encode(json.dumps(object_to_encode).encode("utf-8")), "utf-8")
 
 
-def jsonify_str_and_base64_encode(object_to_encode: str):
-    """Encodes a given string to bytes assuming utf-8, and encodes that byte-array to an url-save base64 str"""
-    return str(base64.urlsafe_b64encode(object_to_encode.encode("utf-8")), "utf-8")
+def jsonify_list_with_str_and_base64_encode(object_to_encode: List[str]) -> str:
+    """Encodes a given list of strings to bytes assuming utf-8, and encodes that byte-array to an url-save base64 str"""
+    return str([str(base64.urlsafe_b64encode(s.encode("utf-8")), "utf-8") for s in object_to_encode])
 
 
 def unzip(zipped_list: List[Tuple[Any, Any]]):
     """Inverse of the python builtin `zip` operation"""
     return tuple(zip(*zipped_list))
+
+
+def from_kwargs(cls, **kwargs: dict):
+    """
+    Create an instance of the class by extracting attributes from keyword arguments.
+
+    This method takes keyword arguments and initializes an instance of the class
+    with attributes that match the class's constructor parameters. Any additional
+    keyword arguments that don't correspond to class attributes are assigned as
+    attributes to the created instance.
+
+    Args:
+        cls: The class (typically, the class that defines this method).
+        **kwargs: Keyword arguments to initialize the instance.
+
+    Returns:
+        An instance of the class with attributes initialized from the keyword
+        arguments.
+    """
+    cls_fields = set(signature(cls).parameters)
+    native_args, new_args = {}, {}
+
+    for name, val in kwargs.items():
+        if name in cls_fields:
+            native_args[name] = val
+        else:
+            new_args[name] = val
+
+    ret = cls(**native_args)
+
+    for new_name, new_val in new_args.items():
+        setattr(ret, new_name, new_val)
+    return ret

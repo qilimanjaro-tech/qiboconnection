@@ -22,7 +22,7 @@ from qiboconnection.models.job import Job
 from qiboconnection.models.job_result import JobResult
 from qiboconnection.typings.enums import JobStatus, JobType
 from qiboconnection.typings.requests import JobRequest
-from qiboconnection.typings.responses import JobResponse
+from qiboconnection.typings.responses.job_response import JobResponse
 
 from .data import simulator_device_inputs
 
@@ -174,9 +174,7 @@ def test_job_creation_experiment_raises_value_error_when_both_circuit_and_experi
 
     with pytest.raises(ValueError) as e_info:
         _ = Job(experiment={}, circuit=circuit, user=user, device=cast(Device, simulator_device))
-    assert (
-        e_info.value.args[0] == "Both circuit and experiment were provided, but execute() only takes at most of them."
-    )
+    assert e_info.value.args[0] == "Both circuit and experiment were provided, but execute() only takes one of them."
 
 
 def test_job_creation_experiment_raises_value_error_when_neither_of_circuit_and_experiment_are_defined(
@@ -193,7 +191,7 @@ def test_job_creation_experiment_raises_value_error_when_neither_of_circuit_and_
     assert e_info.value.args[0] == "Neither of experiment or circuit were provided,"
 
 
-def test_job_request(circuit: Circuit, user: User, simulator_device: SimulatorDevice):
+def test_job_request_with_circuit(circuit: Circuit, user: User, simulator_device: SimulatorDevice):
     """test job request
 
     Args:
@@ -204,7 +202,7 @@ def test_job_request(circuit: Circuit, user: User, simulator_device: SimulatorDe
     job_status = JobStatus.COMPLETED
     user_id = user.user_id
     job = Job(
-        circuit=circuit,
+        circuit=[circuit],
         user=user,
         device=cast(Device, simulator_device),
         job_status=job_status,
@@ -214,10 +212,41 @@ def test_job_request(circuit: Circuit, user: User, simulator_device: SimulatorDe
     expected_job_request = JobRequest(
         user_id=user_id,
         device_id=simulator_device.id,
-        description="Ly8gR2VuZXJhdGVkIGJ5IFFJQk8gMC4xLjEyLmRldjAKT1BFTlFBU00gMi4wOwppbmNsdWRlICJxZWxpYjEuaW5jIjsKcXJlZyBxWzFdOwpjcmVnIHJlZ2lzdGVyMFsxXTsKaCBxWzBdOwptZWFzdXJlIHFbMF0gLT4gcmVnaXN0ZXIwWzBdOw==",
+        description="['Ly8gR2VuZXJhdGVkIGJ5IFFJQk8gMC4xLjEyLmRldjAKT1BFTlFBU00gMi4wOwppbmNsdWRlICJxZWxpYjEuaW5jIjsKcXJlZyBxWzFdOwpjcmVnIHJlZ2lzdGVyMFsxXTsKaCBxWzBdOwptZWFzdXJlIHFbMF0gLT4gcmVnaXN0ZXIwWzBdOw==']",
         number_shots=10,
         job_type=JobType.CIRCUIT,
     )
+
+    assert isinstance(job, Job)
+    assert job.job_request == expected_job_request
+
+
+def test_job_request_with_experiment(user: User, simulator_device: SimulatorDevice):
+    """test job request
+
+    Args:
+        experiment(dict)
+        user (User): User
+        simulator_device (SimulatorDevice): SimulatorDevice
+    """
+    job_status = JobStatus.COMPLETED
+    user_id = user.user_id
+    job = Job(
+        experiment={},
+        user=user,
+        device=cast(Device, simulator_device),
+        job_status=job_status,
+        id=23,
+        nshots=10,
+    )
+    expected_job_request = JobRequest(
+        user_id=user_id,
+        device_id=simulator_device.id,
+        description="e30=",
+        number_shots=10,
+        job_type=JobType.EXPERIMENT,
+    )
+
     assert isinstance(job, Job)
     assert job.job_request == expected_job_request
 

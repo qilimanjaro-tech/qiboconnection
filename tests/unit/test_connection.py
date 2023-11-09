@@ -1,10 +1,12 @@
 """ Test methods for Connection """
+import io
 from copy import deepcopy
 from unittest.mock import MagicMock, patch
 
 import pytest
 
-from qiboconnection.connection import Connection, ConnectionEstablished, refresh_token_if_unauthorised
+from qiboconnection import __version__
+from qiboconnection.connection import Connection, refresh_token_if_unauthorised
 from qiboconnection.errors import HTTPError, RemoteExecutionException
 from qiboconnection.models.user import User
 
@@ -90,6 +92,19 @@ def test_user_slack_id(mocked_web_call: MagicMock, mocked_connection: Connection
 
 
 @patch("qiboconnection.connection.Connection.send_get_auth_remote_api_call", autospec=True)
+def test_user_slack_id_without_slack_id(mocked_web_call: MagicMock, mocked_connection: Connection):
+    """Test Connection user_slack_id property"""
+    mocked_web_call.return_value = web_responses.users.retrieve_response_without_slack_id
+    connection = deepcopy(mocked_connection)
+    connection._user_slack_id = None
+
+    slack_id = connection.user_slack_id
+
+    mocked_web_call.assert_called_with(self=connection, path=f"/users/{connection.user.user_id}")
+    assert slack_id == ""
+
+
+@patch("qiboconnection.connection.Connection.send_get_auth_remote_api_call", autospec=True)
 def test_user_slack_id_ise(mocked_web_call: MagicMock, mocked_connection: Connection):
     """Test Connection user_slack_id property fails with failing response"""
     mocked_web_call.return_value = web_responses.users.ise_response
@@ -125,7 +140,8 @@ def test_send_put_auth_remote_api_call(mocked_rest_call: MagicMock, mocked_conne
         headers={
             "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
             ".eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ"
-            ".SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+            ".SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
+            "X-Client-Version": __version__,
         },
         timeout=10,
     )
@@ -146,7 +162,8 @@ def test_send_post_auth_remote_api_call(mocked_rest_call: MagicMock, mocked_conn
         headers={
             "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
             ".eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ"
-            ".SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+            ".SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
+            "X-Client-Version": __version__,
         },
         timeout=10,
     )
@@ -167,7 +184,8 @@ def test_send_get_auth_remote_api_call(mocked_rest_call: MagicMock, mocked_conne
         headers={
             "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
             ".eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ"
-            ".SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+            ".SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
+            "X-Client-Version": __version__,
         },
         timeout=10,
     )
@@ -198,7 +216,8 @@ def test_send_delete_auth_remote_api_call(mocked_rest_call: MagicMock, mocked_co
         headers={
             "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
             ".eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ"
-            ".SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+            ".SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
+            "X-Client-Version": __version__,
         },
         timeout=10,
     )
@@ -220,7 +239,8 @@ def test_send_delete_auth_remote_api_call_not_204_not_job_details(
         headers={
             "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
             ".eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ"
-            ".SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+            ".SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
+            "X-Client-Version": __version__,
         },
         timeout=10,
     )
@@ -240,10 +260,68 @@ def test_send_delete_auth_remote_api_call_not_204_with_job_details(
         headers={
             "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
             ".eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ"
-            ".SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+            ".SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
+            "X-Client-Version": __version__,
         },
         timeout=10,
     )
+
+
+@patch("qiboconnection.connection.requests.post", autospec=True)
+def test_send_post_file_auth_remote_api_call(mocked_rest_call: MagicMock, mocked_connection: Connection):
+    mocked_rest_call.return_value = web_responses.raw.response_200
+
+    _PATH = "/PATH"
+    _FILE = io.StringIO()
+    _FILENAME = "filename"
+    _TIMEOUT = 10
+
+    mocked_connection.send_post_file_auth_remote_api_call(path=_PATH, file=_FILE, filename=_FILENAME, timeout=_TIMEOUT)
+
+    mocked_rest_call.assert_called_with(
+        f"{mocked_connection._remote_server_api_url}{_PATH}",
+        files={"file": (_FILENAME, _FILE)},
+        headers={
+            "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
+            ".eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ"
+            ".SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
+            "X-Client-Version": __version__,
+        },
+        timeout=_TIMEOUT,
+    )
+
+
+@patch("qiboconnection.connection.requests.get", autospec=True)
+def test_send_get_auth_remote_api_call_all_pages(mocked_rest_call: MagicMock, mocked_connection: Connection):
+    mocked_rest_call.side_effect = [
+        web_responses.raw.response_200_paginated,
+        web_responses.raw.response_200_paginated_last,
+    ]
+
+    _PATH = "/path"
+    _PARAMS = {"param": "value"}
+    _TIMEOUT = 10
+
+    responses = mocked_connection.send_get_auth_remote_api_call_all_pages(path=_PATH, params=_PARAMS, timeout=_TIMEOUT)
+
+    mocked_rest_call.assert_called()
+    assert responses == [
+        (
+            {
+                "items": [{"key": "value"}],
+                "total": 2,
+                "per_page": 5,
+                "self": "https://qilimanjarodev.ddns.net:8080/api/v1/path?page=1&per_page=5",
+                "links": {
+                    "first": "https://qilimanjarodev.ddns.net:8080/api/v1/path?page=1&per_page=5",
+                    "prev": "https://qilimanjarodev.ddns.net:8080/api/v1/path?page=None&per_page=5",
+                    "next": "https://qilimanjarodev.ddns.net:8080/api/v1/path?page=None&per_page=5",
+                    "last": "https://qilimanjarodev.ddns.net:8080/api/v1/path?page=1&per_page=5",
+                },
+            },
+            200,
+        )
+    ]
 
 
 @patch("qiboconnection.connection.requests.get", autospec=True)
@@ -253,7 +331,9 @@ def test_send_get_remote_call(mocked_rest_call: MagicMock, mocked_connection: Co
 
     response, code = mocked_connection.send_get_remote_call(path="/PATH", timeout=10)
 
-    mocked_rest_call.assert_called_with(f"{mocked_connection._remote_server_base_url}/PATH", timeout=10)
+    mocked_rest_call.assert_called_with(
+        f"{mocked_connection._remote_server_base_url}/PATH", timeout=10, headers={"X-Client-Version": __version__}
+    )
     assert response == web_responses.raw.response_200.json()
     assert code == web_responses.raw.response_200.status_code
 
@@ -293,60 +373,8 @@ def test_request_authorisation_token_with_ise(mocked_rest_call: MagicMock, mocke
     """tests send_get_remote_call"""
     mocked_rest_call.return_value = web_responses.raw.response_500
 
-    with pytest.raises(ValueError, match=f"Authorisation request failed: {web_responses.raw.response_500.reason}"):
+    with pytest.raises(ValueError, match="Authorisation request failed."):
         _, _ = mocked_connection._request_authorisation_token()
-
-
-@patch("qiboconnection.connection.write_config_file_to_disk", autospec=True)
-def test_store_configuration_nominal(mocked_write_call: MagicMock, mocked_connection: Connection):
-    """Tests that store configuration does the pertinent checks and calls the corresponding utils function"""
-
-    mocked_connection._store_configuration()
-
-    mocked_write_call.assert_called_with(
-        config_data=ConnectionEstablished(
-            **mocked_connection.user.__dict__,
-            authorisation_access_token=mocked_connection._authorisation_access_token,  # type: ignore[arg-type]
-            authorisation_refresh_token=mocked_connection._authorisation_refresh_token,  # type: ignore[arg-type]
-            api_path=mocked_connection._api_path,  # type: ignore[arg-type]
-        )
-    )
-
-
-@patch("qiboconnection.connection.write_config_file_to_disk", autospec=True)
-def test_store_configuration_with_no_api_path(mocked_write_call: MagicMock, mocked_connection: Connection):
-    """Tests that store configuration fails if no api path is defined"""
-
-    mocked_connection_copy = deepcopy(mocked_connection)
-    mocked_connection_copy._api_path = None
-
-    with pytest.raises(ValueError, match="API path not specified"):
-        mocked_connection_copy._store_configuration()
-        mocked_write_call.assert_not_called()
-
-
-@patch("qiboconnection.connection.write_config_file_to_disk", autospec=True)
-def test_store_configuration_with_no_access_token(mocked_write_call: MagicMock, mocked_connection: Connection):
-    """Tests that store configuration fails if there is no access token stored"""
-
-    mocked_connection_copy = deepcopy(mocked_connection)
-    mocked_connection_copy._authorisation_access_token = None
-
-    with pytest.raises(ValueError, match="Authorisation access token not specified"):
-        mocked_connection_copy._store_configuration()
-        mocked_write_call.assert_not_called()
-
-
-@patch("qiboconnection.connection.write_config_file_to_disk", autospec=True)
-def test_store_configuration_with_no_refresh_token(mocked_write_call: MagicMock, mocked_connection: Connection):
-    """Tests that store configuration fails if there is no refresh token stored"""
-
-    mocked_connection_copy = deepcopy(mocked_connection)
-    mocked_connection_copy._authorisation_refresh_token = None
-
-    with pytest.raises(ValueError, match="Authorisation refresh token not specified"):
-        mocked_connection_copy._store_configuration()
-        mocked_write_call.assert_not_called()
 
 
 @patch("qiboconnection.connection.requests.post", autospec=True)
@@ -413,7 +441,8 @@ def test_update_authorisation_using_refresh_token(mocked_rest_call: MagicMock, m
                 + "yMDcxLCJpYXQiOjE2ODQ0MDU2NzEsImlzcyI6Imh0dHBzOi8vcWlsaW1hbmphcm9kZXYuZGRucy5uZXQ6ODA4MC8i"
                 + "LCJ0eXBlIjoicmVmcmVzaCIsInVzZXJfaWQiOjMsInVzZXJfcm9sZSI6ImFkbWluIn0"
                 + ".4oSyRW9Ia7C-50x2yZxQAEXDZp-TLkFkPOtHBR4cCi9LnkREtYrJpDXufep_EYoRwDSJL_2z20moYMuMHy0QCg"
-            )
+            ),
+            "X-Client-Version": __version__,
         },
         timeout=10,
     )
@@ -459,3 +488,53 @@ def test_refresh_token_if_unauthorised_when_other_error():
 
     func.assert_called_once_with(connection)
     connection.update_authorisation_using_refresh_token.assert_not_called()
+
+
+@patch("qiboconnection.connection.Connection.send_put_auth_remote_api_call", autospec=True)
+def test_update_device_status(mocked_rest_call: MagicMock, mocked_connection: Connection):
+    """Asserts correct put function is called for updating a device status"""
+
+    _DEVICE_ID = 1
+    _NEW_STATUS = "new_status"
+
+    mocked_connection.update_device_status(device_id=1, status=_NEW_STATUS)
+    mocked_rest_call.assert_called_with(mocked_connection, path=f"/devices/{_DEVICE_ID}", data={"status": _NEW_STATUS})
+
+
+@patch("qiboconnection.connection.Connection.send_put_auth_remote_api_call", autospec=True)
+def test_update_device_availability(mocked_rest_call: MagicMock, mocked_connection: Connection):
+    """Asserts correct put function is called for updating a device status"""
+
+    _DEVICE_ID = 1
+    _NEW_AVAILABILITY = "new_status"
+
+    mocked_connection.update_device_availability(device_id=1, availability=_NEW_AVAILABILITY)
+    mocked_rest_call.assert_called_with(
+        mocked_connection, path=f"/devices/{_DEVICE_ID}", data={"availability": _NEW_AVAILABILITY}
+    )
+
+
+@patch("qiboconnection.connection.Connection.send_post_auth_remote_api_call", autospec=True)
+def test_send_message(mocked_rest_call: MagicMock, mocked_connection: Connection):
+    """Asserts correct put function is called for updating a device status"""
+
+    _CHANNEL_ID = 1
+    _MESSAGE = {"block": "message"}
+
+    mocked_connection.send_message(channel_id=_CHANNEL_ID, message=_MESSAGE)
+    mocked_rest_call.assert_called_with(mocked_connection, path=f"/messages?channel={_CHANNEL_ID}", data=_MESSAGE)
+
+
+@patch("qiboconnection.connection.Connection.send_post_file_auth_remote_api_call", autospec=True)
+def test_send_file(mocked_rest_call: MagicMock, mocked_connection: Connection):
+    """Asserts correct put function is called for updating a device status"""
+
+    _CHANNEL_ID = 1
+    _FILE = io.TextIOWrapper(buffer=io.BytesIO())
+    _FILENAME = "filename"
+    _TIMEOUT = 10
+
+    mocked_connection.send_file(channel_id=_CHANNEL_ID, file=_FILE, filename=_FILENAME, timeout=_TIMEOUT)
+    mocked_rest_call.assert_called_with(
+        mocked_connection, path=f"/files?channel={_CHANNEL_ID}", file=_FILE, filename=_FILENAME, timeout=_TIMEOUT
+    )

@@ -25,13 +25,14 @@ import jwt
 import requests
 from typeguard import typechecked
 
+from qiboconnection import __version__ as VERSION  # pylint: disable=cyclic-import
 from qiboconnection.config import get_environment, logger
 from qiboconnection.errors import ConnectionException, HTTPError, RemoteExecutionException
 from qiboconnection.models.user import User
 from qiboconnection.typings.connection import ConnectionConfiguration, ConnectionEstablished
 from qiboconnection.typings.requests import AssertionPayload
 from qiboconnection.typings.responses import AccessTokenResponse
-from qiboconnection.util import base64url_encode, load_config_file_to_disk, process_response, write_config_file_to_disk
+from qiboconnection.util import base64url_encode, process_response
 
 
 def TIMEOUT():
@@ -67,7 +68,7 @@ class Connection(ABC):  # pylint: disable=too-many-instance-attributes
     @typechecked
     def __init__(
         self,
-        configuration: Optional[ConnectionConfiguration | None] = None,
+        configuration: ConnectionConfiguration,
         api_path: Optional[str] = None,
     ):
         self._environment = get_environment()
@@ -170,46 +171,20 @@ class Connection(ABC):  # pylint: disable=too-many-instance-attributes
         self._authorisation_server_api_call = f"{self._remote_server_api_url}/authorisation-tokens"
         self._authorisation_server_refresh_api_call = f"{self._remote_server_api_url}/authorisation-tokens/refresh"
 
-    def _store_configuration(self) -> None:
-        """
-        Saves the provided info in the Connection() instance creation to a file.
-        """
-        logger.info("Storing personal qibo configuration...")
-        if self._api_path is None:
-            raise ValueError("API path not specified")
-        if self._authorisation_access_token is None:
-            raise ValueError("Authorisation access token not specified")
-        if self._authorisation_refresh_token is None:
-            raise ValueError("Authorisation refresh token not specified")
-        config_data = ConnectionEstablished(
-            **self._user.__dict__,
-            authorisation_access_token=self._authorisation_access_token,
-            authorisation_refresh_token=self._authorisation_refresh_token,
-            api_path=self._api_path,
-        )
-
-        write_config_file_to_disk(config_data=config_data)
+    def _add_version_header(self, header):
+        header["X-Client-Version"] = VERSION
+        return header
 
     def _load_configuration(
         self,
-        input_configuration: Optional[ConnectionConfiguration] = None,
+        input_configuration: ConnectionConfiguration,
         api_path: Optional[str] = None,
     ) -> None:
-        if input_configuration is None:
-            try:
-                self._register_configuration_with_authorisation_tokens(load_config_file_to_disk())
-                return
-            except FileNotFoundError as ex:
-                raise ConnectionException(
-                    "No connection configuration found. Please provide a new configuration."
-                ) from ex
-
         if api_path is None:
             raise ConnectionException("No api path provided.")
         self._set_api_calls(api_path=api_path)
         self._register_configuration_and_request_authorisation_access_token(input_configuration)
         self._load_user_id_from_token(access_token=self._authorisation_access_token)
-        self._store_configuration()
 
     def _register_configuration_and_request_authorisation_access_token(self, configuration: ConnectionConfiguration):
         """
@@ -300,7 +275,7 @@ class Connection(ABC):  # pylint: disable=too-many-instance-attributes
         """
         timeout = timeout or TIMEOUT()
         logger.debug("Calling: %s%s", self._remote_server_api_url, path)
-        header = {"Authorization": f"Bearer {self._authorisation_access_token}"}
+        header = self._add_version_header({"Authorization": f"Bearer {self._authorisation_access_token}"})
         response = requests.post(
             f"{self._remote_server_api_url}{path}", json=data.copy(), headers=header, timeout=timeout
         )
@@ -339,7 +314,7 @@ class Connection(ABC):  # pylint: disable=too-many-instance-attributes
         """
         timeout = timeout or TIMEOUT()
         logger.debug("Calling: %s%s", self._remote_server_api_url, path)
-        header = {"Authorization": f"Bearer {self._authorisation_access_token}"}
+        header = self._add_version_header({"Authorization": f"Bearer {self._authorisation_access_token}"})
         response = requests.put(
             f"{self._remote_server_api_url}{path}", json=data.copy(), headers=header, timeout=timeout
         )
@@ -363,7 +338,7 @@ class Connection(ABC):  # pylint: disable=too-many-instance-attributes
         """
         timeout = timeout or TIMEOUT()
         logger.debug("Calling: %s%s", self._remote_server_api_url, path)
-        header = {"Authorization": f"Bearer {self._authorisation_access_token}"}
+        header = self._add_version_header({"Authorization": f"Bearer {self._authorisation_access_token}"})
         packed_file = {"file": (filename, file)}
         response = requests.post(
             f"{self._remote_server_api_url}{path}", files=packed_file, headers=header, timeout=timeout
@@ -387,14 +362,13 @@ class Connection(ABC):  # pylint: disable=too-many-instance-attributes
         """
         timeout = timeout or TIMEOUT()
         logger.debug("Calling: %s%s", self._remote_server_api_url, path)
-        header = {"Authorization": f"Bearer {self._authorisation_access_token}"}
+        header = self._add_version_header({"Authorization": f"Bearer {self._authorisation_access_token}"})
         response = requests.get(f"{self._remote_server_api_url}{path}", headers=header, params=params, timeout=timeout)
 
         if response.status_code != 200:
             error_details = response.json()
             if "detail" in error_details and "does not exist" in error_details["detail"]:
                 raise RemoteExecutionException("The job does not exist!", status_code=400)
-            response.raise_for_status()
 
         return process_response(response)
 
@@ -415,7 +389,7 @@ class Connection(ABC):  # pylint: disable=too-many-instance-attributes
         """
         timeout = timeout or TIMEOUT()
         logger.debug("Calling: %s%s", self._remote_server_api_url, path)
-        header = {"Authorization": f"Bearer {self._authorisation_access_token}"}
+        header = self._add_version_header({"Authorization": f"Bearer {self._authorisation_access_token}"})
         next_url = f"{self._remote_server_api_url}{path}"
         responses = []
         while "None" not in next_url:
@@ -439,7 +413,7 @@ class Connection(ABC):  # pylint: disable=too-many-instance-attributes
         """
         timeout = timeout or TIMEOUT()
         logger.debug("Calling: %s%s", self._remote_server_api_url, path)
-        header = {"Authorization": f"Bearer {self._authorisation_access_token}"}
+        header = self._add_version_header({"Authorization": f"Bearer {self._authorisation_access_token}"})
         response = requests.delete(f"{self._remote_server_api_url}{path}", headers=header, timeout=timeout)
 
         if response.status_code != 204:
@@ -464,7 +438,9 @@ class Connection(ABC):  # pylint: disable=too-many-instance-attributes
         """
         timeout = timeout or TIMEOUT()
         logger.debug("Calling: %s%s", self._remote_server_api_url, path)
-        response = requests.get(f"{self._remote_server_base_url}{path}", timeout=timeout)
+        response = requests.get(
+            f"{self._remote_server_base_url}{path}", timeout=timeout, headers=self._add_version_header({})
+        )
         return process_response(response)
 
     def _request_authorisation_token(self, timeout: int | None = None):
@@ -493,10 +469,20 @@ class Connection(ABC):  # pylint: disable=too-many-instance-attributes
             raise ValueError("Authorisation server api call is required")
         logger.debug("Calling: %s", self._authorisation_server_api_call)
         response: requests.Response = requests.post(
-            self._authorisation_server_api_call, json=authorisation_request_payload, timeout=timeout
+            self._authorisation_server_api_call,
+            json=authorisation_request_payload,
+            timeout=timeout,
+            headers=self._add_version_header({}),
         )
         if response.status_code not in [200, 201]:
-            raise ValueError(f"Authorisation request failed: {response.reason}")
+            try:
+                json_content = json.loads(response.content)
+                detail = json_content["detail"]
+            except (TypeError, KeyError, json.JSONDecodeError):
+                detail = ""
+            reason_text = f" Reason: {response.reason}." if response.reason else ""
+            details_text = f" Details: {detail}." if detail else ""
+            raise ValueError(f"Authorisation request failed.{reason_text}{details_text}")
 
         access_token_response: AccessTokenResponse = AccessTokenResponse(**response.json())
         logger.debug("Connection successfully established.")
@@ -519,10 +505,10 @@ class Connection(ABC):  # pylint: disable=too-many-instance-attributes
         response: requests.Response = requests.post(
             self._authorisation_server_refresh_api_call,
             json={},
-            headers={"Authorization": f"Bearer {self._authorisation_refresh_token}"},
+            headers=self._add_version_header({"Authorization": f"Bearer {self._authorisation_refresh_token}"}),
             timeout=timeout,
         )
         if response.status_code not in [200, 201]:
-            raise ValueError(f"Authorisation request failed: {response.reason}")
+            raise ValueError(f"Authorisation request failed: {response.reason},{response.status_code}")
         logger.debug("Connection successfully renewed.")
         self._authorisation_access_token = AccessTokenResponse(**response.json()).accessToken

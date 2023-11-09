@@ -7,15 +7,9 @@ from qibo.models.circuit import Circuit
 from requests.models import Response
 
 from qiboconnection.api_utils import deserialize_job_description
-from qiboconnection.connection import ConnectionEstablished
-from qiboconnection.models.job_data import JobType
-from qiboconnection.util import (
-    base64_decode,
-    base64url_encode,
-    load_config_file_to_disk,
-    process_response,
-    write_config_file_to_disk,
-)
+from qiboconnection.typings.enums import JobType
+from qiboconnection.typings.responses.job_response import JobResponse
+from qiboconnection.util import base64_decode, base64url_encode, from_kwargs, process_response
 
 
 def test_base64url_encode():
@@ -62,13 +56,6 @@ def test_base64url_decode_list():
     assert json.loads(base64_decode(data)) == expected_decoded
 
 
-def test_save_and_load_config_to_disk(connection_established: ConnectionEstablished):
-    """Test write_config_file_to_disk() loads the correct ConnectionEstablished object."""
-    write_config_file_to_disk(config_data=connection_established)
-    recovered_config_data = load_config_file_to_disk()
-    assert connection_established == recovered_config_data
-
-
 def test_process_response(response: Response):
     """Test that process_response() recovers the correct parameters (text and status_code)."""
 
@@ -78,7 +65,18 @@ def test_process_response(response: Response):
     assert processed_response[1] == response.status_code
 
 
-def test_deserialize_job_description(base64_qibo_circuit: str, base64_qililab_experiment: str):
+def test_process_response_non_json(response_plain_text: Response):
+    """Test that process_response() recovers the correct parameters (text and status_code)."""
+
+    processed_response = process_response(response=response_plain_text)
+
+    assert processed_response[0] == response_plain_text.text
+    assert processed_response[1] == response_plain_text.status_code
+
+
+def test_deserialize_job_description(
+    base64_qibo_circuit: str, base64_qibo_circuits: str, base64_qililab_experiment: str
+):
     """Unit test of deserialize_job_description()"""
 
     assert isinstance(
@@ -88,5 +86,37 @@ def test_deserialize_job_description(base64_qibo_circuit: str, base64_qililab_ex
         deserialize_job_description(base64_description=base64_qililab_experiment, job_type=JobType.EXPERIMENT), dict
     )
 
-    with pytest.raises(ValueError):
-        deserialize_job_description(base64_description=base64_qibo_circuit, job_type="qiskit")
+    assert deserialize_job_description(base64_description=base64_qibo_circuit, job_type="qiskit") is None
+    assert isinstance(
+        deserialize_job_description(base64_description=base64_qibo_circuits, job_type=JobType.CIRCUIT), list
+    )
+
+
+def test_from_kwargs():
+    "Test of from_kwargs methods requires all explicitly typed attributes but accepts new ones."
+    assert isinstance(
+        from_kwargs(
+            JobResponse,
+            **{
+                "user_id": 1,
+                "device_id": 2,
+                "description": "Job Description",
+                "job_id": 1001,
+                "queue_position": 5,
+                "status": "Completed",
+                "result": "Job Result",
+                "number_shots": 10,
+                "job_type": "whatever",
+                "extra_arg": "Extra Argument",
+            }
+        ),
+        JobResponse,
+    )
+
+    with pytest.raises(TypeError):
+        isinstance(
+            from_kwargs(
+                JobResponse, **{"user_id": 1, "device_id": 2, "number_shots": 10, "extra_arg": "Extra Argument"}
+            ),
+            JobResponse,
+        )

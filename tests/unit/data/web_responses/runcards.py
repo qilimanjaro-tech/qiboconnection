@@ -10,6 +10,7 @@ runcard_base_response = {
     "created_at": "Fri, 16 Dec 2022 18:40:24 GMT",
     "updated_at": "Fri, 16 Dec 2022 18:40:24 GMT",
     "qililab_version": "0.0.0",
+    "new_field": "hello",
 }
 
 
