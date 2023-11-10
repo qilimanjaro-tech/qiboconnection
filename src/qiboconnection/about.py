@@ -11,19 +11,22 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+r"""
+This module contains a function to display all the details of the Qiboconnection installation.
 """
-This module contains all needed classes needed for interacting with Qilimanjaro's QaaS via Qiboconnection SDK.
+import platform
+import sys
+from subprocess import check_output
 
-.. currentmodule:: qiboconnection
-
-.. autosummary::
-    :toctree: API
-
-    ~api.API
-"""
-
-__version__ = "0.14.4"
+import qibo
 
 
-from .about import about
-from .api import API
+def about():
+    """
+    Prints the information for qiboconnection installation.
+    """
+    print(check_output([sys.executable, "-m", "pip", "show", "qiboconnection"]).decode())
+    print(f"Platform info:           {platform.platform(aliased=True)}")
+    print(f"Python version:          {sys.version_info[0]}.{sys.version_info[1]}.{sys.version_info[2]}")
+    print(f"Qibo version:            {qibo.__version__}")
