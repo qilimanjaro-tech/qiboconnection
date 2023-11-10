@@ -87,11 +87,11 @@ def get_logging_conf_or_fail_test(user_role=UserRole.ADMIN) -> ConnectionConfigu
         return get_logging_conf(role=user_role)
     except MissingCredentialsException:
         return pytest.fail("Login failed. Credentials were not provided in the environment.", pytrace=True)
-    except Exception as ex:
-        return pytest.fail(f"Login failed. Unknown exception. {ex}.", pytrace=True)
 
 
-def get_api_or_fail_test(logging_conf: ConnectionConfiguration) -> API:
+def get_api_or_fail_test(  # pylint: disable=inconsistent-return-statements
+    logging_conf: ConnectionConfiguration,
+) -> API:
     """Informatively fail the test if the API instance could not be build with the ConnectionConfiguration:
 
     Returns:
@@ -100,8 +100,6 @@ def get_api_or_fail_test(logging_conf: ConnectionConfiguration) -> API:
         return get_api(logging_conf)
     except MissingCredentialsException as ex:
         pytest.fail(f"Login failed. Check credentials. {ex}.", pytrace=True)
-    except Exception as ex:
-        pytest.fail(f"Login failed. Unknown exception. {ex}.", pytrace=True)
 
 
 def get_devices_listing_params(user_role: UserRole = UserRole.ADMIN) -> list[Device]:
@@ -129,11 +127,9 @@ def get_device(api: API, device_id) -> Device:
     Returns:
         Device: the device instance
     """
-    found: list[Device] = [device for device in api.list_devices()._devices if device.id == device_id]
-    if len(found) == 0:
-        raise Exception(f"Not found device with id {device_id}")
-
-    return found[0]
+    if found := [device for device in api.list_devices()._devices if device.id == device_id]:
+        return found[0]
+    raise NameError(f"Not found device with id {device_id}")
 
 
 def post_and_get_result(
@@ -216,9 +212,9 @@ def get_user_role_operations(user_role: UserRole) -> dict:
     """
     ops = [item for item in USER_OPERATIONS if user_role == item["role"]]
     if len(ops) == 0:
-        raise Exception(f"Not found operation for user role:{user_role}")
+        raise ValueError(f"Not found operation for user role:{user_role}")
     if len(ops) > 1:
-        raise Exception(f"Found {len(ops)} operations (when 1 was expected) in status:{user_role}")
+        raise ValueError(f"Found {len(ops)} operations (when 1 was expected) in status:{user_role}")
 
     return ops[0]
 
@@ -257,7 +253,7 @@ def get_user_roles_id(user_role: UserRole) -> int:
         return 6  # qili-user
     if user_role == UserRole.MACHINE:
         return 13  # dev_quant
-    raise Exception(f"No user id defined for {user_role}")
+    raise ValueError(f"No user id defined for {user_role}")
 
 
 def list_runcards():

@@ -12,7 +12,7 @@ on:
       - "ready_for_review"
 
 jobs:
-  tests:
+  unit-tests:
     if: github.event.pull_request.draft == false
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -24,10 +24,6 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 1
-
-      - name: Install Graphviz
-        run: |
-          sudo apt-get install -y graphviz
 
       - name: Set up Python 3.10
         uses: actions/setup-python@v3
@@ -53,3 +49,43 @@ jobs:
           fail_ci_if_error: true
           token: ${{ secrets.CODECOV_TOKEN }}
           flags: "unittests"
+
+  e2e-tests:
+    if: github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    env:
+      HOME_REPO: /home/repo
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 1
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.10"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install -U pip
+          python -m pip install -r dev-requirements.txt
+
+      - name: Install library
+        run: |
+          python -m pip install .
+
+      - name: Test with pytest core
+        run: |
+          export PUBLIC_LOGIN_ADMIN_USERNAME=${{ secrets.PUBLIC_LOGIN_ADMIN_USERNAME_DEV }}
+          export PUBLIC_LOGIN_ADMIN_KEY=${{ secrets.PUBLIC_LOGIN_ADMIN_KEY_DEV }}
+          export PUBLIC_LOGIN_QILI_USERNAME=${{ secrets.PUBLIC_LOGIN_QILI_USERNAME_DEV }}
+          export PUBLIC_LOGIN_QILI_KEY=${{ secrets.PUBLIC_LOGIN_QILI_KEY_DEV }}
+          export PUBLIC_LOGIN_BSC_USERNAME=${{ secrets.PUBLIC_LOGIN_BSC_USERNAME_DEV }}
+          export PUBLIC_LOGIN_BSC_KEY=${{ secrets.PUBLIC_LOGIN_BSC_KEY_DEV }}
+          export PUBLIC_LOGIN_MACHINE_USERNAME=${{ secrets.DEV_QUANT_DEVICE_USERNAME }}
+          export PUBLIC_LOGIN_MACHINE_KEY=${{ secrets.DEV_QUANT_DEVICE_API_KEY}}
+
+          pytest tests/end2end/

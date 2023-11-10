@@ -5,13 +5,17 @@ from typing import TextIO
 from qiboconnection.api import API
 from qiboconnection.connection import ConnectionConfiguration
 
-from .errors import MissingCredentialsException
 from .typings import UserRole
 
+
+class MissingCredentialsException(ValueError):
+    pass
+
+
 # GLOBALS
-MAX_SLACK_LENGTH = os.getenv("MAX_SLACK_LENGTH", 2800)
-TEST_MESSAGE_SLACK_CHANNEL_ID = os.getenv("TEST_MESSAGE_SLACK_CHANNEL_ID", 3)
-TEST_FILE_SLACK_CHANNEL_ID = os.getenv("TEST_FILE_SLACK_CHANNEL_ID", 4)
+MAX_SLACK_LENGTH = os.getenv("MAX_SLACK_LENGTH", "2800")
+TEST_MESSAGE_SLACK_CHANNEL_ID = os.getenv("TEST_MESSAGE_SLACK_CHANNEL_ID", "3")
+TEST_FILE_SLACK_CHANNEL_ID = os.getenv("TEST_FILE_SLACK_CHANNEL_ID", "4")
 PYTEST_VALID_CHARACTERS = [".", "F", "s", "x"]
 PYTEST_SKIP_CHARACTERS = ["s"]
 PYTEST_FAILURE_CHARACTERS = ["F"]

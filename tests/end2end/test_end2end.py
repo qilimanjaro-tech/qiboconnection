@@ -9,12 +9,12 @@ import pytest
 from qibo.models import Circuit
 
 from qiboconnection.api import API
-from qiboconnection.models import JobData
-from qiboconnection.models.devices import Device, Devices
+from qiboconnection.models.devices import Device
 from qiboconnection.models.saved_experiment_listing import SavedExperimentListing
 from qiboconnection.typings.enums import DeviceAvailability as DA
 from qiboconnection.typings.enums import DeviceStatus as DS
 from qiboconnection.typings.enums import JobStatus
+from qiboconnection.typings.job_data import JobData
 from qiboconnection.typings.responses.job_response import JobResponse
 
 from .utils.operations import (
@@ -72,8 +72,7 @@ def test_device_selection(device: Device, api: API):
             api.select_device_id(device_id=device.id)
         except ConnectionError:
             pytest.fail(f"Connection was not possible to {device.name}", pytrace=False)
-        except Exception as ex:
-            pytest.fail(f"Connecting to {device.name} raised {ex}", pytrace=True)
+
     else:
         pytest.skip(f"Operation {Operation.SELECT} not possible for {device}")
 
@@ -96,8 +95,6 @@ def test_device_blocking_and_release(device: Device, api: API):
             api.release_device(device_id=device.id)
         except ConnectionError:
             pytest.fail(f"Connection was not possible to {device.name}", pytrace=False)
-        except Exception as ex:
-            pytest.fail(f"Connecting to {device.name} raised {ex}", pytrace=True)
     else:
         pytest.skip(f"Operation {Operation.BLOCK} not possbile for {device}")
 

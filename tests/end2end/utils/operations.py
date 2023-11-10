@@ -124,7 +124,7 @@ def get_expected_operation_result(  # pylint: disable=too-many-branches
         else:
             result = OperationResult.FORBIDDEN
     else:
-        raise Exception(f"Unknown operation {operation}")
+        raise NameError(f"Unknown operation {operation}")
 
     return result
 

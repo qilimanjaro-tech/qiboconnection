@@ -467,7 +467,7 @@ def test_cannot_delete_not_owned_runcard(user_role: UserRole, runcard: Runcard, 
 
 @pytest.mark.slow
 @pytest.mark.parametrize("user_role", list_user_roles())
-def test_cannot_delete_any_runcard(user_role: UserRole, runcard: Runcard, api: API):
+def test_cannot_delete_any_runcard(user_role: UserRole, api: API):
     "Check certain users  cannot delete any runcard"
     api_delete = get_user_cannot_delete_runcard_api(user_role=user_role)
     runcards = api.list_runcards()
@@ -549,7 +549,7 @@ def test_cannot_update_not_owned_runcards(user_role: UserRole, runcard: Runcard,
 
 @pytest.mark.slow
 @pytest.mark.parametrize("user_role", list_user_roles())
-def test_cannot_update_any_runcards(user_role: UserRole, runcard: Runcard, api: API):
+def test_cannot_update_any_runcards(user_role: UserRole, api: API):
     "Check certain users can update their own runcards"
     api_update = get_user_cannot_update_runcard_api(user_role=user_role)
     runcards = api.list_runcards()
