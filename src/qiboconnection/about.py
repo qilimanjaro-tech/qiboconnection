@@ -17,7 +17,7 @@ This module contains a function to display all the details of the Qiboconnection
 """
 import platform
 import sys
-from subprocess import check_output
+from subprocess import check_output  # nosec B404
 
 import qibo
 
@@ -26,7 +26,7 @@ def about():
     """
     Prints the information for qiboconnection installation.
     """
-    print(check_output([sys.executable, "-m", "pip", "show", "qiboconnection"]).decode())
+    print(check_output([sys.executable, "-m", "pip", "show", "qiboconnection"]).decode())  # nosec B603
     print(f"Platform info:           {platform.platform(aliased=True)}")
     print(f"Python version:          {sys.version_info[0]}.{sys.version_info[1]}.{sys.version_info[2]}")
     print(f"Qibo version:            {qibo.__version__}")
