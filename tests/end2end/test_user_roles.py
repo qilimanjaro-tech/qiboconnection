@@ -10,10 +10,10 @@ import requests
 from qibo.models import Circuit
 
 from qiboconnection.api import API
-from qiboconnection.models import JobData
 from qiboconnection.models.devices import Device
 from qiboconnection.models.runcard import Runcard
 from qiboconnection.typings.enums import DeviceAvailability, DeviceStatus
+from qiboconnection.typings.job_data import JobData
 
 from .utils.operations import Operation, check_operation_possible_or_skip
 from .utils.typings import UserRole
