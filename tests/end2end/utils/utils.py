@@ -27,10 +27,10 @@ class MissingCredentialsException(ValueError):
 class UserRole(str, Enum):
     """User roles with different permissions. admin is allowed to change device status and availability. qilimanjaro_user can only change availability provided that device status is maintenance. bsc_user can change none."""
 
-    ADMIN = "admin"
-    QILI = "qilimanjaro_user"
-    BSC = "bsc_user"
-    MACHINE = "machine"
+    ADMIN = "ADMIN"
+    QILI = "QILI"
+    BSC = "BSC"
+    MACHINE = "MACHINE"
 
 
 TIMEOUT = 100
@@ -573,8 +573,8 @@ def get_logging_conf(role: UserRole = UserRole.ADMIN) -> ConnectionConfiguration
         ConnectionConfiguration: instance with credentials for creating API instance
     """
 
-    public_login_username = os.getenv(f"PUBLIC_LOGIN_{role.value.upper()}_USERNAME")
-    public_login_key = os.getenv(f"PUBLIC_LOGIN_{role.value.upper()}_KEY")
+    public_login_username = os.getenv(f"PUBLIC_LOGIN_{role.value}_USERNAME")
+    public_login_key = os.getenv(f"PUBLIC_LOGIN_{role.value}_KEY")
 
     # previous try/except was not catching the error
     if public_login_username is None or public_login_key is None:
