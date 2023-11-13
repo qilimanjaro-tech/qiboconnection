@@ -1,6 +1,4 @@
 """Testing user roles can only do what they are intended to."""
-# pylint: disable=import-error
-# pylint: disable=no-name-in-module
 # pylint: disable=logging-fstring-interpolation
 import logging
 
@@ -56,7 +54,6 @@ logger = logging.getLogger(__name__)
     "device, user_role",
     [(device, user_role) for user_role in list_user_roles() for device in get_devices_listing_params(user_role)],
 )
-@pytest.mark.slow
 def test_can_change_device_status(device: Device, user_role: UserRole):
     """Ensure that user roles which, by definition, can change status are allowed to do it.
 
@@ -84,7 +81,6 @@ def test_can_change_device_status(device: Device, user_role: UserRole):
     "device, user_role",
     [(device, user_role) for user_role in list_user_roles() for device in get_devices_listing_params(user_role)],
 )
-@pytest.mark.slow
 def test_cannot_change_device_status(device: Device, user_role: UserRole):
     """Ensure that user roles which, by definition, cannot change status are not allowed to do it.
 

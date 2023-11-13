@@ -1,9 +1,5 @@
 """Testing different large circuits."""
-# pylint: disable=unused-import
 # pylint: disable=logging-fstring-interpolation
-# pylint: disable=protected-access
-# pylint: disable=import-error
-# pylint: disable=no-name-in-module
 import logging
 
 import pytest

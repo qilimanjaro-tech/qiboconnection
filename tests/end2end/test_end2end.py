@@ -1,5 +1,4 @@
 """End to end tests."""
-# pylint: disable=unused-import
 # pylint: disable=logging-fstring-interpolation
 # pylint: disable=protected-access
 import logging
