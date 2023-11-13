@@ -3,7 +3,7 @@ import os
 from qiboconnection.api import API
 from qiboconnection.connection import ConnectionConfiguration
 
-from .typings import UserRole
+from .utils import UserRole
 
 
 class MissingCredentialsException(ValueError):

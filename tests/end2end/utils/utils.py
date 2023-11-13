@@ -3,6 +3,7 @@
 # pylint: disable=import-error
 # pylint: disable=no-name-in-module
 import logging
+from enum import Enum
 from time import sleep
 
 import pytest
@@ -10,18 +11,26 @@ from qibo.models.circuit import Circuit
 
 from qiboconnection.api import API
 from qiboconnection.errors import HTTPError
-from qiboconnection.models.devices import Device, QuantumDevice
+from qiboconnection.models.devices import Device
 from qiboconnection.typings.connection import ConnectionConfiguration
-from qiboconnection.typings.enums import JobStatus
+from qiboconnection.typings.enums import DeviceAvailability, DeviceStatus, JobStatus
 from qiboconnection.typings.job_data import JobData
 
 from .http import get_api, get_logging_conf
 from .operations import is_development
-from .typings import DeviceAvailability, DeviceStatus, UserRole
 
 
 class MissingCredentialsException(ValueError):
     pass
+
+
+class UserRole(str, Enum):
+    """User roles with different permissions. admin is allowed to change device status and availability. qilimanjaro_user can only change availability provided that device status is maintenance. bsc_user can change none."""
+
+    ADMIN = "admin"
+    QILI = "qilimanjaro_user"
+    BSC = "bsc_user"
+    MACHINE = "machine"
 
 
 TIMEOUT = 100

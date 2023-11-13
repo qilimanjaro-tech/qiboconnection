@@ -16,8 +16,8 @@ from qiboconnection.typings.enums import DeviceAvailability, DeviceStatus
 from qiboconnection.typings.job_data import JobData
 
 from .utils.operations import Operation, check_operation_possible_or_skip
-from .utils.typings import UserRole
 from .utils.utils import (
+    UserRole,
     admin_block_device,
     admin_release_device,
     admin_set_device_to_maintenance,
