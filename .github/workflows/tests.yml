@@ -79,13 +79,13 @@ jobs:
 
       - name: Test with pytest core
         run: |
-          export PUBLIC_LOGIN_ADMIN_USERNAME=${{ secrets.PUBLIC_LOGIN_ADMIN_USERNAME_DEV }}
-          export PUBLIC_LOGIN_ADMIN_KEY=${{ secrets.PUBLIC_LOGIN_ADMIN_KEY_DEV }}
-          export PUBLIC_LOGIN_QILI_USERNAME=${{ secrets.PUBLIC_LOGIN_QILI_USERNAME_DEV }}
-          export PUBLIC_LOGIN_QILI_KEY=${{ secrets.PUBLIC_LOGIN_QILI_KEY_DEV }}
-          export PUBLIC_LOGIN_BSC_USERNAME=${{ secrets.PUBLIC_LOGIN_BSC_USERNAME_DEV }}
-          export PUBLIC_LOGIN_BSC_KEY=${{ secrets.PUBLIC_LOGIN_BSC_KEY_DEV }}
-          export PUBLIC_LOGIN_MACHINE_USERNAME=${{ secrets.DEV_QUANT_DEVICE_USERNAME }}
-          export PUBLIC_LOGIN_MACHINE_KEY=${{ secrets.DEV_QUANT_DEVICE_API_KEY}}
+          export PUBLIC_LOGIN_ADMIN_USERNAME=${{ secrets.PUBLIC_LOGIN_ADMIN_USERNAME }}
+          export PUBLIC_LOGIN_ADMIN_KEY=${{ secrets.PUBLIC_LOGIN_ADMIN_KEY }}
+          export PUBLIC_LOGIN_QILI_USERNAME=${{ secrets.PUBLIC_LOGIN_QILI_USERNAME }}
+          export PUBLIC_LOGIN_QILI_KEY=${{ secrets.PUBLIC_LOGIN_QILI_KEY }}
+          export PUBLIC_LOGIN_BSC_USERNAME=${{ secrets.PUBLIC_LOGIN_BSC_USERNAME }}
+          export PUBLIC_LOGIN_BSC_KEY=${{ secrets.PUBLIC_LOGIN_BSC_KEY }}
+          export PUBLIC_LOGIN_MACHINE_USERNAME=${{ secrets.PUBLIC_LOGIN_MACHINE_USERNAME }}
+          export PUBLIC_LOGIN_MACHINE_KEY=${{ secrets.PUBLIC_LOGIN_MACHINE_KEY}}
 
           pytest tests/end2end/
