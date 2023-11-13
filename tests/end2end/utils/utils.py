@@ -106,7 +106,7 @@ def get_api_or_fail_test(  # pylint: disable=inconsistent-return-statements
     Returns:
         API: api instance if it could be built."""
     try:
-        return get_api(logging_conf)
+        return API(configuration=logging_conf)
     except MissingCredentialsException as ex:
         pytest.fail(f"Login failed. Check credentials. {ex}.", pytrace=True)
 
@@ -573,21 +573,8 @@ def get_logging_conf(role: UserRole = UserRole.ADMIN) -> ConnectionConfiguration
         ConnectionConfiguration: instance with credentials for creating API instance
     """
 
-    if role == UserRole.ADMIN:
-        public_login_username = os.getenv("PUBLIC_LOGIN_ADMIN_USERNAME")
-        public_login_key = os.getenv("PUBLIC_LOGIN_ADMIN_KEY")
-
-    elif role == UserRole.BSC:
-        public_login_username = os.getenv("PUBLIC_LOGIN_BSC_USERNAME")
-        public_login_key = os.getenv("PUBLIC_LOGIN_BSC_KEY")
-
-    elif role == UserRole.QILI:
-        public_login_username = os.getenv("PUBLIC_LOGIN_QILI_USERNAME")
-        public_login_key = os.getenv("PUBLIC_LOGIN_QILI_KEY")
-
-    elif role == UserRole.MACHINE:
-        public_login_username = os.getenv("PUBLIC_LOGIN_MACHINE_USERNAME")
-        public_login_key = os.getenv("PUBLIC_LOGIN_MACHINE_KEY")
+    public_login_username = os.getenv(f"PUBLIC_LOGIN_{role.value}_USERNAME")
+    public_login_key = os.getenv(f"PUBLIC_LOGIN_{role.value}_KEY")
 
     # previous try/except was not catching the error
     if public_login_username is None or public_login_key is None:
@@ -596,15 +583,3 @@ def get_logging_conf(role: UserRole = UserRole.ADMIN) -> ConnectionConfiguration
         )
 
     return ConnectionConfiguration(username=public_login_username, api_key=public_login_key)
-
-
-def get_api(logging_conf: ConnectionConfiguration) -> API:
-    """Returns API instance given a ConnectionConfiguration instance
-
-    Args:
-        logging_conf: login credentials
-
-    Returns:
-        API: api usable api instance
-    """
-    return API(configuration=logging_conf)
