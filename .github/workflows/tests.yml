@@ -23,6 +23,8 @@ env:
   PUBLIC_LOGIN_MACHINE_USERNAME: ${{ secrets.PUBLIC_LOGIN_MACHINE_USERNAME }}
   PUBLIC_LOGIN_MACHINE_KEY: ${{ secrets.PUBLIC_LOGIN_MACHINE_KEY}}
 
+  QIBOCONNECTION_ENVIRONMENT: "development"
+
 jobs:
   unit-tests:
     if: github.event.pull_request.draft == false
