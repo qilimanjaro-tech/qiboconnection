@@ -219,17 +219,6 @@ def get_user_role_operations(user_role: UserRole) -> dict:
     return ops[0]
 
 
-def is_quantum(device: Device):
-    """Returns True if the device is a quantum device
-    Args:
-        device: device instance
-
-    Returns:
-        bool: if the device is a quantum device
-    """
-    return isinstance(device, QuantumDevice)
-
-
 def list_user_roles() -> list[UserRole]:
     """Get a list of user roles defined in UserRole enum
 
