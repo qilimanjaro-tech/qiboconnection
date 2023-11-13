@@ -5,7 +5,7 @@ import pytest
 from qiboconnection.api import API
 
 
-@pytest.mark.first
+@pytest.mark.order(0)
 def test_store_initial_job_and_runcard_count(api: API, request):
     """Count number jobs and runcards before running the test suite"""
     initial_job_count = len(api.list_jobs().dataframe)
@@ -16,7 +16,7 @@ def test_store_initial_job_and_runcard_count(api: API, request):
     assert isinstance(initial_job_count, int)
 
 
-@pytest.mark.last
+@pytest.mark.order(-1)
 def test_check_all_test_jobs_and_runcards_deleted(api: API, request):
     """Count number jobs and runcards before running the test suite"""
     if request.config.cache.get("initial_job_count", None) != len(api.list_jobs().dataframe):
