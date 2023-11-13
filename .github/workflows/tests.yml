@@ -87,5 +87,6 @@ jobs:
           export PUBLIC_LOGIN_BSC_KEY=${{ secrets.PUBLIC_LOGIN_BSC_KEY }}
           export PUBLIC_LOGIN_MACHINE_USERNAME=${{ secrets.PUBLIC_LOGIN_MACHINE_USERNAME }}
           export PUBLIC_LOGIN_MACHINE_KEY=${{ secrets.PUBLIC_LOGIN_MACHINE_KEY}}
+          export QIBOCONNECTION_ENVIRONMENT="development"
 
           pytest tests/end2end/
