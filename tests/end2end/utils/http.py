@@ -3,12 +3,7 @@ import os
 from qiboconnection.api import API
 from qiboconnection.connection import ConnectionConfiguration
 
-from .utils import UserRole
-
-
-class MissingCredentialsException(ValueError):
-    pass
-
+from .utils import MissingCredentialsException, UserRole
 
 # GLOBALS
 MAX_SLACK_LENGTH = os.getenv("MAX_SLACK_LENGTH", "2800")
