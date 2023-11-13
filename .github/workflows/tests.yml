@@ -11,14 +11,23 @@ on:
       - "synchronize"
       - "ready_for_review"
 
+env:
+  HOME_REPO: /home/repo
+
+  PUBLIC_LOGIN_ADMIN_USERNAME: ${{ secrets.PUBLIC_LOGIN_ADMIN_USERNAME }}
+  PUBLIC_LOGIN_ADMIN_KEY: ${{ secrets.PUBLIC_LOGIN_ADMIN_KEY }}
+  PUBLIC_LOGIN_BSC_USERNAME: ${{ secrets.PUBLIC_LOGIN_BSC_USERNAME }}
+  PUBLIC_LOGIN_BSC_KEY: ${{ secrets.PUBLIC_LOGIN_BSC_KEY }}
+  PUBLIC_LOGIN_QILI_USERNAME: ${{ secrets.PUBLIC_LOGIN_QILI_USERNAME }}
+  PUBLIC_LOGIN_QILI_KEY: ${{ secrets.PUBLIC_LOGIN_QILI_KEY }}
+  PUBLIC_LOGIN_MACHINE_USERNAME: ${{ secrets.PUBLIC_LOGIN_MACHINE_USERNAME }}
+  PUBLIC_LOGIN_MACHINE_KEY: ${{ secrets.PUBLIC_LOGIN_MACHINE_KEY}}
+
 jobs:
   unit-tests:
     if: github.event.pull_request.draft == false
     runs-on: ubuntu-latest
     timeout-minutes: 10
-
-    env:
-      HOME_REPO: /home/repo
 
     steps:
       - uses: actions/checkout@v2
@@ -55,9 +64,6 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
-    env:
-      HOME_REPO: /home/repo
-
     steps:
       - uses: actions/checkout@v2
         with:
@@ -79,14 +85,4 @@ jobs:
 
       - name: Test with pytest core
         run: |
-          export PUBLIC_LOGIN_ADMIN_USERNAME=${{ secrets.PUBLIC_LOGIN_ADMIN_USERNAME }}
-          export PUBLIC_LOGIN_ADMIN_KEY=${{ secrets.PUBLIC_LOGIN_ADMIN_KEY }}
-          export PUBLIC_LOGIN_QILI_USERNAME=${{ secrets.PUBLIC_LOGIN_QILI_USERNAME }}
-          export PUBLIC_LOGIN_QILI_KEY=${{ secrets.PUBLIC_LOGIN_QILI_KEY }}
-          export PUBLIC_LOGIN_BSC_USERNAME=${{ secrets.PUBLIC_LOGIN_BSC_USERNAME }}
-          export PUBLIC_LOGIN_BSC_KEY=${{ secrets.PUBLIC_LOGIN_BSC_KEY }}
-          export PUBLIC_LOGIN_MACHINE_USERNAME=${{ secrets.PUBLIC_LOGIN_MACHINE_USERNAME }}
-          export PUBLIC_LOGIN_MACHINE_KEY=${{ secrets.PUBLIC_LOGIN_MACHINE_KEY}}
-          export QIBOCONNECTION_ENVIRONMENT="development"
-
           pytest tests/end2end/
