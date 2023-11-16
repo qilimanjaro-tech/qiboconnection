@@ -71,7 +71,8 @@ def test_device_selection(device: Device, api: API):
             api.select_device_id(device_id=device.id)
         except ConnectionError:
             pytest.fail(f"Connection was not possible to {device.name}", pytrace=False)
-
+        except Exception as ex:  # pylint: disable=broad-exception-caught
+            pytest.fail(f"Connecting to {device.name} raised {ex}", pytrace=True)
     else:
         pytest.skip(f"Operation {Operation.SELECT} not possible for {device}")
 
@@ -94,6 +95,8 @@ def test_device_blocking_and_release(device: Device, api: API):
             api.release_device(device_id=device.id)
         except ConnectionError:
             pytest.fail(f"Connection was not possible to {device.name}", pytrace=False)
+        except Exception as ex:  # pylint: disable=broad-exception-caught
+            pytest.fail(f"Connecting to {device.name} raised {ex}", pytrace=True)
     else:
         pytest.skip(f"Operation {Operation.BLOCK} not possbile for {device}")
 
