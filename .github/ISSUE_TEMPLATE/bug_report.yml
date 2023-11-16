@@ -51,7 +51,7 @@ body:
     id: system_information
     attributes:
       label: System Information
-      description: Please post the output of `import qiboconnection as qc; qc.about()``.
+      description: Please post the output of `import qiboconnection as qc; qc.about()`.
       render: Shell
     validations:
       required: true
