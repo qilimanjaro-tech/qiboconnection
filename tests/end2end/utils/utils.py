@@ -247,9 +247,9 @@ def get_user_roles_id(user_role: UserRole) -> int:
     if user_role == UserRole.BSC:
         return 5  # bsc-user
     if user_role == UserRole.QILI:
-        return 4  # qili-user
+        return 6  # qili-user
     if user_role == UserRole.MACHINE:
-        return 2  # dev_quant
+        return 13  # dev_quant
     raise ValueError(f"No user id defined for {user_role}")
 
 
