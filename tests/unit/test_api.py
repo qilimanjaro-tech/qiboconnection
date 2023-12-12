@@ -23,9 +23,9 @@ from qiboconnection.models.saved_experiment import SavedExperiment
 from qiboconnection.models.saved_experiment_listing import SavedExperimentListing
 from qiboconnection.typings.job_data import JobData
 from qiboconnection.typings.responses import PlottingResponse
-from tests.data.web_responses.job import JobResponse
 
 from .data import experiment_dict, results_dict, runcard_dict, web_responses
+from .data.web_responses.job import JobResponse
 from .utils import get_current_event_loop_or_create
 
 
