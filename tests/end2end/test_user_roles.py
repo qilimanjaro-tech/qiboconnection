@@ -2,7 +2,7 @@
 # pylint: disable=logging-fstring-interpolation
 import logging
 
-# import pandas as pd
+import pandas as pd
 import pytest
 import requests
 from qibo.models import Circuit
@@ -14,7 +14,7 @@ from qiboconnection.typings.enums import DeviceAvailability, DeviceStatus
 from qiboconnection.typings.job_data import JobData
 
 from .utils.operations import Operation, check_operation_possible_or_skip
-from .utils.utils import (  # get_user_can_post_and_list_experiment_api,
+from .utils.utils import (
     UserRole,
     admin_block_device,
     admin_release_device,
@@ -29,6 +29,7 @@ from .utils.utils import (  # get_user_can_post_and_list_experiment_api,
     get_user_can_delete_runcard_api,
     get_user_can_get_runcard_api,
     get_user_can_list_runcard_api,
+    get_user_can_post_and_list_experiment_api,
     get_user_can_save_runcard_api,
     get_user_can_update_runcard_api,
     get_user_cannot_change_availability_api,
@@ -263,17 +264,17 @@ def test_cannot_post_experiment(device: Device, experiment_dict: dict, user_role
 # ------------------------------------------------------------------------ OPERATION: LIST SAVED EXPERIMENTS
 
 
-# @pytest.mark.parametrize("user_role", list_user_roles())
-# @pytest.mark.slow
-# def test_can_list_saved_experiments(user_role: UserRole):
-#     """Test user roles that are allowed to list saved experiments can do it -- e.g admin and qili-user
-#     Args:
-#         api: api instance to call the server with
-#     """
+@pytest.mark.parametrize("user_role", list_user_roles())
+@pytest.mark.slow
+def test_can_list_saved_experiments(user_role: UserRole):
+    """Test user roles that are allowed to list saved experiments can do it -- e.g admin and qili-user
+    Args:
+        api: api instance to call the server with
+    """
 
-#     user_api = get_user_can_post_and_list_experiment_api(user_role=user_role)
+    user_api = get_user_can_post_and_list_experiment_api(user_role=user_role)
 
-#     assert isinstance(user_api._list_saved_experiments().dataframe, pd.DataFrame)
+    assert isinstance(user_api._list_saved_experiments().dataframe, pd.DataFrame)
 
 
 @pytest.mark.parametrize("user_role", list_user_roles())
