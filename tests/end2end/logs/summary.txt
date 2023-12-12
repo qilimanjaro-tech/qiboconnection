@@ -1,0 +1,52 @@
+============================= test session starts ==============================
+platform linux -- Python 3.11.3, pytest-7.1.3, pluggy-1.0.0
+rootdir: /home/adria/Projects/qiboconnection/tests/end2end, configfile: pytest.ini
+plugins: pylama-8.4.1, json-0.4.0, forked-1.4.0, typeguard-2.13.3, xdist-2.5.0, html-4.1.1, anyio-3.6.2, cov-4.0.0, order-1.1.0, metadata-3.0.0
+collected 161 items
+
+qiboconnection/tests/end2end/test_sanity_checks.py .
+qiboconnection/tests/end2end/test_circuits.py s.ss.ss.ss.s
+qiboconnection/tests/end2end/test_end2end.py ..................s..s.s
+qiboconnection/tests/end2end/test_endurance.py s.s
+qiboconnection/tests/end2end/test_user_roles.py s..ssssssss...s..s...s..s..sssssss.s..s...ssssss...ssss.....................ssss..s.ss.s..ss..ssss.....ssss...s...s.ss.s
+qiboconnection/tests/end2end/test_sanity_checks.py .
+
+- generated json report: /home/adria/Projects/qiboconnection/tests/end2end/logs/test_results.json -
+- Generated html report: file:///home/adria/Projects/qiboconnection/tests/end2end/logs/report.html -
+=========================== short test summary info ============================
+SKIPPED [6] qiboconnection/tests/end2end/utils/operations.py:141: Operation Operation.RESPONSE is not possible in offline in the environment development.
+SKIPPED [6] qiboconnection/tests/end2end/utils/operations.py:141: Operation Operation.RESPONSE is not possible in dev_quant in the environment development.
+SKIPPED [3] qiboconnection/tests/end2end/utils/operations.py:141: Operation Operation.CHANGE_STATUS is not possible in offline in the environment development.
+SKIPPED [3] qiboconnection/tests/end2end/utils/utils.py:273: UserRole.QILI cannot change status
+SKIPPED [1] qiboconnection/tests/end2end/utils/utils.py:273: UserRole.BSC cannot change status
+SKIPPED [3] qiboconnection/tests/end2end/utils/utils.py:288: UserRole.ADMIN can change status
+SKIPPED [6] qiboconnection/tests/end2end/utils/utils.py:526: offline is offline
+SKIPPED [1] qiboconnection/tests/end2end/utils/utils.py:303: UserRole.BSC cannot change availability
+SKIPPED [2] qiboconnection/tests/end2end/utils/utils.py:318: UserRole.ADMIN can change availability
+SKIPPED [2] qiboconnection/tests/end2end/utils/utils.py:318: UserRole.QILI can change availability
+SKIPPED [2] qiboconnection/tests/end2end/utils/utils.py:511: offline is offline
+SKIPPED [4] qiboconnection/tests/end2end/utils/utils.py:348: UserRole.ADMIN can post experiments
+SKIPPED [4] qiboconnection/tests/end2end/utils/utils.py:348: UserRole.QILI can post experiments
+SKIPPED [1] qiboconnection/tests/end2end/utils/utils.py:333: UserRole.BSC cannot post experiments
+SKIPPED [1] qiboconnection/tests/end2end/utils/utils.py:333: UserRole.MACHINE cannot post experiments
+SKIPPED [1] qiboconnection/tests/end2end/utils/utils.py:468: UserRole.ADMIN can get runcards
+SKIPPED [1] qiboconnection/tests/end2end/utils/utils.py:468: UserRole.QILI can get runcards
+SKIPPED [1] qiboconnection/tests/end2end/utils/utils.py:468: UserRole.BSC can get runcards
+SKIPPED [1] qiboconnection/tests/end2end/utils/utils.py:468: UserRole.MACHINE can get runcards
+SKIPPED [3] qiboconnection/tests/end2end/utils/utils.py:363: UserRole.BSC cannot save runcards
+SKIPPED [1] qiboconnection/tests/end2end/utils/utils.py:378: UserRole.ADMIN can save runcards
+SKIPPED [1] qiboconnection/tests/end2end/utils/utils.py:378: UserRole.QILI can save runcards
+SKIPPED [1] qiboconnection/tests/end2end/utils/utils.py:378: UserRole.MACHINE can save runcards
+SKIPPED [2] qiboconnection/tests/end2end/utils/utils.py:393: UserRole.MACHINE cannot delete runcards
+SKIPPED [1] qiboconnection/tests/end2end/utils/utils.py:393: UserRole.BSC cannot delete runcards
+SKIPPED [1] qiboconnection/tests/end2end/utils/utils.py:408: UserRole.ADMIN can delete runcards
+SKIPPED [1] qiboconnection/tests/end2end/utils/utils.py:408: UserRole.QILI can delete runcards
+SKIPPED [1] qiboconnection/tests/end2end/utils/utils.py:483: UserRole.MACHINE cannot list runcards
+SKIPPED [1] qiboconnection/tests/end2end/utils/utils.py:497: UserRole.ADMIN can list runcards
+SKIPPED [1] qiboconnection/tests/end2end/utils/utils.py:497: UserRole.QILI can list runcards
+SKIPPED [1] qiboconnection/tests/end2end/utils/utils.py:497: UserRole.BSC can list runcards
+SKIPPED [1] qiboconnection/tests/end2end/utils/utils.py:423: UserRole.BSC cannot update runcards
+SKIPPED [1] qiboconnection/tests/end2end/utils/utils.py:438: UserRole.ADMIN can update runcards
+SKIPPED [1] qiboconnection/tests/end2end/utils/utils.py:438: UserRole.QILI can update runcards
+SKIPPED [1] qiboconnection/tests/end2end/utils/utils.py:438: UserRole.MACHINE can update runcards
+================== 93 passed, 68 skipped in 766.54s (0:12:46) ==================
