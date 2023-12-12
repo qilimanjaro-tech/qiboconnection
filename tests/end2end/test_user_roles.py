@@ -2,7 +2,7 @@
 # pylint: disable=logging-fstring-interpolation
 import logging
 
-import pandas as pd
+# import pandas as pd
 import pytest
 import requests
 from qibo.models import Circuit
@@ -14,7 +14,7 @@ from qiboconnection.typings.enums import DeviceAvailability, DeviceStatus
 from qiboconnection.typings.job_data import JobData
 
 from .utils.operations import Operation, check_operation_possible_or_skip
-from .utils.utils import (
+from .utils.utils import (  # get_user_can_post_and_list_experiment_api,
     UserRole,
     admin_block_device,
     admin_release_device,
@@ -29,7 +29,6 @@ from .utils.utils import (
     get_user_can_delete_runcard_api,
     get_user_can_get_runcard_api,
     get_user_can_list_runcard_api,
-    get_user_can_post_and_list_experiment_api,
     get_user_can_save_runcard_api,
     get_user_can_update_runcard_api,
     get_user_cannot_change_availability_api,
