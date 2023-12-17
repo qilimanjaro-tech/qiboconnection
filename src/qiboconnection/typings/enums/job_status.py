@@ -33,3 +33,4 @@ class JobStatus(StrEnum):
     RUNNING = "running"
     COMPLETED = "completed"
     ERROR = "error"
+    QUEUED = "queued"
