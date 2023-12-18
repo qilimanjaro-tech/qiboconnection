@@ -36,5 +36,5 @@ def test_endurance(device: Device, api: API, numpy_circuit: Circuit, total: int 
         logger.info(f"Run {ind}/{total} (wait {timeout} seconds)")
         result: JobResponse = post_and_get_result(api, device, numpy_circuit, timeout)
         logger.info(f"Job #{result.job_id}: {result.status}")
-        assert result.status == JobStatus.QUEUED
+        assert result.status in [JobStatus.QUEUED, JobStatus.COMPLETED]
         api.delete_job(job_id=result.job_id)

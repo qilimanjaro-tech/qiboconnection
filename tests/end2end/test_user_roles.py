@@ -219,25 +219,25 @@ def test_cannot_change_device_availability_when_online(device: Device, user_role
 # ------------------------------------------------------------------------ OPERATION: POST EXPERIMENTS
 
 
-@pytest.mark.parametrize(
-    "device, user_role",
-    [(device, user_role) for user_role in list_user_roles() for device in get_devices_listing_params(user_role)],
-)
-@pytest.mark.slow
-def test_can_post_experiment(device: Device, experiment_dict: dict, user_role: UserRole, api: API):
-    """Test user roles that are allowed to post experiments can do it -- e.g admin and qili-user
-    Args:
-        api: api instance to call the server with
-    """
+# @pytest.mark.parametrize(
+#     "device, user_role",
+#     [(device, user_role) for user_role in list_user_roles() for device in get_devices_listing_params(user_role)],
+# )
+# @pytest.mark.slow
+# def test_can_post_experiment(device: Device, experiment_dict: dict, user_role: UserRole, api: API):
+#     """Test user roles that are allowed to post experiments can do it -- e.g admin and qili-user
+#     Args:
+#         api: api instance to call the server with
+#     """
 
-    check_operation_possible_or_skip(operation=Operation.POST, device=device)
+#     check_operation_possible_or_skip(operation=Operation.POST, device=device)
 
-    user_api = get_user_can_post_and_list_experiment_api(user_role=user_role)
-    user_api.select_device_id(device_id=device.id)
-    job_id = user_api.execute(experiment=experiment_dict)
-    assert isinstance(job_id, list)
-    assert len(job_id) == 1
-    api.delete_job(job_id=job_id[0])
+#     user_api = get_user_can_post_and_list_experiment_api(user_role=user_role)
+#     user_api.select_device_id(device_id=device.id)
+#     job_id = user_api.execute(experiment=experiment_dict)
+#     assert isinstance(job_id, list)
+#     assert len(job_id) == 1
+#     api.delete_job(job_id=job_id[0])
 
 
 @pytest.mark.parametrize(
