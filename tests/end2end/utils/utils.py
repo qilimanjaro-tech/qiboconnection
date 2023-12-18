@@ -196,7 +196,7 @@ def get_job_result(api: API, job_id: int, timeout: int = 250, call_every_seconds
     while timer < timeout:
         logger.debug(f"timer: {timer}, timeout: {timeout}")
         job_data = api.get_job(job_id)
-        if job_data.status != JobStatus.PENDING:
+        if job_data.status not in [JobStatus.PENDING, JobStatus.QUEUED]:
             break
 
         sleep(call_every_seconds)
