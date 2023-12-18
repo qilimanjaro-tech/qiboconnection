@@ -34,7 +34,7 @@ class UserRole(str, Enum):
 
 
 TIMEOUT = 100
-CALL_EVERY_SECONDS = 3
+CALL_EVERY_SECONDS = 5
 
 USER_OPERATIONS = [
     {
