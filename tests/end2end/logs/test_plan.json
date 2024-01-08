@@ -1,207 +1,1262 @@
 [
   {
-    "file": "end2end/tests/test_end2end.py",
+    "file": "tests/test_about.py",
+    "name": "test_about",
+    "docstring": "Test that the `about` function prints the correct information."
+  },
+  {
+    "file": "tests/end2end/tests/test_end2end.py",
     "name": "test_all_status",
     "docstring": "Test whether a device can be set to maitenance/online\n"
   },
   {
-    "file": "end2end/tests/test_end2end.py",
+    "file": "tests/end2end/tests/test_end2end.py",
     "name": "test_circuit_posting",
     "docstring": "Test whether a circuit can be sent to each device\n"
   },
   {
-    "file": "end2end/tests/test_end2end.py",
+    "file": "tests/end2end/tests/test_end2end.py",
     "name": "test_circuit_result_response",
     "docstring": "Test whether a circuit can be sent and then its result can be retrieved, for each device.\n\n"
   },
   {
-    "file": "end2end/tests/test_end2end.py",
+    "file": "tests/end2end/tests/test_end2end.py",
     "name": "test_connection",
     "docstring": "Test the connection by pinging the server\n"
   },
   {
-    "file": "end2end/tests/test_end2end.py",
+    "file": "tests/end2end/tests/test_end2end.py",
     "name": "test_device_blocking_and_release",
     "docstring": "Test whether each device can be blocked and released\n\n"
   },
   {
-    "file": "end2end/tests/test_end2end.py",
+    "file": "tests/end2end/tests/test_end2end.py",
     "name": "test_device_listing",
     "docstring": "Test the device listing call\n"
   },
   {
-    "file": "end2end/tests/test_end2end.py",
+    "file": "tests/end2end/tests/test_end2end.py",
     "name": "test_device_selection",
     "docstring": "Test the device electability for every listed device. The offline devices are skipped.\n"
   },
   {
-    "file": "end2end/tests/test_end2end.py",
+    "file": "tests/end2end/tests/test_end2end.py",
     "name": "test_experiment_saving_and_retrieving",
     "docstring": "Test whether a saved experiment can be sent and retrieved.\n"
   },
   {
-    "file": "end2end/tests/test_end2end.py",
+    "file": "tests/end2end/tests/test_end2end.py",
     "name": "test_post_and_results_from_maintenance_to_online",
     "docstring": "A Job posted in a device in maintenance mode should be able to get the results when de device goes to online.\n\nThe tests are skipped if the device is quantum or it is in status offline.\nOnce the tests are done, the device is returned back to its original status.\n\n"
   },
   {
-    "file": "end2end/tests/test_end2end.py",
+    "file": "tests/end2end/tests/test_end2end.py",
     "name": "test_saved_experiments_listing",
     "docstring": "Test whether a saved experiment listing can be obtained"
   },
   {
-    "file": "end2end/tests/test_endurance.py",
+    "file": "tests/end2end/tests/test_endurance.py",
     "name": "test_endurance",
     "docstring": "Check there is no a degradation of service.\n\nThe same circuit is executed multiple times and  wait always the same maximum amount of time for a COMPLETED status.\n\n"
   },
   {
-    "file": "end2end/tests/test_user_roles.py",
+    "file": "tests/end2end/tests/test_user_roles.py",
     "name": "test_can_change_device_availability",
     "docstring": "Ensure that user roles which, by definition, can change availability are allowed to do it.\n\n"
   },
   {
-    "file": "end2end/tests/test_user_roles.py",
+    "file": "tests/end2end/tests/test_user_roles.py",
     "name": "test_can_change_device_status",
     "docstring": "Ensure that user roles which, by definition, can change status are allowed to do it.\n\n"
   },
   {
-    "file": "end2end/tests/test_user_roles.py",
+    "file": "tests/end2end/tests/test_user_roles.py",
     "name": "test_can_get_runcard",
     "docstring": "Check certain users can get all runcards"
   },
   {
-    "file": "end2end/tests/test_user_roles.py",
+    "file": "tests/end2end/tests/test_user_roles.py",
     "name": "test_can_list_runcards",
     "docstring": "Check certain users can list all runcards"
   },
   {
-    "file": "end2end/tests/test_user_roles.py",
+    "file": "tests/end2end/tests/test_user_roles.py",
     "name": "test_can_list_saved_experiments",
     "docstring": "Test user roles that are allowed to list saved experiments can do it -- e.g admin and qili-user\n"
   },
   {
-    "file": "end2end/tests/test_user_roles.py",
+    "file": "tests/end2end/tests/test_user_roles.py",
     "name": "test_can_save_and_delete_owned_runcards",
     "docstring": "Check all users can save runcard delete their runcards except for admin who can delete of all them."
   },
   {
-    "file": "end2end/tests/test_user_roles.py",
+    "file": "tests/end2end/tests/test_user_roles.py",
     "name": "test_can_save_get_and_update_owned_runcards",
     "docstring": "Check certain users can update their own runcards"
   },
   {
-    "file": "end2end/tests/test_user_roles.py",
+    "file": "tests/end2end/tests/test_user_roles.py",
     "name": "test_can_save_runcard",
     "docstring": "Check certain users cannot save runcards"
   },
   {
-    "file": "end2end/tests/test_user_roles.py",
+    "file": "tests/end2end/tests/test_user_roles.py",
     "name": "test_can_select_device",
     "docstring": "Test every user can select the devices to which it has access\n"
   },
   {
-    "file": "end2end/tests/test_user_roles.py",
+    "file": "tests/end2end/tests/test_user_roles.py",
     "name": "test_cannot_change_device_availability",
     "docstring": "Ensure that user roles which, by definition, cannot change availability are not allowed to do it\n\n"
   },
   {
-    "file": "end2end/tests/test_user_roles.py",
+    "file": "tests/end2end/tests/test_user_roles.py",
     "name": "test_cannot_change_device_availability_when_online",
     "docstring": "Ensure tany user can block any device when status is not maintenance\n\n"
   },
   {
-    "file": "end2end/tests/test_user_roles.py",
+    "file": "tests/end2end/tests/test_user_roles.py",
     "name": "test_cannot_change_device_status",
     "docstring": "Ensure that user roles which, by definition, cannot change status are not allowed to do it.\n\n"
   },
   {
-    "file": "end2end/tests/test_user_roles.py",
+    "file": "tests/end2end/tests/test_user_roles.py",
     "name": "test_cannot_change_device_status_when_blocked",
     "docstring": "Ensure any user role can change device status when device availabiliyty is not available\n\n"
   },
   {
-    "file": "end2end/tests/test_user_roles.py",
+    "file": "tests/end2end/tests/test_user_roles.py",
     "name": "test_cannot_delete_any_runcard",
     "docstring": "Check certain users  cannot delete any runcard"
   },
   {
-    "file": "end2end/tests/test_user_roles.py",
+    "file": "tests/end2end/tests/test_user_roles.py",
     "name": "test_cannot_delete_not_owned_runcard",
     "docstring": "Check users cannot delete runcards from other users, in particular, admin."
   },
   {
-    "file": "end2end/tests/test_user_roles.py",
+    "file": "tests/end2end/tests/test_user_roles.py",
     "name": "test_cannot_get_runcard",
     "docstring": "Check certain users cannot get runcards"
   },
   {
-    "file": "end2end/tests/test_user_roles.py",
+    "file": "tests/end2end/tests/test_user_roles.py",
     "name": "test_cannot_list_runcards",
     "docstring": "Check certain users cannot list runcards"
   },
   {
-    "file": "end2end/tests/test_user_roles.py",
+    "file": "tests/end2end/tests/test_user_roles.py",
     "name": "test_cannot_list_saved_experiments",
     "docstring": "Test user roles that aren't allowed to list saved experiments can do it -- e.g bsc\n"
   },
   {
-    "file": "end2end/tests/test_user_roles.py",
+    "file": "tests/end2end/tests/test_user_roles.py",
     "name": "test_cannot_post_experiment",
     "docstring": "Test user roles that aren't allowed to post experiments can do it -- e.g bsc\n"
   },
   {
-    "file": "end2end/tests/test_user_roles.py",
+    "file": "tests/end2end/tests/test_user_roles.py",
     "name": "test_cannot_save_runcard",
     "docstring": "Check certain users cannot save runcards"
   },
   {
-    "file": "end2end/tests/test_user_roles.py",
+    "file": "tests/end2end/tests/test_user_roles.py",
     "name": "test_cannot_update_any_runcards",
     "docstring": "Check certain users can update their own runcards"
   },
   {
-    "file": "end2end/tests/test_user_roles.py",
+    "file": "tests/end2end/tests/test_user_roles.py",
     "name": "test_cannot_update_not_owned_runcards",
     "docstring": "Check users who are allowed to update runcards can only update theirs"
   },
   {
-    "file": "end2end/tests/test_user_roles.py",
+    "file": "tests/end2end/tests/test_user_roles.py",
     "name": "test_list_jobs",
     "docstring": "Test that users can see only their saved experiments"
   },
   {
-    "file": "end2end/tests/test_user_roles.py",
+    "file": "tests/end2end/tests/test_user_roles.py",
     "name": "test_post_get_and_delete_job",
     "docstring": "Post a circuit and get all its data\n\n"
   },
   {
-    "file": "end2end/tests/test_sanity_checks.py",
+    "file": "tests/end2end/tests/test_sanity_checks.py",
     "name": "test_check_all_test_jobs_and_runcards_deleted",
     "docstring": "Count number jobs and runcards before running the test suite"
   },
   {
-    "file": "end2end/tests/test_sanity_checks.py",
+    "file": "tests/end2end/tests/test_sanity_checks.py",
     "name": "test_store_initial_job_and_runcard_count",
     "docstring": "Count number jobs and runcards before running the test suite"
   },
   {
-    "file": "end2end/tests/test_circuits.py",
+    "file": "tests/end2end/tests/test_circuits.py",
     "name": "test_all_circuits",
     "docstring": "Test whether all circuits can be sent in a single job and then its result can be retrieved, for each device. This is the real user case. Note that this only considers ONLINE and AVAILABLE devices. Should be run with qili-admin-test user.\n\n\n"
   },
   {
-    "file": "end2end/tests/test_circuits.py",
+    "file": "tests/end2end/tests/test_circuits.py",
     "name": "test_five_qubit_500_gates_circuit",
     "docstring": "Test whether a five-qubit 500 gates circuit can be sent and then its result can be retrieved, for each device. This is the real user case. Note that this only considers ONLINE and AVAILABLE devices. Should be run with qili-admin-test user.\n\n\n"
   },
   {
-    "file": "end2end/tests/test_circuits.py",
+    "file": "tests/end2end/tests/test_circuits.py",
     "name": "test_one_qubit_500_gates_circuit",
     "docstring": "Test whether a one-qubit 500 gates circuit can be sent and then its result can be retrieved, for each device. This is the real user case. Note that this only considers ONLINE and AVAILABLE devices. Should be run with qili-admin-test user.\n\n"
   },
   {
-    "file": "end2end/tests/test_circuits.py",
+    "file": "tests/end2end/tests/test_circuits.py",
     "name": "test_two_qubit_500_gates_circuit",
     "docstring": "Test whether a two-qubit 500 gates circuit can be sent and then its result can be retrieved, for each device. This is the real user case. Note that this only considers ONLINE and AVAILABLE devices. Should be run with qili-admin-test user.\n\n\n"
+  },
+  {
+    "file": "tests/unit/test_runcard_typings.py",
+    "name": "test_runcard_request_creation",
+    "docstring": "Tests RuncardRequest creation"
+  },
+  {
+    "file": "tests/unit/test_runcard_typings.py",
+    "name": "test_runcard_response_creation",
+    "docstring": "Tests RuncardRequest creation"
+  },
+  {
+    "file": "tests/unit/test_live_plot.py",
+    "name": "test_ensure_packet_compatibility",
+    "docstring": "Test that the `_ensure_packet_types` works as intended in the nominal case."
+  },
+  {
+    "file": "tests/unit/test_live_plot.py",
+    "name": "test_ensure_packet_compatibility_with_bad_packet_list",
+    "docstring": "Test that the `_ensure_packet_types` function rises its error when a bad list is provided."
+  },
+  {
+    "file": "tests/unit/test_live_plot.py",
+    "name": "test_ensure_packet_types_with_bad_list",
+    "docstring": "Test that the `_ensure_packet_types` function rises its error when a bad list is provided."
+  },
+  {
+    "file": "tests/unit/test_live_plot.py",
+    "name": "test_heatmap_data_packet",
+    "docstring": "Tests heatmap data packet"
+  },
+  {
+    "file": "tests/unit/test_live_plot.py",
+    "name": "test_heatmap_data_packet_parsing_with_point_single_values",
+    "docstring": "Tests heatmap data packet with single points"
+  },
+  {
+    "file": "tests/unit/test_live_plot.py",
+    "name": "test_heatmap_data_packet_with_numpy_arrays",
+    "docstring": "Tests heatmap data packet with arrays"
+  },
+  {
+    "file": "tests/unit/test_live_plot.py",
+    "name": "test_live_plot",
+    "docstring": "test live plot"
+  },
+  {
+    "file": "tests/unit/test_live_plot.py",
+    "name": "test_live_plot_points_constructor",
+    "docstring": "test live plot creation with points"
+  },
+  {
+    "file": "tests/unit/test_live_plot.py",
+    "name": "test_live_plot_points_equality",
+    "docstring": "test live plots `__eq__`"
+  },
+  {
+    "file": "tests/unit/test_live_plot.py",
+    "name": "test_live_plot_points_raises_value_error_for_mixed_array_like_with_number_like_input",
+    "docstring": "test live plot fails when mixing points and arrays"
+  },
+  {
+    "file": "tests/unit/test_live_plot.py",
+    "name": "test_open_and_close_connection",
+    "docstring": "Test _open_connection and _close_connection work as intended"
+  },
+  {
+    "file": "tests/unit/test_live_plot.py",
+    "name": "test_open_connection_with_failing_connection",
+    "docstring": "Test _open_connection and _close_connection work as intended"
+  },
+  {
+    "file": "tests/unit/test_live_plot.py",
+    "name": "test_plotting_response_constructor",
+    "docstring": "tests plotting response"
+  },
+  {
+    "file": "tests/unit/test_live_plot.py",
+    "name": "test_plotting_response_from_response",
+    "docstring": "tests plotting response `from_response`"
+  },
+  {
+    "file": "tests/unit/test_live_plot.py",
+    "name": "test_plotting_response_to_dict",
+    "docstring": "tests plotting response `to_dict`"
+  },
+  {
+    "file": "tests/unit/test_live_plot.py",
+    "name": "test_reset_connection",
+    "docstring": "Tests _reset_connection method closes and opens a connection"
+  },
+  {
+    "file": "tests/unit/test_live_plot.py",
+    "name": "test_send_data",
+    "docstring": "Tests send_data method in the"
+  },
+  {
+    "file": "tests/unit/test_live_plot.py",
+    "name": "test_send_data_with_closed_connection",
+    "docstring": "Tests start-up method for the initialisation of a LivePlot"
+  },
+  {
+    "file": "tests/unit/test_live_plot.py",
+    "name": "test_send_data_with_missbehaving_queue",
+    "docstring": "Tests start-up method for the initialisation of a LivePlot"
+  },
+  {
+    "file": "tests/unit/test_live_plot.py",
+    "name": "test_send_data_with_too_log_lived_connection",
+    "docstring": "Tests start-up method for the initialisation of a LivePlot"
+  },
+  {
+    "file": "tests/unit/test_live_plot.py",
+    "name": "test_start_up",
+    "docstring": "Tests start-up method for the initialisation of a LivePlot"
+  },
+  {
+    "file": "tests/unit/test_live_plots.py",
+    "name": "test_check_data_and_plot_type_compatibility_rises_attribute_error",
+    "docstring": "test live plot `CheckDataAndPlotTypeCompatibility` works as expected in wrong attr err case"
+  },
+  {
+    "file": "tests/unit/test_live_plots.py",
+    "name": "test_check_data_and_plot_type_compatibility_rises_value_error_for_heatmap",
+    "docstring": "test live plot `CheckDataAndPlotTypeCompatibility` works as expected in wrong val err case"
+  },
+  {
+    "file": "tests/unit/test_live_plots.py",
+    "name": "test_check_data_and_plot_type_compatibility_rises_value_error_for_heatmap_axis",
+    "docstring": "test live plot `CheckDataAndPlotTypeCompatibility` works as expected in wrong val err case"
+  },
+  {
+    "file": "tests/unit/test_live_plots.py",
+    "name": "test_check_data_and_plot_type_compatibility_rises_value_error_for_lines",
+    "docstring": "test live plot `CheckDataAndPlotTypeCompatibility` works as expected in wrong val err case"
+  },
+  {
+    "file": "tests/unit/test_live_plots.py",
+    "name": "test_check_data_and_plot_type_compatibility_rises_value_error_for_scatter3d",
+    "docstring": "test live plot `CheckDataAndPlotTypeCompatibility` works as expected in wrong val err case"
+  },
+  {
+    "file": "tests/unit/test_live_plots.py",
+    "name": "test_check_data_and_plot_type_compatibility_with_ok_case",
+    "docstring": "test live plot `CheckDataAndPlotTypeCompatibility` works with base case"
+  },
+  {
+    "file": "tests/unit/test_live_plots.py",
+    "name": "test_live_plots_add_plot",
+    "docstring": "Tests LivePlots add plot functionality"
+  },
+  {
+    "file": "tests/unit/test_live_plots.py",
+    "name": "test_live_plots_constructor",
+    "docstring": "test live plot creation"
+  },
+  {
+    "file": "tests/unit/test_live_plots.py",
+    "name": "test_live_plots_send_data",
+    "docstring": "Tests the LivePlots send_data functionality, mocking the inferior LivePlot layer."
+  },
+  {
+    "file": "tests/unit/test_device.py",
+    "name": "test_create_offline_device",
+    "docstring": "Tests create_device() utility function creates an OfflineDevice when provided OfflineDevice-like input data"
+  },
+  {
+    "file": "tests/unit/test_device.py",
+    "name": "test_create_quantum_device",
+    "docstring": "Tests create_device() utility function creates an QuantumDevice when provided QuantumDevice-like input data"
+  },
+  {
+    "file": "tests/unit/test_device.py",
+    "name": "test_create_simulator_device",
+    "docstring": "Tests create_device() utility function creates an SimulatorDevice when provided SimulatorDevice-like input\ndata"
+  },
+  {
+    "file": "tests/unit/test_device.py",
+    "name": "test_device_constructor",
+    "docstring": "Test device instance creation"
+  },
+  {
+    "file": "tests/unit/test_device.py",
+    "name": "test_device_dict_representation",
+    "docstring": "Tests Device().__dict__ property"
+  },
+  {
+    "file": "tests/unit/test_device.py",
+    "name": "test_device_json_representation",
+    "docstring": "Tests Device().toJSON() method"
+  },
+  {
+    "file": "tests/unit/test_device.py",
+    "name": "test_device_string_representation",
+    "docstring": "Tests Device().__str__() method"
+  },
+  {
+    "file": "tests/unit/test_device.py",
+    "name": "test_is_offline_device_input",
+    "docstring": "Tests is_offline_device() utility function over an OfflineDevice-like input data"
+  },
+  {
+    "file": "tests/unit/test_device.py",
+    "name": "test_is_offline_device_input_rises_value_error_if_no_status",
+    "docstring": "Tests is_offline_device() utility function rises error when provided an OnlineDevice-like input data"
+  },
+  {
+    "file": "tests/unit/test_device.py",
+    "name": "test_is_quantum_device_input",
+    "docstring": "Tests is_quantum_device_input() utility function over an QuantumDevice-like input data"
+  },
+  {
+    "file": "tests/unit/test_device.py",
+    "name": "test_offline_device_constructor",
+    "docstring": "Tests OfflineDevice class constructor"
+  },
+  {
+    "file": "tests/unit/test_device.py",
+    "name": "test_quantum_device_characteristics_constructor",
+    "docstring": "Tests QuantumDeviceCharacteristics class constructor"
+  },
+  {
+    "file": "tests/unit/test_device.py",
+    "name": "test_quantum_device_characteristics_json_representation",
+    "docstring": "Tests QuantumDeviceCharacteristics().toJSON() method"
+  },
+  {
+    "file": "tests/unit/test_device.py",
+    "name": "test_quantum_device_constructor",
+    "docstring": "Tests QuantumDevice class constructor"
+  },
+  {
+    "file": "tests/unit/test_device.py",
+    "name": "test_quantum_device_dict_representation",
+    "docstring": "Tests QuantumDevice().__dict__ property"
+  },
+  {
+    "file": "tests/unit/test_device.py",
+    "name": "test_quantum_device_json_representation",
+    "docstring": "Tests QuantumDevice().toJSON() representation"
+  },
+  {
+    "file": "tests/unit/test_device.py",
+    "name": "test_simulator_device_characteristics_constructor",
+    "docstring": "Tests SimulatorCharacteristics class constructor"
+  },
+  {
+    "file": "tests/unit/test_device.py",
+    "name": "test_simulator_device_characteristics_json_representation",
+    "docstring": "Tests SimulatorDeviceCharacteristics().toJSON() method"
+  },
+  {
+    "file": "tests/unit/test_device.py",
+    "name": "test_simulator_device_constructor",
+    "docstring": "Tests SimulatorDevice class constructor"
+  },
+  {
+    "file": "tests/unit/test_device.py",
+    "name": "test_simulator_device_dict_representation",
+    "docstring": "Tests SimulatorDevice().__str__() method"
+  },
+  {
+    "file": "tests/unit/test_device.py",
+    "name": "test_simulator_device_json_representation",
+    "docstring": "Tests SimulatorDevice().toJSON() method"
+  },
+  {
+    "file": "tests/unit/test_util.py",
+    "name": "test_base64url_decode",
+    "docstring": "Test the base64url_decode() function"
+  },
+  {
+    "file": "tests/unit/test_util.py",
+    "name": "test_base64url_decode_list",
+    "docstring": "Test the base64url_decode() function providing it a list of dicts."
+  },
+  {
+    "file": "tests/unit/test_util.py",
+    "name": "test_base64url_encode",
+    "docstring": "Tests the base64url_encode() function."
+  },
+  {
+    "file": "tests/unit/test_util.py",
+    "name": "test_base64url_encode_list",
+    "docstring": "Tests the base64url_encode() function providing it a list of dicts."
+  },
+  {
+    "file": "tests/unit/test_util.py",
+    "name": "test_deserialize_job_description",
+    "docstring": "Unit test of deserialize_job_description()"
+  },
+  {
+    "file": "tests/unit/test_util.py",
+    "name": "test_from_kwargs",
+    "docstring": "Test of from_kwargs methods requires all explicitly typed attributes but accepts new ones."
+  },
+  {
+    "file": "tests/unit/test_util.py",
+    "name": "test_process_response",
+    "docstring": "Test that process_response() recovers the correct parameters (text and status_code)."
+  },
+  {
+    "file": "tests/unit/test_util.py",
+    "name": "test_process_response_non_json",
+    "docstring": "Test that process_response() recovers the correct parameters (text and status_code)."
+  },
+  {
+    "file": "tests/unit/test_environment.py",
+    "name": "test_development_environmemt",
+    "docstring": "Test get_environment() returns a DEVELOPMENT environment when the QIBOCONNECTION_ENVIRONMENT env variable is set\nto 'development'"
+  },
+  {
+    "file": "tests/unit/test_environment.py",
+    "name": "test_environment_constructor",
+    "docstring": "Test Environment class constructor."
+  },
+  {
+    "file": "tests/unit/test_environment.py",
+    "name": "test_environment_constructor_raises_value_error_for_unexpected_environment_types",
+    "docstring": "Test Environment class constructor."
+  },
+  {
+    "file": "tests/unit/test_environment.py",
+    "name": "test_local_environmemt",
+    "docstring": "Test get_environment() returns a LOCAL environment when the QIBOCONNECTION_ENVIRONMENT env variable is set to\n'local'"
+  },
+  {
+    "file": "tests/unit/test_environment.py",
+    "name": "test_staging_environmemt",
+    "docstring": "Test get_environment() returns a STAGING environment when the QIBOCONNECTION_ENVIRONMENT env variable is set to\n'staging'"
+  },
+  {
+    "file": "tests/unit/test_connection.py",
+    "name": "test_connection_user_id_setter",
+    "docstring": "Test Connection user property"
+  },
+  {
+    "file": "tests/unit/test_connection.py",
+    "name": "test_connection_user_id_setter_when_user_not_defined",
+    "docstring": "Test Connection user property"
+  },
+  {
+    "file": "tests/unit/test_connection.py",
+    "name": "test_connection_user_id_when_user_not_defined",
+    "docstring": "Test Connection user property"
+  },
+  {
+    "file": "tests/unit/test_connection.py",
+    "name": "test_constructor",
+    "docstring": "Test Connection class constructor"
+  },
+  {
+    "file": "tests/unit/test_connection.py",
+    "name": "test_refresh_token_if_unauthorised_when_ok",
+    "docstring": "Tests the refresh_token_if_unauthorised with a valid response"
+  },
+  {
+    "file": "tests/unit/test_connection.py",
+    "name": "test_refresh_token_if_unauthorised_when_other_error",
+    "docstring": "Tests the refresh_token_if_unauthorised with a valid response"
+  },
+  {
+    "file": "tests/unit/test_connection.py",
+    "name": "test_refresh_token_if_unauthorised_when_unauthorised",
+    "docstring": "Tests the refresh_token_if_unauthorised with a valid response"
+  },
+  {
+    "file": "tests/unit/test_connection.py",
+    "name": "test_request_authorisation_token_with_ise",
+    "docstring": "tests send_get_remote_call"
+  },
+  {
+    "file": "tests/unit/test_connection.py",
+    "name": "test_request_authorisation_token_with_no_url_raises_error",
+    "docstring": "tests send_get_remote_call"
+  },
+  {
+    "file": "tests/unit/test_connection.py",
+    "name": "test_request_authorisation_token_with_ok_response",
+    "docstring": "tests send_get_remote_call"
+  },
+  {
+    "file": "tests/unit/test_connection.py",
+    "name": "test_send_delete_auth_remote_api_call",
+    "docstring": "tests send_delete_auth_remote_api_call"
+  },
+  {
+    "file": "tests/unit/test_connection.py",
+    "name": "test_send_delete_auth_remote_api_call_not_204_not_job_details",
+    "docstring": "tests send_delete_auth_remote_api_call raise"
+  },
+  {
+    "file": "tests/unit/test_connection.py",
+    "name": "test_send_delete_auth_remote_api_call_not_204_with_job_details",
+    "docstring": "tests send_delete_auth_remote_api_call raise"
+  },
+  {
+    "file": "tests/unit/test_connection.py",
+    "name": "test_send_file",
+    "docstring": "Asserts correct put function is called for updating a device status"
+  },
+  {
+    "file": "tests/unit/test_connection.py",
+    "name": "test_send_get_auth_remote_api_call",
+    "docstring": "tests send_get_auth_remote_api_call"
+  },
+  {
+    "file": "tests/unit/test_connection.py",
+    "name": "test_send_get_auth_remote_api_call_all_pages",
+    "docstring": ""
+  },
+  {
+    "file": "tests/unit/test_connection.py",
+    "name": "test_send_get_auth_remote_api_call_exception",
+    "docstring": "tests send_get_auth_remote_api_call"
+  },
+  {
+    "file": "tests/unit/test_connection.py",
+    "name": "test_send_get_remote_call",
+    "docstring": "tests send_get_remote_call"
+  },
+  {
+    "file": "tests/unit/test_connection.py",
+    "name": "test_send_message",
+    "docstring": "Asserts correct put function is called for updating a device status"
+  },
+  {
+    "file": "tests/unit/test_connection.py",
+    "name": "test_send_post_auth_remote_api_call",
+    "docstring": "tests send_post_auth_remote_api_call"
+  },
+  {
+    "file": "tests/unit/test_connection.py",
+    "name": "test_send_post_file_auth_remote_api_call",
+    "docstring": ""
+  },
+  {
+    "file": "tests/unit/test_connection.py",
+    "name": "test_send_put_auth_remote_api_call",
+    "docstring": "tests send_put_auth_remote_api_call"
+  },
+  {
+    "file": "tests/unit/test_connection.py",
+    "name": "test_update_authorisation_using_refresh_token",
+    "docstring": "test Connection's update_authorisation_using_refresh_token"
+  },
+  {
+    "file": "tests/unit/test_connection.py",
+    "name": "test_update_authorisation_using_refresh_token_no_server_refresh_api_call",
+    "docstring": "test Connection's update_authorisation_using_refresh_token, with no refresh api call defined"
+  },
+  {
+    "file": "tests/unit/test_connection.py",
+    "name": "test_update_authorisation_using_refresh_token_unsuccessful",
+    "docstring": "test Connection's update_authorisation_using_refresh_token"
+  },
+  {
+    "file": "tests/unit/test_connection.py",
+    "name": "test_update_device_availability",
+    "docstring": "Asserts correct put function is called for updating a device status"
+  },
+  {
+    "file": "tests/unit/test_connection.py",
+    "name": "test_update_device_status",
+    "docstring": "Asserts correct put function is called for updating a device status"
+  },
+  {
+    "file": "tests/unit/test_connection.py",
+    "name": "test_user",
+    "docstring": "Test Connection user property"
+  },
+  {
+    "file": "tests/unit/test_connection.py",
+    "name": "test_user_id",
+    "docstring": "Test Connection user property"
+  },
+  {
+    "file": "tests/unit/test_connection.py",
+    "name": "test_user_slack_id",
+    "docstring": "Test Connection user_slack_id property"
+  },
+  {
+    "file": "tests/unit/test_connection.py",
+    "name": "test_user_slack_id_ise",
+    "docstring": "Test Connection user_slack_id property fails with failing response"
+  },
+  {
+    "file": "tests/unit/test_connection.py",
+    "name": "test_user_slack_id_local",
+    "docstring": "Test Connection user_slack_id property"
+  },
+  {
+    "file": "tests/unit/test_connection.py",
+    "name": "test_user_slack_id_without_slack_id",
+    "docstring": "Test Connection user_slack_id property"
+  },
+  {
+    "file": "tests/unit/test_connection.py",
+    "name": "test_user_slack_id_without_user",
+    "docstring": "Test Connection user_slack_id property fails without local user"
+  },
+  {
+    "file": "tests/unit/test_connection.py",
+    "name": "test_user_when_not_defined",
+    "docstring": "Test Connection user property"
+  },
+  {
+    "file": "tests/unit/test_connection.py",
+    "name": "test_username",
+    "docstring": "Test Connection user property"
+  },
+  {
+    "file": "tests/unit/test_connection.py",
+    "name": "test_username_when_user_not_defined",
+    "docstring": "Test Connection user property"
+  },
+  {
+    "file": "tests/unit/test_job.py",
+    "name": "test_job_creation",
+    "docstring": "Test job creation\n\n"
+  },
+  {
+    "file": "tests/unit/test_job.py",
+    "name": "test_job_creation_default_values",
+    "docstring": "test job creation using the default values\n\n"
+  },
+  {
+    "file": "tests/unit/test_job.py",
+    "name": "test_job_creation_experiment",
+    "docstring": "test job creation using an experiment instead of a circuit\n\n"
+  },
+  {
+    "file": "tests/unit/test_job.py",
+    "name": "test_job_creation_experiment_raises_value_error_when_both_circuit_and_experiment_are_defined",
+    "docstring": "test job creation using both experiment and circuit at the same time\n\n"
+  },
+  {
+    "file": "tests/unit/test_job.py",
+    "name": "test_job_creation_experiment_raises_value_error_when_neither_of_circuit_and_experiment_are_defined",
+    "docstring": "test job creation using neither experiment nor circuit\n\n"
+  },
+  {
+    "file": "tests/unit/test_job.py",
+    "name": "test_job_request_raises_value_error_if_not_circuit_or_experiment",
+    "docstring": "test job raises proper exceptions when trying to build request with none of circuit, experiment\n\n"
+  },
+  {
+    "file": "tests/unit/test_job.py",
+    "name": "test_job_request_raises_value_error_if_several_of_circuit_and_experiment",
+    "docstring": "test job raises proper exceptions when trying to build request with more than one of circuit, experiment\n\n"
+  },
+  {
+    "file": "tests/unit/test_job.py",
+    "name": "test_job_request_with_circuit",
+    "docstring": "test job request\n\n"
+  },
+  {
+    "file": "tests/unit/test_job.py",
+    "name": "test_job_request_with_experiment",
+    "docstring": "test job request\n\n"
+  },
+  {
+    "file": "tests/unit/test_job.py",
+    "name": "test_jobs_job_type_raises_value_error",
+    "docstring": "test job.job_type raises value error when unable to determine type\n\n"
+  },
+  {
+    "file": "tests/unit/test_job.py",
+    "name": "test_update_with_job_response",
+    "docstring": "test update with job response\n\n"
+  },
+  {
+    "file": "tests/unit/test_job.py",
+    "name": "test_update_with_job_response_raises_error_when_updating_incorrect_job",
+    "docstring": "test update with job response of different user or from different device raises ValueError\n\n"
+  },
+  {
+    "file": "tests/unit/test_devices.py",
+    "name": "test_devices_constructor",
+    "docstring": "Test Devices class constructor"
+  },
+  {
+    "file": "tests/unit/test_devices.py",
+    "name": "test_devices_constructor_with_device_list",
+    "docstring": "Test Devices class constructor providing a list of devices"
+  },
+  {
+    "file": "tests/unit/test_devices.py",
+    "name": "test_devices_constructor_with_single_device",
+    "docstring": "Test Devices class constructor providing a single device"
+  },
+  {
+    "file": "tests/unit/test_devices.py",
+    "name": "test_devices_json",
+    "docstring": "Test Devices().toJSON() method"
+  },
+  {
+    "file": "tests/unit/test_devices.py",
+    "name": "test_devices_select_device",
+    "docstring": "Test Devices().select_device() method"
+  },
+  {
+    "file": "tests/unit/test_devices.py",
+    "name": "test_devices_select_device_raises_value_error_for_duplicated",
+    "docstring": "Test Devices.select_device() method providing it an id of a duplicated device."
+  },
+  {
+    "file": "tests/unit/test_devices.py",
+    "name": "test_devices_select_device_raises_value_error_for_nonexistent_devices",
+    "docstring": "Test Devices().select_device() method providing it an id of a non-existing device."
+  },
+  {
+    "file": "tests/unit/test_devices.py",
+    "name": "test_devices_str",
+    "docstring": "Test Devices().__str__() method"
+  },
+  {
+    "file": "tests/unit/test_devices.py",
+    "name": "test_devices_update_device",
+    "docstring": "Test Devices().add_or_update() method with a not-preexisting device (add) and with a preexisting device\n(update)"
+  },
+  {
+    "file": "tests/unit/test_errors.py",
+    "name": "test_connection_exception",
+    "docstring": "Test the ConnectionException is raised properly when explicitly raised."
+  },
+  {
+    "file": "tests/unit/test_errors.py",
+    "name": "test_custom_raise_for_status_400",
+    "docstring": "Test custom_raise_for_status() raises the proper exception when meeting a status_code 400 response."
+  },
+  {
+    "file": "tests/unit/test_errors.py",
+    "name": "test_custom_raise_for_status_500",
+    "docstring": "Test custom_raise_for_status() raises the proper exception when meeting a status_code 500 response."
+  },
+  {
+    "file": "tests/unit/test_errors.py",
+    "name": "test_remote_execution_exception",
+    "docstring": "Test the RemoteExecutionException is raised properly when explicitly raised."
+  },
+  {
+    "file": "tests/unit/test_algorithm.py",
+    "name": "test_algorithm_definition_constructor",
+    "docstring": "Tests the AlgorithmDefinition class constructor"
+  },
+  {
+    "file": "tests/unit/test_algorithm.py",
+    "name": "test_algorithm_definition_dict_representation",
+    "docstring": "Tests the AlgorithmDefinition().__dict__ method"
+  },
+  {
+    "file": "tests/unit/test_algorithm.py",
+    "name": "test_algorithm_options_constructor",
+    "docstring": "Tests the AlgorithmOptions class constructor"
+  },
+  {
+    "file": "tests/unit/test_algorithm.py",
+    "name": "test_algorithm_options_dict_representation",
+    "docstring": "Tests the AlgorithmOptions().__dict__ method"
+  },
+  {
+    "file": "tests/unit/test_saved_experiment_typings.py",
+    "name": "test_saved_experiment_listing_item_response_creation",
+    "docstring": "Tests SavedExperimentListingItemResponse creation"
+  },
+  {
+    "file": "tests/unit/test_saved_experiment_typings.py",
+    "name": "test_saved_experiment_request_creation",
+    "docstring": "Tests SavedExperimentRequest creation"
+  },
+  {
+    "file": "tests/unit/test_saved_experiment_typings.py",
+    "name": "test_saved_experiment_response_creation",
+    "docstring": "Tests SavedExperimentResponse creation"
+  },
+  {
+    "file": "tests/unit/test_job_result.py",
+    "name": "test_job_result_creation",
+    "docstring": "Test job result creation"
+  },
+  {
+    "file": "tests/unit/test_job_result.py",
+    "name": "test_job_result_program_raises_error",
+    "docstring": "Test we are rising exceptions to inform correctly that PROGRAMS are not currently supported."
+  },
+  {
+    "file": "tests/unit/test_runcard.py",
+    "name": "test_runcard_creation",
+    "docstring": "Tests Runcard Creation"
+  },
+  {
+    "file": "tests/unit/test_runcard.py",
+    "name": "test_runcard_creation_from_response",
+    "docstring": "Tests Runcard Creation"
+  },
+  {
+    "file": "tests/unit/test_runcard.py",
+    "name": "test_runcard_request",
+    "docstring": "Tests Runcard request builder method"
+  },
+  {
+    "file": "tests/unit/test_user.py",
+    "name": "test_user_constructor",
+    "docstring": "Test User class constructor."
+  },
+  {
+    "file": "tests/unit/test_job_listing_typings.py",
+    "name": "test_JobData_typing",
+    "docstring": "Test JobData typing, this is what is returned to the user with get_job()."
+  },
+  {
+    "file": "tests/unit/test_job_listing_typings.py",
+    "name": "test_JobData_typing_descripton_raises_value_error",
+    "docstring": "Test JobData typing, this is what is returned to the user with get_job()."
+  },
+  {
+    "file": "tests/unit/test_job_listing_typings.py",
+    "name": "test_JobData_typing_result_raises_value_error",
+    "docstring": "Test JobData typing raises error if results are not the correct type"
+  },
+  {
+    "file": "tests/unit/test_job_listing_typings.py",
+    "name": "test_job_listing_item_response_typing",
+    "docstring": "Test JobListingItemResponse instantiation"
+  },
+  {
+    "file": "tests/unit/test_api.py",
+    "name": "test_api_constructor",
+    "docstring": "Test API class constructor"
+  },
+  {
+    "file": "tests/unit/test_api.py",
+    "name": "test_api_login",
+    "docstring": "Tests user utility constructor Login calls __init__ with the correct information,"
+  },
+  {
+    "file": "tests/unit/test_api.py",
+    "name": "test_create_live_plot",
+    "docstring": "Test the creation of a liveplot using the api"
+  },
+  {
+    "file": "tests/unit/test_api.py",
+    "name": "test_create_live_plot_with_unexpected_response",
+    "docstring": "Test the creation of a liveplot using the api"
+  },
+  {
+    "file": "tests/unit/test_api.py",
+    "name": "test_delete_job",
+    "docstring": "Tests API.delete_job() method"
+  },
+  {
+    "file": "tests/unit/test_api.py",
+    "name": "test_delete_job_exception",
+    "docstring": "Tests API.delete_job() method with non-existent job id"
+  },
+  {
+    "file": "tests/unit/test_api.py",
+    "name": "test_delete_runcard",
+    "docstring": "Tests API.delete_runcard() method"
+  },
+  {
+    "file": "tests/unit/test_api.py",
+    "name": "test_delete_runcard_ise",
+    "docstring": "Tests API.delete_runcard() method"
+  },
+  {
+    "file": "tests/unit/test_api.py",
+    "name": "test_fav_saved_experiment",
+    "docstring": "Tests API.fav_saved_experiment() with ONE experiment"
+  },
+  {
+    "file": "tests/unit/test_api.py",
+    "name": "test_fav_saved_experiment_ise",
+    "docstring": "Tests API.fav_saved_experiment() with ONE experiment"
+  },
+  {
+    "file": "tests/unit/test_api.py",
+    "name": "test_fav_saved_experiments",
+    "docstring": "Tests API.fav_saved_experiments() method with a LIST of experiments"
+  },
+  {
+    "file": "tests/unit/test_api.py",
+    "name": "test_fav_saved_experiments_ise",
+    "docstring": "Tests API.fav_saved_experiments() method with a LIST of experiments"
+  },
+  {
+    "file": "tests/unit/test_api.py",
+    "name": "test_get_job",
+    "docstring": "Tests API.get_job() method."
+  },
+  {
+    "file": "tests/unit/test_api.py",
+    "name": "test_get_job_exception",
+    "docstring": "Tests API.get_result() method with non-existent job id"
+  },
+  {
+    "file": "tests/unit/test_api.py",
+    "name": "test_get_result_exception",
+    "docstring": "Tests API.get_result() method with non-existent job id."
+  },
+  {
+    "file": "tests/unit/test_api.py",
+    "name": "test_get_runcard",
+    "docstring": "Tests API.get_runcard() method using runcard id"
+  },
+  {
+    "file": "tests/unit/test_api.py",
+    "name": "test_get_runcard_by_name",
+    "docstring": "Tests API.get_runcard() method using runcard name"
+  },
+  {
+    "file": "tests/unit/test_api.py",
+    "name": "test_get_runcard_ise",
+    "docstring": "Tests API.get_runcard() method when server response raises an error"
+  },
+  {
+    "file": "tests/unit/test_api.py",
+    "name": "test_get_runcard_with_insufficient_info",
+    "docstring": "Tests API.get_runcard() method fails if not name nor id are provided"
+  },
+  {
+    "file": "tests/unit/test_api.py",
+    "name": "test_get_runcard_with_redundant_info",
+    "docstring": "Tests API.get_runcard() method fails when providing name and id at the same time"
+  },
+  {
+    "file": "tests/unit/test_api.py",
+    "name": "test_get_saved_experiment",
+    "docstring": "Tests API.get_saved_experiment() method"
+  },
+  {
+    "file": "tests/unit/test_api.py",
+    "name": "test_get_saved_experiment_ise",
+    "docstring": "Tests API.get_saved_experiment() method"
+  },
+  {
+    "file": "tests/unit/test_api.py",
+    "name": "test_get_saved_experiments",
+    "docstring": "Tests API.get_saved_experiments() method"
+  },
+  {
+    "file": "tests/unit/test_api.py",
+    "name": "test_get_saved_experiments_ise",
+    "docstring": "Tests API.get_saved_experiments() method"
+  },
+  {
+    "file": "tests/unit/test_api.py",
+    "name": "test_jobs",
+    "docstring": "Test jobs property"
+  },
+  {
+    "file": "tests/unit/test_api.py",
+    "name": "test_last_job",
+    "docstring": "Test last_job property"
+  },
+  {
+    "file": "tests/unit/test_api.py",
+    "name": "test_last_runcard",
+    "docstring": "Test last_runcard property"
+  },
+  {
+    "file": "tests/unit/test_api.py",
+    "name": "test_last_saved_experiment",
+    "docstring": "Test last_saved_experiment property"
+  },
+  {
+    "file": "tests/unit/test_api.py",
+    "name": "test_last_saved_experiment_listing",
+    "docstring": "Test last_saved_experiment_listing property"
+  },
+  {
+    "file": "tests/unit/test_api.py",
+    "name": "test_list_devices",
+    "docstring": "Test list devices function"
+  },
+  {
+    "file": "tests/unit/test_api.py",
+    "name": "test_list_devices_ise",
+    "docstring": "Test list devices function"
+  },
+  {
+    "file": "tests/unit/test_api.py",
+    "name": "test_list_jobs",
+    "docstring": "Tests API.list_jobs() method"
+  },
+  {
+    "file": "tests/unit/test_api.py",
+    "name": "test_list_runcards",
+    "docstring": "Tests API.list_runcard() method"
+  },
+  {
+    "file": "tests/unit/test_api.py",
+    "name": "test_list_runcards_ise",
+    "docstring": "Tests API.list_runcard() method"
+  },
+  {
+    "file": "tests/unit/test_api.py",
+    "name": "test_list_saved_experiments",
+    "docstring": "Tests API.list_saved_experiments() method"
+  },
+  {
+    "file": "tests/unit/test_api.py",
+    "name": "test_list_saved_experiments_ise",
+    "docstring": "Tests API.list_saved_experiments() method"
+  },
+  {
+    "file": "tests/unit/test_api.py",
+    "name": "test_no_devices_selected_exception",
+    "docstring": "Tests API.execute() method with no devices selected"
+  },
+  {
+    "file": "tests/unit/test_api.py",
+    "name": "test_ping",
+    "docstring": "Test ping function"
+  },
+  {
+    "file": "tests/unit/test_api.py",
+    "name": "test_ping_ise",
+    "docstring": "Test ping function with failing"
+  },
+  {
+    "file": "tests/unit/test_api.py",
+    "name": "test_save_experiment",
+    "docstring": "Tests API.save_experiment() method"
+  },
+  {
+    "file": "tests/unit/test_api.py",
+    "name": "test_save_experiment_ise",
+    "docstring": "Tests API.save_experiment() method"
+  },
+  {
+    "file": "tests/unit/test_api.py",
+    "name": "test_save_runcard",
+    "docstring": "Tests API.save_runcard() method"
+  },
+  {
+    "file": "tests/unit/test_api.py",
+    "name": "test_save_runcard_ise",
+    "docstring": "Tests API.save_runcard() method"
+  },
+  {
+    "file": "tests/unit/test_api.py",
+    "name": "test_select_device_id",
+    "docstring": "Test list devices function"
+  },
+  {
+    "file": "tests/unit/test_api.py",
+    "name": "test_select_device_id_ise",
+    "docstring": "Test list devices function"
+  },
+  {
+    "file": "tests/unit/test_api.py",
+    "name": "test_select_device_ids",
+    "docstring": "Test list devices function"
+  },
+  {
+    "file": "tests/unit/test_api.py",
+    "name": "test_select_device_ids_ise",
+    "docstring": "Test list devices function"
+  },
+  {
+    "file": "tests/unit/test_api.py",
+    "name": "test_send_plot_points",
+    "docstring": "Test the creation of a liveplot using the api"
+  },
+  {
+    "file": "tests/unit/test_api.py",
+    "name": "test_unfav_saved_experiment",
+    "docstring": "Tests API.unfav_saved_experiment() method with ONE experiment"
+  },
+  {
+    "file": "tests/unit/test_api.py",
+    "name": "test_unfav_saved_experiment_ise",
+    "docstring": "Tests API.unfav_saved_experiment() method with ONE experiment"
+  },
+  {
+    "file": "tests/unit/test_api.py",
+    "name": "test_unfav_saved_experiments",
+    "docstring": "Tests API.unfav_saved_experiments() method with a LIST of experiments"
+  },
+  {
+    "file": "tests/unit/test_api.py",
+    "name": "test_unfav_saved_experiments_ise",
+    "docstring": "Tests API.unfav_saved_experiments() method with a LIST of experiments"
+  },
+  {
+    "file": "tests/unit/test_api.py",
+    "name": "test_update_runcard",
+    "docstring": "Tests API.update_runcard() method"
+  },
+  {
+    "file": "tests/unit/test_api.py",
+    "name": "test_update_runcard_ise",
+    "docstring": "Tests API.update_runcard() method"
+  },
+  {
+    "file": "tests/unit/test_api.py",
+    "name": "test_update_runcard_with_no_id",
+    "docstring": "Tests API.update_runcard() method"
+  },
+  {
+    "file": "tests/unit/test_api.py",
+    "name": "test_user_id",
+    "docstring": "Test last_runcard property"
+  },
+  {
+    "file": "tests/unit/test_saved_experiment_listing.py",
+    "name": "test_saved_experiment_listing_creation",
+    "docstring": "Tests SavedExperimentListing creation"
+  },
+  {
+    "file": "tests/unit/test_saved_experiment_listing.py",
+    "name": "test_saved_experiment_listing_creation_from_response",
+    "docstring": "Tests SavedExperimentListing creation"
+  },
+  {
+    "file": "tests/unit/test_saved_experiment_listing.py",
+    "name": "test_saved_experiment_listing_item_creation",
+    "docstring": "Tests SavedExperimentListingItem creation"
+  },
+  {
+    "file": "tests/unit/test_saved_experiment_listing.py",
+    "name": "test_saved_experiment_listing_item_creation_from_response",
+    "docstring": "Tests SavedExperimentListingItem's from_response() constructor"
+  },
+  {
+    "file": "tests/unit/test_job_listing.py",
+    "name": "test_job_listing_creation_dataframe",
+    "docstring": "Ensure job are listed as dataframes"
+  },
+  {
+    "file": "tests/unit/test_job_listing.py",
+    "name": "test_job_listing_item_creation_from_response",
+    "docstring": "JobListingItem cration from response"
+  },
+  {
+    "file": "tests/unit/test_saved_experiment.py",
+    "name": "test_saved_experiment_creation",
+    "docstring": "Tests SavedExperiment creation"
+  },
+  {
+    "file": "tests/unit/test_saved_experiment.py",
+    "name": "test_saved_experiment_creation_from_response",
+    "docstring": "Tests SavedExperiment creation from response"
+  },
+  {
+    "file": "tests/unit/test_saved_experiment.py",
+    "name": "test_saved_experiment_request",
+    "docstring": "Tests SavedExperiment request builder method"
   }
 ]

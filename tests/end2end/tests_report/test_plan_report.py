@@ -294,17 +294,19 @@ Tools to perform several kind of reports in relation with the test definition an
     parser.add_argument("--report", action="store_true", help="Generates a Report with the Test Run")
 
     parser.add_argument("--cfg_logger", default="./logging.ini", help="Logger config file")
-    parser.add_argument("--dir", default="end2end", help="Base folder searching for tests")
-    parser.add_argument("--json_plan", default="end2end/logs/test_plan.json", help="File with the report")
+    parser.add_argument("--dir", default="tests", help="Base folder searching for tests")
+    parser.add_argument("--json_plan", default="tests/end2end/logs/test_plan.json", help="File with the report")
     parser.add_argument(
-        "--json_results", default="end2end/logs/test_results.json", help="File with the result of the execution"
+        "--json_results", default="tests/end2end/logs/test_results.json", help="File with the result of the execution"
     )
     parser.add_argument(
-        "--json_run", default="end2end/logs/test_run.json", help="File with the combination of test plan + test results"
+        "--json_run",
+        default="tests/end2end/logs/test_run.json",
+        help="File with the combination of test plan + test results",
     )
-    parser.add_argument("--out_report", default="end2end/logs/test_run.html", help="HTML file with the test run")
+    parser.add_argument("--out_report", default="tests/end2end/logs/test_run.html", help="HTML file with the test run")
     parser.add_argument(
-        "--tmpl_report", default="end2end/tests_report/test_run.html.tmpl", help="Template with the HTML"
+        "--tmpl_report", default="tests/end2end/tests_report/test_run.html.tmpl", help="Template with the HTML"
     )
 
     args = parser.parse_args()
