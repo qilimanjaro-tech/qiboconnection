@@ -3,13 +3,12 @@
 import logging
 
 import pytest
+from end2end.utils.operations import Operation, check_operation_possible_or_skip
+from end2end.utils.utils import delete_job, get_devices_listing_params, post_and_get_result
 from qibo.models import Circuit
 
 from qiboconnection.api import API
 from qiboconnection.models.devices import Device
-
-from .utils.operations import Operation, check_operation_possible_or_skip
-from .utils.utils import delete_job, get_devices_listing_params, post_and_get_result
 
 # ------------------------------------------------------------------------ TESTS
 

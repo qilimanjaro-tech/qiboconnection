@@ -3,12 +3,12 @@ import os
 from pathlib import Path
 from typing import Union
 
-from http_utils import send_slack_file, send_slack_message
+from ..utils.slack_report_utils import send_slack_file, send_slack_message
 
 os.environ["QIBOCONNECTION_ENVIRONMENT"] = "development"
 
 # GLOBALS
-WORKDIR = Path(".")
+WORKDIR = Path("end2end")  # cwd in daily_e2e_tests.yml in qgqs is qiboconnection/tests
 LOGS_PATH = WORKDIR / "logs"
 PATH_SUMMARY = LOGS_PATH / "summary.txt"
 PATH_TEST_RUN = LOGS_PATH / "test_run.json"

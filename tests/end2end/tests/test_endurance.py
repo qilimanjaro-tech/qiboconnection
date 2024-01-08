@@ -3,15 +3,14 @@
 import logging
 
 import pytest
+from end2end.utils.operations import Operation, check_operation_possible_or_skip
+from end2end.utils.utils import get_devices_listing_params, post_and_get_result
 from qibo.models import Circuit
 
 from qiboconnection.api import API
 from qiboconnection.models.devices import Device
 from qiboconnection.typings.enums import JobStatus
 from qiboconnection.typings.responses.job_response import JobResponse
-
-from .utils.operations import Operation, check_operation_possible_or_skip
-from .utils.utils import get_devices_listing_params, post_and_get_result
 
 
 @pytest.mark.parametrize("device", get_devices_listing_params())
