@@ -5,5 +5,4 @@ plugins: pylama-8.4.1, json-0.4.0, forked-1.4.0, typeguard-2.13.3, xdist-2.5.0, 
 collected 161 items
 
 tests/test_sanity_checks.py F
-tests/test_circuits.py ssssssssssss
-tests/test_end2end.py .....
+tests/test_circuits.py ssss

@@ -7,6 +7,8 @@ import sys
 
 import pytest
 from qibo.models import Circuit
+from utils.operations import Operation, OperationResult, check_operation_possible_or_skip, get_expected_operation_result
+from utils.utils import delete_job, get_device, get_devices_listing_params, get_job_result, post_and_get_result
 
 from qiboconnection.api import API
 from qiboconnection.models.devices import Device
@@ -18,8 +20,7 @@ from qiboconnection.typings.job_data import JobData
 from qiboconnection.typings.responses.job_response import JobResponse
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
-from utils.operations import Operation, OperationResult, check_operation_possible_or_skip, get_expected_operation_result
-from utils.utils import delete_job, get_device, get_devices_listing_params, get_job_result, post_and_get_result
+
 
 # ------------------------------------------------------------------------ TESTS
 

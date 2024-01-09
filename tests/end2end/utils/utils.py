@@ -10,6 +10,7 @@ from time import sleep
 
 import pytest
 from qibo.models.circuit import Circuit
+from utils.operations import is_development
 
 from qiboconnection.api import API
 from qiboconnection.errors import HTTPError
@@ -19,7 +20,6 @@ from qiboconnection.typings.enums import DeviceAvailability, DeviceStatus, JobSt
 from qiboconnection.typings.job_data import JobData
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-from utils.operations import is_development
 
 
 class MissingCredentialsException(ValueError):
