@@ -9,9 +9,11 @@ import os
 import re
 import sys
 
-# It should be nicer to get this info from pytest but I have not find an easy ENum with all the
+# It should be nicer to get this info from pytest but I have not find an easy Enum with all the
 # possible outcomes
 ALL_OUTCOMES = ["passed", "skipped", "failed"]
+# pylint: disable=broad-exception-raised
+# pylint: disable=raising-format-tuple
 
 
 class MyArgumentFormatter(argparse.ArgumentDefaultsHelpFormatter, argparse.RawTextHelpFormatter):
@@ -32,9 +34,8 @@ def _group(values, keyField, allowDuplicates=True, keyRequired=True):
                 if v not in keyValue:
                     if keyRequired:
                         raise Exception("Key %s not found in %s and it is required", v, keyValue)
-                    else:
-                        keyValue = None
-                        break
+                    keyValue = None
+                    break
                 keyValue = keyValue[v]
 
         if keyValue:
@@ -45,7 +46,7 @@ def _group(values, keyField, allowDuplicates=True, keyRequired=True):
                 data[keyValue].append(item)
             else:
                 if keyValue in data:
-                    raise Exception(f"Dupplicated key {keyValue} in {data} and they are not allowed")
+                    raise Exception("Duplicated key %s in %s and they are not allowed", keyValue, data)
                 data[keyValue] = item
 
     return data
