@@ -1,15 +1,19 @@
 """Testing different large circuits."""
 # pylint: disable=logging-fstring-interpolation
 import logging
+import os
+import sys
 
 import pytest
 from qibo.models import Circuit
+from utils.operations import Operation, check_operation_possible_or_skip
+from utils.utils import delete_job, get_devices_listing_params, post_and_get_result
 
 from qiboconnection.api import API
 from qiboconnection.models.devices import Device
 
-from .utils.operations import Operation, check_operation_possible_or_skip
-from .utils.utils import delete_job, get_devices_listing_params, post_and_get_result
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
+
 
 # ------------------------------------------------------------------------ TESTS
 

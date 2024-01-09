@@ -1,0 +1,8 @@
+============================= test session starts ==============================
+platform linux -- Python 3.11.3, pytest-7.1.3, pluggy-1.0.0
+rootdir: /home/adria/Projects/qiboconnection/tests/end2end, configfile: pytest.ini
+plugins: pylama-8.4.1, json-0.4.0, forked-1.4.0, typeguard-2.13.3, xdist-2.5.0, html-4.1.1, anyio-3.6.2, cov-4.0.0, order-1.1.0, metadata-3.0.0
+collected 161 items
+
+tests/test_sanity_checks.py F
+tests/test_circuits.py ssss
