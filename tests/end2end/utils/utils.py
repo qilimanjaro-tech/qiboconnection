@@ -9,7 +9,6 @@ from time import sleep
 
 import pytest
 from qibo.models.circuit import Circuit
-
 from qiboconnection.api import API
 from qiboconnection.errors import HTTPError
 from qiboconnection.models.devices import Device
@@ -32,7 +31,7 @@ class UserRole(str, Enum):
 
 
 TIMEOUT = 100
-CALL_EVERY_SECONDS = 5
+CALL_EVERY_SECONDS = 10
 
 USER_OPERATIONS = [
     {
