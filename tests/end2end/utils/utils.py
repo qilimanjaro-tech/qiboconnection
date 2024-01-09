@@ -4,7 +4,6 @@
 # pylint: disable=no-name-in-module
 import logging
 import os
-import sys
 from enum import Enum
 from time import sleep
 
