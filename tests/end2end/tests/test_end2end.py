@@ -3,6 +3,7 @@
 # pylint: disable=protected-access
 import logging
 import os
+import sys
 
 import pytest
 from qibo.models import Circuit
@@ -15,14 +16,22 @@ from qiboconnection.typings.enums import DeviceStatus as DS
 from qiboconnection.typings.enums import JobStatus
 from qiboconnection.typings.job_data import JobData
 from qiboconnection.typings.responses.job_response import JobResponse
-
-from .utils.operations import (
+from tests.end2end.utils.operations import (
     Operation,
     OperationResult,
     check_operation_possible_or_skip,
     get_expected_operation_result,
 )
-from .utils.utils import delete_job, get_device, get_devices_listing_params, get_job_result, post_and_get_result
+from tests.end2end.utils.utils import (
+    delete_job,
+    get_device,
+    get_devices_listing_params,
+    get_job_result,
+    post_and_get_result,
+)
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..")))
+
 
 # ------------------------------------------------------------------------ TESTS
 
@@ -137,11 +146,11 @@ def test_circuit_result_response(device: Device, api: API, numpy_circuit: Circui
     # the meaning of SUCCESS/EXCEPTION/FORBIDDEN means something different:
     response_result = get_expected_operation_result(Operation.RESPONSE, device)
     if response_result == OperationResult.SUCCESS:
-        assert result.status == "completed"
+        assert result.status == JobStatus.COMPLETED
     elif response_result == OperationResult.EXCEPTION:
-        assert result.status == "error"
+        assert result.status == JobStatus.ERROR
     else:
-        assert result.status == "pending"
+        assert result.status == JobStatus.PENDING  # offline device
 
     delete_job(api, job_id=result.job_id)
 
@@ -258,7 +267,7 @@ def test_post_and_results_from_maintenance_to_online(device: Device, api: API, n
     )
     result: JobResponse = post_and_get_result(api, device, numpy_circuit, timeout=5)
     logger.info(f"Result: {result}")
-    assert result.status == JobStatus.PENDING.value
+    assert result.status == JobStatus.QUEUED
 
     # Put it back to online
     logger.info("Put it back to online")
@@ -270,7 +279,7 @@ def test_post_and_results_from_maintenance_to_online(device: Device, api: API, n
     )
     result = get_job_result(api, result.job_id, timeout=20)
     logger.info(f"Result: {result}")
-    assert result.status == JobStatus.COMPLETED.value
+    assert result.status == JobStatus.COMPLETED
 
     # Put back to its original state
     if original_status == DS.MAINTENANCE:

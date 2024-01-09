@@ -84,13 +84,14 @@ def log_job_status_info(job_response: JobResponse):
     Returns:
 
     """
-    if job_response.status == JobStatus.PENDING:
+    if job_response.status in [JobStatus.QUEUED, JobStatus.PENDING]:
         logger.warning(
             "Your job with id %i is still pending. Job queue position: %s",
             job_response.job_id,
             job_response.queue_position,
         )
         return None
+
     if job_response.status == JobStatus.RUNNING:
         logger.warning("Your job with id %i is still running.", job_response.job_id)
         return None
