@@ -14,6 +14,7 @@ import sys
 ALL_OUTCOMES = ["passed", "skipped", "failed"]
 # pylint: disable=broad-exception-raised
 # pylint: disable=raising-format-tuple
+# pylint: disable=too-many-locals
 
 
 class MyArgumentFormatter(argparse.ArgumentDefaultsHelpFormatter, argparse.RawTextHelpFormatter):
@@ -136,14 +137,14 @@ def gen_test_plan(directory, file_out):
     """
     logger = logging.getLogger(__name__)
 
-    logger.info(f"Generating the json {file_out} with the test plan ... ")
+    logger.info("Generating the json %s with the test plan ... ", file_out)
 
     sys.path.append(directory)
     tests = discover_tests(directory)
-    with open(file_out, "w") as fp:
+    with open(file_out, "w", encoding="utf-8") as fp:
         json.dump(tests, fp, indent=2)
 
-    logger.info(f"File {file_out} created!")
+    logger.info("File %s created!", file_out)
 
     print(f"Report created at {file_out}")
 
@@ -160,14 +161,17 @@ def gen_test_run(in_json_plan: str, in_json_results: str, out_json_run: str):
 
     logger = logging.getLogger(__name__)
     logger.info(
-        f"Generating test_run: {out_json_run} using test_plan: {in_json_plan} and test_results: {in_json_results} ..."
+        "Generating test_run: %s} using test_plan: %s and test_results: %s ...",
+        out_json_run,
+        in_json_plan,
+        in_json_results,
     )
 
     data_test_run: dict = {"detail": {}}
-    with open(in_json_plan, "r") as fp_plan:
+    with open(in_json_plan, "r", encoding="utf-8") as fp_plan:
         data_plan: dict = json.load(fp_plan)
         tests_def_by_name = _group(data_plan, "name", False)
-        with open(in_json_results, "r") as fp_results:
+        with open(in_json_results, "r", encoding="utf-8") as fp_results:
             data_results: dict = json.load(fp_results)
 
             # Here the "name" is something like
@@ -207,7 +211,7 @@ def gen_test_run(in_json_plan: str, in_json_results: str, out_json_run: str):
                         tot_outcomes[test_result["outcome"]] += 1
                 # Test Case not executed
                 else:
-                    logger.warn(f"Test {test_name} defined but not performed")
+                    logger.warning("Test %s defined but not performed", test_name)
 
     data_test_run["summary"] = {
         "tot_test_plan": tot_test_plan,
@@ -216,9 +220,9 @@ def gen_test_run(in_json_plan: str, in_json_results: str, out_json_run: str):
         "date_run_tests": data_results["report"]["created_at"],
     }
 
-    with open(out_json_run, "w") as fp_run:
+    with open(out_json_run, "w", encoding="utf-8") as fp_run:
         json.dump(data_test_run, fp_run, indent=2)
-        logger.info(f"File {out_json_run} created!")
+        logger.info("File %s} created!", out_json_run)
 
 
 def gen_test_run_report(out_report, tmpl_report, in_json_run):
@@ -233,18 +237,18 @@ def gen_test_run_report(out_report, tmpl_report, in_json_run):
 
     logger = logging.getLogger(__name__)
 
-    vars = {}
-    with open(in_json_run, "r") as fp_in:
+    variables = {}
+    with open(in_json_run, "r", encoding="utf-8") as fp_in:
         data: dict = json.load(fp_in)
 
         # Sumary
-        vars.update({f"tot_{outcome}": 0 for outcome in ALL_OUTCOMES})
+        variables.update({f"tot_{outcome}": 0 for outcome in ALL_OUTCOMES})
         for key, val in data["summary"].items():
             if key == "tot_outcomes":
                 for outcome_name, outcome_value in val.items():
-                    vars[f"tot_{outcome_name}"] = str(outcome_value)
+                    variables[f"tot_{outcome_name}"] = str(outcome_value)
             else:
-                vars[key] = str(val)
+                variables[key] = str(val)
 
         # Detail
 
@@ -264,17 +268,17 @@ def gen_test_run_report(out_report, tmpl_report, in_json_run):
                 for outcome in ALL_OUTCOMES:
                     tbody += f"{0 if not outcome in info['results'] else info['results'][outcome]}|"
                 tbody += "\n"
-        vars["tbody"] = tbody
+        variables["tbody"] = tbody
 
-    with open(tmpl_report, "r") as fp_tmpl:
+    with open(tmpl_report, "r", encoding="utf-8") as fp_tmpl:
         html_txt = fp_tmpl.read()
-        for name, value in vars.items():
-            logger.info(f"Replacing {name} ...")
+        for name, value in variables.items():
+            logger.info("Replacing %s ...", name)
             html_txt = html_txt.replace(f"#{name}#", value)
 
-        with open(out_report, "w") as fp_out:
+        with open(out_report, "w", encoding="utf-8") as fp_out:
             fp_out.write(html_txt)
-            logger.info(f"File {out_report} generated!")
+            logger.info("File %s generated!", out_report)
 
 
 # -----------------------------------------------------------------------------
