@@ -4,6 +4,7 @@
 # pylint: disable=no-name-in-module
 import logging
 import os
+import sys
 from enum import Enum
 from time import sleep
 
@@ -17,7 +18,8 @@ from qiboconnection.typings.connection import ConnectionConfiguration
 from qiboconnection.typings.enums import DeviceAvailability, DeviceStatus, JobStatus
 from qiboconnection.typings.job_data import JobData
 
-from .operations import is_development
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+from utils.operations import is_development
 
 
 class MissingCredentialsException(ValueError):

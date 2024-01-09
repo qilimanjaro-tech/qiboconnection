@@ -1,14 +1,16 @@
 import json
 import os
+import sys
 from pathlib import Path
 from typing import Union
 
-from ..utils.slack_report_utils import send_slack_file, send_slack_message
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
+from utils.slack_report_utils import send_slack_file, send_slack_message
 
 os.environ["QIBOCONNECTION_ENVIRONMENT"] = "development"
 
 # GLOBALS
-WORKDIR = Path("end2end")  # cwd in daily_e2e_tests.yml in qgqs is qiboconnection/tests
+WORKDIR = Path(".")  # cwd in daily_e2e_tests.yml in qgqs is qiboconnection/tests
 LOGS_PATH = WORKDIR / "logs"
 PATH_SUMMARY = LOGS_PATH / "summary.txt"
 PATH_TEST_RUN = LOGS_PATH / "test_run.json"
