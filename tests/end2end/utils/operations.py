@@ -8,6 +8,8 @@ import pytest
 from qiboconnection.models.devices import Device, QuantumDevice
 from qiboconnection.typings.enums import DeviceAvailability, DeviceStatus
 
+from .utils import is_development
+
 
 # Explanation:
 # Given a device, there are a series of OPERATIONS  we can perform:
@@ -62,15 +64,6 @@ def is_quantum(device: Device) -> bool:
         bool: if the device is a quantum device
     """
     return isinstance(device, QuantumDevice)
-
-
-def is_development() -> bool:
-    """Returns True if the environment is development.
-
-    Returns:
-        bool: if the environment is development
-    """
-    return os.environ["QIBOCONNECTION_ENVIRONMENT"] == "development"
 
 
 def get_expected_operation_result(  # pylint: disable=too-many-branches

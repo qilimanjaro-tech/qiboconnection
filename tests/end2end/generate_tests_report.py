@@ -16,6 +16,8 @@ ALL_OUTCOMES = ["passed", "skipped", "failed"]
 # pylint: disable=raising-format-tuple
 # pylint: disable=too-many-locals
 
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
+
 
 class MyArgumentFormatter(argparse.ArgumentDefaultsHelpFormatter, argparse.RawTextHelpFormatter):
     pass
@@ -310,12 +312,17 @@ Tools to perform several kind of reports in relation with the test definition an
         help="File with the combination of test plan + test results",
     )
     parser.add_argument("--out_report", default="./logs/test_run.html", help="HTML file with the test run")
-    parser.add_argument("--tmpl_report", default="./tests_report/test_run.html.tmpl", help="Template with the HTML")
+    parser.add_argument("--tmpl_report", default="./logs/test_run.html.tmpl", help="Template with the HTML")
 
     args = parser.parse_args()
-    # logging.config.fileConfig(args.cfg_logger)
+    logger = logging.getLogger(__name__)
+
+    logging.config.fileConfig(args.cfg_logger)
 
     if args.test_plan:
+        import os
+
+        logger.info(os.getcwd())
         gen_test_plan(args.dir, args.json_plan)
     elif args.test_run:
         gen_test_run(args.json_plan, args.json_results, args.json_run)

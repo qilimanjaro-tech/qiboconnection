@@ -10,7 +10,6 @@ from time import sleep
 
 import pytest
 from qibo.models.circuit import Circuit
-from utils.operations import is_development
 
 from qiboconnection.api import API
 from qiboconnection.errors import HTTPError
@@ -18,8 +17,6 @@ from qiboconnection.models.devices import Device
 from qiboconnection.typings.connection import ConnectionConfiguration
 from qiboconnection.typings.enums import DeviceAvailability, DeviceStatus, JobStatus
 from qiboconnection.typings.job_data import JobData
-
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 
 class MissingCredentialsException(ValueError):
@@ -87,6 +84,15 @@ USER_OPERATIONS = [
 
 # TODO: review if these methods are really needed or instead that just raise an exception if there is an error
 # These methods are used in the fixtures like get_api_fixture()
+
+
+def is_development() -> bool:
+    """Returns True if the environment is development.
+
+    Returns:
+        bool: if the environment is development
+    """
+    return os.environ["QIBOCONNECTION_ENVIRONMENT"] == "development"
 
 
 def get_logging_conf_or_fail_test(user_role=UserRole.ADMIN) -> ConnectionConfiguration:

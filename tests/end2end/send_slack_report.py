@@ -6,9 +6,6 @@ from typing import Union
 
 from utils.slack_report_utils import send_slack_file, send_slack_message
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
-
-
 os.environ["QIBOCONNECTION_ENVIRONMENT"] = "development"
 
 # GLOBALS

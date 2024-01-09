@@ -4,5 +4,8 @@ rootdir: /home/adria/Projects/qiboconnection/tests/end2end, configfile: pytest.i
 plugins: pylama-8.4.1, json-0.4.0, forked-1.4.0, typeguard-2.13.3, xdist-2.5.0, html-4.1.1, anyio-3.6.2, cov-4.0.0, order-1.1.0, metadata-3.0.0
 collected 161 items
 
-tests/test_sanity_checks.py F
-tests/test_circuits.py ssss
+tests/test_sanity_checks.py .
+tests/test_circuits.py ssssssssssss
+tests/test_end2end.py .........FF.FF....ssssss
+tests/test_endurance.py sss
+tests/test_user_roles.py ssssssssssssssssssssssssssssssssssssssssssssssss...ssss...........F
