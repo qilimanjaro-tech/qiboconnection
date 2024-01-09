@@ -45,8 +45,7 @@ def _determine_results_emoji(summary: str):
         return ":red_circle:"
     if True in [test_result in PYTEST_SKIP_CHARACTERS for test_result in first_report_line]:
         return ":large_yellow_circle:"
-    else:
-        return ":large_green_circle:"
+    return ":large_green_circle:"
 
 
 def _build_formatted_summary_message(summary: str) -> dict:
