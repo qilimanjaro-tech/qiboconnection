@@ -23,7 +23,7 @@ class MissingCredentialsException(ValueError):
 
 
 class UserRole(str, Enum):
-    """User roles with different permissions. admin is allowed to change device status and availability. qilimanjaro_user can only change availability provided that device status is maintenance. bsc_user can change none."""
+    """User roles with different permissions. admin is allowed to change device status and availability. qilimanjaro_user can only change availability provided that device status=maintenance. bsc_user can change none."""
 
     ADMIN = "admin"
     QILI = "qilimanjaro_user"
