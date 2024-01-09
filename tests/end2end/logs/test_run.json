@@ -45,9 +45,9 @@
         "name": "test_connection",
         "docstring": "Test the connection by pinging the server\n"
       },
-      "executions": 0,
+      "executions": 1,
       "results": {
-        "passed": 0,
+        "passed": 1,
         "skipped": 0,
         "failed": 0
       }
@@ -474,9 +474,9 @@
         "name": "test_store_initial_job_and_runcard_count",
         "docstring": "Count number jobs and runcards before running the test suite"
       },
-      "executions": 0,
+      "executions": 1,
       "results": {
-        "passed": 0,
+        "passed": 1,
         "skipped": 0,
         "failed": 0
       }
@@ -487,10 +487,10 @@
         "name": "test_all_circuits",
         "docstring": "Test whether all circuits can be sent in a single job and then its result can be retrieved, for each device. This is the real user case. Note that this only considers ONLINE and AVAILABLE devices. Should be run with qili-admin-test user.\n\n\n"
       },
-      "executions": 0,
+      "executions": 3,
       "results": {
         "passed": 0,
-        "skipped": 0,
+        "skipped": 3,
         "failed": 0
       }
     },
@@ -500,10 +500,10 @@
         "name": "test_five_qubit_500_gates_circuit",
         "docstring": "Test whether a five-qubit 500 gates circuit can be sent and then its result can be retrieved, for each device. This is the real user case. Note that this only considers ONLINE and AVAILABLE devices. Should be run with qili-admin-test user.\n\n\n"
       },
-      "executions": 0,
+      "executions": 3,
       "results": {
         "passed": 0,
-        "skipped": 0,
+        "skipped": 3,
         "failed": 0
       }
     },
@@ -513,10 +513,10 @@
         "name": "test_one_qubit_500_gates_circuit",
         "docstring": "Test whether a one-qubit 500 gates circuit can be sent and then its result can be retrieved, for each device. This is the real user case. Note that this only considers ONLINE and AVAILABLE devices. Should be run with qili-admin-test user.\n\n"
       },
-      "executions": 0,
+      "executions": 3,
       "results": {
         "passed": 0,
-        "skipped": 0,
+        "skipped": 3,
         "failed": 0
       }
     },
@@ -526,22 +526,22 @@
         "name": "test_two_qubit_500_gates_circuit",
         "docstring": "Test whether a two-qubit 500 gates circuit can be sent and then its result can be retrieved, for each device. This is the real user case. Note that this only considers ONLINE and AVAILABLE devices. Should be run with qili-admin-test user.\n\n\n"
       },
-      "executions": 0,
+      "executions": 3,
       "results": {
         "passed": 0,
-        "skipped": 0,
+        "skipped": 3,
         "failed": 0
       }
     }
   },
   "summary": {
     "tot_test_plan": 41,
-    "tot_test_plan_executed": 0,
+    "tot_test_plan_executed": 6,
     "tot_outcomes": {
-      "passed": 0,
-      "skipped": 0,
+      "passed": 2,
+      "skipped": 12,
       "failed": 0
     },
-    "date_run_tests": "2024-01-08 17:14:10.699573"
+    "date_run_tests": "2024-01-09 15:21:18.743359"
   }
 }

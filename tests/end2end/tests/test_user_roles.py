@@ -8,8 +8,14 @@ import pandas as pd
 import pytest
 import requests
 from qibo.models import Circuit
-from utils.operations import Operation, check_operation_possible_or_skip
-from utils.utils import (
+
+from qiboconnection.api import API
+from qiboconnection.models.devices import Device
+from qiboconnection.models.runcard import Runcard
+from qiboconnection.typings.enums import DeviceAvailability, DeviceStatus
+from qiboconnection.typings.job_data import JobData
+from tests.end2end.utils.operations import Operation, check_operation_possible_or_skip
+from tests.end2end.utils.utils import (
     UserRole,
     admin_block_device,
     admin_release_device,
@@ -40,13 +46,7 @@ from utils.utils import (
     list_user_roles,
 )
 
-from qiboconnection.api import API
-from qiboconnection.models.devices import Device
-from qiboconnection.models.runcard import Runcard
-from qiboconnection.typings.enums import DeviceAvailability, DeviceStatus
-from qiboconnection.typings.job_data import JobData
-
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..")))
 
 # ------------------------------------------------------------------------ OPERATION: CAN CHANGE STATUS
 
