@@ -31,13 +31,13 @@ def send_tests_summary_as_message():
 
     try:
         summary = ""
-        with open(PATH_TEST_RUN, "r") as file:
+        with open(PATH_TEST_RUN, "r", encoding="utf-8") as file:
             data: dict = json.load(file)["summary"]
             summary += f"Test Cases: {data['tot_test_plan']} - "
             summary += f"Test Cases Executed: {data['tot_test_plan_executed']} : "
             summary += ", ".join([f"{outcome} : {tot}" for outcome, tot in data["tot_outcomes"].items()])
         send_slack_message(f"{summary}", test_summary_message=True)
-    except Exception as e:
+    except Exception as e:  # pylint: disable=broad-exception-caught
         send_slack_message(
             f":skull: SUMMARY ERROR\n-Found {e}\n."
             f" {'' if not summary else 'The message had size '+str(len(summary))}."
@@ -48,12 +48,11 @@ def send_tests_full_report_as_file():
     """ "Send a file to Slack"""
     try:
         filename = PATH_FULL_REPORT.name
-        file = open(PATH_FULL_REPORT, "r")
-        send_slack_file(filename=filename, file=file)
-    except Exception as e:
+        with open(PATH_FULL_REPORT, "r", encoding="utf-8") as file:
+            send_slack_file(filename=filename, file=file)
+    except Exception as e:  # pylint: disable=broad-exception-caught
         send_slack_message(f":skull: FULL REPORT ERROR\n-Found {e}")
 
 
 if __name__ == "__main__":
-    """Main entry point"""
     main()
