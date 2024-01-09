@@ -31,7 +31,7 @@ class UserRole(str, Enum):
 
 
 TIMEOUT = 100
-CALL_EVERY_SECONDS = 3
+CALL_EVERY_SECONDS = 10
 
 USER_OPERATIONS = [
     {
@@ -203,7 +203,7 @@ def get_job_result(api: API, job_id: int, timeout: int = 250, call_every_seconds
         sleep(call_every_seconds)
         logger.debug(f"timer: {timer}, timeout: {timeout}")
         job_data = api.get_job(job_id)
-        if job_data.status != JobStatus.PENDING:
+        if job_data.status not in [JobStatus.PENDING, JobStatus.QUEUED]:
             break
 
         timer += call_every_seconds

@@ -102,8 +102,8 @@ def get_expected_operation_result(  # pylint: disable=too-many-branches
     elif operation == Operation.CHANGE_STATUS:
         if is_quantum(device) and not is_development():
             result = OperationResult.FORBIDDEN
-        if is_device(device, DeviceStatus.ONLINE, DeviceAvailability.AVAILABLE) or is_device(
-            device, DeviceAvailability.AVAILABLE, DeviceStatus.MAINTENANCE
+        if is_device(device, status=DeviceStatus.ONLINE, availability=DeviceAvailability.AVAILABLE) or is_device(
+            device, availability=DeviceAvailability.AVAILABLE, status=DeviceStatus.MAINTENANCE
         ):
             result = OperationResult.SUCCESS
         else:
@@ -112,7 +112,7 @@ def get_expected_operation_result(  # pylint: disable=too-many-branches
     elif operation == Operation.RESPONSE:
         if is_quantum(device) and is_development():
             result = OperationResult.EXCEPTION
-        elif is_device(device, DeviceStatus.ONLINE, DeviceAvailability.AVAILABLE):
+        elif is_device(device, status=DeviceStatus.ONLINE, availability=DeviceAvailability.AVAILABLE):
             result = OperationResult.SUCCESS
         else:
             result = OperationResult.FORBIDDEN
