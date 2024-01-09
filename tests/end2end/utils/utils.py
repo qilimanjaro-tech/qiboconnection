@@ -1,6 +1,5 @@
 # pylint: disable=logging-fstring-interpolation
 # pylint: disable=protected-access
-# pylint: disable=import-error
 # pylint: disable=no-name-in-module
 import logging
 import os
@@ -9,6 +8,7 @@ from time import sleep
 
 import pytest
 from qibo.models.circuit import Circuit
+
 from qiboconnection.api import API
 from qiboconnection.errors import HTTPError
 from qiboconnection.models.devices import Device
