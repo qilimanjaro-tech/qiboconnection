@@ -22,6 +22,7 @@ from qiboconnection import __version__  # pylint: disable=cyclic-import
 
 logger = logging.getLogger(__name__)
 
+
 if "API_LAMBDA" not in os.environ:
     QUANTUM_SERVICE_URL = {
         "local": "http://localhost:8080",
