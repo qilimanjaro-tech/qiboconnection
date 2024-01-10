@@ -1,6 +1,5 @@
 # pylint: disable=logging-fstring-interpolation
 # pylint: disable=protected-access
-# pylint: disable=import-error
 # pylint: disable=no-name-in-module
 import logging
 import os
@@ -17,24 +16,22 @@ from qiboconnection.typings.connection import ConnectionConfiguration
 from qiboconnection.typings.enums import DeviceAvailability, DeviceStatus, JobStatus
 from qiboconnection.typings.job_data import JobData
 
-from .operations import is_development
-
 
 class MissingCredentialsException(ValueError):
     pass
 
 
 class UserRole(str, Enum):
-    """User roles with different permissions. admin is allowed to change device status and availability. qilimanjaro_user can only change availability provided that device status is maintenance. bsc_user can change none."""
+    """User roles with different permissions. admin is allowed to change device status and availability. qilimanjaro_user can only change availability provided that device status=maintenance. bsc_user can change none."""
 
-    ADMIN = "ADMIN"
-    QILI = "QILI"
-    BSC = "BSC"
-    MACHINE = "MACHINE"
+    ADMIN = "admin"
+    QILI = "qilimanjaro_user"
+    BSC = "bsc_user"
+    MACHINE = "machine"
 
 
 TIMEOUT = 100
-CALL_EVERY_SECONDS = 5
+CALL_EVERY_SECONDS = 10
 
 USER_OPERATIONS = [
     {
@@ -85,6 +82,15 @@ USER_OPERATIONS = [
 
 # TODO: review if these methods are really needed or instead that just raise an exception if there is an error
 # These methods are used in the fixtures like get_api_fixture()
+
+
+def is_development() -> bool:
+    """Returns True if the environment is development.
+
+    Returns:
+        bool: if the environment is development
+    """
+    return os.environ["QIBOCONNECTION_ENVIRONMENT"] == "development"
 
 
 def get_logging_conf_or_fail_test(user_role=UserRole.ADMIN) -> ConnectionConfiguration:
@@ -194,12 +200,12 @@ def get_job_result(api: API, job_id: int, timeout: int = 250, call_every_seconds
     timer = 0
     job_data: JobData = None
     while timer < timeout:
+        sleep(call_every_seconds)
         logger.debug(f"timer: {timer}, timeout: {timeout}")
         job_data = api.get_job(job_id)
-        if job_data.status != JobStatus.PENDING:
+        if job_data.status not in [JobStatus.PENDING, JobStatus.QUEUED]:
             break
 
-        sleep(call_every_seconds)
         timer += call_every_seconds
 
     return job_data
@@ -573,8 +579,21 @@ def get_logging_conf(role: UserRole = UserRole.ADMIN) -> ConnectionConfiguration
         ConnectionConfiguration: instance with credentials for creating API instance
     """
 
-    public_login_username = os.getenv(f"PUBLIC_LOGIN_{role.value}_USERNAME")
-    public_login_key = os.getenv(f"PUBLIC_LOGIN_{role.value}_KEY")
+    if role == UserRole.ADMIN:
+        public_login_username = os.getenv("PUBLIC_LOGIN_ADMIN_USERNAME")
+        public_login_key = os.getenv("PUBLIC_LOGIN_ADMIN_KEY")
+
+    elif role == UserRole.BSC:
+        public_login_username = os.getenv("PUBLIC_LOGIN_BSC_USERNAME")
+        public_login_key = os.getenv("PUBLIC_LOGIN_BSC_KEY")
+
+    elif role == UserRole.QILI:
+        public_login_username = os.getenv("PUBLIC_LOGIN_QILI_USERNAME")
+        public_login_key = os.getenv("PUBLIC_LOGIN_QILI_KEY")
+
+    elif role == UserRole.MACHINE:
+        public_login_username = os.getenv("PUBLIC_LOGIN_MACHINE_USERNAME")
+        public_login_key = os.getenv("PUBLIC_LOGIN_MACHINE_KEY")
 
     # previous try/except was not catching the error
     if public_login_username is None or public_login_key is None:

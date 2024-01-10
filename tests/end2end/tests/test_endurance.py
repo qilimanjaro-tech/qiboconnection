@@ -1,6 +1,8 @@
 """Endurance tests."""
 # pylint: disable=logging-fstring-interpolation
 import logging
+import os
+import sys
 
 import pytest
 from qibo.models import Circuit
@@ -9,9 +11,10 @@ from qiboconnection.api import API
 from qiboconnection.models.devices import Device
 from qiboconnection.typings.enums import JobStatus
 from qiboconnection.typings.responses.job_response import JobResponse
+from tests.end2end.utils.operations import Operation, check_operation_possible_or_skip
+from tests.end2end.utils.utils import get_devices_listing_params, post_and_get_result
 
-from .utils.operations import Operation, check_operation_possible_or_skip
-from .utils.utils import get_devices_listing_params, post_and_get_result
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..")))
 
 
 @pytest.mark.parametrize("device", get_devices_listing_params())
@@ -36,5 +39,5 @@ def test_endurance(device: Device, api: API, numpy_circuit: Circuit, total: int 
         logger.info(f"Run {ind}/{total} (wait {timeout} seconds)")
         result: JobResponse = post_and_get_result(api, device, numpy_circuit, timeout)
         logger.info(f"Job #{result.job_id}: {result.status}")
-        assert result.status == JobStatus.COMPLETED.value
+        assert result.status == JobStatus.COMPLETED
         api.delete_job(job_id=result.job_id)

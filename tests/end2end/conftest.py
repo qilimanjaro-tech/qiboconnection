@@ -14,8 +14,7 @@ from qiboconnection.api import API
 from qiboconnection.errors import HTTPError
 from qiboconnection.models.devices import Device
 from qiboconnection.models.runcard import Runcard
-
-from .utils.utils import get_api_or_fail_test, get_logging_conf_or_fail_test
+from tests.end2end.utils.utils import get_api_or_fail_test, get_logging_conf_or_fail_test
 
 
 def pytest_configure(config: Config):  # pylint: disable=unused-argument

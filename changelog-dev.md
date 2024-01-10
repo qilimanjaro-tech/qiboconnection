@@ -13,3 +13,6 @@ This document contains the changes of the current release.
 ### Documentation
 
 ### Bug fixes
+
+- Recover test report 
+  [#133](https://github.com/qilimanjaro-tech/qiboconnection/pull/133)
