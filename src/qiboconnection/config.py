@@ -23,7 +23,7 @@ from qiboconnection import __version__  # pylint: disable=cyclic-import
 logger = logging.getLogger(__name__)
 
 
-if "API_LAMBDA" not in os.environ:
+if "QUANTUM_SERVICE_URL" not in os.environ:
     QUANTUM_SERVICE_URL = {
         "local": "http://localhost:8080",
         "docker_local": "http://nginx:8080",
@@ -51,10 +51,10 @@ class Environment:
     """Execution Environment"""
 
     def __init__(self, environment_type: EnvironmentType):
-        if "API_LAMBDA" in os.environ:
+        if "QUANTUM_SERVICE_URL" in os.environ:
             self._environment_type = EnvironmentType.LAMBDA
             self.quantum_service_url = os.environ["QUANTUM_SERVICE_URL"]
-            self._audience_url = os.environ["AUDIENCE_URL"]
+            self._audience_url = os.environ.get("AUDIENCE_URL", self.quantum_service_url)
         else:
             if environment_type not in [
                 EnvironmentType.LOCAL,
