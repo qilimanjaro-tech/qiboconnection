@@ -1,3 +1,15 @@
+## 0.15
+
+### Improvements
+
+- Adapt end2end tests to Slurm integration and show queue position
+  [#135](https://github.com/qilimanjaro-tech/qiboconnection/pull/135)
+
+### Bug fixes
+
+- Recover test report
+  [#133](https://github.com/qilimanjaro-tech/qiboconnection/pull/133)
+
 ## 0.14.4
 
 - Show more information at errors coming from login calls
@@ -5,7 +17,7 @@
 
 ## 0.14.3
 
-### Buf fixes
+### Bug fixes
 
 - Fix issue with circuit parsing when no circuit was provided
   [#108](https://github.com/qilimanjaro-tech/qiboconnection/pull/108)
