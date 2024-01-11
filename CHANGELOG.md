@@ -1,3 +1,4 @@
+
 ## 0.15.1
 
 ### Improvements
@@ -9,8 +10,17 @@
 
 - Recover test report
   [#133](https://github.com/qilimanjaro-tech/qiboconnection/pull/133)
+## 0.14.6
+
+### Bug fixes
+
+- Restore test suite
+  [#131](https://github.com/qilimanjaro-tech/qiboconnection/pull/131)
+
 
 ## 0.14.4
+
+### New features since last release
 
 - Show more information at errors coming from login calls
   [#110](https://github.com/qilimanjaro-tech/qiboconnection/pull/110)
