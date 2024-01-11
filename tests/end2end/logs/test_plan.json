@@ -1,0 +1,207 @@
+[
+  {
+    "file": "tests/test_end2end.py",
+    "name": "test_all_status",
+    "docstring": "Test whether a device can be set to maitenance/online\n"
+  },
+  {
+    "file": "tests/test_end2end.py",
+    "name": "test_circuit_posting",
+    "docstring": "Test whether a circuit can be sent to each device\n"
+  },
+  {
+    "file": "tests/test_end2end.py",
+    "name": "test_circuit_result_response",
+    "docstring": "Test whether a circuit can be sent and then its result can be retrieved, for each device.\n\n"
+  },
+  {
+    "file": "tests/test_end2end.py",
+    "name": "test_connection",
+    "docstring": "Test the connection by pinging the server\n"
+  },
+  {
+    "file": "tests/test_end2end.py",
+    "name": "test_device_blocking_and_release",
+    "docstring": "Test whether each device can be blocked and released\n\n"
+  },
+  {
+    "file": "tests/test_end2end.py",
+    "name": "test_device_listing",
+    "docstring": "Test the device listing call\n"
+  },
+  {
+    "file": "tests/test_end2end.py",
+    "name": "test_device_selection",
+    "docstring": "Test the device electability for every listed device. The offline devices are skipped.\n"
+  },
+  {
+    "file": "tests/test_end2end.py",
+    "name": "test_experiment_saving_and_retrieving",
+    "docstring": "Test whether a saved experiment can be sent and retrieved.\n"
+  },
+  {
+    "file": "tests/test_end2end.py",
+    "name": "test_post_and_results_from_maintenance_to_online",
+    "docstring": "A Job posted in a device in maintenance mode should be able to get the results when de device goes to online.\n\nThe tests are skipped if the device is quantum or it is in status offline.\nOnce the tests are done, the device is returned back to its original status.\n\n"
+  },
+  {
+    "file": "tests/test_end2end.py",
+    "name": "test_saved_experiments_listing",
+    "docstring": "Test whether a saved experiment listing can be obtained"
+  },
+  {
+    "file": "tests/test_endurance.py",
+    "name": "test_endurance",
+    "docstring": "Check there is no a degradation of service.\n\nThe same circuit is executed multiple times and  wait always the same maximum amount of time for a COMPLETED status.\n\n"
+  },
+  {
+    "file": "tests/test_user_roles.py",
+    "name": "test_can_change_device_availability",
+    "docstring": "Ensure that user roles which, by definition, can change availability are allowed to do it.\n\n"
+  },
+  {
+    "file": "tests/test_user_roles.py",
+    "name": "test_can_change_device_status",
+    "docstring": "Ensure that user roles which, by definition, can change status are allowed to do it.\n\n"
+  },
+  {
+    "file": "tests/test_user_roles.py",
+    "name": "test_can_get_runcard",
+    "docstring": "Check certain users can get all runcards"
+  },
+  {
+    "file": "tests/test_user_roles.py",
+    "name": "test_can_list_runcards",
+    "docstring": "Check certain users can list all runcards"
+  },
+  {
+    "file": "tests/test_user_roles.py",
+    "name": "test_can_list_saved_experiments",
+    "docstring": "Test user roles that are allowed to list saved experiments can do it -- e.g admin and qili-user\n"
+  },
+  {
+    "file": "tests/test_user_roles.py",
+    "name": "test_can_save_and_delete_owned_runcards",
+    "docstring": "Check all users can save runcard delete their runcards except for admin who can delete of all them."
+  },
+  {
+    "file": "tests/test_user_roles.py",
+    "name": "test_can_save_get_and_update_owned_runcards",
+    "docstring": "Check certain users can update their own runcards"
+  },
+  {
+    "file": "tests/test_user_roles.py",
+    "name": "test_can_save_runcard",
+    "docstring": "Check certain users cannot save runcards"
+  },
+  {
+    "file": "tests/test_user_roles.py",
+    "name": "test_can_select_device",
+    "docstring": "Test every user can select the devices to which it has access\n"
+  },
+  {
+    "file": "tests/test_user_roles.py",
+    "name": "test_cannot_change_device_availability",
+    "docstring": "Ensure that user roles which, by definition, cannot change availability are not allowed to do it\n\n"
+  },
+  {
+    "file": "tests/test_user_roles.py",
+    "name": "test_cannot_change_device_availability_when_online",
+    "docstring": "Ensure tany user can block any device when status is not maintenance\n\n"
+  },
+  {
+    "file": "tests/test_user_roles.py",
+    "name": "test_cannot_change_device_status",
+    "docstring": "Ensure that user roles which, by definition, cannot change status are not allowed to do it.\n\n"
+  },
+  {
+    "file": "tests/test_user_roles.py",
+    "name": "test_cannot_change_device_status_when_blocked",
+    "docstring": "Ensure any user role can change device status when device availabiliyty is not available\n\n"
+  },
+  {
+    "file": "tests/test_user_roles.py",
+    "name": "test_cannot_delete_any_runcard",
+    "docstring": "Check certain users  cannot delete any runcard"
+  },
+  {
+    "file": "tests/test_user_roles.py",
+    "name": "test_cannot_delete_not_owned_runcard",
+    "docstring": "Check users cannot delete runcards from other users, in particular, admin."
+  },
+  {
+    "file": "tests/test_user_roles.py",
+    "name": "test_cannot_get_runcard",
+    "docstring": "Check certain users cannot get runcards"
+  },
+  {
+    "file": "tests/test_user_roles.py",
+    "name": "test_cannot_list_runcards",
+    "docstring": "Check certain users cannot list runcards"
+  },
+  {
+    "file": "tests/test_user_roles.py",
+    "name": "test_cannot_list_saved_experiments",
+    "docstring": "Test user roles that aren't allowed to list saved experiments can do it -- e.g bsc\n"
+  },
+  {
+    "file": "tests/test_user_roles.py",
+    "name": "test_cannot_post_experiment",
+    "docstring": "Test user roles that aren't allowed to post experiments can do it -- e.g bsc\n"
+  },
+  {
+    "file": "tests/test_user_roles.py",
+    "name": "test_cannot_save_runcard",
+    "docstring": "Check certain users cannot save runcards"
+  },
+  {
+    "file": "tests/test_user_roles.py",
+    "name": "test_cannot_update_any_runcards",
+    "docstring": "Check certain users can update their own runcards"
+  },
+  {
+    "file": "tests/test_user_roles.py",
+    "name": "test_cannot_update_not_owned_runcards",
+    "docstring": "Check users who are allowed to update runcards can only update theirs"
+  },
+  {
+    "file": "tests/test_user_roles.py",
+    "name": "test_list_jobs",
+    "docstring": "Test that users can see only their saved experiments"
+  },
+  {
+    "file": "tests/test_user_roles.py",
+    "name": "test_post_get_and_delete_job",
+    "docstring": "Post a circuit and get all its data\n\n"
+  },
+  {
+    "file": "tests/test_sanity_checks.py",
+    "name": "test_check_all_test_jobs_and_runcards_deleted",
+    "docstring": "Count number jobs and runcards before running the test suite"
+  },
+  {
+    "file": "tests/test_sanity_checks.py",
+    "name": "test_store_initial_job_and_runcard_count",
+    "docstring": "Count number jobs and runcards before running the test suite"
+  },
+  {
+    "file": "tests/test_circuits.py",
+    "name": "test_all_circuits",
+    "docstring": "Test whether all circuits can be sent in a single job and then its result can be retrieved, for each device. This is the real user case. Note that this only considers ONLINE and AVAILABLE devices. Should be run with qili-admin-test user.\n\n\n"
+  },
+  {
+    "file": "tests/test_circuits.py",
+    "name": "test_five_qubit_500_gates_circuit",
+    "docstring": "Test whether a five-qubit 500 gates circuit can be sent and then its result can be retrieved, for each device. This is the real user case. Note that this only considers ONLINE and AVAILABLE devices. Should be run with qili-admin-test user.\n\n\n"
+  },
+  {
+    "file": "tests/test_circuits.py",
+    "name": "test_one_qubit_500_gates_circuit",
+    "docstring": "Test whether a one-qubit 500 gates circuit can be sent and then its result can be retrieved, for each device. This is the real user case. Note that this only considers ONLINE and AVAILABLE devices. Should be run with qili-admin-test user.\n\n"
+  },
+  {
+    "file": "tests/test_circuits.py",
+    "name": "test_two_qubit_500_gates_circuit",
+    "docstring": "Test whether a two-qubit 500 gates circuit can be sent and then its result can be retrieved, for each device. This is the real user case. Note that this only considers ONLINE and AVAILABLE devices. Should be run with qili-admin-test user.\n\n\n"
+  }
+]
