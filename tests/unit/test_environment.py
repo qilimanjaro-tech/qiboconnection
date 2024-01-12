@@ -20,12 +20,24 @@ def test_environment_constructor_set_quantum_service_url():
     """Test Environment class constructor setting QUANTUM_SERVICE_URL."""
     my_quantum_service_url = "http://www.my_quantum_service_url.com"
 
+    old_quantum_service_url = os.environ.get("QUANTUM_SERVICE_URL", None)
+    old_audience_url = os.environ.get("AUDIENCE_URL", None)
+
     os.environ["QUANTUM_SERVICE_URL"] = my_quantum_service_url
-    del os.environ["AUDIENCE_URL"]
+    if old_audience_url is not None:
+        del os.environ["AUDIENCE_URL"]
 
     environment = Environment()
 
-    del os.environ["QUANTUM_SERVICE_URL"]
+    if old_quantum_service_url:
+        os.environ["QUANTUM_SERVICE_URL"] = old_quantum_service_url
+    else:
+        del os.environ["QUANTUM_SERVICE_URL"]
+
+    if old_audience_url:
+        os.environ["AUDIENCE_URL"] = old_audience_url
+    else:
+        del os.environ["AUDIENCE_URL"]
 
     assert environment.environment_type == EnvironmentType.LAMBDA
     assert environment.qibo_quantum_service_url == my_quantum_service_url
@@ -37,13 +49,23 @@ def test_environment_constructor_set_quantum_service_and_audience_url():
     my_quantum_service_url = "http://www.my_quantum_service_url.com"
     my_audience_url = "http://www.my_audience_url.com"
 
+    old_quantum_service_url = os.environ.get("QUANTUM_SERVICE_URL", None)
+    old_audience_url = os.environ.get("AUDIENCE_URL", None)
+
     os.environ["QUANTUM_SERVICE_URL"] = my_quantum_service_url
     os.environ["AUDIENCE_URL"] = my_audience_url
 
     environment = Environment()
 
-    del os.environ["QUANTUM_SERVICE_URL"]
-    del os.environ["AUDIENCE_URL"]
+    if old_quantum_service_url:
+        os.environ["QUANTUM_SERVICE_URL"] = old_quantum_service_url
+    else:
+        del os.environ["QUANTUM_SERVICE_URL"]
+
+    if old_audience_url:
+        os.environ["AUDIENCE_URL"] = old_audience_url
+    else:
+        del os.environ["AUDIENCE_URL"]
 
     assert environment.environment_type == EnvironmentType.LAMBDA
     assert environment.qibo_quantum_service_url == my_quantum_service_url
