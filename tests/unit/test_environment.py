@@ -27,7 +27,7 @@ def test_environment_constructor_set_quantum_service_url():
     if old_audience_url is not None:
         del os.environ["AUDIENCE_URL"]
 
-    environment = Environment()
+    environment = Environment(EnvironmentType.LAMBDA)
 
     if old_quantum_service_url:
         os.environ["QUANTUM_SERVICE_URL"] = old_quantum_service_url
@@ -39,7 +39,6 @@ def test_environment_constructor_set_quantum_service_url():
     else:
         del os.environ["AUDIENCE_URL"]
 
-    assert environment.environment_type == EnvironmentType.LAMBDA
     assert environment.qibo_quantum_service_url == my_quantum_service_url
     assert environment.audience_url == my_quantum_service_url
 
@@ -55,7 +54,7 @@ def test_environment_constructor_set_quantum_service_and_audience_url():
     os.environ["QUANTUM_SERVICE_URL"] = my_quantum_service_url
     os.environ["AUDIENCE_URL"] = my_audience_url
 
-    environment = Environment()
+    environment = Environment(EnvironmentType.LAMBDA)
 
     if old_quantum_service_url:
         os.environ["QUANTUM_SERVICE_URL"] = old_quantum_service_url
@@ -67,7 +66,6 @@ def test_environment_constructor_set_quantum_service_and_audience_url():
     else:
         del os.environ["AUDIENCE_URL"]
 
-    assert environment.environment_type == EnvironmentType.LAMBDA
     assert environment.qibo_quantum_service_url == my_quantum_service_url
     assert environment.audience_url == my_audience_url
 
