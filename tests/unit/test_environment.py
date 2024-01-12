@@ -16,6 +16,40 @@ def test_environment_constructor():
     assert isinstance(environment, Environment)
 
 
+def test_environment_constructor_set_quantum_service_url():
+    """Test Environment class constructor setting QUANTUM_SERVICE_URL."""
+    my_quantum_service_url = "http://www.my_quantum_service_url.com"
+
+    os.environ["QUANTUM_SERVICE_URL"] = my_quantum_service_url
+    del os.environ["AUDIENCE_URL"]
+
+    environment = Environment()
+
+    del os.environ["QUANTUM_SERVICE_URL"]
+
+    assert environment.environment_type == EnvironmentType.LAMBDA
+    assert environment.qibo_quantum_service_url == my_quantum_service_url
+    assert environment.audience_url == my_quantum_service_url
+
+
+def test_environment_constructor_set_quantum_service_and_audience_url():
+    """Test Environment class constructor setting QUANTUM_SERVICE_URL and AUDIENCE_URL."""
+    my_quantum_service_url = "http://www.my_quantum_service_url.com"
+    my_audience_url = "http://www.my_audience_url.com"
+
+    os.environ["QUANTUM_SERVICE_URL"] = my_quantum_service_url
+    os.environ["AUDIENCE_URL"] = my_audience_url
+
+    environment = Environment()
+
+    del os.environ["QUANTUM_SERVICE_URL"]
+    del os.environ["AUDIENCE_URL"]
+
+    assert environment.environment_type == EnvironmentType.LAMBDA
+    assert environment.qibo_quantum_service_url == my_quantum_service_url
+    assert environment.audience_url == my_audience_url
+
+
 def test_environment_constructor_raises_value_error_for_unexpected_environment_types():
     """Test Environment class constructor."""
 

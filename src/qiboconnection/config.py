@@ -50,7 +50,7 @@ class EnvironmentType(str, enum.Enum):
 class Environment:
     """Execution Environment"""
 
-    def __init__(self, environment_type: EnvironmentType):
+    def __init__(self, environment_type: EnvironmentType = None):
         if "QUANTUM_SERVICE_URL" in os.environ:
             self._environment_type = EnvironmentType.LAMBDA
             self.quantum_service_url = os.environ["QUANTUM_SERVICE_URL"]
