@@ -27,3 +27,4 @@ class JobType(StrEnum):
 
     CIRCUIT = "circuit"
     QPROGRAM = "qprogram"
+    OTHER = "other"
