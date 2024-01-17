@@ -26,7 +26,6 @@ from datetime import datetime, timedelta
 from time import sleep
 from typing import Any, List, cast
 
-import numpy as np
 from numpy import typing as npt
 from qibo.models.circuit import Circuit
 from qibo.states import CircuitResult
@@ -38,20 +37,13 @@ from qiboconnection.config import logger
 from qiboconnection.connection import Connection
 from qiboconnection.constants import API_CONSTANTS, REST, REST_ERROR
 from qiboconnection.errors import ConnectionException, RemoteExecutionException
-from qiboconnection.models import Job, JobListing, LivePlots, Runcard, SavedExperiment, SavedExperimentListing
+from qiboconnection.models import Job, JobListing, Runcard
 from qiboconnection.models.devices import Device, Devices, OfflineDevice, QuantumDevice, SimulatorDevice, create_device
 from qiboconnection.typings.connection import ConnectionConfiguration
 from qiboconnection.typings.enums import JobStatus
 from qiboconnection.typings.job_data import JobData
-from qiboconnection.typings.live_plot import LivePlotAxis, LivePlotLabels, LivePlotType
-from qiboconnection.typings.responses import (
-    JobListingItemResponse,
-    RuncardResponse,
-    SavedExperimentListingItemResponse,
-    SavedExperimentResponse,
-)
+from qiboconnection.typings.responses import JobListingItemResponse, RuncardResponse
 from qiboconnection.typings.responses.job_response import JobResponse
-from qiboconnection.typings.responses.plotting_response import PlottingResponse
 from qiboconnection.util import unzip
 
 
@@ -63,10 +55,8 @@ class API(ABC):
     _JOBS_CALL_PATH = "/jobs"
     _CIRCUITS_CALL_PATH = "/circuits"
     _DEVICES_CALL_PATH = "/devices"
-    _SAVED_EXPERIMENTS_CALL_PATH = "/saved_experiments"
     _RUNCARDS_CALL_PATH = "/runcards"
     _PING_CALL_PATH = "/status"
-    _LIVE_PLOTTING_PATH = "/live-plotting"
 
     @typechecked
     def __init__(
@@ -78,9 +68,6 @@ class API(ABC):
         self._jobs: List[Job] = []
         self._jobs_listing: JobListing | None = None
         self._selected_devices: List[Device] | None = None
-        self._live_plots: LivePlots = LivePlots()
-        self._saved_experiment: SavedExperiment | None = None
-        self._saved_experiments_listing: SavedExperimentListing | None = None
         self._runcard: Runcard | None = None
 
     @classmethod
@@ -116,24 +103,6 @@ class API(ABC):
             Job: last Job launched
         """
         return self._jobs[-1]
-
-    @property
-    def _last_saved_experiment(self) -> SavedExperiment | None:
-        """Returns the last saved experiment of the current session, in case there has been one.
-
-        Returns:
-            SavedExperiment | None: last saved experiment
-        """
-        return self._saved_experiment
-
-    @property
-    def _last_saved_experiment_listing(self) -> SavedExperimentListing | None:
-        """Returns the last experiment listing downloaded in the current session, in case there has been one.
-
-        Returns:
-            SavedExperimentListing | None: last downloaded experiment listing
-        """
-        return self._saved_experiments_listing
 
     @property
     def last_runcard(self) -> Runcard | None:
@@ -342,7 +311,7 @@ class API(ABC):
     def execute(
         self,
         circuit: Circuit | List[Circuit] | None = None,
-        experiment: dict | None = None,
+        qprogram: dict | None = None,
         nshots: int = 10,
         device_ids: List[int] | None = None,
     ) -> List[int]:
@@ -351,7 +320,7 @@ class API(ABC):
 
         Args:
             circuit (Circuit or List[Circuit]): a Qibo circuit to execute
-            experiment (dict): an Experiment description, result of Qililab's Experiment().to_dict() function.
+            qprogram (dict): a QProgram description, result of Qililab's QProgram().to_dict() function.
             nshots (int): number of times the execution is to be done.
             device_ids (List[int]): list of devices where the execution should be performed. If set, any device set
             using API.select_device_id() will not be used. This will not update the selected devices.
@@ -385,7 +354,7 @@ class API(ABC):
         jobs = [
             Job(
                 circuit=circuit,
-                experiment=experiment,
+                qprogram=qprogram,
                 nshots=nshots,
                 user=self._connection.user,
                 device=cast(Device, device),
@@ -494,7 +463,7 @@ class API(ABC):
     def execute_and_return_results(
         self,
         circuit: Circuit | None = None,
-        experiment: dict | None = None,
+        qprogram: dict | None = None,
         nshots: int = 10,
         device_ids: List[int] | None = None,
         timeout: int = 3600,
@@ -504,7 +473,7 @@ class API(ABC):
 
         Args:
             circuit (Circuit): a Qibo circuit to execute
-            experiment (dict): an Experiment description, results of Qililab's Experiment().to_dict() function.
+            qprogram (dict): a QProgram description, results of Qililab's QProgram().to_dict() function.
             nshots (int): number of times the execution is to be done.
             device_ids (List[int]): list of devices where the execution should be performed. If set, any device set
              using API.select_device_id() will not be used. This will not update the selected
@@ -525,193 +494,11 @@ class API(ABC):
         deadline = datetime.now() + timedelta(seconds=timeout)
         job_ids = self.execute(
             circuit=circuit,
-            experiment=experiment,
+            qprogram=qprogram,
             nshots=nshots,
             device_ids=device_ids,
         )
         return self._wait_and_return_results(deadline=deadline, interval=interval, job_ids=job_ids)
-
-    # REMOTE PLOTTING
-
-    @typechecked
-    async def _create_liveplot(
-        self,
-        plot_type: str = LivePlotType.LINES.value,
-        title: str | None = None,
-        x_label: str | None = None,
-        y_label: str | None = None,
-        z_label: str | None = None,
-        x_axis: npt.NDArray[np.int_] | List[int] | None = None,
-        y_axis: npt.NDArray[np.int_] | List[int] | None = None,
-    ):
-        """Creates a LivePlot of *plot_type* type at which we will be able to send points to plot.
-
-        Attributes:
-            plot_type: LivePlotType
-            title: title for the plot
-            x_label: title for the x label
-            y_label: title for the y label
-            z_label: title for the z label
-            x_axis: range of values for the x_axis
-            y_axis: range of values for the y_axis
-
-
-        Raises:
-            RemoteExecutionException: Live-plotting connection data could not be retrieved
-
-        Returns:
-            int: id of the just created plot
-        """
-        # Get info from PublicAPI
-        response, status_code = self._connection.send_post_auth_remote_api_call(
-            path=f"{self._LIVE_PLOTTING_PATH}", data={}
-        )
-        if status_code != 200:
-            raise RemoteExecutionException(
-                message="Live-plotting connection data could not be retrieved.", status_code=status_code
-            )
-        plotting_response = PlottingResponse.from_response(**response)
-        await self._live_plots.create_live_plot(
-            plot_id=plotting_response.plot_id,
-            websocket_url=plotting_response.websocket_url,
-            plot_type=LivePlotType(plot_type),
-            labels=LivePlotLabels(title=title, x_label=x_label, y_label=y_label, z_label=z_label),
-            axis=LivePlotAxis(x_axis=x_axis, y_axis=y_axis),
-        )
-        return plotting_response.plot_id
-
-    @typechecked
-    async def _send_plot_points(
-        self,
-        plot_id: int,
-        x: npt.NDArray[np.float_ | np.int_] | list[float] | list[int] | float | int,
-        y: npt.NDArray[np.float_ | np.int_] | list[float] | list[int] | float | int,
-        z: npt.NDArray[np.float_ | np.int_] | list[float] | list[int] | float | int | None = None,
-    ):
-        """Sends point(s) to a specific plot.
-        Args:
-            plot_id: id of the plot to send points to
-            x: x coord of the point to send info to
-            y: y coord of the point to send info to
-            z: z coord of the point to send info to
-
-        Returns:
-            None
-        """
-        return await self._live_plots.send_data(plot_id=plot_id, x=x, y=y, z=z)
-
-    # SAVED EXPERIMENTS
-
-    @typechecked
-    def _save_experiment(
-        self,
-        name: str,
-        description: str,
-        experiment_dict: dict,
-        results_dict: dict,
-        device_id: int,
-        user_id: int,
-        qililab_version: str,
-        favourite: bool = False,
-    ):
-        """Save an experiment and its results into the database af our servers, for them to be easily recovered when
-        needed.
-        Default behaviour is to create one if no previous occurrence with the same name exists, or to create a new one
-        if none exists.
-
-        Args:
-            name: Name the experiment is going to be saved with.
-            description: Short descriptive text to more easily identify this specific experiment instance.
-            experiment_dict: Serialized qililab experiment (using its `.to_dict()` method)
-            results_dict: Serialized qililab results (using their `.to_dict()` method )
-            device_id: Id of the device the experiment was executed in
-            user_id: Id of the user that is executing the experiment
-            qililab_version: version of qililab the experiment was executed with
-            favourite: Whether to save the experiment as favourite
-
-        Returns:
-            newly created experiment id
-
-        """
-
-        saved_experiment = SavedExperiment(
-            id=None,
-            name=name,
-            description=description,
-            experiment=experiment_dict,
-            results=results_dict,
-            device_id=device_id,
-            user_id=user_id,
-            qililab_version=qililab_version,
-        )
-
-        response, status_code = self._connection.send_post_auth_remote_api_call(
-            path=self._SAVED_EXPERIMENTS_CALL_PATH,
-            data=asdict(saved_experiment.saved_experiment_request(favourite=favourite)),
-        )
-        if status_code != 201:
-            raise RemoteExecutionException(message="Experiment could not be saved.", status_code=status_code)
-        logger.debug("Experiment saved successfully.")
-
-        saved_experiment.id = response[API_CONSTANTS.SAVED_EXPERIMENT_ID]
-
-        self._saved_experiment = saved_experiment
-        return saved_experiment.id
-
-    def _update_favourite_saved_experiment(self, saved_experiment_id: int, favourite: bool):
-        """Ask the api to add or remove a saved experiment from the favourite relations, by using the update saved
-        experiment's endpoint"""
-
-        response, status_code = self._connection.send_put_auth_remote_api_call(
-            path=f"{self._SAVED_EXPERIMENTS_CALL_PATH}/{saved_experiment_id}",
-            data={API_CONSTANTS.FAVOURITE: favourite, API_CONSTANTS.USER_ID: self._connection.user.user_id},
-        )
-
-        if status_code != 200:
-            raise RemoteExecutionException(
-                message="Experiment favourite status could not be updated.", status_code=status_code
-            )
-
-        logger.debug(
-            "Experiment %s updated successfully.",
-            response[API_CONSTANTS.SAVED_EXPERIMENT_ID],
-        )
-
-    def _fav_saved_experiment(self, saved_experiment_id: int):
-        """Adds a saved experiment to the list of favourite saved experiments"""
-        return self._update_favourite_saved_experiment(saved_experiment_id=saved_experiment_id, favourite=True)
-
-    def _fav_saved_experiments(self, saved_experiment_ids: List[int] | npt.NDArray[np.int_]):
-        """Adds a list of saved experiments to the list of favourite saved experiments"""
-        for saved_experiment_id in saved_experiment_ids:
-            self._update_favourite_saved_experiment(saved_experiment_id=saved_experiment_id, favourite=True)
-
-    def _unfav_saved_experiment(self, saved_experiment_id: int):
-        """Removes a saved experiment from the list of favourite saved experiments"""
-        return self._update_favourite_saved_experiment(saved_experiment_id=saved_experiment_id, favourite=False)
-
-    def _unfav_saved_experiments(self, saved_experiment_ids: List[int] | npt.NDArray[np.int_]):
-        """Removes a list of saved experiments from the list of favourite saved experiments"""
-        for saved_experiment_id in saved_experiment_ids:
-            self._update_favourite_saved_experiment(saved_experiment_id=saved_experiment_id, favourite=False)
-
-    def _get_list_saved_experiments_response(
-        self, favourites: bool = False
-    ) -> List[SavedExperimentListingItemResponse]:
-        """Performs the actual saved_experiments listing request
-        Returns
-            List[SavedExperimentListingItemResponse]: list of objects encoding the expected response structure"""
-        responses, status_codes = unzip(
-            self._connection.send_get_auth_remote_api_call_all_pages(
-                path=self._SAVED_EXPERIMENTS_CALL_PATH, params={API_CONSTANTS.FAVOURITES: favourites}
-            )
-        )
-        for status_code in status_codes:
-            if status_code != 200:
-                raise RemoteExecutionException(message="Job could not be listed.", status_code=status_code)
-
-        items = [item for response in responses for item in response[REST.ITEMS]]
-        return [SavedExperimentListingItemResponse(**item) for item in items]
 
     def _get_list_jobs_response(self, favourites: bool = False) -> List[JobListingItemResponse]:
         """Performs the actual jobs listing request
@@ -730,21 +517,6 @@ class API(ABC):
         return [JobListingItemResponse.from_kwargs(**item) for item in items]
 
     @typechecked
-    def _list_saved_experiments(self, favourites: bool = False) -> SavedExperimentListing:
-        """List all saved experiments
-
-        Raises:
-            RemoteExecutionException: Devices could not be retrieved
-
-        Returns:
-            Devices: All SavedExperiments
-        """
-        saved_experiments_list_response = self._get_list_saved_experiments_response(favourites=favourites)
-        saved_experiment_listing = SavedExperimentListing.from_response(saved_experiments_list_response)
-        self._saved_experiments_listing = saved_experiment_listing
-        return saved_experiment_listing
-
-    @typechecked
     def list_jobs(self, favourites: bool = False) -> JobListing:
         """List all jobs metadata
 
@@ -758,36 +530,6 @@ class API(ABC):
         jobs_listing = JobListing.from_response(jobs_list_response)
         self._jobs_listing = jobs_listing
         return jobs_listing
-
-    @typechecked
-    def _get_saved_experiment_response(self, saved_experiment_id: int):
-        """Gets complete information of a single saved experiment
-
-        Raises:
-            RemoteExecutionException: SavedExperiment could not be retrieved
-
-        Returns:
-            SavedExperimentResponse: response with the info of the requested saved experiment"""
-        response, status_code = self._connection.send_get_auth_remote_api_call(
-            path=f"{self._SAVED_EXPERIMENTS_CALL_PATH}/{saved_experiment_id}"
-        )
-        if status_code != 200:
-            raise RemoteExecutionException(message="SavedExperiment could not be retrieved.", status_code=status_code)
-        return SavedExperimentResponse(**response)
-
-    @typechecked
-    def _get_saved_experiment(self, saved_experiment_id: int) -> SavedExperiment:
-        """Get full information of a single experiment
-
-        Raises:
-            RemoteExecutionException: SavedExperiments could not be retrieved
-
-        Returns:
-            SavedExperiment: complete saved experiment, including results
-        """
-        return SavedExperiment.from_response(
-            self._get_saved_experiment_response(saved_experiment_id=saved_experiment_id)
-        )
 
     @typechecked
     def get_job(self, job_id: int):
@@ -808,21 +550,6 @@ class API(ABC):
         job_response = self._get_job(job_id=job_id)
         log_job_status_info(job_response=job_response)
         return JobData(**vars(job_response))
-
-    @typechecked
-    def _get_saved_experiments(self, saved_experiment_ids: List[int] | npt.NDArray[np.int_]) -> List[SavedExperiment]:
-        """Get full information of the chosen experiments
-
-        Raises:
-            RemoteExecutionException: SavedExperiments could not be retrieved
-
-        Returns:
-            List[SavedExperiment]: complete saved experiment list, including results
-        """
-        return [
-            SavedExperiment.from_response(self._get_saved_experiment_response(saved_experiment_id=saved_experiment_id))
-            for saved_experiment_id in saved_experiment_ids
-        ]
 
     # RUNCARDS
 
@@ -960,13 +687,13 @@ class API(ABC):
 
     @typechecked
     def list_runcards(self) -> List[Runcard]:
-        """List all saved experiments
+        """List all runcards
 
         Raises:
             RemoteExecutionException: Devices could not be retrieved
 
         Returns:
-            Devices: All SavedExperiments
+            Runcards: All Runcards
         """
         runcards_response = self._get_list_runcard_response()
         return [Runcard.from_response(response=response) for response in runcards_response]

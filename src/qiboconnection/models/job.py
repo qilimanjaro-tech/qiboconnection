@@ -39,17 +39,17 @@ class Job(ABC):  # pylint: disable=too-many-instance-attributes
     device: Device
     program: ProgramDefinition | None = field(default=None)
     circuit: list[Circuit] | None = None
-    experiment: dict | None = None
+    qprogram: dict | None = None
     nshots: int = 10
     job_status: JobStatus = JobStatus.NOT_SENT
     job_result: JobResult | None = None
     id: int = 0  # pylint: disable=invalid-name
 
     def __post_init__(self):
-        if self.experiment is not None and self.circuit is not None:
-            raise ValueError("Both circuit and experiment were provided, but execute() only takes one of them.")
-        if self.experiment is None and self.circuit is None:
-            raise ValueError("Neither of experiment or circuit were provided,")
+        if self.qprogram is not None and self.circuit is not None:
+            raise ValueError("Both circuit and qprogram were provided, but execute() only takes one of them.")
+        if self.qprogram is None and self.circuit is None:
+            raise ValueError("Neither of circuit or qprogram were provided.")
 
     @property
     def user_id(self) -> int | None:
@@ -83,7 +83,7 @@ class Job(ABC):  # pylint: disable=too-many-instance-attributes
 
     @property
     def job_request(self) -> JobRequest:
-        """Returns a Job Request
+        """Returns a Job Request with the Job instance info
 
         Returns:
             JobRequest: Job Request object
@@ -117,19 +117,22 @@ class Job(ABC):  # pylint: disable=too-many-instance-attributes
     @property
     def job_type(self):
         """Get the type of the job, checking whether the user has defined circuit or experiment."""
-        if self.experiment is None and self.circuit is not None:
+        if self.qprogram is None and self.circuit is not None:
             return JobType.CIRCUIT
-        if self.experiment is not None and self.circuit is None:
-            return JobType.EXPERIMENT
+        if self.qprogram is not None and self.circuit is None:
+            return JobType.QPROGRAM
         raise ValueError("Could not determine JobType")
 
     def _get_job_description(self) -> str:
-        "Serialize either circuit or experiment to obtain job description"
+        """Serialize either circuit or qprogram to obtain job description"""
 
-        if self.circuit is None:
-            return jsonify_dict_and_base64_encode(object_to_encode=self.experiment)  # type: ignore[arg-type]
+        if self.qprogram is not None:
+            return jsonify_dict_and_base64_encode(object_to_encode=self.qprogram)
 
-        return jsonify_list_with_str_and_base64_encode(object_to_encode=[c.to_qasm() for c in self.circuit])
+        if self.circuit is not None:
+            return jsonify_list_with_str_and_base64_encode(object_to_encode=[c.to_qasm() for c in self.circuit])
+
+        raise ValueError("No suitable information found for building description.")
 
     @property
     def result(self) -> Any:

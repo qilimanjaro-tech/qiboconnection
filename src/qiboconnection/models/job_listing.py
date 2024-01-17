@@ -36,7 +36,22 @@ class JobListing:
 
     def _build_dataframe(self):
         """Builds the dataframe from the info in each listing item"""
-        return pd.DataFrame((asdict(item) for item in self.items))
+        df = pd.DataFrame((item.__dict__ for item in self.items))
+        for col in df.columns:
+            df[col] = self._coerce_column_type(column=df[col])
+        return df
+
+    @classmethod
+    def _coerce_column_type(cls, column: pd.Series):
+        """Convert a column into a number if possible. Else, try to convert it into a date."""
+
+        try:
+            return pd.to_numeric(column)
+        except Exception:
+            try:
+                return pd.to_datetime(column)
+            except Exception:
+                return column
 
     @classmethod
     def from_response(cls, response_list: List[JobListingItemResponse]):

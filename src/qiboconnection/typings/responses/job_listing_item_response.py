@@ -41,5 +41,9 @@ class JobListingItemResponse:
 
     @classmethod
     def from_kwargs(cls, **kwargs):
-        "Returns an instance of the class including non-typed attributes"
+        """Returns an instance of the class including non-typed attributes"""
         return from_kwargs(cls, **kwargs)
+
+    def to_dict(self):
+        """Convert into dict, including non-typed attributes"""
+        return self.__dict__

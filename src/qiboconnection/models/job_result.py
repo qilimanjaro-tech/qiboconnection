@@ -13,6 +13,7 @@
 # limitations under the License.
 """ JobResult typing """
 
+import logging
 from abc import ABC
 from dataclasses import dataclass, field
 from typing import List
@@ -21,7 +22,9 @@ from numpy import typing as npt
 from qibo.states import CircuitResult
 
 from qiboconnection.typings.enums import JobType
-from qiboconnection.util import decode_results_from_circuit, decode_results_from_experiment
+from qiboconnection.util import decode_results_from_circuit, decode_results_from_qprogram
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -33,7 +36,7 @@ class JobResult(ABC):
     job_type: str
     data: List[CircuitResult] | CircuitResult | npt.NDArray | List[int] | List[float] | dict | List[
         dict
-    ] | None = field(init=False)
+    ] | str | None = field(init=False)
 
     def __post_init__(self) -> None:
         """
@@ -43,10 +46,10 @@ class JobResult(ABC):
 
         if self.job_type == JobType.CIRCUIT:
             self.data = decode_results_from_circuit(self.http_response)
-            return None
-        if self.job_type == JobType.EXPERIMENT:
-            self.data = decode_results_from_experiment(self.http_response)
-            return None
+            return
+        if self.job_type == JobType.QPROGRAM:
+            self.data = decode_results_from_qprogram(self.http_response)
+            return
 
-        self.data = f"JobType {self.job_type} not supported!"
-        return None
+        logger.warning("Result not supported for type of job. Returning a plain string. ")
+        self.data = self.http_response

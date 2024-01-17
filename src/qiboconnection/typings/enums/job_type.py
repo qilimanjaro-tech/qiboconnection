@@ -26,4 +26,4 @@ class JobType(StrEnum):
     """
 
     CIRCUIT = "circuit"
-    EXPERIMENT = "experiment"
+    QPROGRAM = "qprogram"
