@@ -46,7 +46,7 @@ def test_JobData_typing_result_raises_value_error():
 def test_JobData_typing_descripton_raises_value_error(mocked_deserialize_job_description: MagicMock):
     """Test JobData typing, this is what is returned to the user with get_job()."""
 
-    mocked_deserialize_job_description.return_value = "A bad description"
+    mocked_deserialize_job_description.return_value = 27
 
     with pytest.raises(ValueError) as ex:
         _ = JobData(
@@ -55,13 +55,13 @@ def test_JobData_typing_descripton_raises_value_error(mocked_deserialize_job_des
             user_id=None,
             device_id=3,
             job_id=4,
-            job_type="experiment",
+            job_type="qprogram",
             number_shots=84,
             description="",
             result="",
         )
 
-    assert ex.match("Job description needs to be a Qibo Circuit, a dict, a list or a None!")
+    assert ex.match("Job description needs to be a Qibo Circuit, a dict, a list, a str or a None!")
 
 
 def test_job_listing_item_response_typing():

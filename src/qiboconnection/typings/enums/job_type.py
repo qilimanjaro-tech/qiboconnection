@@ -23,6 +23,7 @@ class JobType(StrEnum):
         enum (str): Accepted values are:
             * "circuit"
             * "experiment"
+            * "other"
     """
 
     CIRCUIT = "circuit"

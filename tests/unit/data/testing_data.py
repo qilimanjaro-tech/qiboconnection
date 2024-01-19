@@ -10,7 +10,6 @@ from qiboconnection.typings.devices import (
     SimulatorDeviceInput,
 )
 from qiboconnection.typings.enums import DeviceAvailability, DeviceStatus
-from qiboconnection.typings.live_plot import UnitPoint
 
 from .web_responses import WebResponses
 
@@ -79,15 +78,6 @@ quantum_device_inputs = [
         characteristics={"type": "quantum", "description": "Cluster"},
         calibration_details={"t1": 10, "frequency": 988, "elapsed_time": 10},
     )
-]
-
-unit_plot_point = [UnitPoint(x=0, y=0, z=None, idx=None, idy=None)]
-
-heatmap_unit_plot_points = [
-    UnitPoint(x=0, y=0, z=0, idx=0, idy=0),
-    UnitPoint(x=0, y=1, z=1, idx=0, idy=1),
-    UnitPoint(x=1, y=0, z=2, idx=1, idy=0),
-    UnitPoint(x=1, y=1, z=3, idx=1, idy=1),
 ]
 
 web_responses = WebResponses()

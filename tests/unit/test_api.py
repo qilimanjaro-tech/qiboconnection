@@ -1,6 +1,5 @@
 """API testing"""
 import ast
-import asyncio
 import base64
 import json
 from dataclasses import asdict
@@ -19,14 +18,10 @@ from qiboconnection.models.devices.devices import Devices
 from qiboconnection.models.devices.util import create_device
 from qiboconnection.models.job_listing import JobListing
 from qiboconnection.models.runcard import Runcard
-from qiboconnection.models.saved_experiment import SavedExperiment
-from qiboconnection.models.saved_experiment_listing import SavedExperimentListing
 from qiboconnection.typings.job_data import JobData
-from qiboconnection.typings.responses import PlottingResponse
 
-from .data import experiment_dict, results_dict, runcard_dict, web_responses
+from .data import runcard_dict, web_responses
 from .data.web_responses.job import JobResponse
-from .utils import get_current_event_loop_or_create
 
 
 def test_api_constructor(mocked_api: API):
@@ -58,42 +53,6 @@ def test_last_job(mocked_api: API):
     """Test last_job property"""
     with pytest.raises(IndexError):
         _ = mocked_api.last_job
-
-
-@patch("qiboconnection.connection.Connection.send_post_auth_remote_api_call", autospec=True)
-def test_last_saved_experiment(mocked_web_call: MagicMock, mocked_api: API):
-    """Test last_saved_experiment property"""
-    mocked_web_call.return_value = web_responses.saved_experiments.create_response
-
-    assert mocked_api._last_saved_experiment is None
-    name = "MyDemoExperiment"
-    description = "A test saved experiment"
-    device_id = 1
-    user_id = 1
-    qililab_version = "0.0.0"
-    favourite = True
-    _ = mocked_api._save_experiment(
-        name=name,
-        description=description,
-        experiment_dict=experiment_dict,
-        results_dict=results_dict,
-        device_id=device_id,
-        user_id=user_id,
-        qililab_version=qililab_version,
-        favourite=favourite,
-    )
-    assert isinstance(mocked_api._last_saved_experiment, SavedExperiment)
-
-
-@patch("qiboconnection.connection.Connection.send_get_auth_remote_api_call_all_pages", autospec=True)
-def test_last_saved_experiment_listing(mocked_web_call: MagicMock, mocked_api: API):
-    """Test last_saved_experiment_listing property"""
-    mocked_web_call.return_value = web_responses.saved_experiments.retrieve_listing_response
-
-    assert mocked_api._last_saved_experiment_listing is None
-    saved_experiments_list = mocked_api._list_saved_experiments()
-    assert isinstance(mocked_api._last_saved_experiment_listing, SavedExperimentListing)
-    assert mocked_api._last_saved_experiment_listing == saved_experiments_list
 
 
 @patch("qiboconnection.connection.Connection.send_post_auth_remote_api_call", autospec=True)
@@ -216,112 +175,6 @@ def test_select_device_ids_ise(mocked_web_call: MagicMock, mocked_api: API):
     assert mocked_api._selected_devices == []
 
 
-@patch("websockets.connect", autospec=True)
-@patch("qiboconnection.connection.Connection.send_post_auth_remote_api_call", autospec=True)
-def test_create_live_plot(mocked_web_call: MagicMock, mocked_websockets_connect: MagicMock, mocked_api: API):
-    """Test the creation of a liveplot using the api"""
-
-    loop = get_current_event_loop_or_create()
-    mocked_connection_future = loop.create_future()
-    mocked_connection_future.set_result(MagicMock())
-    mocked_websockets_connect.return_value = mocked_connection_future
-
-    mocked_web_call.return_value = PlottingResponse(websocket_url="test_url", plot_id=1).to_dict(), 200
-
-    plot_id = asyncio.run(mocked_api._create_liveplot())
-
-    mocked_web_call.assert_called_with(self=mocked_api._connection, path=mocked_api._LIVE_PLOTTING_PATH, data={})
-    mocked_websockets_connect.assert_called_with("test_url")
-    assert plot_id == 1
-
-
-@patch("qiboconnection.connection.Connection.send_post_auth_remote_api_call", autospec=True)
-def test_create_live_plot_with_unexpected_response(mocked_web_call: MagicMock, mocked_api: API):
-    """Test the creation of a liveplot using the api"""
-
-    mocked_web_call.return_value = {}, 400
-
-    with pytest.raises(RemoteExecutionException):
-        _ = asyncio.run(mocked_api._create_liveplot())
-
-
-@patch("qiboconnection.models.live_plot.LivePlot.send_data", autospec=True)
-@patch("websockets.connect", autospec=True)
-@patch("qiboconnection.connection.Connection.send_post_auth_remote_api_call", autospec=True)
-def test_send_plot_points(
-    mocked_web_call: MagicMock,
-    mocked_websockets_connect: MagicMock,
-    mocked_live_plot_send_data: MagicMock,
-    mocked_api: API,
-):
-    """Test the creation of a liveplot using the api"""
-
-    loop = get_current_event_loop_or_create()
-    mocked_connection_future = loop.create_future()
-    mocked_connection_future.set_result(MagicMock())
-    mocked_websockets_connect.return_value = mocked_connection_future
-
-    mocked_web_call.return_value = PlottingResponse(websocket_url="test_url", plot_id=1).to_dict(), 200
-
-    plot_id = asyncio.run(mocked_api._create_liveplot())
-
-    asyncio.run(mocked_api._send_plot_points(plot_id=plot_id, x=0, y=0))
-
-    mocked_live_plot_send_data.assert_called()
-
-
-@patch("qiboconnection.connection.Connection.send_post_auth_remote_api_call", autospec=True)
-def test_save_experiment(mocked_web_call: MagicMock, mocked_api: API):
-    """Tests API.save_experiment() method"""
-    mocked_web_call.return_value = web_responses.saved_experiments.create_response
-
-    name = "MyDemoExperiment"
-    description = "A test saved experiment"
-    device_id = 1
-    user_id = 1
-    qililab_version = "0.0.0"
-    favourite = True
-
-    saved_experiment_id = mocked_api._save_experiment(
-        name=name,
-        description=description,
-        experiment_dict=experiment_dict,
-        results_dict=results_dict,
-        device_id=device_id,
-        user_id=user_id,
-        qililab_version=qililab_version,
-        favourite=favourite,
-    )
-
-    mocked_web_call.assert_called()
-    assert saved_experiment_id == web_responses.saved_experiments.create_response[0]["saved_experiment_id"]
-
-
-@patch("qiboconnection.connection.Connection.send_post_auth_remote_api_call", autospec=True)
-def test_save_experiment_ise(mocked_web_call: MagicMock, mocked_api: API):
-    """Tests API.save_experiment() method"""
-    mocked_web_call.return_value = web_responses.saved_experiments.ise_response
-
-    name = "MyDemoExperiment"
-    description = "A test saved experiment"
-    device_id = 1
-    user_id = 1
-    qililab_version = "0.0.0"
-    favourite = True
-    with pytest.raises(RemoteExecutionException):
-        _ = mocked_api._save_experiment(
-            name=name,
-            description=description,
-            experiment_dict=experiment_dict,
-            results_dict=results_dict,
-            device_id=device_id,
-            user_id=user_id,
-            qililab_version=qililab_version,
-            favourite=favourite,
-        )
-    mocked_web_call.assert_called()
-
-
 @pytest.mark.parametrize("favourites", [False, True])
 @patch("qiboconnection.connection.Connection.send_get_auth_remote_api_call_all_pages", autospec=True)
 def test_list_jobs(mocked_web_call: MagicMock, favourites: bool, mocked_api: API):
@@ -335,46 +188,6 @@ def test_list_jobs(mocked_web_call: MagicMock, favourites: bool, mocked_api: API
     )
     assert isinstance(jobs_list, JobListing)
     assert isinstance(jobs_list.dataframe, pd.DataFrame)
-
-
-@pytest.mark.parametrize("favourites", [False, True])
-@patch("qiboconnection.connection.Connection.send_get_auth_remote_api_call_all_pages", autospec=True)
-def test_list_saved_experiments(mocked_web_call: MagicMock, favourites: bool, mocked_api: API):
-    """Tests API.list_saved_experiments() method"""
-    mocked_web_call.return_value = web_responses.saved_experiments.retrieve_listing_response
-
-    saved_experiments_list = mocked_api._list_saved_experiments(favourites=favourites)
-
-    mocked_web_call.assert_called_with(
-        self=mocked_api._connection, path=mocked_api._SAVED_EXPERIMENTS_CALL_PATH, params={"favourites": favourites}
-    )
-    assert isinstance(saved_experiments_list, SavedExperimentListing)
-    assert isinstance(saved_experiments_list.dataframe, pd.DataFrame)
-
-
-@pytest.mark.parametrize("favourites", [False, True])
-@patch("qiboconnection.connection.Connection.send_get_auth_remote_api_call_all_pages", autospec=True)
-def test_list_saved_experiments_ise(mocked_web_call: MagicMock, favourites: bool, mocked_api: API):
-    """Tests API.list_saved_experiments() method"""
-    mocked_web_call.return_value = web_responses.saved_experiments.ise_listing_response
-
-    with pytest.raises(RemoteExecutionException):
-        _ = mocked_api._list_saved_experiments(favourites=favourites)
-
-    mocked_web_call.assert_called_with(
-        self=mocked_api._connection, path=mocked_api._SAVED_EXPERIMENTS_CALL_PATH, params={"favourites": favourites}
-    )
-
-
-@patch("qiboconnection.connection.Connection.send_get_auth_remote_api_call", autospec=True)
-def test_get_saved_experiment(mocked_web_call: MagicMock, mocked_api: API):
-    """Tests API.get_saved_experiment() method"""
-    mocked_web_call.return_value = web_responses.saved_experiments.retrieve_response
-
-    saved_experiment = mocked_api._get_saved_experiment(saved_experiment_id=1)
-
-    mocked_web_call.assert_called_with(self=mocked_api._connection, path=f"{mocked_api._SAVED_EXPERIMENTS_CALL_PATH}/1")
-    assert isinstance(saved_experiment, SavedExperiment)
 
 
 @pytest.mark.parametrize(
@@ -405,155 +218,6 @@ def test_get_job_exception(mocked_api_call: MagicMock, mocked_api: API):
 
     # Assert that the mocked function was called with correct arguments
     mocked_api_call.assert_called_with(self=mocked_api._connection, path=f"{mocked_api._JOBS_CALL_PATH}/{0}")
-
-
-@patch("qiboconnection.connection.Connection.send_get_auth_remote_api_call", autospec=True)
-def test_get_saved_experiment_ise(mocked_web_call: MagicMock, mocked_api: API):
-    """Tests API.get_saved_experiment() method"""
-    mocked_web_call.return_value = web_responses.saved_experiments.ise_response
-
-    with pytest.raises(RemoteExecutionException):
-        _ = mocked_api._get_saved_experiment(saved_experiment_id=1)
-
-    mocked_web_call.assert_called_with(self=mocked_api._connection, path=f"{mocked_api._SAVED_EXPERIMENTS_CALL_PATH}/1")
-
-
-@patch("qiboconnection.connection.Connection.send_get_auth_remote_api_call", autospec=True)
-def test_get_saved_experiments(mocked_web_call: MagicMock, mocked_api: API):
-    """Tests API.get_saved_experiments() method"""
-    mocked_web_call.return_value = web_responses.saved_experiments.retrieve_response
-
-    saved_experiment = mocked_api._get_saved_experiments(saved_experiment_ids=[1])
-
-    mocked_web_call.assert_called_with(self=mocked_api._connection, path=f"{mocked_api._SAVED_EXPERIMENTS_CALL_PATH}/1")
-    assert isinstance(saved_experiment[0], SavedExperiment)
-
-
-@patch("qiboconnection.connection.Connection.send_get_auth_remote_api_call", autospec=True)
-def test_get_saved_experiments_ise(mocked_web_call: MagicMock, mocked_api: API):
-    """Tests API.get_saved_experiments() method"""
-    mocked_web_call.return_value = web_responses.saved_experiments.ise_response
-
-    with pytest.raises(RemoteExecutionException):
-        _ = mocked_api._get_saved_experiments(saved_experiment_ids=[1])
-
-    mocked_web_call.assert_called_with(self=mocked_api._connection, path=f"{mocked_api._SAVED_EXPERIMENTS_CALL_PATH}/1")
-
-
-@patch("qiboconnection.connection.Connection.send_put_auth_remote_api_call", autospec=True)
-def test_fav_saved_experiment(mocked_web_call: MagicMock, mocked_api: API):
-    """Tests API.fav_saved_experiment() with ONE experiment"""
-    mocked_web_call.return_value = web_responses.saved_experiments.update_response
-
-    mocked_api._fav_saved_experiment(saved_experiment_id=1)
-
-    mocked_web_call.assert_called_with(
-        self=mocked_api._connection,
-        path=f"{mocked_api._SAVED_EXPERIMENTS_CALL_PATH}/1",
-        data={"favourite": True, "user_id": mocked_api.user_id},
-    )
-
-
-@patch("qiboconnection.connection.Connection.send_put_auth_remote_api_call", autospec=True)
-def test_fav_saved_experiment_ise(mocked_web_call: MagicMock, mocked_api: API):
-    """Tests API.fav_saved_experiment() with ONE experiment"""
-    mocked_web_call.return_value = web_responses.saved_experiments.ise_response
-
-    with pytest.raises(RemoteExecutionException):
-        mocked_api._fav_saved_experiment(saved_experiment_id=1)
-
-    mocked_web_call.assert_called_with(
-        self=mocked_api._connection,
-        path=f"{mocked_api._SAVED_EXPERIMENTS_CALL_PATH}/1",
-        data={"favourite": True, "user_id": mocked_api.user_id},
-    )
-
-
-@patch("qiboconnection.connection.Connection.send_put_auth_remote_api_call", autospec=True)
-def test_fav_saved_experiments(mocked_web_call: MagicMock, mocked_api: API):
-    """Tests API.fav_saved_experiments() method with a LIST of experiments"""
-    mocked_web_call.return_value = web_responses.saved_experiments.update_response
-
-    mocked_api._fav_saved_experiments(saved_experiment_ids=[1])
-
-    mocked_web_call.assert_called_with(
-        self=mocked_api._connection,
-        path=f"{mocked_api._SAVED_EXPERIMENTS_CALL_PATH}/1",
-        data={"favourite": True, "user_id": mocked_api.user_id},
-    )
-
-
-@patch("qiboconnection.connection.Connection.send_put_auth_remote_api_call", autospec=True)
-def test_fav_saved_experiments_ise(mocked_web_call: MagicMock, mocked_api: API):
-    """Tests API.fav_saved_experiments() method with a LIST of experiments"""
-    mocked_web_call.return_value = web_responses.saved_experiments.ise_response
-
-    with pytest.raises(RemoteExecutionException):
-        mocked_api._fav_saved_experiments(saved_experiment_ids=[1])
-
-    mocked_web_call.assert_called_with(
-        self=mocked_api._connection,
-        path=f"{mocked_api._SAVED_EXPERIMENTS_CALL_PATH}/1",
-        data={"favourite": True, "user_id": mocked_api.user_id},
-    )
-
-
-@patch("qiboconnection.connection.Connection.send_put_auth_remote_api_call", autospec=True)
-def test_unfav_saved_experiment(mocked_web_call: MagicMock, mocked_api: API):
-    """Tests API.unfav_saved_experiment() method with ONE experiment"""
-    mocked_web_call.return_value = web_responses.saved_experiments.update_response
-
-    mocked_api._unfav_saved_experiment(saved_experiment_id=1)
-
-    mocked_web_call.assert_called_with(
-        self=mocked_api._connection,
-        path=f"{mocked_api._SAVED_EXPERIMENTS_CALL_PATH}/1",
-        data={"favourite": False, "user_id": mocked_api.user_id},
-    )
-
-
-@patch("qiboconnection.connection.Connection.send_put_auth_remote_api_call", autospec=True)
-def test_unfav_saved_experiment_ise(mocked_web_call: MagicMock, mocked_api: API):
-    """Tests API.unfav_saved_experiment() method with ONE experiment"""
-    mocked_web_call.return_value = web_responses.saved_experiments.ise_response
-
-    with pytest.raises(RemoteExecutionException):
-        mocked_api._unfav_saved_experiment(saved_experiment_id=1)
-
-    mocked_web_call.assert_called_with(
-        self=mocked_api._connection,
-        path=f"{mocked_api._SAVED_EXPERIMENTS_CALL_PATH}/1",
-        data={"favourite": False, "user_id": mocked_api.user_id},
-    )
-
-
-@patch("qiboconnection.connection.Connection.send_put_auth_remote_api_call", autospec=True)
-def test_unfav_saved_experiments(mocked_web_call: MagicMock, mocked_api: API):
-    """Tests API.unfav_saved_experiments() method with a LIST of experiments"""
-    mocked_web_call.return_value = web_responses.saved_experiments.update_response
-
-    mocked_api._unfav_saved_experiments(saved_experiment_ids=[1])
-
-    mocked_web_call.assert_called_with(
-        self=mocked_api._connection,
-        path=f"{mocked_api._SAVED_EXPERIMENTS_CALL_PATH}/1",
-        data={"favourite": False, "user_id": mocked_api.user_id},
-    )
-
-
-@patch("qiboconnection.connection.Connection.send_put_auth_remote_api_call", autospec=True)
-def test_unfav_saved_experiments_ise(mocked_web_call: MagicMock, mocked_api: API):
-    """Tests API.unfav_saved_experiments() method with a LIST of experiments"""
-    mocked_web_call.return_value = web_responses.saved_experiments.ise_response
-
-    with pytest.raises(RemoteExecutionException):
-        mocked_api._unfav_saved_experiments(saved_experiment_ids=[1])
-
-    mocked_web_call.assert_called_with(
-        self=mocked_api._connection,
-        path=f"{mocked_api._SAVED_EXPERIMENTS_CALL_PATH}/1",
-        data={"favourite": False, "user_id": mocked_api.user_id},
-    )
 
 
 @patch("qiboconnection.connection.Connection.send_post_auth_remote_api_call", autospec=True)
