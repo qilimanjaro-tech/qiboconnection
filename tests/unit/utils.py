@@ -1,8 +1,7 @@
 # Utils module for testing
 
 import asyncio
-import os
-from typing import Dict, Union
+from typing import Dict
 
 
 def get_current_event_loop_or_create():
