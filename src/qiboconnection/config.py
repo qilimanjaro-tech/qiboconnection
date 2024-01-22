@@ -28,7 +28,7 @@ if "QUANTUM_SERVICE_URL" not in os.environ:
         "local": "http://localhost:8080",
         "docker_local": "http://nginx:8080",
         "staging": "https://qilimanjaroqaas.ddns.net:8080",
-        "development": "https://FEDERICO:8080",
+        "development": "https://qilimanjarodev.ddns.net:8080",
     }
 
 
