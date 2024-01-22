@@ -16,9 +16,7 @@ def get_current_event_loop_or_create():
         return asyncio.new_event_loop()
 
 
-def set_and_keep_values(
-    values: Dict[str, str], my_dict: Union[Dict[str, str], os._Environ[str]] = os.environ
-) -> Dict[str, str]:
+def set_and_keep_values(values: Dict[str, str], my_dict: Dict[str, str]) -> Dict[str, str]:
     """Utility to set or remove values in a dictionary.
 
     The original values are return, so they can be set afterwards.
