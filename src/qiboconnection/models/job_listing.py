@@ -14,7 +14,7 @@
 
 """ JobListing class """
 
-from dataclasses import asdict, dataclass, field
+from dataclasses import dataclass, field
 from typing import List
 
 import pandas as pd
@@ -47,10 +47,10 @@ class JobListing:
 
         try:
             return pd.to_numeric(column)
-        except Exception:
+        except Exception:  # pylint: disable=broad-except
             try:
                 return pd.to_datetime(column)
-            except Exception:
+            except Exception:  # pylint: disable=broad-except
                 return column
 
     @classmethod

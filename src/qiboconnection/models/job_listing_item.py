@@ -13,14 +13,14 @@
 # limitations under the License.
 """ JobListingItem class """
 
-from dataclasses import dataclass, field
+from dataclasses import field
 
 from qiboconnection.typings.enums import JobStatus, JobType
 from qiboconnection.typings.responses import JobListingItemResponse
 from qiboconnection.util import from_kwargs
 
 
-class JobListingItem:
+class JobListingItem:  # pylint: disable=too-few-public-methods
     """JobListing single item representation."""
 
     user_id: int
