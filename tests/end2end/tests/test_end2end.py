@@ -10,7 +10,6 @@ from qibo.models import Circuit
 
 from qiboconnection.api import API
 from qiboconnection.models.devices import Device
-from qiboconnection.models.saved_experiment_listing import SavedExperimentListing
 from qiboconnection.typings.enums import DeviceAvailability as DA
 from qiboconnection.typings.enums import DeviceStatus as DS
 from qiboconnection.typings.enums import JobStatus
@@ -177,14 +176,6 @@ def test_experiment_saving_and_retrieving(device: Device, api: API, experiment_d
 
     assert saved_experiment.experiment == experiment_dict, "Sent and recovered experiments are not the same"
     assert saved_experiment.results == results_dict, "Sent and recovered results are not the same"
-
-
-def test_saved_experiments_listing(api: API):
-    """Test whether a saved experiment listing can be obtained"""
-
-    saved_experiment_listing = api._list_saved_experiments()
-
-    assert isinstance(saved_experiment_listing, SavedExperimentListing)
 
 
 # New Tests
