@@ -141,7 +141,7 @@ def test_circuit_result_response(device: Device, api: API, numpy_circuit: Circui
     result: JobData = post_and_get_result(api=api, device=device, circuit=numpy_circuit, timeout=15)
     logger.debug(f"result: {result}")
 
-    # The operation post + response can be performed always (it is an ansych action) but
+    # The operation post + response can be performed always (it is an async action) but
     # the meaning of SUCCESS/EXCEPTION/FORBIDDEN means something different:
     response_result = get_expected_operation_result(Operation.RESPONSE, device)
     if response_result == OperationResult.SUCCESS:
