@@ -4,7 +4,6 @@ import logging
 import os
 import sys
 
-import pandas as pd
 import pytest
 import requests
 from qibo.models import Circuit

@@ -298,13 +298,10 @@ def test_job_request_raises_value_error_if_several_of_circuit_and_qprogram(
     assert e_info.value.args[0] == "Could not determine JobType"
 
 
-def test_job_request_raises_value_error_if_unknown_type(
-    circuits: list[Circuit], user: User, simulator_device: SimulatorDevice
-):
+def test_job_request_raises_value_error_if_unknown_type(user: User, simulator_device: SimulatorDevice):
     """test job raises proper exceptions when trying to build request with more than one of circuit, qprogram
 
     Args:
-        circuits (list[Circuit]): Circuit
         user (User): User
         simulator_device (SimulatorDevice): SimulatorDevice
     """
