@@ -298,6 +298,31 @@ def test_job_request_raises_value_error_if_several_of_circuit_and_qprogram(
     assert e_info.value.args[0] == "Could not determine JobType"
 
 
+def test_job_request_raises_value_error_if_unknown_type(
+    circuits: list[Circuit], user: User, simulator_device: SimulatorDevice
+):
+    """test job raises proper exceptions when trying to build request with more than one of circuit, qprogram
+
+    Args:
+        circuits (list[Circuit]): Circuit
+        user (User): User
+        simulator_device (SimulatorDevice): SimulatorDevice
+    """
+    job = Job(
+        qprogram={},
+        user=user,
+        device=cast(Device, simulator_device),
+        job_status=JobStatus.COMPLETED,
+        id=23,
+        nshots=10,
+    )
+    job.qprogram = None
+
+    with pytest.raises(ValueError) as e_info:
+        _ = job._get_job_description()
+    assert e_info.value.args[0] == "No suitable information found for building description."
+
+
 def test_update_with_job_response(circuits: list[Circuit], user: User, simulator_device: SimulatorDevice):
     """test update with job response
 
