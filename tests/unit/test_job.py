@@ -128,7 +128,7 @@ def test_job_creation_default_values(circuits: list[Circuit], user: User, simula
     assert e_info.value.args[0] == "Job result still not completed"
     with pytest.raises(ValueError) as e_info:
         _ = job.algorithms
-    assert e_info.value.args[0] == "Job does not contains an algorithm Program"
+    assert e_info.value.args[0] == "Job does not contain an algorithm Program"
 
 
 def test_jobs_job_type_raises_value_error(circuits: list[Circuit], user: User, simulator_device: SimulatorDevice):
