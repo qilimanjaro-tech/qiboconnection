@@ -154,30 +154,6 @@ def test_circuit_result_response(device: Device, api: API, numpy_circuit: Circui
     delete_job(api, job_id=result.job_id)
 
 
-@pytest.mark.parametrize("device", get_devices_listing_params())
-def test_experiment_saving_and_retrieving(device: Device, api: API, experiment_dict: dict, results_dict: dict):
-    """Test whether a saved experiment can be sent and retrieved.
-    Args:
-        api: api instance to call the server with
-    """
-
-    experiment_id = api._save_experiment(
-        name="SaveTest",
-        description="Test saving by QGQS",
-        experiment_dict=experiment_dict,
-        results_dict=results_dict,
-        user_id=api._connection._user_id,
-        favourite=False,
-        device_id=device.id,
-        qililab_version="0.0.0",
-    )
-
-    saved_experiment = api._get_saved_experiment(saved_experiment_id=experiment_id)
-
-    assert saved_experiment.experiment == experiment_dict, "Sent and recovered experiments are not the same"
-    assert saved_experiment.results == results_dict, "Sent and recovered results are not the same"
-
-
 # New Tests
 @pytest.mark.parametrize("device", get_devices_listing_params())
 def test_all_status(device: Device, api: API):

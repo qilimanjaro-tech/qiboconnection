@@ -30,7 +30,6 @@ from tests.end2end.utils.utils import (
     get_user_can_delete_runcard_api,
     get_user_can_get_runcard_api,
     get_user_can_list_runcard_api,
-    get_user_can_post_and_list_experiment_api,
     get_user_can_save_runcard_api,
     get_user_can_update_runcard_api,
     get_user_cannot_change_availability_api,
@@ -38,7 +37,7 @@ from tests.end2end.utils.utils import (
     get_user_cannot_delete_runcard_api,
     get_user_cannot_get_runcard_api,
     get_user_cannot_list_runcard_api,
-    get_user_cannot_post_and_list_experiment_api,
+    get_user_cannot_post_and_list_qprogram_api,
     get_user_cannot_save_runcard_api,
     get_user_cannot_update_runcard_api,
     get_user_roles_id,
@@ -219,79 +218,25 @@ def test_cannot_change_device_availability_when_online(device: Device, user_role
     admin_set_device_to_online(device=device, api=api)
 
 
-# ------------------------------------------------------------------------ OPERATION: POST EXPERIMENTS
-
-
-# @pytest.mark.parametrize(
-#     "device, user_role",
-#     [(device, user_role) for user_role in list_user_roles() for device in get_devices_listing_params(user_role)],
-# )
-# @pytest.mark.slow
-# def test_can_post_experiment(device: Device, experiment_dict: dict, user_role: UserRole, api: API):
-#     """Test user roles that are allowed to post experiments can do it -- e.g admin and qili-user
-#     Args:
-#         api: api instance to call the server with
-#     """
-
-#     check_operation_possible_or_skip(operation=Operation.POST, device=device)
-
-#     user_api = get_user_can_post_and_list_experiment_api(user_role=user_role)
-#     user_api.select_device_id(device_id=device.id)
-#     job_id = user_api.execute(experiment=experiment_dict)
-#     assert isinstance(job_id, list)
-#     assert len(job_id) == 1
-#     api.delete_job(job_id=job_id[0])
-
-
 @pytest.mark.parametrize(
     "device, user_role",
     [(device, user_role) for user_role in list_user_roles() for device in get_devices_listing_params(user_role)],
 )
 @pytest.mark.slow
-def test_cannot_post_experiment(device: Device, experiment_dict: dict, user_role: UserRole):
-    """Test user roles that aren't allowed to post experiments can do it -- e.g bsc
+def test_cannot_post_qprogram(device: Device, qprogram_dict: dict, user_role: UserRole):
+    """Test user roles that aren't allowed to post qprogram can do it -- e.g bsc
     Args:
         api: api instance to call the server with.
     """
 
     check_operation_possible_or_skip(operation=Operation.POST, device=device)
 
-    user_api = get_user_cannot_post_and_list_experiment_api(user_role=user_role)
+    user_api = get_user_cannot_post_and_list_qprogram_api(user_role=user_role)
 
     user_api.select_device_id(device_id=device.id)
 
     with pytest.raises(requests.exceptions.HTTPError):
-        user_api.execute(experiment=experiment_dict)
-
-
-# ------------------------------------------------------------------------ OPERATION: LIST SAVED EXPERIMENTS
-
-
-@pytest.mark.parametrize("user_role", list_user_roles())
-@pytest.mark.slow
-def test_can_list_saved_experiments(user_role: UserRole):
-    """Test user roles that are allowed to list saved experiments can do it -- e.g admin and qili-user
-    Args:
-        api: api instance to call the server with
-    """
-
-    user_api = get_user_can_post_and_list_experiment_api(user_role=user_role)
-
-    assert isinstance(user_api._list_saved_experiments().dataframe, pd.DataFrame)
-
-
-@pytest.mark.parametrize("user_role", list_user_roles())
-@pytest.mark.slow
-def test_cannot_list_saved_experiments(user_role: UserRole):
-    """Test user roles that aren't allowed to list saved experiments can do it -- e.g bsc
-    Args:
-        api: api instance to call the server with
-    """
-
-    user_api = get_user_cannot_post_and_list_experiment_api(user_role=user_role)
-
-    with pytest.raises(requests.exceptions.HTTPError):
-        user_api._list_saved_experiments()
+        user_api.execute(qprogram=qprogram_dict)
 
 
 # ------------------------------------------------------------------------ OPERATION: LIST AND SELECT DEVICES
@@ -443,7 +388,7 @@ def test_can_save_and_delete_owned_runcards(user_role: UserRole, runcard: Runcar
 @pytest.mark.slow
 @pytest.mark.parametrize("user_role", list_user_roles())
 def test_cannot_delete_not_owned_runcard(user_role: UserRole, runcard: Runcard, api: API):
-    "Check users cannot delete runcards from other users, in particular, admin."
+    """Check users cannot delete runcards from other users, in particular, admin."""
 
     api_delete = get_user_can_delete_runcard_api(user_role=user_role)
 
