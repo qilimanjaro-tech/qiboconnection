@@ -68,7 +68,18 @@ def test_job_listing_item_response_typing():
     """Test JobListingItemResponse instantiation"""
 
     listing_job_response = JobListingItemResponse(
-        status="89", user_id=None, device_id=3, job_type="jaiof", number_shots=84, id=3
+        status="89", user_id=123, device_id=3, job_type="jaiof", number_shots=84, id=3
     )
 
     assert isinstance(listing_job_response, JobListingItemResponse)
+
+
+def test_job_listing_item_response_typing_to_dict():
+    """Test JobListingItemResponse instantiation"""
+
+    listing_job_response = JobListingItemResponse(
+        status="89", user_id=12, device_id=3, job_type="jaiof", number_shots=84, id=3
+    )
+    listing_job_response_dict = listing_job_response.to_dict()
+
+    assert isinstance(listing_job_response_dict, dict)

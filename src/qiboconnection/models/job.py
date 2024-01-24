@@ -78,7 +78,8 @@ class Job(ABC):  # pylint: disable=too-many-instance-attributes
             List[dict]: a list of all algorithms as a dictionary
         """
         if self.program is None:
-            raise ValueError("Job does not contains an algorithm Program")
+            raise ValueError("Job does not contain an algorithm Program")
+
         return [algorithm.__dict__ for algorithm in self.program.algorithms]
 
     @property
