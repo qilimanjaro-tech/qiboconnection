@@ -599,3 +599,23 @@ class TestExecute:
             circuit=[self.circuit] * 10, nshots=1000, device_ids=[9], timeout=10, interval=1
         )
         assert isinstance(result, list | dict)
+
+    @patch("qiboconnection.api.API._get_job", autospec=True)
+    def test_execute_and_return_results_timeout(self, mocked_get_job: MagicMock, mocked_api: API):
+        mocked_get_job.return_value = JobData(
+            user_id=1,
+            job_type=JobType.OTHER,
+            queue_position=0,
+            job_id=0,
+            result={},
+            device_id=9,
+            status=JobStatus.PENDING,
+            number_shots=1000,
+            description="unknown description",
+        )
+
+        with pytest.raises(TimeoutError) as e_info:
+            _ = mocked_api.execute_and_return_results(
+                circuit=[self.circuit] * 10, nshots=1000, device_ids=[9], timeout=1, interval=1
+            )
+        assert e_info.value.args[0] == "Server did not execute the jobs in time."
