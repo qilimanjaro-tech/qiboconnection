@@ -6,7 +6,6 @@ from .job import JobResponse
 from .ping import Ping
 from .responses_raw import ResponsesRaw
 from .runcards import Runcards
-from .saved_experiments import SavedExperiments
 from .users import Users
 
 
@@ -15,7 +14,6 @@ class WebResponses:
 
     ping = Ping()
     devices = Devices()
-    saved_experiments = SavedExperiments()
     runcards = Runcards()
     users = Users()
     auth = Auth()

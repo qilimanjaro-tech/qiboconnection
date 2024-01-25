@@ -38,7 +38,7 @@ USER_OPERATIONS = [
         "role": UserRole.ADMIN,
         "can_change_status": True,
         "can_change_availability": True,
-        "can_post_experiments": True,
+        "can_post_qprograms": True,
         "can_get_runcard": True,
         "can_list_runcard": True,
         "can_save_runcard": True,
@@ -49,7 +49,7 @@ USER_OPERATIONS = [
         "role": UserRole.BSC,
         "can_change_status": False,
         "can_change_availability": False,
-        "can_post_experiments": False,
+        "can_post_qprograms": True,
         "can_get_runcard": True,
         "can_list_runcard": True,
         "can_save_runcard": False,
@@ -60,7 +60,7 @@ USER_OPERATIONS = [
         "role": UserRole.QILI,
         "can_change_status": False,
         "can_change_availability": True,
-        "can_post_experiments": True,
+        "can_post_qprograms": True,
         "can_get_runcard": True,
         "can_list_runcard": True,
         "can_save_runcard": True,
@@ -71,7 +71,7 @@ USER_OPERATIONS = [
         "role": UserRole.MACHINE,
         "can_change_status": False,
         "can_change_availability": False,
-        "can_post_experiments": False,
+        "can_post_qprograms": False,
         "can_get_runcard": True,
         "can_list_runcard": False,
         "can_save_runcard": True,
@@ -326,32 +326,17 @@ def get_user_cannot_change_availability_api(user_role: UserRole):
     return get_api_or_fail_test(get_logging_conf_or_fail_test(user_role=user_role))
 
 
-def get_user_can_post_and_list_experiment_api(user_role: UserRole):
-    """Get API instance for the user roles that can post qililab experiments, by definition.
-    Args:
-        user_role (UserRole):
-
-    Returns:
-        API: API instance only for the users that can qililab experiments
-    """
-
-    if not get_user_role_operations(user_role=user_role)["can_post_experiments"]:
-        pytest.skip(f"{user_role} cannot post experiments")
-
-    return get_api_or_fail_test(get_logging_conf_or_fail_test(user_role=user_role))
-
-
-def get_user_cannot_post_and_list_experiment_api(user_role: UserRole):
-    """Get API instance for the user roles that cannot post qililab experiments, by definition.
+def get_user_cannot_post_and_list_qprogram_api(user_role: UserRole):
+    """Get API instance for the user roles that cannot post qililab qprogram, by definition.
 
     Args:
         user_role (UserRole):
 
     Returns:
-        API: API instance only for the users that cannot post experiments
+        API: API instance only for the users that cannot post qprogram
     """
-    if get_user_role_operations(user_role=user_role)["can_post_experiments"]:
-        pytest.skip(f"{user_role} can post experiments")
+    if get_user_role_operations(user_role=user_role)["can_post_qprograms"]:
+        pytest.skip(f"{user_role} can post qprograms")
 
     return get_api_or_fail_test(get_logging_conf_or_fail_test(user_role=user_role))
 

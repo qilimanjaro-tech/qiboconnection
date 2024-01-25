@@ -13,14 +13,14 @@
 # limitations under the License.
 """ JobListingItem class """
 
-from dataclasses import dataclass, field
+from dataclasses import field
 
 from qiboconnection.typings.enums import JobStatus, JobType
 from qiboconnection.typings.responses import JobListingItemResponse
+from qiboconnection.util import from_kwargs
 
 
-@dataclass
-class JobListingItem:
+class JobListingItem:  # pylint: disable=too-few-public-methods
     """JobListing single item representation."""
 
     user_id: int
@@ -33,11 +33,4 @@ class JobListingItem:
     @classmethod
     def from_response(cls, response: JobListingItemResponse):
         """Constructor for JobListingItems that takes in a JobListingItemResponse"""
-        return cls(
-            id=response.id,
-            user_id=response.user_id,
-            device_id=response.device_id,
-            job_type=response.job_type,
-            status=response.status,
-            number_shots=response.number_shots,
-        )
+        return from_kwargs(cls, **response.__dict__)
