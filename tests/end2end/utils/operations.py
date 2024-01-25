@@ -75,7 +75,7 @@ def get_expected_operation_result(  # pylint: disable=too-many-branches
     factors as the environment (eg. PRODUCTION) and the type of device (eg. QUANTUM)
 
     Args:
-        op_name (str): the name of the operation
+        operation (str): the name of the operation
         device (Device): simulator or quantum device class
 
     Raises:
