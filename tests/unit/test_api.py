@@ -18,6 +18,7 @@ from qiboconnection.models.devices.devices import Devices
 from qiboconnection.models.devices.util import create_device
 from qiboconnection.models.job_listing import JobListing
 from qiboconnection.models.runcard import Runcard
+from qiboconnection.typings.enums import JobStatus, JobType
 from qiboconnection.typings.job_data import JobData
 
 from .data import runcard_dict, web_responses
@@ -585,14 +586,16 @@ class TestExecute:
     def test_execute_and_return_results(self, mocked_get_job: MagicMock, mocked_api: API):
         mocked_get_job.return_value = JobData(
             user_id=1,
-            job_type="OTHER",
+            job_type=JobType.OTHER,
             queue_position=0,
             job_id=0,
             result={},
             device_id=9,
-            status="COMPLETED",
+            status=JobStatus.COMPLETED,
             number_shots=1000,
-            description="{}",
+            description="unknown description",
         )
-        result = mocked_api.execute_and_return_results(circuit=[self.circuit] * 10, nshots=1000, device_ids=[9])
+        result = mocked_api.execute_and_return_results(
+            circuit=[self.circuit] * 10, nshots=1000, device_ids=[9], timeout=10, interval=1
+        )
         assert isinstance(result, list | dict)
