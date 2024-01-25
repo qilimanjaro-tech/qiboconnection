@@ -462,7 +462,7 @@ class API(ABC):
 
     def execute_and_return_results(
         self,
-        circuit: Circuit | None = None,
+        circuit: list[Circuit] | None = None,
         qprogram: dict | None = None,
         nshots: int = 10,
         device_ids: List[int] | None = None,

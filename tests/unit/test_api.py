@@ -580,3 +580,19 @@ class TestExecute:
         assert all(
             base64.urlsafe_b64decode(d).decode() == self.circuit.to_qasm() for d in description
         )  # make sure we posted the correct circuits
+
+    @patch("qiboconnection.api.API._get_job", autospec=True)
+    def test_execute_and_return_results(self, mocked_get_job: MagicMock, mocked_api: API):
+        mocked_get_job.return_value = JobData(
+            user_id=1,
+            job_type="OTHER",
+            queue_position=0,
+            job_id=0,
+            result={},
+            device_id=9,
+            status="COMPLETED",
+            number_shots=1000,
+            description="{}",
+        )
+        result = mocked_api.execute_and_return_results(circuit=[self.circuit] * 10, nshots=1000, device_ids=[9])
+        assert isinstance(result, list | dict)
