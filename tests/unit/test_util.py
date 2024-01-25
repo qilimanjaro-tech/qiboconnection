@@ -74,22 +74,20 @@ def test_process_response_non_json(response_plain_text: Response):
     assert processed_response[1] == response_plain_text.status_code
 
 
-def test_deserialize_job_description(
-    base64_qibo_circuit: str, base64_qibo_circuits: str, base64_qililab_experiment: str
-):
+def test_deserialize_job_description(base64_qibo_circuit: str, base64_qibo_circuits: str, base64_qililab_qprogram: str):
     """Unit test of deserialize_job_description()"""
 
     assert isinstance(
         deserialize_job_description(base64_description=base64_qibo_circuit, job_type=JobType.CIRCUIT), Circuit
     )
     assert isinstance(
-        deserialize_job_description(base64_description=base64_qililab_experiment, job_type=JobType.EXPERIMENT), dict
-    )
-
-    assert deserialize_job_description(base64_description=base64_qibo_circuit, job_type="qiskit") is None
-    assert isinstance(
         deserialize_job_description(base64_description=base64_qibo_circuits, job_type=JobType.CIRCUIT), list
     )
+    assert isinstance(
+        deserialize_job_description(base64_description=base64_qililab_qprogram, job_type=JobType.QPROGRAM), dict
+    )
+    assert isinstance(deserialize_job_description(base64_description=base64_qibo_circuit, job_type=JobType.OTHER), str)
+    assert isinstance(deserialize_job_description(base64_description=base64_qibo_circuit, job_type="qiskit"), str)
 
 
 def test_from_kwargs():

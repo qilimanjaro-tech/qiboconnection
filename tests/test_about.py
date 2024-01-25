@@ -11,8 +11,8 @@ import qiboconnection as qc
 
 def test_about():
     """Test that the `about` function prints the correct information."""
-    capturedOutput = io.StringIO()
-    sys.stdout = capturedOutput  # Redirect output
+    captured_output = io.StringIO()
+    sys.stdout = captured_output  # Redirect output
     qc.about()
     sys.stdout = sys.__stdout__  # Reset redirect
 
@@ -22,4 +22,4 @@ Python version:          {sys.version_info[0]}.{sys.version_info[1]}.{sys.versio
 Qibo version:            {qibo.__version__}
 """
 
-    assert expected_string == capturedOutput.getvalue()
+    assert expected_string == captured_output.getvalue()

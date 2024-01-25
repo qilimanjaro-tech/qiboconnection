@@ -47,8 +47,8 @@ def fixture_program_definition(algorithm_definition: AlgorithmDefinition) -> Pro
     return ProgramDefinition(algorithms=[algorithm_definition])
 
 
-@pytest.fixture(name="circuit")
-def fixture_circuit():
+@pytest.fixture(name="circuits")
+def fixture_circuits():
     """Create a circuit
 
     Returns:
@@ -58,7 +58,7 @@ def fixture_circuit():
     circuit.add(gates.H(0))
     circuit.add(gates.M(0))
 
-    return circuit
+    return [circuit]
 
 
 @pytest.fixture(name="user")
@@ -81,11 +81,11 @@ def fixture_simulator_device() -> SimulatorDevice:
     return SimulatorDevice(device_input=simulator_device_inputs[0])
 
 
-def test_job_creation(circuit: Circuit, user: User, simulator_device: SimulatorDevice):
+def test_job_creation(circuits: list[Circuit], user: User, simulator_device: SimulatorDevice):
     """Test job creation
 
     Args:
-        circuit (Circuit): Circuit
+        circuits (list(Circuit)): Circuit
         user (User): User
         simulator_device (SimulatorDevice): SimulatorDevice
     """
@@ -96,7 +96,7 @@ def test_job_creation(circuit: Circuit, user: User, simulator_device: SimulatorD
         job_id=job_id, http_response="WzAuMSwgMC4xLCAwLjEsIDAuMSwgMC4xXQ==", job_type=JobType.CIRCUIT
     )
     job = Job(
-        circuit=circuit,
+        circuit=circuits,
         user=user,
         device=cast(Device, simulator_device),
         job_status=job_status,
@@ -106,16 +106,16 @@ def test_job_creation(circuit: Circuit, user: User, simulator_device: SimulatorD
     assert isinstance(job, Job)
 
 
-def test_job_creation_default_values(circuit: Circuit, user: User, simulator_device: SimulatorDevice):
+def test_job_creation_default_values(circuits: list[Circuit], user: User, simulator_device: SimulatorDevice):
     """test job creation using the default values
 
     Args:
-        circuit (Circuit): ProgramDefinition
+        circuits (list[Circuit]): ProgramDefinition
         user (User): User
         simulator_device (SimulatorDevice): SimulatorDevice
     """
 
-    job = Job(circuit=circuit, user=user, device=cast(Device, simulator_device))
+    job = Job(circuit=circuits, user=user, device=cast(Device, simulator_device))
     assert isinstance(job, Job)
     assert job.job_status == JobStatus.NOT_SENT
     assert job.job_result is None
@@ -128,19 +128,19 @@ def test_job_creation_default_values(circuit: Circuit, user: User, simulator_dev
     assert e_info.value.args[0] == "Job result still not completed"
     with pytest.raises(ValueError) as e_info:
         _ = job.algorithms
-    assert e_info.value.args[0] == "Job does not contains an algorithm Program"
+    assert e_info.value.args[0] == "Job does not contain an algorithm Program"
 
 
-def test_jobs_job_type_raises_value_error(circuit: Circuit, user: User, simulator_device: SimulatorDevice):
+def test_jobs_job_type_raises_value_error(circuits: list[Circuit], user: User, simulator_device: SimulatorDevice):
     """test job.job_type raises value error when unable to determine type
 
     Args:
-        circuit (Circuit): circuit
+        circuit (list[Circuit]): circuit
         user (User): User
         simulator_device (SimulatorDevice): SimulatorDevice
     """
 
-    job = Job(circuit=circuit, user=user, device=cast(Device, simulator_device))
+    job = Job(circuit=circuits, user=user, device=cast(Device, simulator_device))
     job.circuit = None
 
     with pytest.raises(ValueError) as e_info:
@@ -149,60 +149,60 @@ def test_jobs_job_type_raises_value_error(circuit: Circuit, user: User, simulato
     assert e_info.value.args[0] == "Could not determine JobType"
 
 
-def test_job_creation_experiment(user: User, simulator_device: SimulatorDevice):
-    """test job creation using an experiment instead of a circuit
+def test_job_creation_qprogram(user: User, simulator_device: SimulatorDevice):
+    """test job creation using an qprogram instead of a circuit
 
     Args:
         user (User): User
         simulator_device (SimulatorDevice): SimulatorDevice
     """
 
-    job = Job(experiment={}, user=user, device=cast(Device, simulator_device))
-    assert job.job_type == JobType.EXPERIMENT
+    job = Job(qprogram={}, user=user, device=cast(Device, simulator_device))
+    assert job.job_type == JobType.QPROGRAM
 
 
-def test_job_creation_experiment_raises_value_error_when_both_circuit_and_experiment_are_defined(
-    circuit: Circuit, user: User, simulator_device: SimulatorDevice
+def test_job_creation_qprogram_raises_value_error_when_both_circuit_and_qprogram_are_defined(
+    circuits: list[Circuit], user: User, simulator_device: SimulatorDevice
 ):
-    """test job creation using both experiment and circuit at the same time
+    """test job creation using both qprogram and circuit at the same time
 
     Args:
-        circuit (Circuit): ProgramDefinition
+        circuits (list[Circuit]): ProgramDefinition
         user (User): User
         simulator_device (SimulatorDevice): SimulatorDevice
     """
 
     with pytest.raises(ValueError) as e_info:
-        _ = Job(experiment={}, circuit=circuit, user=user, device=cast(Device, simulator_device))
-    assert e_info.value.args[0] == "Both circuit and experiment were provided, but execute() only takes one of them."
+        _ = Job(qprogram={}, circuit=circuits, user=user, device=cast(Device, simulator_device))
+    assert e_info.value.args[0] == "Both circuit and qprogram were provided, but execute() only takes one of them."
 
 
-def test_job_creation_experiment_raises_value_error_when_neither_of_circuit_and_experiment_are_defined(
+def test_job_creation_qprogram_raises_value_error_when_neither_of_circuit_and_qprogram_are_defined(
     user: User, simulator_device: SimulatorDevice
 ):
-    """test job creation using neither experiment nor circuit
+    """test job creation using neither qprogram nor circuit
 
     Args:
         user (User): User
         simulator_device (SimulatorDevice): SimulatorDevice
     """
     with pytest.raises(ValueError) as e_info:
-        _ = Job(experiment=None, circuit=None, user=user, device=cast(Device, simulator_device))
-    assert e_info.value.args[0] == "Neither of experiment or circuit were provided,"
+        _ = Job(qprogram=None, circuit=None, user=user, device=cast(Device, simulator_device))
+    assert e_info.value.args[0] == "Neither of circuit or qprogram were provided."
 
 
-def test_job_request_with_circuit(circuit: Circuit, user: User, simulator_device: SimulatorDevice):
+def test_job_request_with_circuit(circuits: list[Circuit], user: User, simulator_device: SimulatorDevice):
     """test job request
 
     Args:
-        circuit (Circuit): Circuit
+        circuits (list[Circuit]): Circuit
         user (User): User
         simulator_device (SimulatorDevice): SimulatorDevice
     """
     job_status = JobStatus.COMPLETED
     user_id = user.user_id
     job = Job(
-        circuit=[circuit],
+        circuit=circuits,
         user=user,
         device=cast(Device, simulator_device),
         job_status=job_status,
@@ -221,18 +221,17 @@ def test_job_request_with_circuit(circuit: Circuit, user: User, simulator_device
     assert job.job_request == expected_job_request
 
 
-def test_job_request_with_experiment(user: User, simulator_device: SimulatorDevice):
+def test_job_request_with_qprogram(user: User, simulator_device: SimulatorDevice):
     """test job request
 
     Args:
-        experiment(dict)
         user (User): User
         simulator_device (SimulatorDevice): SimulatorDevice
     """
     job_status = JobStatus.COMPLETED
     user_id = user.user_id
     job = Job(
-        experiment={},
+        qprogram={},
         user=user,
         device=cast(Device, simulator_device),
         job_status=job_status,
@@ -244,25 +243,25 @@ def test_job_request_with_experiment(user: User, simulator_device: SimulatorDevi
         device_id=simulator_device.id,
         description="e30=",
         number_shots=10,
-        job_type=JobType.EXPERIMENT,
+        job_type=JobType.QPROGRAM,
     )
 
     assert isinstance(job, Job)
     assert job.job_request == expected_job_request
 
 
-def test_job_request_raises_value_error_if_not_circuit_or_experiment(
-    circuit: Circuit, user: User, simulator_device: SimulatorDevice
+def test_job_request_raises_value_error_if_not_circuit_or_qprogram(
+    circuits: list[Circuit], user: User, simulator_device: SimulatorDevice
 ):
-    """test job raises proper exceptions when trying to build request with none of circuit, experiment
+    """test job raises proper exceptions when trying to build request with none of circuit, qprogram
 
     Args:
-        circuit (Circuit): Circuit
+        circuits (list[Circuit]): Circuit
         user (User): User
         simulator_device (SimulatorDevice): SimulatorDevice
     """
     job = Job(
-        circuit=circuit,
+        circuit=circuits,
         user=user,
         device=cast(Device, simulator_device),
         job_status=JobStatus.COMPLETED,
@@ -275,35 +274,57 @@ def test_job_request_raises_value_error_if_not_circuit_or_experiment(
     assert e_info.value.args[0] == "Could not determine JobType"
 
 
-def test_job_request_raises_value_error_if_several_of_circuit_and_experiment(
-    circuit: Circuit, user: User, simulator_device: SimulatorDevice
+def test_job_request_raises_value_error_if_several_of_circuit_and_qprogram(
+    circuits: list[Circuit], user: User, simulator_device: SimulatorDevice
 ):
-    """test job raises proper exceptions when trying to build request with more than one of circuit, experiment
+    """test job raises proper exceptions when trying to build request with more than one of circuit, qprogram
 
     Args:
-        circuit (Circuit): Circuit
+        circuits (list[Circuit]): Circuit
         user (User): User
         simulator_device (SimulatorDevice): SimulatorDevice
     """
     job = Job(
-        experiment={},
+        qprogram={},
         user=user,
         device=cast(Device, simulator_device),
         job_status=JobStatus.COMPLETED,
         id=23,
         nshots=10,
     )
-    job.circuit = circuit
+    job.circuit = circuits
     with pytest.raises(ValueError) as e_info:
         _ = job.job_request
     assert e_info.value.args[0] == "Could not determine JobType"
 
 
-def test_update_with_job_response(circuit: Circuit, user: User, simulator_device: SimulatorDevice):
+def test_job_request_raises_value_error_if_unknown_type(user: User, simulator_device: SimulatorDevice):
+    """test job raises proper exceptions when trying to build request with more than one of circuit, qprogram
+
+    Args:
+        user (User): User
+        simulator_device (SimulatorDevice): SimulatorDevice
+    """
+    job = Job(
+        qprogram={},
+        user=user,
+        device=cast(Device, simulator_device),
+        job_status=JobStatus.COMPLETED,
+        id=23,
+        nshots=10,
+    )
+    job.qprogram = None
+
+    with pytest.raises(ValueError) as e_info:
+        _ = job._get_job_description()
+    assert e_info.value.args[0] == "No suitable information found for building description."
+
+
+def test_update_with_job_response(circuits: list[Circuit], user: User, simulator_device: SimulatorDevice):
     """test update with job response
 
     Args:
-        circuit (Circuit): Circuit
+        circuits (list[Circuit]): Circuit
         user (User): User
         simulator_device (SimulatorDevice): SimulatorDevice
     """
@@ -311,7 +332,7 @@ def test_update_with_job_response(circuit: Circuit, user: User, simulator_device
     user_id = user.user_id
     job_status = JobStatus.PENDING
     job = Job(
-        circuit=circuit,
+        circuit=circuits,
         user=user,
         device=cast(Device, simulator_device),
         job_status=job_status,
@@ -333,12 +354,12 @@ def test_update_with_job_response(circuit: Circuit, user: User, simulator_device
 
 
 def test_update_with_job_response_raises_error_when_updating_incorrect_job(
-    circuit: Circuit, user: User, simulator_device: SimulatorDevice
+    circuits: list[Circuit], user: User, simulator_device: SimulatorDevice
 ):
     """test update with job response of different user or from different device raises ValueError
 
     Args:
-        circuit (Circuit): Circuit
+        circuits (list[Circuit]): Circuit
         user (User): User
         simulator_device (SimulatorDevice): SimulatorDevice
     """
@@ -346,7 +367,7 @@ def test_update_with_job_response_raises_error_when_updating_incorrect_job(
     user_id = user.user_id
     job_status = JobStatus.PENDING
     job = Job(
-        circuit=circuit,
+        circuit=circuits,
         user=user,
         device=cast(Device, simulator_device),
         job_status=job_status,
