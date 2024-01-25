@@ -41,5 +41,5 @@ class JobResponse(JobRequest):
 
     @classmethod
     def from_kwargs(cls, **kwargs):
-        "Returns an instance of JobResponse including non-typed attributes"
+        """Returns an instance of JobResponse including non-typed attributes"""
         return from_kwargs(cls, **kwargs)

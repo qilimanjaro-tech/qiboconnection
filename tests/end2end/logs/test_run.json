@@ -1,0 +1,547 @@
+{
+  "detail": {
+    "test_all_status": {
+      "info": {
+        "file": "tests/test_end2end.py",
+        "name": "test_all_status",
+        "docstring": "Test whether a device can be set to maitenance/online\n"
+      },
+      "executions": 0,
+      "results": {
+        "passed": 0,
+        "skipped": 0,
+        "failed": 0
+      }
+    },
+    "test_circuit_posting": {
+      "info": {
+        "file": "tests/test_end2end.py",
+        "name": "test_circuit_posting",
+        "docstring": "Test whether a circuit can be sent to each device\n"
+      },
+      "executions": 0,
+      "results": {
+        "passed": 0,
+        "skipped": 0,
+        "failed": 0
+      }
+    },
+    "test_circuit_result_response": {
+      "info": {
+        "file": "tests/test_end2end.py",
+        "name": "test_circuit_result_response",
+        "docstring": "Test whether a circuit can be sent and then its result can be retrieved, for each device.\n\n"
+      },
+      "executions": 0,
+      "results": {
+        "passed": 0,
+        "skipped": 0,
+        "failed": 0
+      }
+    },
+    "test_connection": {
+      "info": {
+        "file": "tests/test_end2end.py",
+        "name": "test_connection",
+        "docstring": "Test the connection by pinging the server\n"
+      },
+      "executions": 1,
+      "results": {
+        "passed": 1,
+        "skipped": 0,
+        "failed": 0
+      }
+    },
+    "test_device_blocking_and_release": {
+      "info": {
+        "file": "tests/test_end2end.py",
+        "name": "test_device_blocking_and_release",
+        "docstring": "Test whether each device can be blocked and released\n\n"
+      },
+      "executions": 0,
+      "results": {
+        "passed": 0,
+        "skipped": 0,
+        "failed": 0
+      }
+    },
+    "test_device_listing": {
+      "info": {
+        "file": "tests/test_end2end.py",
+        "name": "test_device_listing",
+        "docstring": "Test the device listing call\n"
+      },
+      "executions": 0,
+      "results": {
+        "passed": 0,
+        "skipped": 0,
+        "failed": 0
+      }
+    },
+    "test_device_selection": {
+      "info": {
+        "file": "tests/test_end2end.py",
+        "name": "test_device_selection",
+        "docstring": "Test the device electability for every listed device. The offline devices are skipped.\n"
+      },
+      "executions": 0,
+      "results": {
+        "passed": 0,
+        "skipped": 0,
+        "failed": 0
+      }
+    },
+    "test_experiment_saving_and_retrieving": {
+      "info": {
+        "file": "tests/test_end2end.py",
+        "name": "test_experiment_saving_and_retrieving",
+        "docstring": "Test whether a saved experiment can be sent and retrieved.\n"
+      },
+      "executions": 0,
+      "results": {
+        "passed": 0,
+        "skipped": 0,
+        "failed": 0
+      }
+    },
+    "test_post_and_results_from_maintenance_to_online": {
+      "info": {
+        "file": "tests/test_end2end.py",
+        "name": "test_post_and_results_from_maintenance_to_online",
+        "docstring": "A Job posted in a device in maintenance mode should be able to get the results when de device goes to online.\n\nThe tests are skipped if the device is quantum or it is in status offline.\nOnce the tests are done, the device is returned back to its original status.\n\n"
+      },
+      "executions": 0,
+      "results": {
+        "passed": 0,
+        "skipped": 0,
+        "failed": 0
+      }
+    },
+    "test_saved_experiments_listing": {
+      "info": {
+        "file": "tests/test_end2end.py",
+        "name": "test_saved_experiments_listing",
+        "docstring": "Test whether a saved experiment listing can be obtained"
+      },
+      "executions": 0,
+      "results": {
+        "passed": 0,
+        "skipped": 0,
+        "failed": 0
+      }
+    },
+    "test_endurance": {
+      "info": {
+        "file": "tests/test_endurance.py",
+        "name": "test_endurance",
+        "docstring": "Check there is no a degradation of service.\n\nThe same circuit is executed multiple times and  wait always the same maximum amount of time for a COMPLETED status.\n\n"
+      },
+      "executions": 0,
+      "results": {
+        "passed": 0,
+        "skipped": 0,
+        "failed": 0
+      }
+    },
+    "test_can_change_device_availability": {
+      "info": {
+        "file": "tests/test_user_roles.py",
+        "name": "test_can_change_device_availability",
+        "docstring": "Ensure that user roles which, by definition, can change availability are allowed to do it.\n\n"
+      },
+      "executions": 0,
+      "results": {
+        "passed": 0,
+        "skipped": 0,
+        "failed": 0
+      }
+    },
+    "test_can_change_device_status": {
+      "info": {
+        "file": "tests/test_user_roles.py",
+        "name": "test_can_change_device_status",
+        "docstring": "Ensure that user roles which, by definition, can change status are allowed to do it.\n\n"
+      },
+      "executions": 0,
+      "results": {
+        "passed": 0,
+        "skipped": 0,
+        "failed": 0
+      }
+    },
+    "test_can_get_runcard": {
+      "info": {
+        "file": "tests/test_user_roles.py",
+        "name": "test_can_get_runcard",
+        "docstring": "Check certain users can get all runcards"
+      },
+      "executions": 0,
+      "results": {
+        "passed": 0,
+        "skipped": 0,
+        "failed": 0
+      }
+    },
+    "test_can_list_runcards": {
+      "info": {
+        "file": "tests/test_user_roles.py",
+        "name": "test_can_list_runcards",
+        "docstring": "Check certain users can list all runcards"
+      },
+      "executions": 0,
+      "results": {
+        "passed": 0,
+        "skipped": 0,
+        "failed": 0
+      }
+    },
+    "test_can_list_saved_experiments": {
+      "info": {
+        "file": "tests/test_user_roles.py",
+        "name": "test_can_list_saved_experiments",
+        "docstring": "Test user roles that are allowed to list saved experiments can do it -- e.g admin and qili-user\n"
+      },
+      "executions": 0,
+      "results": {
+        "passed": 0,
+        "skipped": 0,
+        "failed": 0
+      }
+    },
+    "test_can_save_and_delete_owned_runcards": {
+      "info": {
+        "file": "tests/test_user_roles.py",
+        "name": "test_can_save_and_delete_owned_runcards",
+        "docstring": "Check all users can save runcard delete their runcards except for admin who can delete of all them."
+      },
+      "executions": 0,
+      "results": {
+        "passed": 0,
+        "skipped": 0,
+        "failed": 0
+      }
+    },
+    "test_can_save_get_and_update_owned_runcards": {
+      "info": {
+        "file": "tests/test_user_roles.py",
+        "name": "test_can_save_get_and_update_owned_runcards",
+        "docstring": "Check certain users can update their own runcards"
+      },
+      "executions": 0,
+      "results": {
+        "passed": 0,
+        "skipped": 0,
+        "failed": 0
+      }
+    },
+    "test_can_save_runcard": {
+      "info": {
+        "file": "tests/test_user_roles.py",
+        "name": "test_can_save_runcard",
+        "docstring": "Check certain users cannot save runcards"
+      },
+      "executions": 0,
+      "results": {
+        "passed": 0,
+        "skipped": 0,
+        "failed": 0
+      }
+    },
+    "test_can_select_device": {
+      "info": {
+        "file": "tests/test_user_roles.py",
+        "name": "test_can_select_device",
+        "docstring": "Test every user can select the devices to which it has access\n"
+      },
+      "executions": 0,
+      "results": {
+        "passed": 0,
+        "skipped": 0,
+        "failed": 0
+      }
+    },
+    "test_cannot_change_device_availability": {
+      "info": {
+        "file": "tests/test_user_roles.py",
+        "name": "test_cannot_change_device_availability",
+        "docstring": "Ensure that user roles which, by definition, cannot change availability are not allowed to do it\n\n"
+      },
+      "executions": 0,
+      "results": {
+        "passed": 0,
+        "skipped": 0,
+        "failed": 0
+      }
+    },
+    "test_cannot_change_device_availability_when_online": {
+      "info": {
+        "file": "tests/test_user_roles.py",
+        "name": "test_cannot_change_device_availability_when_online",
+        "docstring": "Ensure tany user can block any device when status is not maintenance\n\n"
+      },
+      "executions": 0,
+      "results": {
+        "passed": 0,
+        "skipped": 0,
+        "failed": 0
+      }
+    },
+    "test_cannot_change_device_status": {
+      "info": {
+        "file": "tests/test_user_roles.py",
+        "name": "test_cannot_change_device_status",
+        "docstring": "Ensure that user roles which, by definition, cannot change status are not allowed to do it.\n\n"
+      },
+      "executions": 0,
+      "results": {
+        "passed": 0,
+        "skipped": 0,
+        "failed": 0
+      }
+    },
+    "test_cannot_change_device_status_when_blocked": {
+      "info": {
+        "file": "tests/test_user_roles.py",
+        "name": "test_cannot_change_device_status_when_blocked",
+        "docstring": "Ensure any user role can change device status when device availabiliyty is not available\n\n"
+      },
+      "executions": 0,
+      "results": {
+        "passed": 0,
+        "skipped": 0,
+        "failed": 0
+      }
+    },
+    "test_cannot_delete_any_runcard": {
+      "info": {
+        "file": "tests/test_user_roles.py",
+        "name": "test_cannot_delete_any_runcard",
+        "docstring": "Check certain users  cannot delete any runcard"
+      },
+      "executions": 0,
+      "results": {
+        "passed": 0,
+        "skipped": 0,
+        "failed": 0
+      }
+    },
+    "test_cannot_delete_not_owned_runcard": {
+      "info": {
+        "file": "tests/test_user_roles.py",
+        "name": "test_cannot_delete_not_owned_runcard",
+        "docstring": "Check users cannot delete runcards from other users, in particular, admin."
+      },
+      "executions": 0,
+      "results": {
+        "passed": 0,
+        "skipped": 0,
+        "failed": 0
+      }
+    },
+    "test_cannot_get_runcard": {
+      "info": {
+        "file": "tests/test_user_roles.py",
+        "name": "test_cannot_get_runcard",
+        "docstring": "Check certain users cannot get runcards"
+      },
+      "executions": 0,
+      "results": {
+        "passed": 0,
+        "skipped": 0,
+        "failed": 0
+      }
+    },
+    "test_cannot_list_runcards": {
+      "info": {
+        "file": "tests/test_user_roles.py",
+        "name": "test_cannot_list_runcards",
+        "docstring": "Check certain users cannot list runcards"
+      },
+      "executions": 0,
+      "results": {
+        "passed": 0,
+        "skipped": 0,
+        "failed": 0
+      }
+    },
+    "test_cannot_list_saved_experiments": {
+      "info": {
+        "file": "tests/test_user_roles.py",
+        "name": "test_cannot_list_saved_experiments",
+        "docstring": "Test user roles that aren't allowed to list saved experiments can do it -- e.g bsc\n"
+      },
+      "executions": 0,
+      "results": {
+        "passed": 0,
+        "skipped": 0,
+        "failed": 0
+      }
+    },
+    "test_cannot_post_experiment": {
+      "info": {
+        "file": "tests/test_user_roles.py",
+        "name": "test_cannot_post_experiment",
+        "docstring": "Test user roles that aren't allowed to post experiments can do it -- e.g bsc\n"
+      },
+      "executions": 0,
+      "results": {
+        "passed": 0,
+        "skipped": 0,
+        "failed": 0
+      }
+    },
+    "test_cannot_save_runcard": {
+      "info": {
+        "file": "tests/test_user_roles.py",
+        "name": "test_cannot_save_runcard",
+        "docstring": "Check certain users cannot save runcards"
+      },
+      "executions": 0,
+      "results": {
+        "passed": 0,
+        "skipped": 0,
+        "failed": 0
+      }
+    },
+    "test_cannot_update_any_runcards": {
+      "info": {
+        "file": "tests/test_user_roles.py",
+        "name": "test_cannot_update_any_runcards",
+        "docstring": "Check certain users can update their own runcards"
+      },
+      "executions": 0,
+      "results": {
+        "passed": 0,
+        "skipped": 0,
+        "failed": 0
+      }
+    },
+    "test_cannot_update_not_owned_runcards": {
+      "info": {
+        "file": "tests/test_user_roles.py",
+        "name": "test_cannot_update_not_owned_runcards",
+        "docstring": "Check users who are allowed to update runcards can only update theirs"
+      },
+      "executions": 0,
+      "results": {
+        "passed": 0,
+        "skipped": 0,
+        "failed": 0
+      }
+    },
+    "test_list_jobs": {
+      "info": {
+        "file": "tests/test_user_roles.py",
+        "name": "test_list_jobs",
+        "docstring": "Test that users can see only their saved experiments"
+      },
+      "executions": 0,
+      "results": {
+        "passed": 0,
+        "skipped": 0,
+        "failed": 0
+      }
+    },
+    "test_post_get_and_delete_job": {
+      "info": {
+        "file": "tests/test_user_roles.py",
+        "name": "test_post_get_and_delete_job",
+        "docstring": "Post a circuit and get all its data\n\n"
+      },
+      "executions": 0,
+      "results": {
+        "passed": 0,
+        "skipped": 0,
+        "failed": 0
+      }
+    },
+    "test_check_all_test_jobs_and_runcards_deleted": {
+      "info": {
+        "file": "tests/test_sanity_checks.py",
+        "name": "test_check_all_test_jobs_and_runcards_deleted",
+        "docstring": "Count number jobs and runcards before running the test suite"
+      },
+      "executions": 0,
+      "results": {
+        "passed": 0,
+        "skipped": 0,
+        "failed": 0
+      }
+    },
+    "test_store_initial_job_and_runcard_count": {
+      "info": {
+        "file": "tests/test_sanity_checks.py",
+        "name": "test_store_initial_job_and_runcard_count",
+        "docstring": "Count number jobs and runcards before running the test suite"
+      },
+      "executions": 1,
+      "results": {
+        "passed": 1,
+        "skipped": 0,
+        "failed": 0
+      }
+    },
+    "test_all_circuits": {
+      "info": {
+        "file": "tests/test_circuits.py",
+        "name": "test_all_circuits",
+        "docstring": "Test whether all circuits can be sent in a single job and then its result can be retrieved, for each device. This is the real user case. Note that this only considers ONLINE and AVAILABLE devices. Should be run with qili-admin-test user.\n\n\n"
+      },
+      "executions": 3,
+      "results": {
+        "passed": 0,
+        "skipped": 3,
+        "failed": 0
+      }
+    },
+    "test_five_qubit_500_gates_circuit": {
+      "info": {
+        "file": "tests/test_circuits.py",
+        "name": "test_five_qubit_500_gates_circuit",
+        "docstring": "Test whether a five-qubit 500 gates circuit can be sent and then its result can be retrieved, for each device. This is the real user case. Note that this only considers ONLINE and AVAILABLE devices. Should be run with qili-admin-test user.\n\n\n"
+      },
+      "executions": 3,
+      "results": {
+        "passed": 0,
+        "skipped": 3,
+        "failed": 0
+      }
+    },
+    "test_one_qubit_500_gates_circuit": {
+      "info": {
+        "file": "tests/test_circuits.py",
+        "name": "test_one_qubit_500_gates_circuit",
+        "docstring": "Test whether a one-qubit 500 gates circuit can be sent and then its result can be retrieved, for each device. This is the real user case. Note that this only considers ONLINE and AVAILABLE devices. Should be run with qili-admin-test user.\n\n"
+      },
+      "executions": 3,
+      "results": {
+        "passed": 0,
+        "skipped": 3,
+        "failed": 0
+      }
+    },
+    "test_two_qubit_500_gates_circuit": {
+      "info": {
+        "file": "tests/test_circuits.py",
+        "name": "test_two_qubit_500_gates_circuit",
+        "docstring": "Test whether a two-qubit 500 gates circuit can be sent and then its result can be retrieved, for each device. This is the real user case. Note that this only considers ONLINE and AVAILABLE devices. Should be run with qili-admin-test user.\n\n\n"
+      },
+      "executions": 3,
+      "results": {
+        "passed": 0,
+        "skipped": 3,
+        "failed": 0
+      }
+    }
+  },
+  "summary": {
+    "tot_test_plan": 41,
+    "tot_test_plan_executed": 6,
+    "tot_outcomes": {
+      "passed": 2,
+      "skipped": 12,
+      "failed": 0
+    },
+    "date_run_tests": "2024-01-09 15:21:18.743359"
+  }
+}

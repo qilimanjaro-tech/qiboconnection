@@ -8,6 +8,8 @@ import pytest
 from qiboconnection.models.devices import Device, QuantumDevice
 from qiboconnection.typings.enums import DeviceAvailability, DeviceStatus
 
+from .utils import is_development
+
 
 # Explanation:
 # Given a device, there are a series of OPERATIONS  we can perform:
@@ -64,15 +66,6 @@ def is_quantum(device: Device) -> bool:
     return isinstance(device, QuantumDevice)
 
 
-def is_development() -> bool:
-    """Returns True if the environment is development.
-
-    Returns:
-        bool: if the environment is development
-    """
-    return os.environ["QIBOCONNECTION_ENVIRONMENT"] == "development"
-
-
 def get_expected_operation_result(  # pylint: disable=too-many-branches
     operation: Operation, device: Device
 ) -> OperationResult:
@@ -82,7 +75,7 @@ def get_expected_operation_result(  # pylint: disable=too-many-branches
     factors as the environment (eg. PRODUCTION) and the type of device (eg. QUANTUM)
 
     Args:
-        op_name (str): the name of the operation
+        operation (str): the name of the operation
         device (Device): simulator or quantum device class
 
     Raises:
@@ -109,8 +102,8 @@ def get_expected_operation_result(  # pylint: disable=too-many-branches
     elif operation == Operation.CHANGE_STATUS:
         if is_quantum(device) and not is_development():
             result = OperationResult.FORBIDDEN
-        if is_device(device, DeviceStatus.ONLINE, DeviceAvailability.AVAILABLE) or is_device(
-            device, DeviceAvailability.AVAILABLE, DeviceStatus.MAINTENANCE
+        if is_device(device, status=DeviceStatus.ONLINE, availability=DeviceAvailability.AVAILABLE) or is_device(
+            device, availability=DeviceAvailability.AVAILABLE, status=DeviceStatus.MAINTENANCE
         ):
             result = OperationResult.SUCCESS
         else:
@@ -119,7 +112,7 @@ def get_expected_operation_result(  # pylint: disable=too-many-branches
     elif operation == Operation.RESPONSE:
         if is_quantum(device) and is_development():
             result = OperationResult.EXCEPTION
-        elif is_device(device, DeviceStatus.ONLINE, DeviceAvailability.AVAILABLE):
+        elif is_device(device, status=DeviceStatus.ONLINE, availability=DeviceAvailability.AVAILABLE):
             result = OperationResult.SUCCESS
         else:
             result = OperationResult.FORBIDDEN

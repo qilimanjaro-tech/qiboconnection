@@ -47,7 +47,7 @@ def parse_job_responses_to_results(job_responses: List[JobResponse]) -> List[dic
     return list(raw_results)
 
 
-def deserialize_job_description(base64_description: str, job_type: str) -> list[Circuit] | Circuit | dict:
+def deserialize_job_description(base64_description: str, job_type: str) -> list[Circuit] | Circuit | dict | str:
     """Convert base64 job description to its corresponding Qibo Circuit or Qililab experiment
 
     Args:
@@ -68,11 +68,11 @@ def deserialize_job_description(base64_description: str, job_type: str) -> list[
         except SyntaxError:
             return Circuit.from_qasm(base64_decode(encoded_data=base64_description))
 
-    if job_type == JobType.EXPERIMENT:
+    if job_type == JobType.QPROGRAM:
         return json.loads(base64_decode(encoded_data=base64_description))
 
-    logger.warning(f"JobType {job_type} not supported!")
-    return None
+    logger.warning(f"JobType {job_type} not supported in this Qiboconnection version!")
+    return base64_description
 
 
 def log_job_status_info(job_response: JobResponse):
@@ -84,13 +84,14 @@ def log_job_status_info(job_response: JobResponse):
     Returns:
 
     """
-    if job_response.status == JobStatus.PENDING:
+    if job_response.status in [JobStatus.QUEUED, JobStatus.PENDING]:
         logger.warning(
             "Your job with id %i is still pending. Job queue position: %s",
             job_response.job_id,
             job_response.queue_position,
         )
         return None
+
     if job_response.status == JobStatus.RUNNING:
         logger.warning("Your job with id %i is still running.", job_response.job_id)
         return None
