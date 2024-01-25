@@ -22,12 +22,14 @@ from qiboconnection import __version__  # pylint: disable=cyclic-import
 
 logger = logging.getLogger(__name__)
 
-QUANTUM_SERVICE_URL = {
-    "local": "http://localhost:8080",
-    "docker_local": "http://nginx:8080",
-    "staging": "https://qilimanjaroqaas.ddns.net:8080",
-    "development": "https://qilimanjarodev.ddns.net:8080",
-}
+
+if "QUANTUM_SERVICE_URL" not in os.environ:
+    QUANTUM_SERVICE_URL = {
+        "local": "http://localhost:8080",
+        "docker_local": "http://nginx:8080",
+        "staging": "https://qilimanjaroqaas.ddns.net:8080",
+        "development": "https://qilimanjarodev.ddns.net:8080",
+    }
 
 
 class EnvironmentType(str, enum.Enum):
@@ -42,30 +44,36 @@ class EnvironmentType(str, enum.Enum):
     LOCAL = "local"
     STAGING = "staging"
     DEVELOPMENT = "development"
+    LAMBDA = "lambda"
 
 
 class Environment:
     """Execution Environment"""
 
-    def __init__(self, environment_type: EnvironmentType):
-        if environment_type not in [
-            EnvironmentType.LOCAL,
-            EnvironmentType.STAGING,
-            EnvironmentType.DEVELOPMENT,
-        ]:
-            raise ValueError("Environment Type MUST be 'local', 'staging' or 'development'")
-        if environment_type == EnvironmentType.LOCAL:
-            self._environment_type = EnvironmentType.LOCAL
-            self.quantum_service_url = QUANTUM_SERVICE_URL["local"]
-            self._audience_url = QUANTUM_SERVICE_URL["docker_local"]
-        if environment_type == EnvironmentType.STAGING:
-            self._environment_type = EnvironmentType.STAGING
-            self.quantum_service_url = QUANTUM_SERVICE_URL["staging"]
-            self._audience_url = QUANTUM_SERVICE_URL["staging"]
-        if environment_type == EnvironmentType.DEVELOPMENT:
-            self._environment_type = EnvironmentType.DEVELOPMENT
-            self.quantum_service_url = QUANTUM_SERVICE_URL["development"]
-            self._audience_url = QUANTUM_SERVICE_URL["development"]
+    def __init__(self, environment_type: Union[EnvironmentType | None] = None):
+        if "QUANTUM_SERVICE_URL" in os.environ:
+            self._environment_type = EnvironmentType.LAMBDA
+            self.quantum_service_url = os.environ["QUANTUM_SERVICE_URL"]
+            self._audience_url = os.environ.get("AUDIENCE_URL", self.quantum_service_url)
+        else:
+            if environment_type not in [
+                EnvironmentType.LOCAL,
+                EnvironmentType.STAGING,
+                EnvironmentType.DEVELOPMENT,
+            ]:
+                raise ValueError("Environment Type MUST be 'local', 'staging' or 'development'")
+            if environment_type == EnvironmentType.LOCAL:
+                self._environment_type = EnvironmentType.LOCAL
+                self.quantum_service_url = QUANTUM_SERVICE_URL["local"]
+                self._audience_url = QUANTUM_SERVICE_URL["docker_local"]
+            if environment_type == EnvironmentType.STAGING:
+                self._environment_type = EnvironmentType.STAGING
+                self.quantum_service_url = QUANTUM_SERVICE_URL["staging"]
+                self._audience_url = QUANTUM_SERVICE_URL["staging"]
+            if environment_type == EnvironmentType.DEVELOPMENT:
+                self._environment_type = EnvironmentType.DEVELOPMENT
+                self.quantum_service_url = QUANTUM_SERVICE_URL["development"]
+                self._audience_url = QUANTUM_SERVICE_URL["development"]
 
     @property
     def qibo_quantum_service_url(self) -> str:
@@ -88,7 +96,12 @@ class Environment:
     @property
     def environment_type(
         self,
-    ) -> Union[Literal[EnvironmentType.LOCAL], Literal[EnvironmentType.STAGING], Literal[EnvironmentType.DEVELOPMENT]]:
+    ) -> Union[
+        Literal[EnvironmentType.LOCAL],
+        Literal[EnvironmentType.STAGING],
+        Literal[EnvironmentType.DEVELOPMENT],
+        Literal[EnvironmentType.LAMBDA],
+    ]:
         """Returns the environment_type
 
         Returns:
