@@ -7,6 +7,8 @@ import pytest
 
 from qiboconnection.config import Environment, EnvironmentType, get_environment
 
+from .utils import set_and_keep_values
+
 
 def test_environment_constructor():
     """Test Environment class constructor."""
@@ -14,6 +16,46 @@ def test_environment_constructor():
 
     environment = Environment(environment_type=environment_type)
     assert isinstance(environment, Environment)
+
+
+def test_environment_constructor_set_quantum_service_url():
+    """Test Environment class constructor setting QUANTUM_SERVICE_URL."""
+    my_quantum_service_url = "http://www.my_quantum_service_url.com"
+
+    old_values = set_and_keep_values({"QUANTUM_SERVICE_URL": my_quantum_service_url, "AUDIENCE_URL": None}, os.environ)
+    environment = Environment()
+    _ = set_and_keep_values(old_values, os.environ)
+
+    assert environment.environment_type == EnvironmentType.LAMBDA
+    assert environment.qibo_quantum_service_url == my_quantum_service_url
+    assert environment.audience_url == my_quantum_service_url
+
+
+def test_environment_constructor_set_quantum_service_and_audience_url():
+    """Test Environment class constructor setting QUANTUM_SERVICE_URL and AUDIENCE_URL."""
+    my_quantum_service_url = "http://www.my_quantum_service_url.com"
+    my_audience_url = "http://www.my_audience_url.com"
+
+    old_values = set_and_keep_values(
+        {"QUANTUM_SERVICE_URL": my_quantum_service_url, "AUDIENCE_URL": my_audience_url}, os.environ
+    )
+    environment = Environment()
+    _ = set_and_keep_values(old_values, os.environ)
+
+    assert environment.environment_type == EnvironmentType.LAMBDA
+    assert environment.qibo_quantum_service_url == my_quantum_service_url
+    assert environment.audience_url == my_audience_url
+
+
+def test_environment_constructor_raises_value_error_for_not_set_environment_types():
+    """If not set the environment type neither the QUANTUM_SERVICE_URL, an error is raised."""
+
+    old_values = set_and_keep_values({"QUANTUM_SERVICE_URL": None}, os.environ)
+    with pytest.raises(ValueError) as e_info:
+        _ = Environment()
+    _ = set_and_keep_values(old_values, os.environ)
+
+    assert e_info.value.args[0] == "Environment Type MUST be 'local', 'staging' or 'development'"
 
 
 def test_environment_constructor_raises_value_error_for_unexpected_environment_types():
