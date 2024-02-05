@@ -767,3 +767,13 @@ class API(ABC):
         if status_code != 204:
             raise RemoteExecutionException(message="Job could not be removed.", status_code=status_code)
         logger.info(f"Job {job_id} deleted successfully")
+
+    @typechecked
+    def cancel_job(self, job_id: int) -> None:
+        """Cancels a job"""
+        response, status_code = self._connection.send_put_auth_remote_api_call(
+            data={"job_id": job_id}, path=f"{self._JOBS_CALL_PATH}/cancel/{job_id}"  # pylint: disable=unused-variable
+        )
+        if status_code != 204:
+            raise RemoteExecutionException(message="Job could not be cancelled.", status_code=status_code)
+        logger.info(f"Job {job_id} cancelled successfully")
