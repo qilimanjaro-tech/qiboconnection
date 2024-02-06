@@ -1,3 +1,15 @@
+## 0.16.0
+
+### Features
+
+- Add optional environment variables QUANTUM_SERVICE_URL and AUDIENCE_URL for a multi-client public API
+  [#136](https://github.com/qilimanjaro-tech/qiboconnection/pull/136/files)
+
+## 0.15.3
+
+### Features
+
+- Introduction of QProgram [#139](https://github.com/qilimanjaro-tech/qiboconnection/pull/139)
 
 ## 0.15.1
 
@@ -10,13 +22,13 @@
 
 - Recover test report
   [#133](https://github.com/qilimanjaro-tech/qiboconnection/pull/133)
+
 ## 0.14.6
 
 ### Bug fixes
 
 - Restore test suite
   [#131](https://github.com/qilimanjaro-tech/qiboconnection/pull/131)
-
 
 ## 0.14.4
 
