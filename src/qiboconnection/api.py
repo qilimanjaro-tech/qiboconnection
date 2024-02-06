@@ -775,5 +775,5 @@ class API(ABC):
             data={"job_id": job_id}, path=f"{self._JOBS_CALL_PATH}/cancel/{job_id}"
         )
         if status_code != 204:
-            raise RemoteExecutionException(message="Job could not be cancelled.", status_code=status_code)
+            raise RemoteExecutionException(message=f"Job {job_id} could not be cancelled.", status_code=status_code)
         logger.info(f"Job {job_id} cancelled successfully")
