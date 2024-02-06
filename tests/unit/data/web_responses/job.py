@@ -82,6 +82,8 @@ class JobResponse:
 
     delete_job_response: tuple[str, int] = ("", 204)
     delete_job_response_ise: tuple[str, int] = ("", 500)
+    cancel_job_response: tuple[str, int] = ("", 204)
+    cancel_job_response_ise: tuple[str, int] = ("", 500)
 
     retrieve_job_response_1: tuple[dict[str, object], int] = (
         {
