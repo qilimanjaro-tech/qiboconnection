@@ -244,7 +244,7 @@ def test_post_and_results_from_maintenance_to_online(device: Device, api: API, n
     logger.info(
         f"Now wait longer to get the result for job #{result.job_id}, expecting it  will be in {JobStatus.COMPLETED.value} because the device is in online mode"
     )
-    result = get_job_result(api, result.job_id, timeout=20)
+    result = get_job_result(api, result.job_id, call_every_seconds=10)
     logger.info(f"Result: {result}")
     assert result.status == JobStatus.COMPLETED
 

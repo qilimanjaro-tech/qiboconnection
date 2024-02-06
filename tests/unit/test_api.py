@@ -508,6 +508,31 @@ def test_delete_job_exception(mocked_api_call: MagicMock, mocked_api: API):
     mocked_api_call.assert_called_with(self=mocked_api._connection, path=f"{mocked_api._JOBS_CALL_PATH}/{0}")
 
 
+@patch("qiboconnection.connection.Connection.send_put_auth_remote_api_call", autospec=True)
+def test_cancel_job(mocked_api_call: MagicMock, mocked_api: API):
+    """Tests API.cancel_job() method"""
+    mocked_api_call.return_value = web_responses.job_response.cancel_job_response
+    mocked_api.cancel_job(job_id=0)
+
+    mocked_api_call.assert_called_with(
+        self=mocked_api._connection, path=f"{mocked_api._JOBS_CALL_PATH}/cancel/{0}", data={"job_id": 0}
+    )
+
+
+@patch("qiboconnection.connection.Connection.send_put_auth_remote_api_call", autospec=True)
+def test_cancel_job_exception(mocked_api_call: MagicMock, mocked_api: API):
+    """Tests API.cancel_job() method with non-existent job id"""
+    # Define the behavior of the mocked function to raise the RemoteExecutionException
+    mocked_api_call.return_value = web_responses.job_response.cancel_job_response_ise
+    with pytest.raises(RemoteExecutionException, match="Job could not be cancelled."):
+        # Call the function that should raise the exception
+        mocked_api.cancel_job(job_id=0)
+    # Assert that the mocked function was called with correct arguments
+    mocked_api_call.assert_called_with(
+        self=mocked_api._connection, path=f"{mocked_api._JOBS_CALL_PATH}/cancel/{0}", data={"job_id": 0}
+    )
+
+
 class TestExecute:
     """Unit tests for the `API.execute` method."""
 
