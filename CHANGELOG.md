@@ -1,3 +1,9 @@
+## 0.16.0
+
+### Features
+
+- Job cancellation
+  [#142](https://github.com/qilimanjaro-tech/qiboconnection/pull/142)
 
 ## 0.15.1
 
@@ -10,13 +16,13 @@
 
 - Recover test report
   [#133](https://github.com/qilimanjaro-tech/qiboconnection/pull/133)
+
 ## 0.14.6
 
 ### Bug fixes
 
 - Restore test suite
   [#131](https://github.com/qilimanjaro-tech/qiboconnection/pull/131)
-
 
 ## 0.14.4
 
