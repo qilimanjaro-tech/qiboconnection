@@ -1,6 +1,13 @@
+## 0.16.0
+
+### Features
+
+- Add optional environment variables QUANTUM_SERVICE_URL and AUDIENCE_URL for a multi-client public API
+  [#136](https://github.com/qilimanjaro-tech/qiboconnection/pull/136/files)
+
 ## 0.15.3
 
-### New features since last release
+### Features
 
 - Introduction of QProgram [#139](https://github.com/qilimanjaro-tech/qiboconnection/pull/139)
 
