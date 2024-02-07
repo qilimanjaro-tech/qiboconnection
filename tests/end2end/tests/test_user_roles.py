@@ -8,11 +8,11 @@ import pytest
 import requests
 from qibo.models import Circuit
 
-from build.lib.qiboconnection.typings.job import JobStatus
 from qiboconnection.api import API
 from qiboconnection.models.devices import Device
 from qiboconnection.models.runcard import Runcard
 from qiboconnection.typings.enums import DeviceAvailability, DeviceStatus
+from qiboconnection.typings.enums.job_status import JobStatus
 from qiboconnection.typings.job_data import JobData
 from tests.end2end.utils.operations import Operation, check_operation_possible_or_skip
 from tests.end2end.utils.utils import (
