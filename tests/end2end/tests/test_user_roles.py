@@ -327,7 +327,11 @@ def test_post_cancel_and_get_job(user_role: UserRole, numpy_circuit: Circuit, de
     api_user.select_device_id(device_id=device.id)
     job_id = api_user.execute(circuit=numpy_circuit)[0]
     api_user.cancel_job(job_id)
-    assert api_user.get_job(job_id).status == JobStatus.CANCELLED
+    match device._status:
+        case DeviceStatus.OFFLINE:
+            assert api_user.get_job(job_id).status == JobStatus.PENDING
+        case _:
+            assert api_user.get_job(job_id).status == JobStatus.CANCELLED
 
 
 @pytest.mark.parametrize(
@@ -348,12 +352,17 @@ def test_only_owned_jobs_can_be_cancelled(user_role: UserRole, numpy_circuit: Ci
 
     api.select_device_id(device_id=device.id)
     job_id = api.execute(circuit=numpy_circuit)[0]
-    if user_role != UserRole.ADMIN:  # check only admin can delete jobs
-        with pytest.raises(BaseException):
+    match user_role:
+        case UserRole.ADMIN:
             api_user.cancel_job(job_id=job_id)
-    else:
-        api_user.cancel_job(job_id=job_id)
-        assert api_user.get_job(job_id).status == JobStatus.CANCELLED
+            match device._status:
+                case DeviceStatus.OFFLINE:
+                    assert api_user.get_job(job_id).status == JobStatus.PENDING
+                case _:
+                    assert api_user.get_job(job_id).status == JobStatus.CANCELLED
+        case _:  # check only admin can delete jobs
+            with pytest.raises(BaseException):
+                api_user.cancel_job(job_id=job_id)
 
 
 # ------------------------------------------------------------------------ OPERATION: GET RUNCARDS
