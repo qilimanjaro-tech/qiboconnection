@@ -774,6 +774,7 @@ class API(ABC):
         response, status_code = self._connection.send_put_auth_remote_api_call(  # pylint: disable=unused-variable
             data={"job_id": job_id}, path=f"{self._JOBS_CALL_PATH}/cancel/{job_id}"
         )
+        logger.debug(status_code)
         if status_code != 204:
-            raise RemoteExecutionException(message="Job could not be cancelled.", status_code=status_code)
+            raise RemoteExecutionException(message=f"Job {job_id} could not be cancelled.", status_code=status_code)
         logger.info(f"Job {job_id} cancelled successfully")

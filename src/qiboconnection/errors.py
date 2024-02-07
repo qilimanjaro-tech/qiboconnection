@@ -16,9 +16,8 @@
 import json
 from typing import Union
 
-from requests.models import HTTPError, Response
-
 from qiboconnection.config import logger
+from requests.models import HTTPError, Response
 
 
 class RemoteExecutionException(Exception):
