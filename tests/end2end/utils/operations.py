@@ -47,6 +47,7 @@ class Operation(Enum):
     POST = "post"
     RESPONSE = "response"
     CHANGE_STATUS = "change_status"
+    CANCEL = "cancel"
 
 
 def is_device(device: Device, status: DeviceStatus, availability: DeviceAvailability) -> bool:
@@ -88,9 +89,7 @@ def get_expected_operation_result(  # pylint: disable=too-many-branches
     """
 
     result: OperationResult = OperationResult.FORBIDDEN
-    if operation == Operation.SELECT:
-        result = OperationResult.SUCCESS
-    elif operation == Operation.POST:
+    if operation in [Operation.SELECT, Operation.POST, Operation.CANCEL]:
         result = OperationResult.SUCCESS
     elif operation == Operation.BLOCK:
         if is_quantum(device) and not is_development():

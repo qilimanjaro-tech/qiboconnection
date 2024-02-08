@@ -65,7 +65,7 @@ jobs:
     timeout-minutes: 10
 
     env:
-      QIBOCONNECTION_ENVIRONMENT: "development"
+      QUANTUM_SERVICE_URL : "https://dev-api.qaas.qilimanjaro.tech"
 
     steps:
       - uses: actions/checkout@v2
