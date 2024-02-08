@@ -339,8 +339,34 @@ def test_post_cancel_and_get_job(user_role: UserRole, numpy_circuit: Circuit, de
     [(device, user_role) for user_role in list_user_roles() for device in get_devices_listing_params(user_role)],
 )
 @pytest.mark.slow
+def test_admin_can_cancel_jobs_from_all_users(user_role: UserRole, numpy_circuit: Circuit, device: Device, api: API):
+    """Post a circuit with all user roles and cancel it with admin user.
+
+    Args:
+        user_role (UserRole): _description_
+        numpy_circuit (Circuit): _description_
+        device (Device): _description_
+    """
+    check_operation_possible_or_skip(Operation.CANCEL, device=device)
+    api_user = get_api_or_fail_test(get_logging_conf_or_fail_test(user_role=user_role))
+
+    api_user.select_device_id(device_id=device.id)
+    job_id = api_user.execute(circuit=numpy_circuit)[0]
+    api.cancel_job(job_id)
+    match device._status:
+        case DeviceStatus.OFFLINE:
+            assert api_user.get_job(job_id).status == JobStatus.PENDING
+        case _:
+            assert api_user.get_job(job_id).status == JobStatus.CANCELLED
+
+
+@pytest.mark.parametrize(
+    "device, user_role",
+    [(device, user_role) for user_role in list_user_roles() for device in get_devices_listing_params(user_role)],
+)
+@pytest.mark.slow
 def test_only_owned_jobs_can_be_cancelled(user_role: UserRole, numpy_circuit: Circuit, device: Device, api: API):
-    """Post a circuit and cancel it.
+    """Post a circuit and cancel it. This test proves that only admin users can cancel jobs submitted by admin users. This is a restricted case but is representative of how the permissions works --e.g qilimanjaro user cannot cancel a job submitted by a bsc user.
 
     Args:
         user_role (UserRole): _description_
