@@ -524,7 +524,7 @@ def test_cancel_job_exception(mocked_api_call: MagicMock, mocked_api: API):
     """Tests API.cancel_job() method with non-existent job id"""
     # Define the behavior of the mocked function to raise the RemoteExecutionException
     mocked_api_call.return_value = web_responses.job_response.cancel_job_response_ise
-    with pytest.raises(RemoteExecutionException, match="Job could not be cancelled."):
+    with pytest.raises(RemoteExecutionException, match="Job 0 could not be cancelled."):
         # Call the function that should raise the exception
         mocked_api.cancel_job(job_id=0)
     # Assert that the mocked function was called with correct arguments
