@@ -43,6 +43,8 @@ class Job(ABC):  # pylint: disable=too-many-instance-attributes
     nshots: int = 10
     job_status: JobStatus = JobStatus.NOT_SENT
     job_result: JobResult | None = None
+    name: str = "-"
+    summary: str = "-"
     id: int = 0  # pylint: disable=invalid-name
 
     def __post_init__(self):
@@ -94,6 +96,8 @@ class Job(ABC):  # pylint: disable=too-many-instance-attributes
             device_id=self.device.id,
             number_shots=self.nshots,
             job_type=self.job_type,
+            name=self.name,
+            summary=self.summary,
             description=self._get_job_description(),
         )
 
