@@ -29,9 +29,12 @@ def test_one_qubit_500_gates_circuit(device: Device, api: API, one_qubits_500_ga
     """
     logger.info(f"Device: {device}")
     check_operation_possible_or_skip(Operation.RESPONSE, device=device)
-    jobdata = post_and_get_result(api=api, device=device, circuit=one_qubits_500_gates_circuit)
+    jobdata = post_and_get_result(
+        api=api, device=device, circuit=one_qubits_500_gates_circuit, name="test", summary="test"
+    )
     result = jobdata.result
     assert isinstance(result, list)
+    assert jobdata.name == jobdata.summary == "test"
 
     delete_job(api, job_id=jobdata.job_id)
 

@@ -314,6 +314,8 @@ class API(ABC):
         qprogram: dict | None = None,
         nshots: int = 10,
         device_ids: List[int] | None = None,
+        name: str = "-",
+        summary: str = "-",
     ) -> List[int]:
         """Send a Qibo circuit(s) to be executed on the remote service API. User should define either a *circuit* or an
         *experiment*. If both are provided, the function will fail.
@@ -356,6 +358,8 @@ class API(ABC):
                 circuit=circuit,
                 qprogram=qprogram,
                 nshots=nshots,
+                name=name,
+                summary=summary,
                 user=self._connection.user,
                 device=cast(Device, device),
             )
@@ -775,5 +779,5 @@ class API(ABC):
             data={"job_id": job_id}, path=f"{self._JOBS_CALL_PATH}/cancel/{job_id}"
         )
         if status_code != 204:
-            raise RemoteExecutionException(message="Job could not be cancelled.", status_code=status_code)
+            raise RemoteExecutionException(message=f"Job {job_id} could not be cancelled.", status_code=status_code)
         logger.info(f"Job {job_id} cancelled successfully")

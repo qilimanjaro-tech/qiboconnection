@@ -33,3 +33,5 @@ class JobRequest(ABC):
     number_shots: int
     job_type: str
     description: str
+    name: str
+    summary: str

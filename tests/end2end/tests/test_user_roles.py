@@ -12,6 +12,7 @@ from qiboconnection.api import API
 from qiboconnection.models.devices import Device
 from qiboconnection.models.runcard import Runcard
 from qiboconnection.typings.enums import DeviceAvailability, DeviceStatus
+from qiboconnection.typings.enums.job_status import JobStatus
 from qiboconnection.typings.job_data import JobData
 from tests.end2end.utils.operations import Operation, check_operation_possible_or_skip
 from tests.end2end.utils.utils import (
@@ -302,6 +303,92 @@ def test_post_get_and_delete_job(user_role: UserRole, numpy_circuit: Circuit, de
             api_user.delete_job(job_id=job_id)
 
     api.delete_job(job_id=job_id)
+
+
+# ------------------------------------------------------------------------ OPERATION: POST AND CANCEL JOB
+
+
+@pytest.mark.parametrize(
+    "device, user_role",
+    [(device, user_role) for user_role in list_user_roles() for device in get_devices_listing_params(user_role)],
+)
+@pytest.mark.slow
+def test_post_cancel_and_get_job(user_role: UserRole, numpy_circuit: Circuit, device: Device):
+    """Post a circuit and cancel it.
+
+    Args:
+        user_role (UserRole): _description_
+        numpy_circuit (Circuit): _description_
+        device (Device): _description_
+    """
+    check_operation_possible_or_skip(Operation.CANCEL, device=device)
+    api_user = get_api_or_fail_test(get_logging_conf_or_fail_test(user_role=user_role))
+
+    api_user.select_device_id(device_id=device.id)
+    job_id = api_user.execute(circuit=numpy_circuit)[0]
+    api_user.cancel_job(job_id)
+    match device._status:
+        case DeviceStatus.OFFLINE:
+            assert api_user.get_job(job_id).status == JobStatus.PENDING
+        case _:
+            assert api_user.get_job(job_id).status == JobStatus.CANCELLED
+
+
+@pytest.mark.parametrize(
+    "device, user_role",
+    [(device, user_role) for user_role in list_user_roles() for device in get_devices_listing_params(user_role)],
+)
+@pytest.mark.slow
+def test_admin_can_cancel_jobs_from_all_users(user_role: UserRole, numpy_circuit: Circuit, device: Device, api: API):
+    """Post a circuit with all user roles and cancel it with admin user.
+
+    Args:
+        user_role (UserRole): _description_
+        numpy_circuit (Circuit): _description_
+        device (Device): _description_
+    """
+    check_operation_possible_or_skip(Operation.CANCEL, device=device)
+    api_user = get_api_or_fail_test(get_logging_conf_or_fail_test(user_role=user_role))
+
+    api_user.select_device_id(device_id=device.id)
+    job_id = api_user.execute(circuit=numpy_circuit)[0]
+    api.cancel_job(job_id)
+    match device._status:
+        case DeviceStatus.OFFLINE:
+            assert api_user.get_job(job_id).status == JobStatus.PENDING
+        case _:
+            assert api_user.get_job(job_id).status == JobStatus.CANCELLED
+
+
+@pytest.mark.parametrize(
+    "device, user_role",
+    [(device, user_role) for user_role in list_user_roles() for device in get_devices_listing_params(user_role)],
+)
+@pytest.mark.slow
+def test_only_owned_jobs_can_be_cancelled(user_role: UserRole, numpy_circuit: Circuit, device: Device, api: API):
+    """Post a circuit and cancel it. This test proves that only admin users can cancel jobs submitted by admin users. This is a restricted case but is representative of how the permissions works --e.g qilimanjaro user cannot cancel a job submitted by a bsc user.
+
+    Args:
+        user_role (UserRole): _description_
+        numpy_circuit (Circuit): _description_
+        device (Device): _description_
+    """
+    check_operation_possible_or_skip(Operation.CANCEL, device=device)
+    api_user = get_api_or_fail_test(get_logging_conf_or_fail_test(user_role=user_role))
+
+    api.select_device_id(device_id=device.id)
+    job_id = api.execute(circuit=numpy_circuit)[0]
+    match user_role:
+        case UserRole.ADMIN:
+            api_user.cancel_job(job_id=job_id)
+            match device._status:
+                case DeviceStatus.OFFLINE:
+                    assert api_user.get_job(job_id).status == JobStatus.PENDING
+                case _:
+                    assert api_user.get_job(job_id).status == JobStatus.CANCELLED
+        case _:  # check only admin can delete jobs
+            with pytest.raises(BaseException):
+                api_user.cancel_job(job_id=job_id)
 
 
 # ------------------------------------------------------------------------ OPERATION: GET RUNCARDS

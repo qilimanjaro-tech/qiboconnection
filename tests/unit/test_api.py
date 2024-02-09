@@ -524,7 +524,7 @@ def test_cancel_job_exception(mocked_api_call: MagicMock, mocked_api: API):
     """Tests API.cancel_job() method with non-existent job id"""
     # Define the behavior of the mocked function to raise the RemoteExecutionException
     mocked_api_call.return_value = web_responses.job_response.cancel_job_response_ise
-    with pytest.raises(RemoteExecutionException, match="Job could not be cancelled."):
+    with pytest.raises(RemoteExecutionException, match="Job 0 could not be cancelled."):
         # Call the function that should raise the exception
         mocked_api.cancel_job(job_id=0)
     # Assert that the mocked function was called with correct arguments
@@ -577,7 +577,7 @@ class TestExecute:
 
     def test_execute_with_one_circuit(self, mocked_api: API):
         """Test the API.execute method for a single circuit."""
-        job_ids = mocked_api.execute(circuit=self.circuit, nshots=1000, device_ids=[9])
+        job_ids = mocked_api.execute(circuit=self.circuit, nshots=1000, device_ids=[9], name="test", summary="test")
 
         assert job_ids == [0]
         assert len(self.r_mock.calls) == 2
@@ -590,6 +590,7 @@ class TestExecute:
         assert (
             base64.urlsafe_b64decode(description[0]).decode() == self.circuit.to_qasm()
         )  # make sure we posted the correct circuit
+        assert body["summary"] == body["name"] == "test"
 
     def test_execute_with_multiple_circuits(self, mocked_api: API):
         """Test the API.execute method for multiple circuits."""
@@ -619,6 +620,8 @@ class TestExecute:
             status=JobStatus.COMPLETED,
             number_shots=1000,
             description="unknown description",
+            name="test",
+            summary="test",
         )
         result = mocked_api.execute_and_return_results(
             circuit=[self.circuit] * 10, nshots=1000, device_ids=[9], timeout=10, interval=1
@@ -637,6 +640,8 @@ class TestExecute:
             status=JobStatus.PENDING,
             number_shots=1000,
             description="unknown description",
+            name="test",
+            summary="test",
         )
 
         with pytest.raises(TimeoutError) as e_info:

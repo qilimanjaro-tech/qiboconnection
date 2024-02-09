@@ -105,6 +105,8 @@ def test_from_kwargs():
                 "result": "Job Result",
                 "number_shots": 10,
                 "job_type": "whatever",
+                "name": "test",
+                "summary": "test",
                 "extra_arg": "Extra Argument",
             }
         ),

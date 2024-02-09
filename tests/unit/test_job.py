@@ -208,6 +208,8 @@ def test_job_request_with_circuit(circuits: list[Circuit], user: User, simulator
         job_status=job_status,
         id=23,
         nshots=10,
+        name="test",
+        summary="test",
     )
     expected_job_request = JobRequest(
         user_id=user_id,
@@ -215,6 +217,8 @@ def test_job_request_with_circuit(circuits: list[Circuit], user: User, simulator
         description="['Ly8gR2VuZXJhdGVkIGJ5IFFJQk8gMC4xLjEyLmRldjAKT1BFTlFBU00gMi4wOwppbmNsdWRlICJxZWxpYjEuaW5jIjsKcXJlZyBxWzFdOwpjcmVnIHJlZ2lzdGVyMFsxXTsKaCBxWzBdOwptZWFzdXJlIHFbMF0gLT4gcmVnaXN0ZXIwWzBdOw==']",
         number_shots=10,
         job_type=JobType.CIRCUIT,
+        name="test",
+        summary="test",
     )
 
     assert isinstance(job, Job)
@@ -237,6 +241,8 @@ def test_job_request_with_qprogram(user: User, simulator_device: SimulatorDevice
         job_status=job_status,
         id=23,
         nshots=10,
+        name="test",
+        summary="test",
     )
     expected_job_request = JobRequest(
         user_id=user_id,
@@ -244,6 +250,8 @@ def test_job_request_with_qprogram(user: User, simulator_device: SimulatorDevice
         description="e30=",
         number_shots=10,
         job_type=JobType.QPROGRAM,
+        name="test",
+        summary="test",
     )
 
     assert isinstance(job, Job)
@@ -348,6 +356,8 @@ def test_update_with_job_response(circuits: list[Circuit], user: User, simulator
         queue_position=0,
         status=JobStatus.COMPLETED,
         result="gASVsAAAAAAAAACMFW51bXB5LmNvcmUubXVsdGlhcnJheZSMDF9yZWNvbnN0cnVjdJSTlIwFbnVtcHmUjAduZGFycmF5lJOUSwCFlEMBYpSHlFKUKEsBSwWFlGgDjAVkdHlwZZSTlIwCZjiUiYiHlFKUKEsDjAE8lE5OTkr_____Sv____9LAHSUYolDKAAAAAAAAPA_AAAAAAAA8D8AAAAAAADwPwAAAAAAAPA_AAAAAAAA8D-UdJRiLg==",
+        name="test",
+        summary="summary",
     )
     job.update_with_job_response(job_response=job_response)
     assert (job.result == np.array([1.0, 1.0, 1.0, 1.0, 1.0])).all()
@@ -372,6 +382,8 @@ def test_update_with_job_response_raises_error_when_updating_incorrect_job(
         device=cast(Device, simulator_device),
         job_status=job_status,
         id=23,
+        name="test",
+        summary="test",
     )
 
     job_response_different_user = JobResponse(
@@ -384,6 +396,8 @@ def test_update_with_job_response_raises_error_when_updating_incorrect_job(
         queue_position=0,
         status=JobStatus.COMPLETED,
         result="WzAuMSwgMC4xLCAwLjEsIDAuMSwgMC4xXQ==",
+        name="test",
+        summary="test",
     )
     with pytest.raises(ValueError) as e_info:
         job.update_with_job_response(job_response=job_response_different_user)
@@ -399,105 +413,9 @@ def test_update_with_job_response_raises_error_when_updating_incorrect_job(
         queue_position=0,
         status=JobStatus.COMPLETED,
         result="WzAuMSwgMC4xLCAwLjEsIDAuMSwgMC4xXQ==",
+        name="test",
+        summary="test",
     )
     with pytest.raises(ValueError) as e_info:
         job.update_with_job_response(job_response=job_response_different_device)
     assert e_info.value.args[0] == "Job response does not belong to the device."
-
-
-# def test_job_creation_with_program(program_definition: ProgramDefinition, user: User, simulator_device: SimulatorDevice):
-#     """Test job creation
-#
-#     Args:
-#         program_definition (ProgramDefinition): ProgramDefinition
-#         user (User): User
-#         simulator_device (SimulatorDevice): SimulatorDevice
-#     """
-#
-#     job_id = 23
-#     job_status = JobStatus.COMPLETED
-#     job_result = JobResult(job_id=job_id, http_response="WzAuMSwgMC4xLCAwLjEsIDAuMSwgMC4xXQ==")
-#     job = Job(
-#         program=program_definition,
-#         user=user,
-#         device=cast(Device, simulator_device),
-#         job_status=job_status,
-#         job_result=job_result,
-#         id=job_id,
-#     )
-#     assert isinstance(job, Job)
-#
-#
-# def test_job_creation_with_program_default_values(
-#     program_definition: ProgramDefinition, user: User, simulator_device: SimulatorDevice
-# ):
-#     """test job creation using the default values
-#
-#     Args:
-#         program_definition (ProgramDefinition): ProgramDefinition
-#         user (User): User
-#         simulator_device (SimulatorDevice): SimulatorDevice
-#     """
-#
-#     job = Job(program=program_definition, user=user, device=cast(Device, simulator_device))
-#     assert isinstance(job, Job)
-#     assert job.job_status == JobStatus.NOT_SENT
-#     assert job.job_result is None
-#     assert job.job_id == 0
-#
-#
-# def test_job_request_with_program(program_definition: ProgramDefinition, user: User, simulator_device: SimulatorDevice):
-#     """test job request
-#
-#     Args:
-#         program_definition (ProgramDefinition): ProgramDefinition
-#         user (User): User
-#         simulator_device (SimulatorDevice): SimulatorDevice
-#     """
-#     job_status = JobStatus.COMPLETED
-#     job = Job(
-#         program=program_definition,
-#         user=user,
-#         device=cast(Device, simulator_device),
-#         job_status=job_status,
-#         id=23,
-#         nshots=10,
-#     )
-#     expected_job_request = JobRequest(
-#         user_id=user.user_id,
-#         device_id=simulator_device.id,
-#         description="W3sibmFtZSI6ICJiZWxsLXN0YXRlIiwgInR5cGUiOiAiR2F0ZS1CYXNlZCBDaXJjdWl0IiwgIm9wdGlvbnMiOiB7Im51bWJlcl9xdWJpdHMiOiAyLCAiaW5pdGlhbF92YWx1ZSI6ICJ6ZXJvIn19XQ==",
-#         number_shots=10,
-#     )
-#     assert isinstance(job, Job)
-#     assert job.job_request == expected_job_request
-#
-#
-# def test_update_with_job_response_and_program(program_definition: ProgramDefinition, user: User, simulator_device: SimulatorDevice):
-#     """test update with job response
-#
-#     Args:
-#         program_definition (ProgramDefinition): ProgramDefinition
-#         user (User): User
-#         simulator_device (SimulatorDevice): SimulatorDevice
-#     """
-#
-#     job_status = JobStatus.PENDING
-#     job = Job(
-#         program=program_definition,
-#         user=user,
-#         device=cast(Device, simulator_device),
-#         job_status=job_status,
-#         id=23,
-#     )
-#     job_response = JobResponse(
-#         user_id=user.user_id,
-#         device_id=simulator_device.id,
-#         description="",
-#         job_id=job.id,
-#         queue_position=0,
-#         status=JobStatus.COMPLETED,
-#         result="WzAuMSwgMC4xLCAwLjEsIDAuMSwgMC4xXQ==",
-#     )
-#     job.update_with_job_response(job_response=job_response)
-#     assert job.result == [0.1, 0.1, 0.1, 0.1, 0.1]

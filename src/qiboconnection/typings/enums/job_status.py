@@ -35,3 +35,4 @@ class JobStatus(StrEnum):
     COMPLETED = "completed"
     ERROR = "error"
     QUEUED = "queued"
+    CANCELLED = "cancelled"
