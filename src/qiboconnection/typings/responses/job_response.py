@@ -38,6 +38,8 @@ class JobResponse(JobRequest):
     queue_position: int
     result: str
     status: str
+    name: str
+    summary: str
 
     @classmethod
     def from_kwargs(cls, **kwargs):
