@@ -208,6 +208,8 @@ def test_job_request_with_circuit(circuits: list[Circuit], user: User, simulator
         job_status=job_status,
         id=23,
         nshots=10,
+        name="test",
+        summary="test",
     )
     expected_job_request = JobRequest(
         user_id=user_id,
