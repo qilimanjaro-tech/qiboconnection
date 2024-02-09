@@ -19,6 +19,8 @@ def test_JobData_typing():
         number_shots=84,
         description="<qibo.models.circuit.Circuit at 0x7fb8c2127650>",
         result={},
+        name="test",
+        summary="test",
     )
     assert isinstance(job_full_data, JobData)
 
@@ -37,6 +39,8 @@ def test_JobData_typing_result_raises_value_error():
             number_shots=84,
             description="<qibo.models.circuit.Circuit at 0x7fb8c2127650>",
             result="Not a dict or list",
+            name="test",
+            summary="test",
         )
 
     assert ex.match("Job result needs to be a dict, a list or a None!")
@@ -59,6 +63,8 @@ def test_JobData_typing_descripton_raises_value_error(mocked_deserialize_job_des
             number_shots=84,
             description="",
             result="",
+            name="test",
+            summary="test",
         )
 
     assert ex.match("Job description needs to be a Qibo Circuit, a dict, a list, a str or a None!")

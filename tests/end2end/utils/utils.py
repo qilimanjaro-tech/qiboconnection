@@ -153,6 +153,8 @@ def post_and_get_result(
     circuit: Circuit | list[Circuit],
     timeout: int = TIMEOUT,
     call_every_seconds: int = CALL_EVERY_SECONDS,
+    name: str = "-",
+    summary: str = "-",
 ) -> JobData:
     """Post a circuit and tries to get the result. While he job is pending, retries during timeout
 
@@ -168,7 +170,7 @@ def post_and_get_result(
     """
 
     api.select_device_id(device_id=device.id)
-    job_id = api.execute(circuit=circuit)[0]
+    job_id = api.execute(circuit=circuit, name=name, summary=summary)[0]
 
     return get_job_result(api, job_id, timeout, call_every_seconds)
 
