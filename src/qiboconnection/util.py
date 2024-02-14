@@ -25,6 +25,8 @@ from typing import Any, List, Tuple
 
 import requests
 from qibo.states import CircuitResult
+from qililab.qprogram import QProgram
+from qililab.result import QProgramResults
 
 from qiboconnection.errors import custom_raise_for_status
 
@@ -85,7 +87,7 @@ def decode_results_from_circuit(http_response: str) -> CircuitResult | dict:
         return _decode_pickled_results(http_response)
 
 
-def decode_results_from_qprogram(http_response: str) -> dict:
+def decode_results_from_qprogram(http_response: str) -> QProgramResults:
     """Decode the results from the Qililab experiment execution
 
     Args:
@@ -94,7 +96,7 @@ def decode_results_from_qprogram(http_response: str) -> dict:
     Returns:
         dict: object containing a serialized representation of a qililab Results object
     """
-    return decode_jsonified_dict(http_response)
+    return QProgramResults.from_dict(decode_jsonified_dict(http_response)["attributes"])
 
 
 def process_response(response: requests.Response) -> Tuple[Any, int]:
