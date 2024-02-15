@@ -25,8 +25,6 @@ from typing import Any, List, Tuple
 
 import requests
 from qibo.states import CircuitResult
-from qililab.qprogram import QProgram
-from qililab.result import QProgramResults
 
 from qiboconnection.errors import custom_raise_for_status
 
@@ -87,7 +85,9 @@ def decode_results_from_circuit(http_response: str) -> CircuitResult | dict:
         return _decode_pickled_results(http_response)
 
 
-def decode_results_from_qprogram(http_response: str) -> QProgramResults:
+def decode_results_from_qprogram(http_response: str):
+    from qililab.result.qprogram_results import QProgramResults
+
     """Decode the results from the Qililab experiment execution
 
     Args:
