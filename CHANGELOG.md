@@ -1,10 +1,3 @@
-## 0.16.1
-
-### Features
-
-- job name and summary
-  [#145](https://github.com/qilimanjaro-tech/qiboconnection/pull/145)
-
 ## 0.16.0
 
 ### Features
