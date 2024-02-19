@@ -37,7 +37,8 @@ class JobData(JobResponse):
         self.description: list[Circuit] | Circuit | dict | str = deserialize_job_description(
             base64_description=self.description, job_type=self.job_type
         )
-        from qililab.result.qprogram import QProgramResults
+        # importing here to avoid circular imports
+        from qililab.result.qprogram import QProgramResults  # pylint: disable=import-outside-toplevel
 
         if not isinstance(self.result, (dict, list, type(None), QProgramResults)):
             raise ValueError("Job result needs to be a dict, a list or a None!")
