@@ -86,7 +86,7 @@ def decode_results_from_circuit(http_response: str) -> CircuitResult | dict:
 
 
 def decode_results_from_qprogram(http_response: str):
-    from qililab.result.qprogram_results import QProgramResults
+    from qililab.result.qprogram import QProgramResults  # importing here to avoid circular import
 
     """Decode the results from the Qililab experiment execution
 
