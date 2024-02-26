@@ -95,10 +95,8 @@ def decode_results_from_qprogram(http_response: str):
         QProgramResults: qililab object
 
     """
-    # importing here to avoid circular import
-    from qililab.result.qprogram import QProgramResults  # pylint: disable=import-outside-toplevel
 
-    return QProgramResults.from_dict(decode_jsonified_dict(http_response)["attributes"])
+    return decode_jsonified_dict(http_response)
 
 
 def process_response(response: requests.Response) -> Tuple[Any, int]:
