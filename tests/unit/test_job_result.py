@@ -23,7 +23,7 @@ def test_job_result_creation():
 
 
 def test_job_result_qprogram_works():
-    """Test QProgrom results are returned using qililab class"""
+    """Test QProgrom results are returned as dicts"""
 
     job_result = JobResult(
         job_id=0,

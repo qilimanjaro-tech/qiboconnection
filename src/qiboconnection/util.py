@@ -85,14 +85,14 @@ def decode_results_from_circuit(http_response: str) -> CircuitResult | dict:
         return _decode_pickled_results(http_response)
 
 
-def decode_results_from_qprogram(http_response: str):
+def decode_results_from_qprogram(http_response: str) -> dict:
     """Decode the results from QProgram execution.
 
     Args:
         http_response (str): the execution results as an Http Response
 
     Returns:
-        QProgramResults: qililab object
+        dict: qprogram results
 
     """
 
