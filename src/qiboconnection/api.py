@@ -326,9 +326,10 @@ class API(ABC):
         qprogram: dict | None = None,
         nshots: int = 10,
         device_ids: List[int] | None = None,
+        device_id: int | None = None,
         name: str = "-",
         summary: str = "-",
-    ) -> List[int]:
+    ) -> List[int] | int:
         """Send a Qibo circuit(s) to be executed on the remote service API. User should define either a *circuit* or an
         *experiment*. If both are provided, the function will fail.
 
@@ -338,6 +339,7 @@ class API(ABC):
             nshots (int): number of times the execution is to be done.
             device_ids (List[int]): list of devices where the execution should be performed. If set, any device set
             using API.select_device_id() will not be used. This will not update the selected devices.
+            device_id (int): id of the device your job will be executed on
 
         Returns:
             List[int]: list of job ids
@@ -349,11 +351,24 @@ class API(ABC):
 
         # Ensure provided selected_devices are valid. If not provided, use the ones selected by API.select_device_id.
         selected_devices: List[Device | QuantumDevice | SimulatorDevice | OfflineDevice] = []
+
+        if device_ids is not None and device_id is not None:
+            raise ValueError(
+                "Use only device_id argument, device_ids is deprecated and will be removed in a following qiboconnection version."
+            )
         if device_ids is not None:
-            for device_id in device_ids:
+            warnings.warn(
+                "device_ids arguments is deprecated and will be removed in a future release. Use device_id argument instead."
+            )
+
+        if device_id is not None:
+            device_ids = [device_id]
+
+        if device_ids is not None:
+            for id in device_ids:
                 try:
-                    self._devices = self._add_or_update_single_device(device_id=device_id)
-                    selected_devices.append(self._devices.select_device(device_id=device_id))
+                    self._devices = self._add_or_update_single_device(device_id=id)
+                    selected_devices.append(self._devices.select_device(device_id=id))
                 except HTTPError as ex:
                     logger.error(json.loads(str(ex))[REST_ERROR.DETAIL])
                     raise ex
@@ -391,6 +406,8 @@ class API(ABC):
             job.id = response[API_CONSTANTS.JOB_ID]
             self._jobs.append(job)
             job_ids.append(job.id)
+        if len(job_ids) == 1:
+            return job_ids[0]
         return job_ids
 
     def _get_job(self, job_id: int) -> JobResponse:
