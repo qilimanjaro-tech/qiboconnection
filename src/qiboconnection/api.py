@@ -20,6 +20,7 @@
 # pylint: disable=no-member
 
 import json
+import warnings
 from abc import ABC
 from dataclasses import asdict
 from datetime import datetime, timedelta
@@ -45,6 +46,14 @@ from qiboconnection.typings.job_data import JobData
 from qiboconnection.typings.responses import JobListingItemResponse, RuncardResponse
 from qiboconnection.typings.responses.job_response import JobResponse
 from qiboconnection.util import unzip
+
+
+def warning_on_one_line(message, category, filename, lineno, line=None):
+    return "%s:%s: %s: %s\n" % (filename, lineno, category.__name__, message)
+
+
+warnings.formatwarning = warning_on_one_line
+warnings.simplefilter("always")
 
 
 class API(ABC):
@@ -203,6 +212,9 @@ class API(ABC):
             device_id (int): Device identifier
 
         """
+        warnings.warn(
+            "This method is deprecated and will be removed in the following Qiboconnection release. Use device_id argument in execute() method instead."
+        )
         self._selected_devices = []
         self._devices = self._add_or_update_single_device(device_id=device_id)
         try:
@@ -415,6 +427,9 @@ class API(ABC):
             CircuitResult | npt.NDArray | dict | None: The Job result as an Abstract State or None when it is not
             executed yet.
         """
+        warnings.warn(
+            "This method is deprecated and will be removed in a future qiboconnection version. Use get_job(job_id).result to retrieve your results instead."
+        )
 
         job_response = self._get_job(job_id=job_id)
         log_job_status_info(job_response=job_response)
@@ -434,6 +449,10 @@ class API(ABC):
         Returns:
             Union[CircuitResult, None]: The Job result as an Abstract State or None when it is not executed yet.
         """
+        warnings.warn(
+            "This method is deprecated and will be removed in a future qiboconnection version. Use get_job(job_id).result to retrieve your results instead."
+        )
+
         job_responses = [self._get_job(job_id) for job_id in job_ids]
         for job_response in job_responses:
             log_job_status_info(job_response=job_response)
