@@ -548,7 +548,8 @@ class TestExecute:
 
         This method mocks the `requests` calls used inside the API.execute method.
         """
-        self.r_mock = responses.RequestsMock(assert_all_requests_are_fired=True)
+        # TODO: add assert_all_requests_are_fired once device_ids argument is removed from execute
+        self.r_mock = responses.RequestsMock(assert_all_requests_are_fired=False)
         self.r_mock.start()
         self.r_mock.add(
             method="GET",
@@ -575,11 +576,41 @@ class TestExecute:
         self.r_mock.stop()
         self.r_mock.reset()
 
-    def test_execute_with_one_circuit(self, mocked_api: API):
+    # TODO: delete when removing device_ids argument
+    def test_execute_with_one_circuit_device_ids(self, mocked_api: API):
         """Test the API.execute method for a single circuit."""
         job_ids = mocked_api.execute(circuit=self.circuit, nshots=1000, device_ids=[9], name="test", summary="test")
 
         assert job_ids == [0]
+        assert len(self.r_mock.calls) == 2
+        body = json.loads(self.r_mock.calls[1].request.body.decode())
+        assert body["device_id"] == 9
+        assert body["number_shots"] == 1000
+        assert body["job_type"] == "circuit"
+        description = ast.literal_eval(body["description"])
+        assert len(description) == 1
+        assert (
+            base64.urlsafe_b64decode(description[0]).decode() == self.circuit.to_qasm()
+        )  # make sure we posted the correct circuit
+        assert body["summary"] == body["name"] == "test"
+
+    # TODO: delete when removing device_ids argument
+    def test_execute_with_one_circuit_ValueError(self, mocked_api: API):
+        """Test the API.execute method for a single circuit."""
+        with pytest.raises(ValueError) as e:
+            mocked_api.execute(
+                circuit=self.circuit, nshots=1000, device_ids=[9], device_id=9, name="test", summary="test"
+            )
+        assert (
+            e.value.args[0]
+            == "Use only device_id argument, device_ids is deprecated and will be removed in a following qiboconnection version."
+        )
+
+    def test_execute_with_one_circuit_device_id(self, mocked_api: API):
+        """Test the API.execute method for a single circuit."""
+        job_ids = mocked_api.execute(circuit=self.circuit, nshots=1000, device_id=9, name="test", summary="test")
+
+        assert job_ids == 0
         assert len(self.r_mock.calls) == 2
         body = json.loads(self.r_mock.calls[1].request.body.decode())
         assert body["device_id"] == 9
