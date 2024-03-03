@@ -30,9 +30,6 @@ from typing import Any, List, cast
 from numpy import typing as npt
 from qibo.models.circuit import Circuit
 from qibo.states import CircuitResult
-from requests import HTTPError
-from typeguard import typechecked
-
 from qiboconnection.api_utils import log_job_status_info, parse_job_responses_to_results
 from qiboconnection.config import logger
 from qiboconnection.connection import Connection
@@ -46,9 +43,11 @@ from qiboconnection.typings.job_data import JobData
 from qiboconnection.typings.responses import JobListingItemResponse, RuncardResponse
 from qiboconnection.typings.responses.job_response import JobResponse
 from qiboconnection.util import unzip
+from requests import HTTPError
+from typeguard import typechecked
 
 
-def warning_on_one_line(message, category, filename, lineno, line=None):  # pylint: disable=inused-argument
+def warning_on_one_line(message, category, filename, lineno, line=None):  # pylint: disable=unused-argument
     """Warnings formatting"""
     return f"{filename}:{lineno}: {category.__name__}:{message}\n"
 
