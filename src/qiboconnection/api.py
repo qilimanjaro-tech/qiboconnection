@@ -406,8 +406,8 @@ class API(ABC):
             job.id = response[API_CONSTANTS.JOB_ID]
             self._jobs.append(job)
             job_ids.append(job.id)
-        if len(job_ids) == 1:
-            return job_ids[0]
+        if isinstance(job_ids, int):
+            return job_ids
         return job_ids
 
     def _get_job(self, job_id: int) -> JobResponse:
