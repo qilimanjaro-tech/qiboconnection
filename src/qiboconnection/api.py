@@ -49,7 +49,8 @@ from qiboconnection.util import unzip
 
 
 def warning_on_one_line(message, category, filename, lineno, line=None):
-    return "%s:%s: %s: %s\n" % (filename, lineno, category.__name__, message)
+    """Warnings formatting"""
+    return f"{filename}:{lineno}: {category.__name__}:{message}:{line}\n"
 
 
 warnings.formatwarning = warning_on_one_line
@@ -320,7 +321,7 @@ class API(ABC):
     # REMOTE EXECUTIONS
 
     @typechecked
-    def execute(
+    def execute(  # pylint: disable=too-many-locals
         self,
         circuit: Circuit | List[Circuit] | None = None,
         qprogram: dict | None = None,
@@ -365,10 +366,10 @@ class API(ABC):
             device_ids = [device_id]
 
         if device_ids is not None:
-            for id in device_ids:
+            for device in device_ids:
                 try:
-                    self._devices = self._add_or_update_single_device(device_id=id)
-                    selected_devices.append(self._devices.select_device(device_id=id))
+                    self._devices = self._add_or_update_single_device(device_id=device)
+                    selected_devices.append(self._devices.select_device(device_id=device))
                 except HTTPError as ex:
                     logger.error(json.loads(str(ex))[REST_ERROR.DETAIL])
                     raise ex

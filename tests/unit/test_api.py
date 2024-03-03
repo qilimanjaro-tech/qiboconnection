@@ -661,7 +661,7 @@ class TestExecute:
         assert isinstance(result, list | dict)
 
     @patch("qiboconnection.api.API._get_job", autospec=True)
-    def test_execute_and_return_results_device_ids(self, mocked_get_job: MagicMock, mocked_api: API):
+    def test_execute_and_return_results_device_id(self, mocked_get_job: MagicMock, mocked_api: API):
         mocked_get_job.return_value = JobData(
             user_id=1,
             job_type=JobType.OTHER,
