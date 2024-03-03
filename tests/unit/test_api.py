@@ -472,6 +472,21 @@ def test_get_result_exception(mocked_api_call: MagicMock, mocked_api: API):
     mocked_api_call.assert_called_with(self=mocked_api._connection, path=f"{mocked_api._JOBS_CALL_PATH}/{0}")
 
 
+@patch("qiboconnection.connection.Connection.send_get_auth_remote_api_call", autospec=True)
+def test_get_results_exception(mocked_api_call: MagicMock, mocked_api: API):
+    """Tests API.get_results() method with non-existent job id."""
+
+    # Define the behavior of the mocked function to raise the RemoteExecutionException
+    mocked_api_call.side_effect = RemoteExecutionException("The job does not exist!", status_code=400)
+
+    with pytest.raises(RemoteExecutionException, match="The job does not exist!"):
+        # Call the function that should raise the exception
+        mocked_api.get_results(job_ids=[0, -1])
+
+    # Assert that the mocked function was called with correct arguments
+    mocked_api_call.assert_called_with(self=mocked_api._connection, path=f"{mocked_api._JOBS_CALL_PATH}/{0}")
+
+
 @patch("qiboconnection.connection.Connection.send_get_auth_remote_api_call_all_pages", autospec=True)
 def test_no_devices_selected_exception(mocked_api_call: MagicMock, mocked_api: API):
     """Tests API.execute() method with no devices selected"""

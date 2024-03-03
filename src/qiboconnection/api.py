@@ -48,9 +48,9 @@ from qiboconnection.typings.responses.job_response import JobResponse
 from qiboconnection.util import unzip
 
 
-def warning_on_one_line(message, category, filename, lineno, line=None):
+def warning_on_one_line(message, category, filename, lineno, line=None):  # pylint: disable=inused-argument
     """Warnings formatting"""
-    return f"{filename}:{lineno}: {category.__name__}:{message}:{line}\n"
+    return f"{filename}:{lineno}: {category.__name__}:{message}\n"
 
 
 warnings.formatwarning = warning_on_one_line
