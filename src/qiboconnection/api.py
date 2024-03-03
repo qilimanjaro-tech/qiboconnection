@@ -506,6 +506,7 @@ class API(ABC):
         qprogram: dict | None = None,
         nshots: int = 10,
         device_ids: List[int] | None = None,
+        device_id: int | None = None,
         timeout: int = 3600,
         interval: int = 60,
     ) -> List[dict | Any | None]:
@@ -530,6 +531,17 @@ class API(ABC):
             Union[CircuitResult, None]: The Job result as an Abstract State or None when it is not executed yet.
 
         """
+        if device_ids is not None and device_id is not None:
+            raise ValueError(
+                "Use only device_id argument, device_ids is deprecated and will be removed in a following qiboconnection version."
+            )
+        if device_ids is not None:
+            warnings.warn(
+                "device_ids arguments is deprecated and will be removed in a future release. Use device_id argument instead."
+            )
+
+        if device_id is not None:
+            device_ids = [device_id]
 
         deadline = datetime.now() + timedelta(seconds=timeout)
         job_ids = self.execute(
