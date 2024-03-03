@@ -533,20 +533,13 @@ class API(ABC):
         """
 
         deadline = datetime.now() + timedelta(seconds=timeout)
-        if device_ids is not None and device_id is None:
-            job_ids = self.execute(
-                circuit=circuit,
-                qprogram=qprogram,
-                nshots=nshots,
-                device_ids=device_ids,
-            )
-        else:
-            job_ids = self.execute(
-                circuit=circuit,
-                qprogram=qprogram,
-                nshots=nshots,
-                device_id=device_id,
-            )
+        job_ids = self.execute(
+            circuit=circuit,
+            qprogram=qprogram,
+            nshots=nshots,
+            device_id=device_id,
+            device_ids=device_ids,
+        )
         if isinstance(job_ids, int):
             job_ids = [job_ids]
         return self._wait_and_return_results(deadline=deadline, interval=interval, job_ids=job_ids)
