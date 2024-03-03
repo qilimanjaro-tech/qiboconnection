@@ -547,7 +547,8 @@ class API(ABC):
                 nshots=nshots,
                 device_id=device_id,
             )
-
+        if isinstance(job_ids, int):
+            job_ids = [job_ids]
         return self._wait_and_return_results(deadline=deadline, interval=interval, job_ids=job_ids)
 
     def _get_list_jobs_response(self, favourites: bool = False) -> List[JobListingItemResponse]:
