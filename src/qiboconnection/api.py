@@ -20,6 +20,7 @@
 # pylint: disable=no-member
 
 import json
+import warnings
 from abc import ABC
 from dataclasses import asdict
 from datetime import datetime, timedelta
@@ -45,6 +46,15 @@ from qiboconnection.typings.job_data import JobData
 from qiboconnection.typings.responses import JobListingItemResponse, RuncardResponse
 from qiboconnection.typings.responses.job_response import JobResponse
 from qiboconnection.util import unzip
+
+
+def warning_on_one_line(message, category, filename, lineno, line=None):  # pylint: disable=unused-argument
+    """Warnings formatting"""
+    return f"{filename}:{lineno}: {category.__name__}:{message}\n"
+
+
+warnings.formatwarning = warning_on_one_line
+warnings.simplefilter("always")
 
 
 class API(ABC):
@@ -203,6 +213,9 @@ class API(ABC):
             device_id (int): Device identifier
 
         """
+        warnings.warn(
+            "This method is deprecated and will be removed in the following Qiboconnection release. Use device_id argument in execute() method instead."
+        )
         self._selected_devices = []
         self._devices = self._add_or_update_single_device(device_id=device_id)
         try:
@@ -308,15 +321,16 @@ class API(ABC):
     # REMOTE EXECUTIONS
 
     @typechecked
-    def execute(
+    def execute(  # pylint: disable=too-many-locals
         self,
         circuit: Circuit | List[Circuit] | None = None,
         qprogram: dict | None = None,
         nshots: int = 10,
         device_ids: List[int] | None = None,
+        device_id: int | None = None,
         name: str = "-",
         summary: str = "-",
-    ) -> List[int]:
+    ) -> List[int] | int:
         """Send a Qibo circuit(s) to be executed on the remote service API. User should define either a *circuit* or an
         *experiment*. If both are provided, the function will fail.
 
@@ -326,6 +340,7 @@ class API(ABC):
             nshots (int): number of times the execution is to be done.
             device_ids (List[int]): list of devices where the execution should be performed. If set, any device set
             using API.select_device_id() will not be used. This will not update the selected devices.
+            device_id (int): id of the device your job will be executed on
 
         Returns:
             List[int]: list of job ids
@@ -337,11 +352,24 @@ class API(ABC):
 
         # Ensure provided selected_devices are valid. If not provided, use the ones selected by API.select_device_id.
         selected_devices: List[Device | QuantumDevice | SimulatorDevice | OfflineDevice] = []
+
+        if device_ids is not None and device_id is not None:
+            raise ValueError(
+                "Use only device_id argument, device_ids is deprecated and will be removed in a following qiboconnection version."
+            )
         if device_ids is not None:
-            for device_id in device_ids:
+            warnings.warn(
+                "device_ids arguments is deprecated and will be removed in a future release. Use device_id argument instead."
+            )
+
+        if device_id is not None:
+            device_ids = [device_id]
+
+        if device_ids is not None:
+            for device in device_ids:
                 try:
-                    self._devices = self._add_or_update_single_device(device_id=device_id)
-                    selected_devices.append(self._devices.select_device(device_id=device_id))
+                    self._devices = self._add_or_update_single_device(device_id=device)
+                    selected_devices.append(self._devices.select_device(device_id=device))
                 except HTTPError as ex:
                     logger.error(json.loads(str(ex))[REST_ERROR.DETAIL])
                     raise ex
@@ -379,6 +407,8 @@ class API(ABC):
             job.id = response[API_CONSTANTS.JOB_ID]
             self._jobs.append(job)
             job_ids.append(job.id)
+        if device_id is not None:
+            return job_ids[0]
         return job_ids
 
     def _get_job(self, job_id: int) -> JobResponse:
@@ -415,6 +445,9 @@ class API(ABC):
             CircuitResult | npt.NDArray | dict | None: The Job result as an Abstract State or None when it is not
             executed yet.
         """
+        warnings.warn(
+            "This method is deprecated and will be removed in a future qiboconnection version. Use get_job(job_id).result to retrieve your results instead."
+        )
 
         job_response = self._get_job(job_id=job_id)
         log_job_status_info(job_response=job_response)
@@ -434,6 +467,10 @@ class API(ABC):
         Returns:
             Union[CircuitResult, None]: The Job result as an Abstract State or None when it is not executed yet.
         """
+        warnings.warn(
+            "This method is deprecated and will be removed in a future qiboconnection version. Use get_job(job_id).result to retrieve your results instead."
+        )
+
         job_responses = [self._get_job(job_id) for job_id in job_ids]
         for job_response in job_responses:
             log_job_status_info(job_response=job_response)
@@ -470,6 +507,7 @@ class API(ABC):
         qprogram: dict | None = None,
         nshots: int = 10,
         device_ids: List[int] | None = None,
+        device_id: int | None = None,
         timeout: int = 3600,
         interval: int = 60,
     ) -> List[dict | Any | None]:
@@ -500,8 +538,11 @@ class API(ABC):
             circuit=circuit,
             qprogram=qprogram,
             nshots=nshots,
+            device_id=device_id,
             device_ids=device_ids,
         )
+        if isinstance(job_ids, int):
+            job_ids = [job_ids]
         return self._wait_and_return_results(deadline=deadline, interval=interval, job_ids=job_ids)
 
     def _get_list_jobs_response(self, favourites: bool = False) -> List[JobListingItemResponse]:

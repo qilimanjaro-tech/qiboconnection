@@ -62,7 +62,7 @@ jobs:
   e2e-tests:
     if: github.event.pull_request.draft == false
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 60
 
     env:
       QUANTUM_SERVICE_URL : "https://dev-api.qaas.qilimanjaro.tech"
