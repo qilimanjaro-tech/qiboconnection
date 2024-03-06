@@ -20,13 +20,10 @@ from typeguard import typechecked
 
 from qiboconnection.config import logger
 from qiboconnection.connection import Connection
-from qiboconnection.typings.devices import OfflineDeviceInput, QuantumDeviceInput, SimulatorDeviceInput
+from qiboconnection.typings.devices import DeviceInput
 from qiboconnection.typings.enums import DeviceStatus
 
 from .device import Device
-from .offline_device import OfflineDevice
-from .quantum_device import QuantumDevice
-from .simulator_device import SimulatorDevice
 
 
 def block_device(connection: Connection, device: Device) -> None:
@@ -69,7 +66,7 @@ def is_quantum_device_input(device_input: dict) -> bool:
 
 
 @typechecked
-def create_device(device_input: dict) -> Union[QuantumDevice, SimulatorDevice, OfflineDevice]:
+def create_device(device_input: dict) -> Device:
     """Creates a Device from a given device input.
 
     Args:
@@ -78,8 +75,5 @@ def create_device(device_input: dict) -> Union[QuantumDevice, SimulatorDevice, O
     Returns:
         Union[QuantumDevice, SimulatorDevice, OfflineDevice]: The constructed Device Object
     """
-    if is_offline_device_input(device_input=device_input):
-        return OfflineDevice(device_input=OfflineDeviceInput.from_kwargs(**device_input))
-    if is_quantum_device_input(device_input=device_input):
-        return QuantumDevice(device_input=QuantumDeviceInput.from_kwargs(**device_input))
-    return SimulatorDevice(device_input=SimulatorDeviceInput.from_kwargs(**device_input))
+
+    return Device(device_input=DeviceInput.from_kwargs(**device_input))

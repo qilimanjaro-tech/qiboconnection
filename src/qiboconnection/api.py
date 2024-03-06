@@ -38,7 +38,7 @@ from qiboconnection.connection import Connection
 from qiboconnection.constants import API_CONSTANTS, REST, REST_ERROR
 from qiboconnection.errors import ConnectionException, RemoteExecutionException
 from qiboconnection.models import Job, JobListing, Runcard
-from qiboconnection.models.devices import Device, Devices, OfflineDevice, QuantumDevice, SimulatorDevice, create_device
+from qiboconnection.models.devices import Device, Devices, create_device
 from qiboconnection.typings.connection import ConnectionConfiguration
 from qiboconnection.typings.enums import JobStatus
 from qiboconnection.typings.job_data import JobData
@@ -336,7 +336,7 @@ class API(ABC):
         """
 
         # Ensure provided selected_devices are valid. If not provided, use the ones selected by API.select_device_id.
-        selected_devices: List[Device | QuantumDevice | SimulatorDevice | OfflineDevice] = []
+        selected_devices: List[Device] = []
         if device_ids is not None:
             for device_id in device_ids:
                 try:
@@ -346,9 +346,7 @@ class API(ABC):
                     logger.error(json.loads(str(ex))[REST_ERROR.DETAIL])
                     raise ex
         else:
-            selected_devices = cast(
-                List[Device | QuantumDevice | SimulatorDevice | OfflineDevice], self._selected_devices
-            )
+            selected_devices = cast(List[Device], self._selected_devices)
         if not selected_devices:
             raise ValueError("No devices were selected for execution.")
         if isinstance(circuit, Circuit):

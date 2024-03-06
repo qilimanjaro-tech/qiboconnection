@@ -38,7 +38,7 @@ class Device(DeviceDetails):
         for k, v in vars(device_input).items():
             setattr(self, f"_{k}", v)
         self._str = (
-            f"<Device: device_id={self._device_id}, device_name='{self._device_name}', "  # type: ignore[attr-defined]
+            f"<Device: device_id={self._id}, device_name='{self._name}', "  # type: ignore[attr-defined]
             + f"status='{self._status}', availability='{self._availability}', channel_id={self._channel_id}>"  # type: ignore[attr-defined]
         )
 
@@ -49,7 +49,7 @@ class Device(DeviceDetails):
         Returns:
             int: device identifier
         """
-        return self._device_id  # type: ignore[attr-defined]
+        return self._id  # type: ignore[attr-defined]
 
     @property
     def name(self) -> str:
@@ -58,7 +58,56 @@ class Device(DeviceDetails):
         Returns:
             str: device name
         """
-        return self._device_name  # type: ignore[attr-defined]
+        return self._name  # type: ignore[attr-defined]
+
+    @property
+    def status(self) -> str:
+        """Returns device name
+
+        Returns:
+            str: device name
+        """
+        _status = getattr(self, "_status", None)
+        return DeviceStatus(_status) if _status else None  # type: ignore[attr-defined]
+
+    @property
+    def type(self) -> str:
+        """Returns device type
+
+        Returns:
+            str: device type
+        """
+        return getattr(self, "_type")
+
+    @property
+    def number_pending_jobs(self) -> int | None:
+        """Return pending jobs in the queue for the requested device
+
+        Returns:
+            int: pending jobs
+
+        """
+        return getattr(self, "_number_pending_jobs", None)
+
+    @property
+    def static_features(self) -> int | None:
+        """Return pending jobs in the queue for the requested device
+
+        Returns:
+            int: pending jobs
+
+        """
+        return getattr(self, "_static_features", None)
+
+    @property
+    def dynamic_features(self) -> int | None:
+        """Return pending jobs in the queue for the requested device
+
+        Returns:
+            int: pending jobs
+
+        """
+        return getattr(self, "_dynamic_features", None)
 
     def block_device(self, connection: Connection) -> None:
         """Blocks a device to avoid others to use it
@@ -70,7 +119,7 @@ class Device(DeviceDetails):
             HTTPError: Error blocking device
         """
         try:
-            connection.update_device_availability(device_id=self._device_id, availability=DeviceAvailability.BLOCKED)  # type: ignore[attr-defined]
+            connection.update_device_availability(device_id=self._id, availability=DeviceAvailability.BLOCKED)  # type: ignore[attr-defined]
             self._availability = DeviceAvailability.BLOCKED
         except HTTPError as ex:
             logger.error("Error blocking device %s.", self._device_name)  # type: ignore[attr-defined]
@@ -82,7 +131,7 @@ class Device(DeviceDetails):
         Args:
             connection (Connection): Qibo API connection
         """
-        connection.update_device_availability(device_id=self._device_id, availability=DeviceAvailability.AVAILABLE)  # type: ignore[attr-defined]
+        connection.update_device_availability(device_id=self._id, availability=DeviceAvailability.AVAILABLE)  # type: ignore[attr-defined]
         self._availability = DeviceAvailability.AVAILABLE
 
     def set_to_online(self, connection: Connection) -> None:
@@ -91,7 +140,7 @@ class Device(DeviceDetails):
         Args:
             connection (Connection): Qibo API connection
         """
-        connection.update_device_status(device_id=self._device_id, status=DeviceStatus.ONLINE)  # type: ignore[attr-defined]
+        connection.update_device_status(device_id=self._id, status=DeviceStatus.ONLINE)  # type: ignore[attr-defined]
         self._status = DeviceStatus.ONLINE
 
     def set_to_maintenance(self, connection: Connection) -> None:
@@ -101,22 +150,26 @@ class Device(DeviceDetails):
         Args:
             connection (Connection): Qibo API connection
         """
-        connection.update_device_status(device_id=self._device_id, status=DeviceStatus.MAINTENANCE)  # type: ignore[attr-defined]
+        connection.update_device_status(device_id=self._id, status=DeviceStatus.MAINTENANCE)  # type: ignore[attr-defined]
         self._status = DeviceStatus.MAINTENANCE
 
     @property
-    def __dict__(self):
+    def to_dict(self):
         """Dictionary representation of a Device
 
         Returns:
             dict: Output dictionary of a Device object
         """
-        return {
-            "device_id": self._device_id,  # type: ignore[attr-defined]
-            "device_name": self._device_name,  # type: ignore[attr-defined]
-            "status": self._status,
-            "availability": self._availability,
-        }
+        result_dict = {}
+        for key in self.__dir__():
+            if len(key) >= 2 and key[0] == "_" and key[1] != "_":
+                value = getattr(self, key, None)
+                try:
+                    json.dumps(value)
+                    result_dict |= {key[1:]: getattr(self, key, None)}
+                except (json.JSONDecodeError, TypeError):
+                    pass
+        return result_dict
 
     def toJSON(self) -> str:  # pylint: disable=invalid-name
         """JSON representation of a Device
@@ -125,4 +178,4 @@ class Device(DeviceDetails):
             str: JSON serialization of a Device object
         """
 
-        return json.dumps(self.__dict__, indent=2)
+        return json.dumps(self.to_dict, indent=2)

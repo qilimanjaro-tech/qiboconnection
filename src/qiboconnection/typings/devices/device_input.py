@@ -14,7 +14,6 @@
 
 """ Device Typing """
 from dataclasses import dataclass
-from typing import Optional
 
 from qiboconnection.util import from_kwargs
 
@@ -24,17 +23,21 @@ class DeviceInput:
     """Device Input
 
     Attributes:
-        device_id (int): device identifier
-        device_name (str): device name
+        id (int): device identifier
+        name (str): device name
         status (str): device status
     """
 
-    device_id: int
-    device_name: str
+    id: int
+    name: str
+    type: str
     status: str
-    availability: str
+    availability: str | None
     channel_id: int | None
-    number_pending_jobs: Optional[int] = 0
+    number_pending_jobs: int | None = None
+    slurm_partition: str | None = None
+    static_features: dict | None = None
+    dynamic_features: dict | None = None
 
     @classmethod
     def from_kwargs(cls, **kwargs):
