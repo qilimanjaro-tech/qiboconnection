@@ -33,7 +33,6 @@ class DeviceInput:
     status: str
     type: str | None = None
     availability: str | None = None
-    channel_id: int | None = None
     number_pending_jobs: int | None = None
     slurm_partition: str | None = None
     static_features: dict | None = None
