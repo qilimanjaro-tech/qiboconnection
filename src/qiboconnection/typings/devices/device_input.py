@@ -30,10 +30,10 @@ class DeviceInput:
 
     id: int
     name: str
-    type: str
     status: str
-    availability: str | None
-    channel_id: int | None
+    type: str | None = None
+    availability: str | None = None
+    channel_id: int | None = None
     number_pending_jobs: int | None = None
     slurm_partition: str | None = None
     static_features: dict | None = None
@@ -42,4 +42,21 @@ class DeviceInput:
     @classmethod
     def from_kwargs(cls, **kwargs):
         "Returns an instance of DeviceInput including non-typed attributes"
+
+        kwargs = cls._apply_retrocompatibility_conversions(kwargs=kwargs)
+
         return from_kwargs(cls, **kwargs)
+
+    @classmethod
+    def _apply_retrocompatibility_conversions(cls, kwargs):
+        """
+        If old required keys are provided instead of new ones, update the dictionary with the new
+        expected values.
+        """
+        if "device_id" in kwargs:
+            kwargs["id"] = kwargs.pop("device_id")
+        if "device_name" in kwargs:
+            kwargs["name"] = kwargs.pop("device_name")
+        if "device_type" in kwargs:
+            kwargs["type"] = kwargs.pop("device_type")
+        return kwargs

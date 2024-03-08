@@ -39,7 +39,7 @@ class Device(DeviceDetails):
             setattr(self, f"_{k}", v)
         self._str = (
             f"<Device: device_id={self._id}, device_name='{self._name}', "  # type: ignore[attr-defined]
-            + f"status='{self._status}', availability='{self._availability}', channel_id={self._channel_id}>"  # type: ignore[attr-defined]
+            + f"status='{self._status}', availability='{self._availability}'>"  # type: ignore[attr-defined]
         )
 
     @property
@@ -61,7 +61,7 @@ class Device(DeviceDetails):
         return self._name  # type: ignore[attr-defined]
 
     @property
-    def status(self) -> str:
+    def status(self) -> DeviceStatus | None:
         """Returns device name
 
         Returns:
