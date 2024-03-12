@@ -40,6 +40,7 @@ class Job(ABC):  # pylint: disable=too-many-instance-attributes
     program: ProgramDefinition | None = field(default=None)
     circuit: list[Circuit] | None = None
     qprogram: dict | None = None
+    vqa: dict | None = None
     nshots: int = 10
     job_status: JobStatus = JobStatus.NOT_SENT
     job_result: JobResult | None = None
@@ -48,10 +49,10 @@ class Job(ABC):  # pylint: disable=too-many-instance-attributes
     id: int = 0  # pylint: disable=invalid-name
 
     def __post_init__(self):
-        if self.qprogram is not None and self.circuit is not None:
-            raise ValueError("Both circuit and qprogram were provided, but execute() only takes one of them.")
-        if self.qprogram is None and self.circuit is None:
-            raise ValueError("Neither of circuit or qprogram were provided.")
+        if self.qprogram is not None and self.circuit is not None and self.vqa is not None:
+            raise ValueError("VQA, circuit. qprogram were provided, but execute() only takes one of them.")
+        if self.qprogram is None and self.circuit is None and self.vqa is None:
+            raise ValueError("Neither of circuit, vqa or qprogram were provided.")
 
     @property
     def user_id(self) -> int | None:
@@ -122,16 +123,18 @@ class Job(ABC):  # pylint: disable=too-many-instance-attributes
     @property
     def job_type(self):
         """Get the type of the job, checking whether the user has defined circuit or experiment."""
-        if self.qprogram is None and self.circuit is not None:
+        if self.circuit is not None and self.qprogram is None and self.vqa is None:
             return JobType.CIRCUIT
-        if self.qprogram is not None and self.circuit is None:
+        if self.qprogram is not None and self.circuit is None and self.vqa is None:
             return JobType.QPROGRAM
+        if self.vqa is not None and self.circuit is None and self.qprogram is None:
+            return JobType.VQA
         raise ValueError("Could not determine JobType")
 
     def _get_job_description(self) -> str:
         """Serialize either circuit or qprogram to obtain job description"""
 
-        if self.qprogram is not None:
+        if self.qprogram is not None or self.vqa is not None:
             return jsonify_dict_and_base64_encode(object_to_encode=self.qprogram)
 
         if self.circuit is not None:
