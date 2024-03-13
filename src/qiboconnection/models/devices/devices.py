@@ -107,7 +107,7 @@ class Devices(ABC):
         Returns:
             list[dict]: a list of Devices converted into a dictionary
         """
-        return [dict(device.__dict__.items()) for device in self._devices]
+        return [dict(device.to_dict) for device in self._devices]
 
     def toJSON(self) -> str:  # pylint: disable=invalid-name
         """returns a JSON string representation of the devices
@@ -115,11 +115,13 @@ class Devices(ABC):
         Returns:
             str: a JSON string representation of the devices
         """
-        one_json = ""
+        json_list = "["
         for device in self._devices:
-            one_json += device.toJSON()
-            one_json += "\n"
-        return one_json
+            json_list += device.toJSON()
+            json_list += ",\n"
+        json_list += "]"
+
+        return json_list
 
     def select_device(
         self,
