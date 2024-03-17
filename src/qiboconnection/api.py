@@ -45,6 +45,7 @@ from qiboconnection.typings.enums import JobStatus
 from qiboconnection.typings.job_data import JobData
 from qiboconnection.typings.responses import JobListingItemResponse, RuncardResponse
 from qiboconnection.typings.responses.job_response import JobResponse
+from qiboconnection.typings.vqa import VQA
 from qiboconnection.util import unzip
 
 
@@ -325,7 +326,7 @@ class API(ABC):
         self,
         circuit: Circuit | List[Circuit] | None = None,
         qprogram: dict | None = None,
-        vqa: dict | None = None,
+        vqa: VQA | None = None,
         nshots: int = 10,
         device_ids: List[int] | None = None,
         device_id: int | None = None,
@@ -380,7 +381,7 @@ class API(ABC):
             Job(
                 circuit=circuit,
                 qprogram=qprogram,
-                vqa=vqa,
+                vqa=asdict(vqa),
                 nshots=nshots,
                 name=name,
                 summary=summary,
