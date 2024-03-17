@@ -50,6 +50,9 @@ class JobResult(ABC):
         if self.job_type == JobType.QPROGRAM:
             self.data = decode_results_from_qprogram(self.http_response)
             return
+        if self.job_type == JobType.VQA:
+            self.data = decode_results_from_qprogram(self.http_response)
+            return
 
         logger.warning("Result not supported for type of job. Returning a plain string. ")
         self.data = self.http_response

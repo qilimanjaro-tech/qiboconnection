@@ -134,8 +134,10 @@ class Job(ABC):  # pylint: disable=too-many-instance-attributes
     def _get_job_description(self) -> str:
         """Serialize either circuit or qprogram to obtain job description"""
 
-        if self.qprogram is not None or self.vqa is not None:
+        if self.qprogram is not None:
             return jsonify_dict_and_base64_encode(object_to_encode=self.qprogram)
+        if self.vqa is not None:
+            return jsonify_dict_and_base64_encode(object_to_encode=self.vqa)
 
         if self.circuit is not None:
             return jsonify_list_with_str_and_base64_encode(object_to_encode=[c.to_qasm() for c in self.circuit])
