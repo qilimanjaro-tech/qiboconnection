@@ -77,6 +77,6 @@ def test_device_json_representation_expanded(device_input: DeviceInput):
         "static_features": None,
         "dynamic_features": None,
         "availability": "available",
-        "str": device.__str__(),
+        "str": str(device),
     }
     assert json.loads(device.toJSON(expand=True)) == expected_dict

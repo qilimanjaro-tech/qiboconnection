@@ -59,7 +59,6 @@ def test_devices_to_json_expand(simulator_device_input: DeviceInput):
     Test Devices().to_dict() method with expanded fields.
     It must be considered that unexpected fields might arrive to the json here.
     """
-    import json
 
     simulator_device = Device(device_input=simulator_device_input)
     devices = Devices(device=simulator_device)

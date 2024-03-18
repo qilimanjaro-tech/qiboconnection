@@ -5,8 +5,8 @@ from enum import Enum
 
 import pytest
 
-from qiboconnection.models.devices import Device, QuantumDevice
-from qiboconnection.typings.enums import DeviceAvailability, DeviceStatus
+from qiboconnection.models.devices import Device
+from qiboconnection.typings.enums import DeviceAvailability, DeviceStatus, DeviceType
 
 from .utils import is_development
 
@@ -64,7 +64,7 @@ def is_quantum(device: Device) -> bool:
     Returns:
         bool: if the device is a quantum device
     """
-    return isinstance(device, QuantumDevice)
+    return device.type == DeviceType.QUANTUM
 
 
 def get_expected_operation_result(  # pylint: disable=too-many-branches
