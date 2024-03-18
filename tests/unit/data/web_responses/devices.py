@@ -3,6 +3,7 @@
 device_base_response_a = {
     "device_id": 1,
     "device_name": "AWS Development Simulator",
+    "device_type": "simulator",
     "status": "other",
     "availability": "other",
     "channel_id": 2,
