@@ -27,6 +27,7 @@ from .device_details import DeviceDetails
 
 # pylint: disable=no-member
 # pylint: disable=attribute-defined-outside-init
+# pylint: disable=too-many-instance-attributes
 
 
 class Device(DeviceDetails):
@@ -197,7 +198,7 @@ class Device(DeviceDetails):
         Returns: dict
         """
         result_dict = {}
-        for key in self.__dir__():
+        for key in dir(self):
             if len(key) >= 2 and key[0] == "_" and key[1] != "_":
                 value = getattr(self, key, None)
                 try:

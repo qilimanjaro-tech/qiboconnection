@@ -14,7 +14,6 @@
 
 """ Device Utility Methods
 """
-from typing import Union
 
 from typeguard import typechecked
 
@@ -73,7 +72,7 @@ def create_device(device_input: dict) -> Device:
         device_input (dict): Device Input structure
 
     Returns:
-        Union[QuantumDevice, SimulatorDevice, OfflineDevice]: The constructed Device Object
+        Device: The constructed Device Object
     """
 
     return Device(device_input=DeviceInput.from_kwargs(**device_input))
