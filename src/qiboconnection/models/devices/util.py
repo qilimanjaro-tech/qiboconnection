@@ -20,7 +20,7 @@ from typeguard import typechecked
 from qiboconnection.config import logger
 from qiboconnection.connection import Connection
 from qiboconnection.typings.devices import DeviceInput
-from qiboconnection.typings.enums import DeviceStatus, DeviceType
+from qiboconnection.typings.enums import DeviceStatus
 
 from .device import Device
 
