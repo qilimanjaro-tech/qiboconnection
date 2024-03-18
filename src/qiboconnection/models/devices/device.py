@@ -38,9 +38,20 @@ class Device(DeviceDetails):
         for k, v in vars(device_input).items():
             setattr(self, f"_{k}", v)
         self._str = (
-            f"<Device: device_id={self._id}, device_name='{self._name}', "  # type: ignore[attr-defined]
-            + f"status='{self._status}', availability='{self._availability}'>"  # type: ignore[attr-defined]
+            f"<Device: id={self._id}, name='{self._name}', "  # type: ignore[attr-defined]
+            + f"status='{self._status}', type='{self._type}'>"  # type: ignore[attr-defined]
         )
+
+    def __str__(self):
+        """String representation of a Device
+
+        Returns:
+            str: String representation of a Device
+        """
+        return self._str
+
+    def __repr__(self) -> str:
+        return self.__str__()
 
     @property
     def id(self) -> int:  # pylint: disable=invalid-name
@@ -153,12 +164,37 @@ class Device(DeviceDetails):
         connection.update_device_status(device_id=self._id, status=DeviceStatus.MAINTENANCE)  # type: ignore[attr-defined]
         self._status = DeviceStatus.MAINTENANCE
 
-    @property
-    def to_dict(self):
+    def to_dict(self, expand=False):
         """Dictionary representation of a Device
 
         Returns:
             dict: Output dictionary of a Device object
+        """
+        return self._get_expanded_dict() if expand else self._get_truncated_dict()
+
+    def _get_truncated_dict(self):
+        """
+        Builds a dict representation for the device that contains only the most common checked fields.
+        Fields that are not json serializable are ignored.
+        Returns: dict
+        """
+        result_dict = {}
+        truncated_fields = {"id", "name", "status", "type", "number_pending_jobs"}
+        for key in truncated_fields:
+            value = getattr(self, f"_{key}", None)
+            try:
+                json.dumps(value)
+                result_dict |= {key: getattr(self, key, None)}
+            except (json.JSONDecodeError, TypeError):
+                pass
+        return result_dict
+
+    def _get_expanded_dict(self):
+        """
+        Builds a dict representation for the device that contains all the fields present in the device, including those
+        that qiboconnection does not know about.
+        Fields that are not json serializable are ignored.
+        Returns: dict
         """
         result_dict = {}
         for key in self.__dir__():
@@ -171,11 +207,11 @@ class Device(DeviceDetails):
                     pass
         return result_dict
 
-    def toJSON(self) -> str:  # pylint: disable=invalid-name
+    def toJSON(self, expand=False) -> str:  # pylint: disable=invalid-name
         """JSON representation of a Device
 
         Returns:
             str: JSON serialization of a Device object
         """
 
-        return json.dumps(self.to_dict, indent=2)
+        return json.dumps(self.to_dict(expand=expand), indent=2)

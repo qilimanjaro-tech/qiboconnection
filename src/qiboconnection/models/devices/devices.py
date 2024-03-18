@@ -95,21 +95,21 @@ class Devices(ABC):
         Returns:
             str: String representation of a List of Devices
         """
-        jsonized_devices = self.toJSON()
-        return f"<Devices[{len(self._devices)}]:\n" f"{jsonized_devices}"
+        jsonized_devices = self.toJSON(expand=False)
+        return f"<Devices[{len(self._devices)}]:\n" f"{jsonized_devices}>"
 
     def __repr__(self) -> str:
         return self.__str__()
 
-    def to_dict(self) -> list[dict]:
+    def to_dict(self, expand=False) -> list[dict]:
         """returns a list of Devices converted into a dictionary
 
         Returns:
             list[dict]: a list of Devices converted into a dictionary
         """
-        return [dict(device.to_dict) for device in self._devices]
+        return [dict(device.to_dict(expand=expand)) for device in self._devices]
 
-    def toJSON(self) -> str:  # pylint: disable=invalid-name
+    def toJSON(self, expand=False) -> str:  # pylint: disable=invalid-name
         """returns a JSON string representation of the devices
 
         Returns:
@@ -117,7 +117,7 @@ class Devices(ABC):
         """
         json_list = "["
         for device in self._devices:
-            json_list += device.toJSON()
+            json_list += device.toJSON(expand=expand)
             json_list += ",\n"
         json_list += "]"
 
