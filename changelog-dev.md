@@ -6,6 +6,9 @@ This document contains the changes of the current release.
 
 ### Improvements
 
+- Redefine execution interface
+  [#148](https://github.com/qilimanjaro-tech/qiboconnection/pull/148)
+
 ### Breaking changes
 
 ### Deprecations / Removals

@@ -2,7 +2,13 @@
 
 ### Features
 
-- Add optional environment variables QUANTUM_SERVICE_URL and AUDIENCE_URL for a multi-client public API
+- job name and summary
+  [#145](https://github.com/qilimanjaro-tech/qiboconnection/pull/145)
+
+- Job cancellation
+  [#142](https://github.com/qilimanjaro-tech/qiboconnection/pull/142)
+
+- Add environment variables QUANTUM_SERVICE_URL and AUDIENCE_URL for a multi-client public API
   [#136](https://github.com/qilimanjaro-tech/qiboconnection/pull/136/files)
 
 ## 0.15.3
@@ -10,6 +16,13 @@
 ### Features
 
 - Introduction of QProgram [#139](https://github.com/qilimanjaro-tech/qiboconnection/pull/139)
+
+## 0.16.0
+
+### Features
+
+- Job cancellation
+  [#142](https://github.com/qilimanjaro-tech/qiboconnection/pull/142)
 
 ## 0.15.1
 
