@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """ Devices class """
+import json
 from abc import ABC
 from typing import List
 
@@ -96,7 +97,7 @@ class Devices(ABC):
             str: String representation of a List of Devices
         """
         jsonized_devices = self.toJSON(expand=False)
-        return f"<Devices[{len(self._devices)}]:\n" f"{jsonized_devices}>"
+        return f"<Devices[{len(self._devices)}]:" f"{jsonized_devices}>"
 
     def __repr__(self) -> str:
         return self.__str__()
@@ -115,13 +116,11 @@ class Devices(ABC):
         Returns:
             str: a JSON string representation of the devices
         """
-        json_list = "["
+        dict_list = []
         for device in self._devices:
-            json_list += device.toJSON(expand=expand)
-            json_list += ",\n"
-        json_list += "]"
+            dict_list.append(device.to_dict(expand=expand))
 
-        return json_list
+        return json.dumps(dict_list, indent=2)
 
     def select_device(
         self,

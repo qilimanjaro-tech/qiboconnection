@@ -5,18 +5,9 @@ import json
 import pytest
 
 from qiboconnection.models.devices import Device
-from qiboconnection.models.devices.util import create_device, is_offline_device_input, is_quantum_device_input
 from qiboconnection.typings.devices import DeviceInput
-from qiboconnection.typings.enums import DeviceStatus
 
-from .data import (
-    device_inputs,
-    offline_device_inputs,
-    quantum_device_characteristics_inputs,
-    quantum_device_inputs,
-    simulator_device_characteristics_inputs,
-    simulator_device_inputs,
-)
+from .data import device_inputs
 
 # pylint: disable=no-member
 
@@ -70,3 +61,22 @@ def test_device_json_representation(device_input: DeviceInput):
         "type": None,
     }
     assert json.loads(device.toJSON(expand=False)) == expected_dict
+
+
+@pytest.mark.parametrize("device_input", device_inputs)
+def test_device_json_representation_expanded(device_input: DeviceInput):
+    """Tests Device().toJSON() method"""
+    device = Device(device_input=device_input)
+    expected_dict = {
+        "id": device.id,
+        "name": device.name,
+        "status": device.status.value,
+        "number_pending_jobs": None,
+        "type": None,
+        "slurm_partition": None,
+        "static_features": None,
+        "dynamic_features": None,
+        "availability": "available",
+        "str": device.__str__(),
+    }
+    assert json.loads(device.toJSON(expand=True)) == expected_dict
