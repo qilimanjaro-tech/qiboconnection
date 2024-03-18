@@ -37,21 +37,6 @@ def block_device(connection: Connection, device: Device) -> None:
 
 
 @typechecked
-def is_offline_device_input(device_input: dict) -> bool:
-    """Determine if the given device_input is from an Offline Device or not
-
-    Args:
-        device_input (dict): Device Input structure
-
-    Returns:
-        bool: True if the device is from an Offline Device
-    """
-    if "status" not in device_input or device_input["status"] is None:
-        raise ValueError("'status' missing in device_input keys")
-    return device_input["status"] == DeviceStatus.OFFLINE
-
-
-@typechecked
 def create_device(device_input: dict) -> Device:
     """Creates a Device from a given device input.
 
