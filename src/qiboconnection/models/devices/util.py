@@ -20,7 +20,7 @@ from typeguard import typechecked
 from qiboconnection.config import logger
 from qiboconnection.connection import Connection
 from qiboconnection.typings.devices import DeviceInput
-from qiboconnection.typings.enums import DeviceStatus
+from qiboconnection.typings.enums import DeviceStatus, DeviceType
 
 from .device import Device
 
@@ -49,19 +49,6 @@ def is_offline_device_input(device_input: dict) -> bool:
     if "status" not in device_input or device_input["status"] is None:
         raise ValueError("'status' missing in device_input keys")
     return device_input["status"] == DeviceStatus.OFFLINE
-
-
-@typechecked
-def is_quantum_device_input(device_input: dict) -> bool:
-    """Determine if the given device_input is from a Quantum Device or not
-
-    Args:
-        device_input (dict): Device Input structure
-
-    Returns:
-        bool: True if the device is from a Quantum Device
-    """
-    return not {"last_calibration_time", "calibration_details"}.isdisjoint(device_input)
 
 
 @typechecked
