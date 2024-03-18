@@ -24,6 +24,7 @@ import warnings
 from abc import ABC
 from dataclasses import asdict
 from datetime import datetime, timedelta
+from multiprocessing import Value
 from time import sleep
 from typing import Any, List, cast
 
@@ -359,6 +360,10 @@ class API(ABC):
             warnings.warn(
                 "device_ids arguments is deprecated and will be removed in a future release. Use device_id argument instead."
             )
+        if device_id is not None and device_ids is not None:
+            raise ValueError(
+                "Use only device_id argument, device_ids is deprecated and will be removed in a following qiboconnection version."
+            )
 
         if device_id is not None:
             device_ids = [device_id]
@@ -377,11 +382,15 @@ class API(ABC):
             raise ValueError("No devices were selected for execution.")
         if isinstance(circuit, Circuit):
             circuit = [circuit]
+
+        vqa_dict = None
+        if vqa:
+            vqa_dict = asdict(vqa)
         jobs = [
             Job(
                 circuit=circuit,
                 qprogram=qprogram,
-                vqa=asdict(vqa),
+                vqa=vqa_dict,
                 nshots=nshots,
                 name=name,
                 summary=summary,
