@@ -38,7 +38,7 @@ def test_devices_json(simulator_device_input: DeviceInput):
     """Test Devices().toJSON() method"""
     simulator_device = Device(device_input=simulator_device_input)
     devices = Devices(device=simulator_device)
-    assert devices.toJSON() == f"{simulator_device.toJSON()}\n"
+    assert devices.toJSON() == f"[{simulator_device.toJSON()},\n]"
 
 
 @pytest.mark.parametrize("simulator_device_input", simulator_device_inputs)
@@ -46,7 +46,7 @@ def test_devices_str(simulator_device_input: DeviceInput):
     """Test Devices().__str__() method"""
     simulator_device = Device(device_input=simulator_device_input)
     devices = Devices(device=simulator_device)
-    assert str(devices) == f"<Devices[1]:\n{simulator_device.toJSON()}\n"
+    assert str(devices) == f"<Devices[1]:\n[{simulator_device.toJSON()},\n]>"
 
 
 @pytest.mark.parametrize("simulator_device_input", simulator_device_inputs)
@@ -57,10 +57,10 @@ def test_devices_update_device(simulator_device_input: DeviceInput):
     devices = Devices()
     # ADDS
     devices.add_or_update(simulator_device)
-    assert devices.to_dict() == [dict(simulator_device.__dict__.items())]
+    assert devices.to_dict() == [dict(simulator_device.to_dict())]
     # UPDATES
     devices.add_or_update(simulator_device)
-    assert devices.to_dict() == [dict(simulator_device.__dict__.items())]
+    assert devices.to_dict() == [dict(simulator_device.to_dict())]
 
 
 @pytest.mark.parametrize("simulator_device_input", simulator_device_inputs)
