@@ -49,10 +49,11 @@ class Job(ABC):  # pylint: disable=too-many-instance-attributes
     id: int = 0  # pylint: disable=invalid-name
 
     def __post_init__(self):
-        if self.qprogram is not None and self.circuit is not None and self.vqa is not None:
-            raise ValueError("VQA, circuit. qprogram were provided, but execute() only takes one of them.")
-        if self.qprogram is None and self.circuit is None and self.vqa is None:
-            raise ValueError("Neither of circuit, vqa or qprogram were provided.")
+        match len([arg for arg in [self.qprogram, self.circuit, self.vqa] if arg is not None]):
+            case n if n > 1:
+                raise ValueError("VQA, circuit and qprogram were provided, but execute() only takes one of them.")
+            case 0:
+                raise ValueError("Neither of circuit, vqa or qprogram were provided.")
 
     @property
     def user_id(self) -> int | None:
