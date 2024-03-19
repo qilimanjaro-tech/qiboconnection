@@ -1,5 +1,6 @@
 """ Tests methods for Devices """
 
+import json
 from typing import List
 
 import pytest
@@ -34,11 +35,66 @@ def test_devices_constructor_with_device_list(simulator_device_input: DeviceInpu
 
 
 @pytest.mark.parametrize("simulator_device_input", simulator_device_inputs)
-def test_devices_json(simulator_device_input: DeviceInput):
+def test_devices_to_dict_expand(simulator_device_input: DeviceInput):
+    """
+    Test Devices().to_dict() method with expanded fields.
+    It must be considered that unexpected fields might arrive to the json here.
+    """
+    simulator_device = Device(device_input=simulator_device_input)
+    devices = Devices(device=simulator_device)
+
+    output_dict = devices.to_dict(expand=True)
+
+    assert output_dict[0]["id"] == simulator_device_input.id
+    assert output_dict[0]["name"] == simulator_device_input.name
+    assert output_dict[0]["status"] == simulator_device_input.status
+    assert output_dict[0]["availability"] == simulator_device_input.availability
+    assert output_dict[0]["characteristics"] == simulator_device_input.characteristics  # type: ignore[attr-defined]
+    assert output_dict == [simulator_device.to_dict(expand=True)]
+
+
+@pytest.mark.parametrize("simulator_device_input", simulator_device_inputs)
+def test_devices_to_json_expand(simulator_device_input: DeviceInput):
+    """
+    Test Devices().to_dict() method with expanded fields.
+    It must be considered that unexpected fields might arrive to the json here.
+    """
+
+    simulator_device = Device(device_input=simulator_device_input)
+    devices = Devices(device=simulator_device)
+
+    output_dict = json.loads(devices.toJSON(expand=True))
+
+    assert output_dict[0]["id"] == simulator_device_input.id
+    assert output_dict[0]["name"] == simulator_device_input.name
+    assert output_dict[0]["status"] == simulator_device_input.status
+    assert output_dict[0]["availability"] == simulator_device_input.availability
+    assert output_dict[0]["characteristics"] == simulator_device_input.characteristics  # type: ignore[attr-defined]
+    assert output_dict == [simulator_device.to_dict(expand=True)]
+
+
+@pytest.mark.parametrize("simulator_device_input", simulator_device_inputs)
+def test_devices_json_ontent(simulator_device_input: DeviceInput):
     """Test Devices().toJSON() method"""
     simulator_device = Device(device_input=simulator_device_input)
     devices = Devices(device=simulator_device)
-    assert devices.toJSON() == f"{simulator_device.toJSON()}\n"
+
+    devices_json_deserialized: dict = json.loads(devices.toJSON(expand=True))[0]
+    device_json_deserialized: dict = json.loads(simulator_device.toJSON(expand=True))
+    for key in [*devices_json_deserialized.keys(), *device_json_deserialized.keys()]:
+        assert devices_json_deserialized[key] == device_json_deserialized[key]
+
+
+@pytest.mark.parametrize("simulator_device_input", simulator_device_inputs)
+def test_devices_json_expand_content(simulator_device_input: DeviceInput):
+    """Test Devices().toJSON() method"""
+    simulator_device = Device(device_input=simulator_device_input)
+    devices = Devices(device=simulator_device)
+
+    devices_json_deserialized: dict = json.loads(devices.toJSON(expand=False))[0]
+    device_json_deserialized: dict = json.loads(simulator_device.toJSON(expand=False))
+    for key in [*devices_json_deserialized.keys(), *device_json_deserialized.keys()]:
+        assert devices_json_deserialized[key] == device_json_deserialized[key]
 
 
 @pytest.mark.parametrize("simulator_device_input", simulator_device_inputs)
@@ -46,7 +102,10 @@ def test_devices_str(simulator_device_input: DeviceInput):
     """Test Devices().__str__() method"""
     simulator_device = Device(device_input=simulator_device_input)
     devices = Devices(device=simulator_device)
-    assert str(devices) == f"<Devices[1]:\n{simulator_device.toJSON()}\n"
+
+    str_method = str(devices).translate(str.maketrans("", "", " "))
+    expected_str = f"<Devices[1]:[\n{simulator_device.toJSON()}\n]>".translate(str.maketrans("", "", " "))
+    assert str_method == expected_str
 
 
 @pytest.mark.parametrize("simulator_device_input", simulator_device_inputs)
@@ -57,10 +116,10 @@ def test_devices_update_device(simulator_device_input: DeviceInput):
     devices = Devices()
     # ADDS
     devices.add_or_update(simulator_device)
-    assert devices.to_dict() == [dict(simulator_device.__dict__.items())]
+    assert devices.to_dict() == [dict(simulator_device.to_dict())]
     # UPDATES
     devices.add_or_update(simulator_device)
-    assert devices.to_dict() == [dict(simulator_device.__dict__.items())]
+    assert devices.to_dict() == [dict(simulator_device.to_dict())]
 
 
 @pytest.mark.parametrize("simulator_device_input", simulator_device_inputs)

@@ -16,7 +16,6 @@ from qiboconnection.models.algorithm import (
     InitialValue,
     ProgramDefinition,
 )
-from qiboconnection.models.devices import Devices
 from qiboconnection.models.devices.device import Device
 from qiboconnection.models.job import Job
 from qiboconnection.models.job_result import JobResult

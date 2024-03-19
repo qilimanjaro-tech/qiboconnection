@@ -27,14 +27,14 @@ offline_device_inputs = [
 ]
 
 simulator_device_characteristics_inputs = [
-    dict(
-        type="simulator",
-        cpu="Intel Core i9-9900K @ 16x 5GHz",
-        gpu="NVIDIA GeForce RTX 3090",
-        os="Ubuntu 20.04 focal",
-        kernel="x86_64 Linux 5.4.0-80-generic",
-        ram="64185MiB",
-    )
+    {
+        "type": "simulator",
+        "cpu": "Intel Core i9-9900K @ 16x 5GHz",
+        "gpu": "NVIDIA GeForce RTX 3090",
+        "os": "Ubuntu 20.04 focal",
+        "kernel": "x86_64 Linux 5.4.0-80-generic",
+        "ram": "64185MiB",
+    }
 ]
 
 simulator_device_inputs = [
@@ -54,7 +54,7 @@ simulator_device_inputs = [
     )
 ]
 
-quantum_device_characteristics_inputs = [dict(type="quantum", description="Cluster")]
+quantum_device_characteristics_inputs = [{"type": "quantum", "description": "Cluster"}]
 quantum_device_inputs = [
     DeviceInput.from_kwargs(
         id=1,

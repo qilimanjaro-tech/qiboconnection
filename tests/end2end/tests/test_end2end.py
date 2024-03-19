@@ -1,4 +1,4 @@
-"""End to end tests."""
+"""End-to-end tests."""
 # pylint: disable=logging-fstring-interpolation
 # pylint: disable=protected-access
 import logging

@@ -355,7 +355,13 @@ class API(ABC):
         """
 
         # Ensure provided selected_devices are valid. If not provided, use the ones selected by API.select_device_id.
+
         selected_devices: List[Device] = []
+
+        if device_ids is not None and device_id is not None:
+            raise ValueError(
+                "Use only device_id argument, device_ids is deprecated and will be removed in a following qiboconnection version."
+            )
         if device_ids is not None:
             warnings.warn(
                 "device_ids arguments is deprecated and will be removed in a future release. Use device_id argument instead."

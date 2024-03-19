@@ -5,18 +5,9 @@ import json
 import pytest
 
 from qiboconnection.models.devices import Device
-from qiboconnection.models.devices.util import create_device, is_offline_device_input, is_quantum_device_input
 from qiboconnection.typings.devices import DeviceInput
-from qiboconnection.typings.enums import DeviceStatus
 
-from .data import (
-    device_inputs,
-    offline_device_inputs,
-    quantum_device_characteristics_inputs,
-    quantum_device_inputs,
-    simulator_device_characteristics_inputs,
-    simulator_device_inputs,
-)
+from .data import device_inputs
 
 # pylint: disable=no-member
 
@@ -26,30 +17,20 @@ def test_device_constructor(device_input: DeviceInput):
     """Test device instance creation"""
     device = Device(device_input=device_input)
     assert isinstance(device, Device)
-    assert device.name == device_input.device_name
-    assert device.id == device_input.device_id
+    assert device.name == device_input.name
+    assert device.id == device_input.id
 
 
 @pytest.mark.parametrize("device_input", device_inputs)
 def test_device_string_representation(device_input: DeviceInput):
     """Tests Device().__str__() method"""
     device = Device(device_input=device_input)
-    print(str(device))
-    print(
-        f"<Device: device_id={device._device_id},"
-        f" device_name='{device._device_name}',"
-        f" status='{device._status}',"
-        f" availability='{device._availability}',"
-        f" channel_id=None"
-        f">"
-    )
 
     assert (
-        str(device) == f"<Device: device_id={device._device_id},"
-        f" device_name='{device._device_name}',"
-        f" status='{device._status}',"
-        f" availability='{device._availability}',"
-        f" channel_id={device._channel_id}"
+        str(device) == f"<Device: id={device.id},"
+        f" name='{device.name}',"
+        f" status='{device.status}',"
+        f" type='{device.type}'"
         f">"
     )
 
@@ -59,12 +40,13 @@ def test_device_dict_representation(device_input: DeviceInput):
     """Tests Device().__dict__ property"""
     device = Device(device_input=device_input)
     expected_dict = {
-        "device_id": device._device_id,
-        "device_name": device._device_name,
-        "status": device._status,
-        "availability": device._availability,
+        "id": device.id,
+        "name": device.name,
+        "status": device.status.value,
+        "number_pending_jobs": None,
+        "type": None,
     }
-    assert device.__dict__ == expected_dict
+    assert device.to_dict(expand=False) == expected_dict
 
 
 @pytest.mark.parametrize("device_input", device_inputs)
@@ -72,9 +54,29 @@ def test_device_json_representation(device_input: DeviceInput):
     """Tests Device().toJSON() method"""
     device = Device(device_input=device_input)
     expected_dict = {
-        "device_id": device._device_id,
-        "device_name": device._device_name,
-        "status": device._status,
-        "availability": device._availability,
+        "id": device.id,
+        "name": device.name,
+        "status": device.status.value,
+        "number_pending_jobs": None,
+        "type": None,
     }
-    assert json.loads(device.toJSON()) == expected_dict
+    assert json.loads(device.toJSON(expand=False)) == expected_dict
+
+
+@pytest.mark.parametrize("device_input", device_inputs)
+def test_device_json_representation_expanded(device_input: DeviceInput):
+    """Tests Device().toJSON() method"""
+    device = Device(device_input=device_input)
+    expected_dict = {
+        "id": device.id,
+        "name": device.name,
+        "status": device.status.value,
+        "number_pending_jobs": None,
+        "type": None,
+        "slurm_partition": None,
+        "static_features": None,
+        "dynamic_features": None,
+        "availability": "available",
+        "str": str(device),
+    }
+    assert json.loads(device.toJSON(expand=True)) == expected_dict
