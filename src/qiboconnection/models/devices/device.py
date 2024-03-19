@@ -80,7 +80,7 @@ class Device(DeviceDetails):
             str: device name
         """
         _status = getattr(self, "_status", None)
-        return DeviceStatus(_status) if _status else None  # type: ignore[attr-defined]
+        return _status  # type: ignore[attr-defined]
 
     @property
     def type(self) -> str:
