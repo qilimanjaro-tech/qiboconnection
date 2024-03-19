@@ -9,7 +9,7 @@ class VQA:
 
     vqa_dict: dict
     init_params: list
-    optimizer_params: dict = None
+    optimizer_params: dict | None = None
 
     def __post_init__(self):
         if self.optimizer_params is None:
