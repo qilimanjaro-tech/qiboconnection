@@ -24,7 +24,6 @@ import warnings
 from abc import ABC
 from dataclasses import asdict
 from datetime import datetime, timedelta
-from multiprocessing import Value
 from time import sleep
 from typing import Any, List, cast
 
@@ -323,7 +322,7 @@ class API(ABC):
     # REMOTE EXECUTIONS
 
     @typechecked
-    def execute(  # pylint: disable=too-many-locals
+    def execute(  # pylint: disable=too-many-locals, disable=too-many-branches
         self,
         circuit: Circuit | List[Circuit] | None = None,
         qprogram: dict | None = None,
