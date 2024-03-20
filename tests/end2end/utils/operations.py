@@ -64,7 +64,7 @@ def is_quantum(device: Device) -> bool:
     Returns:
         bool: if the device is a quantum device
     """
-    return device.type == DeviceType.QUANTUM
+    return device.type == DeviceType.QUANTUM_DEVICE
 
 
 def get_expected_operation_result(  # pylint: disable=too-many-branches

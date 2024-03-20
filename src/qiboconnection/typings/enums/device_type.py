@@ -25,5 +25,7 @@ class DeviceType(StrEnum):
         * simulator
     """
 
-    QUANTUM = "quantum"
-    SIMULATOR = "simulator"
+    SIMULATOR_DEVICE = "simulator_device"
+    QUANTUM_DEVICE = "quantum_device"
+    QUANTUM_ANALOG_DEVICE = "quantum_analog_device"
+    QUANTUM_DIGITAL_DEVICE = "quantum_digital_device"

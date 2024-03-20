@@ -95,7 +95,7 @@ def is_development() -> bool:
     Returns:
         bool: if the environment is development
     """
-    return os.environ["QIBOCONNECTION_ENVIRONMENT"] == "development"
+    return os.environ["QUANTUM_SERVICE_URL"] == "https://dev-api.qaas.qilimanjaro.tech"
 
 
 def get_logging_conf_or_fail_test(user_role=UserRole.ADMIN) -> ConnectionConfiguration:
