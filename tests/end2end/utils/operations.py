@@ -131,5 +131,5 @@ def check_operation_possible_or_skip(operation: Operation, device: Device):
 
     if get_expected_operation_result(operation, device) != OperationResult.SUCCESS:
         pytest.skip(
-            f'Operation {operation} is not possible in {device._device_name} in the environment {os.environ["QIBOCONNECTION_ENVIRONMENT"]}.'
+            f'Operation {operation} is not possible in {device.name} in the environment {os.environ["QIBOCONNECTION_ENVIRONMENT"]}.'
         )

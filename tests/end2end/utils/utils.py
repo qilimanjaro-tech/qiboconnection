@@ -7,6 +7,7 @@ from enum import Enum
 from time import sleep
 
 import pytest
+from numpy import False_
 from qibo.models.circuit import Circuit
 
 from qiboconnection.api import API
@@ -39,6 +40,7 @@ USER_OPERATIONS = [
         "can_change_status": True,
         "can_change_availability": True,
         "can_post_qprograms": True,
+        "can_post_vqas": True,
         "can_get_runcard": True,
         "can_list_runcard": True,
         "can_save_runcard": True,
@@ -50,6 +52,7 @@ USER_OPERATIONS = [
         "can_change_status": False,
         "can_change_availability": False,
         "can_post_qprograms": True,
+        "can_post_vqas": False,
         "can_get_runcard": True,
         "can_list_runcard": True,
         "can_save_runcard": False,
@@ -61,6 +64,7 @@ USER_OPERATIONS = [
         "can_change_status": False,
         "can_change_availability": True,
         "can_post_qprograms": True,
+        "can_post_vqas": True,
         "can_get_runcard": True,
         "can_list_runcard": True,
         "can_save_runcard": True,
@@ -72,6 +76,7 @@ USER_OPERATIONS = [
         "can_change_status": False,
         "can_change_availability": False,
         "can_post_qprograms": False,
+        "can_post_vqas": False,
         "can_get_runcard": True,
         "can_list_runcard": False,
         "can_save_runcard": True,
@@ -339,6 +344,21 @@ def get_user_cannot_post_and_list_qprogram_api(user_role: UserRole):
     """
     if get_user_role_operations(user_role=user_role)["can_post_qprograms"]:
         pytest.skip(f"{user_role} can post qprograms")
+
+    return get_api_or_fail_test(get_logging_conf_or_fail_test(user_role=user_role))
+
+
+def get_user_cannot_post_and_list_vqa_api(user_role: UserRole):
+    """Get API instance for the user roles that cannot post applications-sdk vqa, by definition.
+
+    Args:
+        user_role (UserRole):
+
+    Returns:
+        API: API instance
+    """
+    if get_user_role_operations(user_role=user_role)["can_post_vqas"]:
+        pytest.skip(f"{user_role} can post vqas")
 
     return get_api_or_fail_test(get_logging_conf_or_fail_test(user_role=user_role))
 
