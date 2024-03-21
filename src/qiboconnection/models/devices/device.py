@@ -134,7 +134,7 @@ class Device(DeviceDetails):
             connection.update_device_availability(device_id=self._id, availability=DeviceAvailability.BLOCKED)  # type: ignore[attr-defined]
             self._availability = DeviceAvailability.BLOCKED
         except HTTPError as ex:
-            logger.error("Error blocking device %s.", self._device_name)  # type: ignore[attr-defined]
+            logger.error("Error blocking device %s.", self.name)  # type: ignore[attr-defined]
             raise ex
 
     def release_device(self, connection: Connection) -> None:

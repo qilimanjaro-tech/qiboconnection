@@ -233,7 +233,7 @@ def test_cannot_post_qprogram(device: Device, qprogram_dict: dict, user_role: Us
 
     check_operation_possible_or_skip(operation=Operation.POST, device=device)
 
-    user_api = get_user_cannot_post_and_list_vqa_api(user_role=user_role)
+    user_api = get_user_cannot_post_and_list_qprogram_api(user_role=user_role)
 
     user_api.select_device_id(device_id=device.id)
 
@@ -254,7 +254,7 @@ def test_cannot_post_vqa(device: Device, vqa: VQA, user_role: UserRole):
 
     check_operation_possible_or_skip(operation=Operation.POST, device=device)
 
-    user_api = get_user_cannot_post_and_list_qprogram_api(user_role=user_role)
+    user_api = get_user_cannot_post_and_list_vqa_api(user_role=user_role)
 
     user_api.select_device_id(device_id=device.id)
 
