@@ -7,7 +7,6 @@ from enum import Enum
 from time import sleep
 
 import pytest
-from numpy import False_
 from qibo.models.circuit import Circuit
 
 from qiboconnection.api import API
