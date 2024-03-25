@@ -67,6 +67,7 @@ jobs:
 
     env:
       QUANTUM_SERVICE_URL : "https://dev-api.qaas.qilimanjaro.tech"
+      AUDIENCE_URL: "https://dev-api.qaas.qilimanjaro.tech"
 
     steps:
       - uses: actions/checkout@v2
