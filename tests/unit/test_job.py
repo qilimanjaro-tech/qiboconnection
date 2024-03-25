@@ -160,10 +160,10 @@ def test_job_creation_qprogram(user: User, simulator_device: Device):
     assert job.job_type == JobType.QPROGRAM
 
 
-def test_job_creation_qprogram_raises_value_error_when_both_circuit_and_qprogram_are_defined(
+def test_job_creation_raises_value_error_when_circuit_qprogram_or_vqa_are_defined_simultaneously(
     circuits: list[Circuit], user: User, simulator_device: Device
 ):
-    """test job creation using both qprogram and circuit at the same time
+    """test job creation only allows defining one of the following: qprogram, circuit or vqa.
 
     Args:
         circuits (list[Circuit]): ProgramDefinition
@@ -173,13 +173,13 @@ def test_job_creation_qprogram_raises_value_error_when_both_circuit_and_qprogram
 
     with pytest.raises(ValueError) as e_info:
         _ = Job(qprogram={}, circuit=circuits, user=user, device=cast(Device, simulator_device))
-    assert e_info.value.args[0] == "Both circuit and qprogram were provided, but execute() only takes one of them."
+    assert e_info.value.args[0] == "VQA, circuit and qprogram were provided, but execute() only takes one of them."
 
 
-def test_job_creation_qprogram_raises_value_error_when_neither_of_circuit_and_qprogram_are_defined(
+def test_job_creation_qprogram_raises_value_error_when_neither_of_circuit_qprogram_or_vqa_are_defined(
     user: User, simulator_device: Device
 ):
-    """test job creation using neither qprogram nor circuit
+    """test job creation using neither qprogram nor circuit or vqa
 
     Args:
         user (User): User
@@ -187,7 +187,7 @@ def test_job_creation_qprogram_raises_value_error_when_neither_of_circuit_and_qp
     """
     with pytest.raises(ValueError) as e_info:
         _ = Job(qprogram=None, circuit=None, user=user, device=cast(Device, simulator_device))
-    assert e_info.value.args[0] == "Neither of circuit or qprogram were provided."
+    assert e_info.value.args[0] == "Neither of circuit, vqa or qprogram were provided."
 
 
 def test_job_request_with_circuit(circuits: list[Circuit], user: User, simulator_device: Device):

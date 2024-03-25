@@ -25,7 +25,7 @@ def test_device_constructor(device_input: DeviceInput):
 def test_device_string_representation(device_input: DeviceInput):
     """Tests Device().__str__() method"""
     device = Device(device_input=device_input)
-
+    print(str(Device))
     assert (
         str(device) == f"<Device: id={device.id},"
         f" name='{device.name}',"
@@ -42,7 +42,7 @@ def test_device_dict_representation(device_input: DeviceInput):
     expected_dict = {
         "id": device.id,
         "name": device.name,
-        "status": device.status.value,
+        "status": device.status,
         "number_pending_jobs": None,
         "type": None,
     }
@@ -56,7 +56,7 @@ def test_device_json_representation(device_input: DeviceInput):
     expected_dict = {
         "id": device.id,
         "name": device.name,
-        "status": device.status.value,
+        "status": device.status,
         "number_pending_jobs": None,
         "type": None,
     }
@@ -70,7 +70,7 @@ def test_device_json_representation_expanded(device_input: DeviceInput):
     expected_dict = {
         "id": device.id,
         "name": device.name,
-        "status": device.status.value,
+        "status": device.status,
         "number_pending_jobs": None,
         "type": None,
         "slurm_partition": None,

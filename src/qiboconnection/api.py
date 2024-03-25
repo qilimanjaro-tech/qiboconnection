@@ -45,6 +45,7 @@ from qiboconnection.typings.enums import JobStatus
 from qiboconnection.typings.job_data import JobData
 from qiboconnection.typings.responses import JobListingItemResponse, RuncardResponse
 from qiboconnection.typings.responses.job_response import JobResponse
+from qiboconnection.typings.vqa import VQA
 from qiboconnection.util import unzip
 
 
@@ -321,10 +322,11 @@ class API(ABC):
     # REMOTE EXECUTIONS
 
     @typechecked
-    def execute(  # pylint: disable=too-many-locals
+    def execute(  # pylint: disable=too-many-locals, disable=too-many-branches
         self,
         circuit: Circuit | List[Circuit] | None = None,
         qprogram: dict | None = None,
+        vqa: VQA | None = None,
         nshots: int = 10,
         device_ids: List[int] | None = None,
         device_id: int | None = None,
@@ -336,7 +338,8 @@ class API(ABC):
 
         Args:
             circuit (Circuit or List[Circuit]): a Qibo circuit to execute
-            qprogram (dict): a QProgram description, result of Qililab's QProgram().to_dict() function.
+            qprogram (dict): a QProgram description, result of Qililab's QProgram.to_dict() function.
+            vqa (dict): a Variational Quantum Algorithm, result of applications-sdk' VQA.to_dict() method.
             nshots (int): number of times the execution is to be done.
             device_ids (List[int]): list of devices where the execution should be performed. If set, any device set
             using API.select_device_id() will not be used. This will not update the selected devices.
@@ -362,6 +365,10 @@ class API(ABC):
             warnings.warn(
                 "device_ids arguments is deprecated and will be removed in a future release. Use device_id argument instead."
             )
+        if device_id is not None and device_ids is not None:
+            raise ValueError(
+                "Use only device_id argument, device_ids is deprecated and will be removed in a following qiboconnection version."
+            )
 
         if device_id is not None:
             device_ids = [device_id]
@@ -380,10 +387,15 @@ class API(ABC):
             raise ValueError("No devices were selected for execution.")
         if isinstance(circuit, Circuit):
             circuit = [circuit]
+
+        vqa_dict = None
+        if vqa:
+            vqa_dict = asdict(vqa)
         jobs = [
             Job(
                 circuit=circuit,
                 qprogram=qprogram,
+                vqa=vqa_dict,
                 nshots=nshots,
                 name=name,
                 summary=summary,
