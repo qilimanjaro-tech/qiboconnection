@@ -20,6 +20,7 @@ from qiboconnection.models.job_listing import JobListing
 from qiboconnection.models.runcard import Runcard
 from qiboconnection.typings.enums import JobStatus, JobType
 from qiboconnection.typings.job_data import JobData
+from qiboconnection.typings.vqa import VQA
 
 from .data import runcard_dict, web_responses
 from .data.web_responses.job import JobResponse
@@ -558,6 +559,54 @@ class TestExecute:
     circuit.add(gates.H(4))
     circuit.add(gates.M(0, 1, 2, 3, 4))
 
+    vqa = VQA(
+        vqa_dict={
+            "_name": "VQA",
+            "ansatz": {
+                "_name": "HardwareEfficientAnsatz",
+                "_circuit": {"_type": "QuantumCircuit", "_gates": [], "_init_state": None, "n_qubits": 4},
+                "n_qubits": 4,
+                "layers": 1,
+                "connectivity": [(0, 1), (1, 2), (2, 3)],
+                "structure": "grouped",
+                "one_gate": "U2",
+                "two_gate": "CNOT",
+            },
+            "backend": {"_type": "Qibo", "_circuit": None, "backend": "numpy", "platform": None},
+            "cost_function": {
+                "_name": "TSP_CostFunction",
+                "instance": {
+                    "_name": "TSP_Instance",
+                    "n_nodes": 2,
+                    "start": None,
+                    "loop": True,
+                    "_distances": [[0.0, 0.5974254293307999], [0.18562253513856275, 0.0]],
+                },
+                "parameters": [],
+                "encoding": "one_hot",
+                "lagrange_multiplier": 10,
+            },
+            "instance": {
+                "_name": "TSP_Instance",
+                "n_nodes": 2,
+                "start": None,
+                "loop": True,
+                "_distances": [[0.0, 0.5974254293307999], [0.18562253513856275, 0.0]],
+            },
+            "optimizer": {"_name": "GradientDescent"},
+            "sampler": {
+                "_name": "Sampler",
+                "_circuit": None,
+                "_parameters": [],
+                "_quantum_state": None,
+                "_probability_dict": None,
+                "_required_qubits": None,
+            },
+            "n_shots": 1000,
+        },
+        init_params=[0 for __name__ in range(18)],
+    )
+
     def setup_method(self):
         """Method executed before each test contained in this class.
 
@@ -590,6 +639,11 @@ class TestExecute:
         """
         self.r_mock.stop()
         self.r_mock.reset()
+
+    def test_execute_vqa(self, mocked_api: API):
+        """Test api.execute for a vqa"""
+        job_id = mocked_api.execute(vqa=self.vqa, device_id=9, name="test", summary="test")
+        assert isinstance(job_id, int)
 
     # TODO: delete when removing device_ids argument
     def test_execute_with_one_circuit_device_ids(self, mocked_api: API):

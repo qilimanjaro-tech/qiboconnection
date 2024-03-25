@@ -14,6 +14,7 @@ from qiboconnection.models.runcard import Runcard
 from qiboconnection.typings.enums import DeviceAvailability, DeviceStatus
 from qiboconnection.typings.enums.job_status import JobStatus
 from qiboconnection.typings.job_data import JobData
+from qiboconnection.typings.vqa import VQA
 from tests.end2end.utils.operations import Operation, check_operation_possible_or_skip
 from tests.end2end.utils.utils import (
     UserRole,
@@ -38,6 +39,7 @@ from tests.end2end.utils.utils import (
     get_user_cannot_get_runcard_api,
     get_user_cannot_list_runcard_api,
     get_user_cannot_post_and_list_qprogram_api,
+    get_user_cannot_post_and_list_vqa_api,
     get_user_cannot_save_runcard_api,
     get_user_cannot_update_runcard_api,
     get_user_roles_id,
@@ -237,6 +239,27 @@ def test_cannot_post_qprogram(device: Device, qprogram_dict: dict, user_role: Us
 
     with pytest.raises(requests.exceptions.HTTPError):
         user_api.execute(qprogram=qprogram_dict)
+
+
+@pytest.mark.parametrize(
+    "device, user_role",
+    [(device, user_role) for user_role in list_user_roles() for device in get_devices_listing_params(user_role)],
+)
+@pytest.mark.slow
+def test_cannot_post_vqa(device: Device, vqa: VQA, user_role: UserRole):
+    """Test user roles that aren't allowed to post qprogram can do it -- e.g bsc
+    Args:
+        api: api instance to call the server with.
+    """
+
+    check_operation_possible_or_skip(operation=Operation.POST, device=device)
+
+    user_api = get_user_cannot_post_and_list_vqa_api(user_role=user_role)
+
+    user_api.select_device_id(device_id=device.id)
+
+    with pytest.raises(requests.exceptions.HTTPError):
+        user_api.execute(vqa=vqa)
 
 
 # ------------------------------------------------------------------------ OPERATION: LIST AND SELECT DEVICES

@@ -1,60 +1,48 @@
 # data.py
 """ Data to used alongside the test suite. """
 
-from qiboconnection.typings.devices import (
-    DeviceInput,
-    OfflineDeviceInput,
-    QuantumDeviceCharacteristicsInput,
-    QuantumDeviceInput,
-    SimulatorDeviceCharacteristicsInput,
-    SimulatorDeviceInput,
-)
+from qiboconnection.typings.devices import DeviceInput
 from qiboconnection.typings.enums import DeviceAvailability, DeviceStatus
 
 from .web_responses import WebResponses
 
 device_inputs = [
-    DeviceInput(device_id=1, device_name="one_device", status="online", availability="available", channel_id=None),
+    DeviceInput(id=1, name="one_device", status="online", availability="available"),
     DeviceInput(
-        device_id=2,
-        device_name="second_device",
+        id=2,
+        name="second_device",
         status=DeviceStatus.ONLINE,
         availability=DeviceAvailability.AVAILABLE,
-        channel_id=None,
     ),
 ]
 
 offline_device_inputs = [
-    OfflineDeviceInput(
-        device_id=1, device_name="one_device", status="offline", availability="available", channel_id=None
-    ),
-    OfflineDeviceInput(
-        device_id=2,
-        device_name="second_device",
+    DeviceInput(id=1, name="one_device", status="offline", availability="available"),
+    DeviceInput(
+        id=2,
+        name="second_device",
         status=DeviceStatus.OFFLINE,
         availability=DeviceAvailability.AVAILABLE,
-        channel_id=None,
     ),
 ]
 
 simulator_device_characteristics_inputs = [
-    SimulatorDeviceCharacteristicsInput(
-        type="simulator",
-        cpu="Intel Core i9-9900K @ 16x 5GHz",
-        gpu="NVIDIA GeForce RTX 3090",
-        os="Ubuntu 20.04 focal",
-        kernel="x86_64 Linux 5.4.0-80-generic",
-        ram="64185MiB",
-    )
+    {
+        "type": "simulator",
+        "cpu": "Intel Core i9-9900K @ 16x 5GHz",
+        "gpu": "NVIDIA GeForce RTX 3090",
+        "os": "Ubuntu 20.04 focal",
+        "kernel": "x86_64 Linux 5.4.0-80-generic",
+        "ram": "64185MiB",
+    }
 ]
 
 simulator_device_inputs = [
-    SimulatorDeviceInput(
-        device_id=1,
-        device_name="radagast-simulator",
+    DeviceInput.from_kwargs(
+        id=1,
+        name="radagast-simulator",
         status="online",
         availability="available",
-        channel_id=None,
         characteristics={
             "type": "simulator",
             "cpu": "Intel Core i9-9900K @ 16x 5GHz",
@@ -66,15 +54,14 @@ simulator_device_inputs = [
     )
 ]
 
-quantum_device_characteristics_inputs = [QuantumDeviceCharacteristicsInput(type="quantum", description="Cluster")]
+quantum_device_characteristics_inputs = [{"type": "quantum", "description": "Cluster"}]
 quantum_device_inputs = [
-    QuantumDeviceInput(
-        device_id=1,
-        device_name="galadriel-cluster",
+    DeviceInput.from_kwargs(
+        id=1,
+        name="galadriel-cluster",
         status="online",
         availability="available",
         last_calibration_time="0",
-        channel_id=None,
         characteristics={"type": "quantum", "description": "Cluster"},
         calibration_details={"t1": 10, "frequency": 988, "elapsed_time": 10},
     )

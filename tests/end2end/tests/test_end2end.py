@@ -1,4 +1,4 @@
-"""End to end tests."""
+"""End-to-end tests."""
 # pylint: disable=logging-fstring-interpolation
 # pylint: disable=protected-access
 import logging
@@ -15,6 +15,7 @@ from qiboconnection.typings.enums import DeviceStatus as DS
 from qiboconnection.typings.enums import JobStatus
 from qiboconnection.typings.job_data import JobData
 from qiboconnection.typings.responses.job_response import JobResponse
+from qiboconnection.typings.vqa import VQA
 from tests.end2end.utils.operations import (
     Operation,
     OperationResult,
@@ -31,13 +32,14 @@ from tests.end2end.utils.utils import (
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..")))
 
-
 # ------------------------------------------------------------------------ TESTS
 
 # Environment
 # See pytest.ini for the default value, this is a security to set a default value
-os.environ["QIBOCONNECTION_ENVIRONMENT"] = (
-    "development" if "QIBOCONNECTION_ENVIRONMENT" not in os.environ else os.environ["QIBOCONNECTION_ENVIRONMENT"]
+os.environ["QUANTUM_SERVICE_URL"] = (
+    "https://dev-api.qaas.qilimanjaro.tech"
+    if "QUANTUM_SERVICE_URL" not in os.environ
+    else os.environ["QUANTUM_SERVICE_URL"]
 )
 
 # Globals
@@ -154,7 +156,48 @@ def test_circuit_result_response(device: Device, api: API, numpy_circuit: Circui
     delete_job(api, job_id=result.job_id)
 
 
-# New Tests
+@pytest.mark.parametrize("device", get_devices_listing_params())
+def test_vqa_posting(device: Device, api: API, vqa: VQA):
+    """Test whether a vqa can be sent to each device
+    Args:
+        api: api instance to call the server with
+    """
+
+    check_operation_possible_or_skip(Operation.POST, device)
+    job_id = api.execute(vqa=vqa, device_id=device.id)
+    assert isinstance(job_id, int)
+    api.delete_job(job_id=job_id)
+
+
+@pytest.mark.parametrize("device", get_devices_listing_params())
+def test_vqa_response(device: Device, api: API, numpy_circuit: Circuit):
+    """Test whether a vqa can be sent and then its result can be retrieved, for each device.
+
+    Args:
+        api: api instance to call the server with
+    """
+
+    logger = logging.getLogger(__name__)
+    logger.debug(f"device: {device}")
+
+    check_operation_possible_or_skip(Operation.POST, device)
+
+    result: JobData = post_and_get_result(api=api, device=device, circuit=numpy_circuit, timeout=15)
+    logger.debug(f"result: {result}")
+
+    # The operation post + response can be performed always (it is an async action) but
+    # the meaning of SUCCESS/EXCEPTION/FORBIDDEN means something different:
+    response_result = get_expected_operation_result(Operation.RESPONSE, device)
+    if response_result == OperationResult.SUCCESS:
+        assert result.status == JobStatus.COMPLETED
+    elif response_result == OperationResult.EXCEPTION:
+        assert result.status == JobStatus.ERROR
+    else:
+        assert result.status == JobStatus.PENDING  # offline device in legacy
+
+    delete_job(api, job_id=result.job_id)
+
+
 @pytest.mark.parametrize("device", get_devices_listing_params())
 def test_all_status(device: Device, api: API):
     """Test whether a device can be set to maitenance/online

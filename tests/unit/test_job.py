@@ -16,7 +16,6 @@ from qiboconnection.models.algorithm import (
     InitialValue,
     ProgramDefinition,
 )
-from qiboconnection.models.devices import SimulatorDevice
 from qiboconnection.models.devices.device import Device
 from qiboconnection.models.job import Job
 from qiboconnection.models.job_result import JobResult
@@ -72,16 +71,16 @@ def fixture_user() -> User:
 
 
 @pytest.fixture(name="simulator_device")
-def fixture_simulator_device() -> SimulatorDevice:
+def fixture_simulator_device() -> Device:
     """Create a new SimulatorDevice
 
     Returns:
         SimulatorDevice: Instance of the SimulatorDevice class.
     """
-    return SimulatorDevice(device_input=simulator_device_inputs[0])
+    return Device(device_input=simulator_device_inputs[0])
 
 
-def test_job_creation(circuits: list[Circuit], user: User, simulator_device: SimulatorDevice):
+def test_job_creation(circuits: list[Circuit], user: User, simulator_device: Device):
     """Test job creation
 
     Args:
@@ -106,7 +105,7 @@ def test_job_creation(circuits: list[Circuit], user: User, simulator_device: Sim
     assert isinstance(job, Job)
 
 
-def test_job_creation_default_values(circuits: list[Circuit], user: User, simulator_device: SimulatorDevice):
+def test_job_creation_default_values(circuits: list[Circuit], user: User, simulator_device: Device):
     """test job creation using the default values
 
     Args:
@@ -131,7 +130,7 @@ def test_job_creation_default_values(circuits: list[Circuit], user: User, simula
     assert e_info.value.args[0] == "Job does not contain an algorithm Program"
 
 
-def test_jobs_job_type_raises_value_error(circuits: list[Circuit], user: User, simulator_device: SimulatorDevice):
+def test_jobs_job_type_raises_value_error(circuits: list[Circuit], user: User, simulator_device: Device):
     """test job.job_type raises value error when unable to determine type
 
     Args:
@@ -149,7 +148,7 @@ def test_jobs_job_type_raises_value_error(circuits: list[Circuit], user: User, s
     assert e_info.value.args[0] == "Could not determine JobType"
 
 
-def test_job_creation_qprogram(user: User, simulator_device: SimulatorDevice):
+def test_job_creation_qprogram(user: User, simulator_device: Device):
     """test job creation using an qprogram instead of a circuit
 
     Args:
@@ -161,10 +160,10 @@ def test_job_creation_qprogram(user: User, simulator_device: SimulatorDevice):
     assert job.job_type == JobType.QPROGRAM
 
 
-def test_job_creation_qprogram_raises_value_error_when_both_circuit_and_qprogram_are_defined(
-    circuits: list[Circuit], user: User, simulator_device: SimulatorDevice
+def test_job_creation_raises_value_error_when_circuit_qprogram_or_vqa_are_defined_simultaneously(
+    circuits: list[Circuit], user: User, simulator_device: Device
 ):
-    """test job creation using both qprogram and circuit at the same time
+    """test job creation only allows defining one of the following: qprogram, circuit or vqa.
 
     Args:
         circuits (list[Circuit]): ProgramDefinition
@@ -174,13 +173,13 @@ def test_job_creation_qprogram_raises_value_error_when_both_circuit_and_qprogram
 
     with pytest.raises(ValueError) as e_info:
         _ = Job(qprogram={}, circuit=circuits, user=user, device=cast(Device, simulator_device))
-    assert e_info.value.args[0] == "Both circuit and qprogram were provided, but execute() only takes one of them."
+    assert e_info.value.args[0] == "VQA, circuit and qprogram were provided, but execute() only takes one of them."
 
 
-def test_job_creation_qprogram_raises_value_error_when_neither_of_circuit_and_qprogram_are_defined(
-    user: User, simulator_device: SimulatorDevice
+def test_job_creation_qprogram_raises_value_error_when_neither_of_circuit_qprogram_or_vqa_are_defined(
+    user: User, simulator_device: Device
 ):
-    """test job creation using neither qprogram nor circuit
+    """test job creation using neither qprogram nor circuit or vqa
 
     Args:
         user (User): User
@@ -188,10 +187,10 @@ def test_job_creation_qprogram_raises_value_error_when_neither_of_circuit_and_qp
     """
     with pytest.raises(ValueError) as e_info:
         _ = Job(qprogram=None, circuit=None, user=user, device=cast(Device, simulator_device))
-    assert e_info.value.args[0] == "Neither of circuit or qprogram were provided."
+    assert e_info.value.args[0] == "Neither of circuit, vqa or qprogram were provided."
 
 
-def test_job_request_with_circuit(circuits: list[Circuit], user: User, simulator_device: SimulatorDevice):
+def test_job_request_with_circuit(circuits: list[Circuit], user: User, simulator_device: Device):
     """test job request
 
     Args:
@@ -225,7 +224,7 @@ def test_job_request_with_circuit(circuits: list[Circuit], user: User, simulator
     assert job.job_request == expected_job_request
 
 
-def test_job_request_with_qprogram(user: User, simulator_device: SimulatorDevice):
+def test_job_request_with_qprogram(user: User, simulator_device: Device):
     """test job request
 
     Args:
@@ -259,7 +258,7 @@ def test_job_request_with_qprogram(user: User, simulator_device: SimulatorDevice
 
 
 def test_job_request_raises_value_error_if_not_circuit_or_qprogram(
-    circuits: list[Circuit], user: User, simulator_device: SimulatorDevice
+    circuits: list[Circuit], user: User, simulator_device: Device
 ):
     """test job raises proper exceptions when trying to build request with none of circuit, qprogram
 
@@ -283,7 +282,7 @@ def test_job_request_raises_value_error_if_not_circuit_or_qprogram(
 
 
 def test_job_request_raises_value_error_if_several_of_circuit_and_qprogram(
-    circuits: list[Circuit], user: User, simulator_device: SimulatorDevice
+    circuits: list[Circuit], user: User, simulator_device: Device
 ):
     """test job raises proper exceptions when trying to build request with more than one of circuit, qprogram
 
@@ -306,7 +305,7 @@ def test_job_request_raises_value_error_if_several_of_circuit_and_qprogram(
     assert e_info.value.args[0] == "Could not determine JobType"
 
 
-def test_job_request_raises_value_error_if_unknown_type(user: User, simulator_device: SimulatorDevice):
+def test_job_request_raises_value_error_if_unknown_type(user: User, simulator_device: Device):
     """test job raises proper exceptions when trying to build request with more than one of circuit, qprogram
 
     Args:
@@ -328,7 +327,7 @@ def test_job_request_raises_value_error_if_unknown_type(user: User, simulator_de
     assert e_info.value.args[0] == "No suitable information found for building description."
 
 
-def test_update_with_job_response(circuits: list[Circuit], user: User, simulator_device: SimulatorDevice):
+def test_update_with_job_response(circuits: list[Circuit], user: User, simulator_device: Device):
     """test update with job response
 
     Args:
@@ -364,7 +363,7 @@ def test_update_with_job_response(circuits: list[Circuit], user: User, simulator
 
 
 def test_update_with_job_response_raises_error_when_updating_incorrect_job(
-    circuits: list[Circuit], user: User, simulator_device: SimulatorDevice
+    circuits: list[Circuit], user: User, simulator_device: Device
 ):
     """test update with job response of different user or from different device raises ValueError
 

@@ -39,12 +39,13 @@ from qiboconnection.connection import Connection
 from qiboconnection.constants import API_CONSTANTS, REST, REST_ERROR
 from qiboconnection.errors import ConnectionException, RemoteExecutionException
 from qiboconnection.models import Job, JobListing, Runcard
-from qiboconnection.models.devices import Device, Devices, OfflineDevice, QuantumDevice, SimulatorDevice, create_device
+from qiboconnection.models.devices import Device, Devices, create_device
 from qiboconnection.typings.connection import ConnectionConfiguration
 from qiboconnection.typings.enums import JobStatus
 from qiboconnection.typings.job_data import JobData
 from qiboconnection.typings.responses import JobListingItemResponse, RuncardResponse
 from qiboconnection.typings.responses.job_response import JobResponse
+from qiboconnection.typings.vqa import VQA
 from qiboconnection.util import unzip
 
 
@@ -321,10 +322,11 @@ class API(ABC):
     # REMOTE EXECUTIONS
 
     @typechecked
-    def execute(  # pylint: disable=too-many-locals
+    def execute(  # pylint: disable=too-many-locals, disable=too-many-branches
         self,
         circuit: Circuit | List[Circuit] | None = None,
         qprogram: dict | None = None,
+        vqa: VQA | None = None,
         nshots: int = 10,
         device_ids: List[int] | None = None,
         device_id: int | None = None,
@@ -336,7 +338,8 @@ class API(ABC):
 
         Args:
             circuit (Circuit or List[Circuit]): a Qibo circuit to execute
-            qprogram (dict): a QProgram description, result of Qililab's QProgram().to_dict() function.
+            qprogram (dict): a QProgram description, result of Qililab's QProgram.to_dict() function.
+            vqa (dict): a Variational Quantum Algorithm, result of applications-sdk' VQA.to_dict() method.
             nshots (int): number of times the execution is to be done.
             device_ids (List[int]): list of devices where the execution should be performed. If set, any device set
             using API.select_device_id() will not be used. This will not update the selected devices.
@@ -351,7 +354,8 @@ class API(ABC):
         """
 
         # Ensure provided selected_devices are valid. If not provided, use the ones selected by API.select_device_id.
-        selected_devices: List[Device | QuantumDevice | SimulatorDevice | OfflineDevice] = []
+
+        selected_devices: List[Device] = []
 
         if device_ids is not None and device_id is not None:
             raise ValueError(
@@ -360,6 +364,10 @@ class API(ABC):
         if device_ids is not None:
             warnings.warn(
                 "device_ids arguments is deprecated and will be removed in a future release. Use device_id argument instead."
+            )
+        if device_id is not None and device_ids is not None:
+            raise ValueError(
+                "Use only device_id argument, device_ids is deprecated and will be removed in a following qiboconnection version."
             )
 
         if device_id is not None:
@@ -374,17 +382,20 @@ class API(ABC):
                     logger.error(json.loads(str(ex))[REST_ERROR.DETAIL])
                     raise ex
         else:
-            selected_devices = cast(
-                List[Device | QuantumDevice | SimulatorDevice | OfflineDevice], self._selected_devices
-            )
+            selected_devices = cast(List[Device], self._selected_devices)
         if not selected_devices:
             raise ValueError("No devices were selected for execution.")
         if isinstance(circuit, Circuit):
             circuit = [circuit]
+
+        vqa_dict = None
+        if vqa:
+            vqa_dict = asdict(vqa)
         jobs = [
             Job(
                 circuit=circuit,
                 qprogram=qprogram,
+                vqa=vqa_dict,
                 nshots=nshots,
                 name=name,
                 summary=summary,

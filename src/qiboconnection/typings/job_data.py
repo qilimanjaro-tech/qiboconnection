@@ -34,9 +34,7 @@ class JobData(JobResponse):
             setattr(self, k, v)
 
         self.result = parse_job_responses_to_results(job_responses=[JobResponse.from_kwargs(**kwargs)])[0]
-        self.description: list[Circuit] | Circuit | dict | str = deserialize_job_description(
-            base64_description=self.description, job_type=self.job_type
-        )
+        self.description = deserialize_job_description(base64_description=self.description, job_type=self.job_type)
 
         if not isinstance(self.result, (dict, list, type(None))):
             raise ValueError("Job result needs to be a dict, a list or a None!")

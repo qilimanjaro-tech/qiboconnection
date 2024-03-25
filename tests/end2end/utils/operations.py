@@ -5,8 +5,8 @@ from enum import Enum
 
 import pytest
 
-from qiboconnection.models.devices import Device, QuantumDevice
-from qiboconnection.typings.enums import DeviceAvailability, DeviceStatus
+from qiboconnection.models.devices import Device
+from qiboconnection.typings.enums import DeviceAvailability, DeviceStatus, DeviceType
 
 from .utils import is_development
 
@@ -64,7 +64,7 @@ def is_quantum(device: Device) -> bool:
     Returns:
         bool: if the device is a quantum device
     """
-    return isinstance(device, QuantumDevice)
+    return device.type == DeviceType.QUANTUM_DEVICE
 
 
 def get_expected_operation_result(  # pylint: disable=too-many-branches
@@ -131,5 +131,5 @@ def check_operation_possible_or_skip(operation: Operation, device: Device):
 
     if get_expected_operation_result(operation, device) != OperationResult.SUCCESS:
         pytest.skip(
-            f'Operation {operation} is not possible in {device._device_name} in the environment {os.environ["QIBOCONNECTION_ENVIRONMENT"]}.'
+            f'Operation {operation} is not possible in {device.name} in the environment {os.environ["QIBOCONNECTION_ENVIRONMENT"]}.'
         )
