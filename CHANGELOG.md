@@ -1,3 +1,14 @@
+## 0.17.0
+
+### Feature
+
+- Redefine execution interface
+  [#148](https://github.com/qilimanjaro-tech/qiboconnection/pull/148)
+- Redefine information of a device
+  [#354](https://github.com/qilimanjaro-tech/qili-global-quantum-service/pull/354)
+- Variational algorithms against simulators
+  [#369](https://github.com/qilimanjaro-tech/qili-global-quantum-service/pull/369)
+
 ## 0.16.0
 
 ### Features
