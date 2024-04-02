@@ -387,15 +387,11 @@ class API(ABC):
             raise ValueError("No devices were selected for execution.")
         if isinstance(circuit, Circuit):
             circuit = [circuit]
-
-        vqa_dict = None
-        if vqa:
-            vqa_dict = asdict(vqa)
         jobs = [
             Job(
                 circuit=circuit,
                 qprogram=qprogram,
-                vqa=vqa_dict,
+                vqa=vqa,
                 nshots=nshots,
                 name=name,
                 summary=summary,
@@ -407,9 +403,14 @@ class API(ABC):
         job_ids = []
         logger.debug("Sending qibo circuits for a remote execution...")
         for job in jobs:
-            response, status_code = self._connection.send_post_auth_remote_api_call(
-                path=self._CIRCUITS_CALL_PATH, data=asdict(job.job_request)
-            )
+            try:
+                response, status_code = self._connection.send_post_auth_remote_api_call(
+                    path=self._CIRCUITS_CALL_PATH, data=asdict(job.job_request)
+                )
+            except HTTPError:  # delete ASAP
+                response, status_code = self._connection.send_post_auth_remote_api_call(
+                    path=self._CIRCUITS_CALL_PATH, data=asdict(job.job_request_deprecated)
+                )
             if status_code != 201:
                 raise RemoteExecutionException(
                     message=f"Circuit {job.job_id} could not be executed.", status_code=status_code
