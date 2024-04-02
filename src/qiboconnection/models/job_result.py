@@ -47,7 +47,7 @@ class JobResult(ABC):
         try:
             self.data = decompress_any(json.loads(self.http_response)["data"])
             return
-        except Exception as ex:
+        except Exception as ex:  # delete ASAP
             logger.warning(
                 f"Unable to decompress JobResult with get_results interface due to {ex}({type(ex)})."
                 f"Falling back to legacy methods."

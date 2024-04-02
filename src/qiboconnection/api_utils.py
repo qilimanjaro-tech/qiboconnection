@@ -88,14 +88,14 @@ def deserialize_job_description(raw_description: dict, job_type: str) -> list[Ci
         else:
             return raw_description
 
-    except Exception as ex:
+    except Exception as ex:  # delete ASAP
         logger.warning(
             f"Description decompression failed due to {ex} ({type(ex)}). Falling back to old version methods."
         )
         return _deprecated_deserialize_job_description(base64_description=raw_description, job_type=job_type)  # type: ignore
 
 
-def _deprecated_deserialize_job_description(base64_description: str, job_type: str):
+def _deprecated_deserialize_job_description(base64_description: str, job_type: str):  # delete ASAP
     """
     Obsolete way for converting base64 job description to its corresponding Qibo Circuit or Qililab experiment.
     Only left as a fallback during a quick implementation.
