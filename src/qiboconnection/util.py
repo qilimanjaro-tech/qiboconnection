@@ -13,10 +13,13 @@
 # limitations under the License.
 
 """ Utility functions """
+import ast
 import base64
 import binascii
+import gzip
 import io
 import json
+import logging
 import pickle  # nosec - temporary bandit ignore
 from base64 import urlsafe_b64decode, urlsafe_b64encode
 from inspect import signature
@@ -27,6 +30,8 @@ import requests
 from qibo.states import CircuitResult
 
 from qiboconnection.errors import custom_raise_for_status
+
+logger = logging.getLogger()
 
 
 def base64url_encode(payload: dict | bytes | str) -> str:
@@ -130,6 +135,33 @@ def jsonify_list_with_str_and_base64_encode(object_to_encode: List[str]) -> str:
 def unzip(zipped_list: List[Tuple[Any, Any]]):
     """Inverse of the python builtin `zip` operation"""
     return tuple(zip(*zipped_list))
+
+
+def compress_any(any_obj, encoding="utf-8") -> dict:
+    """
+    Transforms any json-serializable object into a compressed string.
+    :param any_obj: object to compress
+    :param encoding: encoding to use for the byte representation
+    :return:
+    """
+
+    encoded_data = json.dumps(any_obj).encode(encoding)
+    compressed_data = str(gzip.compress(encoded_data))
+
+    return {"data": compressed_data, "encoding": encoding, "compression": "gzip"}
+
+
+def decompress_any(compressed: str) -> dict:
+    """
+    Decompresses a compressed string into its original datatype.
+    :param compressed: compressed data containing a json to extract a dictionary from
+    :return:
+    """
+
+    data_bin = ast.literal_eval(compressed)
+    data = json.loads(gzip.decompress(data_bin))
+
+    return data
 
 
 def from_kwargs(cls, **kwargs: dict):

@@ -19,7 +19,7 @@ from inspect import signature
 # pylint: disable=E1101
 from qibo.models import Circuit
 
-from qiboconnection.api_utils import deserialize_job_description, parse_job_responses_to_results
+from qiboconnection.api_utils import deserialize_job_description, parse_job_response_to_result
 from qiboconnection.typings.responses.job_response import JobResponse
 
 # pylint: disable=super-init-not-called
@@ -33,8 +33,8 @@ class JobData(JobResponse):
         for k, v in kwargs.items():
             setattr(self, k, v)
 
-        self.result = parse_job_responses_to_results(job_responses=[JobResponse.from_kwargs(**kwargs)])[0]
-        self.description = deserialize_job_description(base64_description=self.description, job_type=self.job_type)
+        self.result = parse_job_response_to_result(job_response=JobResponse.from_kwargs(**kwargs))  # type: ignore
+        self.description = deserialize_job_description(raw_description=self.description, job_type=self.job_type)
 
         if not isinstance(self.result, (dict, list, type(None))):
             raise ValueError("Job result needs to be a dict, a list or a None!")

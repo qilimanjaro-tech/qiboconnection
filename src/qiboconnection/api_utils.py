@@ -24,7 +24,7 @@ from qiboconnection.config import logger
 from qiboconnection.models import JobResult
 from qiboconnection.typings.enums import JobStatus, JobType
 from qiboconnection.typings.responses.job_response import JobResponse
-from qiboconnection.util import base64_decode
+from qiboconnection.util import base64_decode, decompress_any
 
 
 def parse_job_responses_to_results(job_responses: List[JobResponse]) -> List[dict | Any | None]:
@@ -38,17 +38,68 @@ def parse_job_responses_to_results(job_responses: List[JobResponse]) -> List[dic
     Returns:
 
     """
-    raw_results = [
-        JobResult(job_id=job_response.job_id, job_type=job_response.job_type, http_response=job_response.result).data
-        if job_response.status == JobStatus.COMPLETED
-        else None
-        for job_response in job_responses
-    ]
+    raw_results = [parse_job_response_to_result(job_response=job_response) for job_response in job_responses]
     return list(raw_results)
 
 
-def deserialize_job_description(base64_description: str, job_type: str) -> list[Circuit] | Circuit | dict | str:
+def parse_job_response_to_result(job_response: JobResponse):
+    """Parse a single job_response to a single dict with the content of a job. If the job is not COMPLETED,
+    put a None in its place. For this, we build a JobResult instance for each COMPLETED job, and then we keep its
+    `.data`.
+
+    Args:
+        job_response: JobResponse instance from which we'll get the results
+
+    Returns:
+
+    """
+    return (
+        JobResult(job_id=job_response.job_id, job_type=job_response.job_type, http_response=job_response.result).data
+        if job_response.status == JobStatus.COMPLETED
+        else None
+    )
+
+
+def deserialize_job_description(raw_description: dict, job_type: str) -> list[Circuit] | Circuit | dict | str:
     """Convert base64 job description to its corresponding Qibo Circuit or Qililab experiment
+
+    Args:
+        raw_description (str):
+        job_type (str):
+
+    Raises:
+        ValueError: Job type isn't nor Qibo Circuit neither Qililab experiment
+
+    Returns:
+        Circuit | dict: _description_
+    """
+
+    try:
+        if job_type == JobType.CIRCUIT:
+            return {
+                **raw_description,
+                "data": [
+                    Circuit.from_qasm(base64_decode(encoded_data=description))
+                    for description in decompress_any(raw_description["data"])
+                ],
+            }
+        if job_type in [JobType.QPROGRAM, JobType.VQA]:
+            return {**raw_description, "data": decompress_any(raw_description["data"])}
+        else:
+            return raw_description
+
+    except Exception as ex:
+        logger.warning(
+            f"Description decompression failed due to {ex} ({type(ex)}). Falling back to old version methods."
+        )
+        return _deprecated_deserialize_job_description(base64_description=raw_description, job_type=job_type)  # type: ignore
+
+
+def _deprecated_deserialize_job_description(base64_description: str, job_type: str):
+    """
+    Obsolete way for converting base64 job description to its corresponding Qibo Circuit or Qililab experiment.
+    Only left as a fallback during a quick implementation.
+    To be deleted asap.
 
     Args:
         base64_description (str):
@@ -60,6 +111,7 @@ def deserialize_job_description(base64_description: str, job_type: str) -> list[
     Returns:
         Circuit | dict: _description_
     """
+
     if job_type == JobType.CIRCUIT:
         try:
             circuits_descriptions = ast.literal_eval(base64_description)
