@@ -160,7 +160,7 @@ class Job(ABC):  # pylint: disable=too-many-instance-attributes
         if self.vqa is not None:
             vqa_as_dict = asdict(self.vqa)
             vqa_as_dict.pop("vqa_dict")
-            return json.dumps(**compress_any(self.vqa.vqa_dict), **vqa_as_dict)
+            return json.dumps({**compress_any(self.vqa.vqa_dict), **vqa_as_dict})
         if self.circuit is not None:
             return json.dumps(compress_any([c.to_qasm() for c in self.circuit]))
 
