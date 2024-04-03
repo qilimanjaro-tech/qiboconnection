@@ -13,7 +13,6 @@
 # limitations under the License.
 
 """ Job Data Typing """
-import json
 from inspect import signature
 
 # pylint: disable=too-many-instance-attributes
@@ -35,9 +34,7 @@ class JobData(JobResponse):
             setattr(self, k, v)
 
         self.result = parse_job_response_to_result(job_response=JobResponse.from_kwargs(**kwargs))  # type: ignore
-        self.description = deserialize_job_description(
-            raw_description=json.loads(self.description), job_type=self.job_type
-        )
+        self.description = deserialize_job_description(raw_description=self.description, job_type=self.job_type)
 
         if not isinstance(self.result, (dict, list, type(None))):
             raise ValueError("Job result needs to be a dict, a list or a None!")

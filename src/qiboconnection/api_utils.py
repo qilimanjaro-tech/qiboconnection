@@ -60,7 +60,7 @@ def parse_job_response_to_result(job_response: JobResponse):
     )
 
 
-def deserialize_job_description(raw_description: dict, job_type: str) -> list[Circuit] | Circuit | dict | str:
+def deserialize_job_description(raw_description: str, job_type: str) -> list[Circuit] | Circuit | dict | str:
     """Convert base64 job description to its corresponding Qibo Circuit or Qililab experiment
 
     Args:
@@ -75,18 +75,19 @@ def deserialize_job_description(raw_description: dict, job_type: str) -> list[Ci
     """
 
     try:
+        description_dict = json.loads(raw_description)
         if job_type == JobType.CIRCUIT:
             return {
-                **raw_description,
+                **description_dict,
                 "data": [
                     Circuit.from_qasm(base64_decode(encoded_data=description))
-                    for description in decompress_any(raw_description["data"])
+                    for description in decompress_any(description_dict["data"])
                 ],
             }
         if job_type in [JobType.QPROGRAM, JobType.VQA]:
-            return {**raw_description, "data": decompress_any(raw_description["data"])}
+            return {**description_dict, "data": decompress_any(description_dict["data"])}
         else:
-            return raw_description
+            return description_dict
 
     except Exception as ex:  # delete ASAP
         logger.warning(
