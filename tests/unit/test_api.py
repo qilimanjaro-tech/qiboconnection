@@ -1,5 +1,4 @@
 """API testing"""
-import ast
 import base64
 import gzip
 import json

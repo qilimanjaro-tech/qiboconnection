@@ -1,5 +1,4 @@
 """ Tests methods for Job """
-import json
 from typing import cast
 
 import numpy as np
