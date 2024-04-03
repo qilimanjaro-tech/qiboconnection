@@ -79,10 +79,7 @@ def deserialize_job_description(raw_description: str, job_type: str) -> list[Cir
         if job_type == JobType.CIRCUIT:
             return {
                 **description_dict,
-                "data": [
-                    Circuit.from_qasm(base64_decode(encoded_data=description))
-                    for description in decompress_any(description_dict["data"])
-                ],
+                "data": [Circuit.from_qasm(decom_data) for decom_data in decompress_any(description_dict["data"])],
             }
         if job_type in [JobType.QPROGRAM, JobType.VQA]:
             return {**description_dict, "data": decompress_any(description_dict["data"])}
