@@ -83,10 +83,9 @@ def deserialize_job_description(raw_description: str, job_type: str) -> list[Cir
             }
         if job_type in [JobType.QPROGRAM, JobType.VQA]:
             return {**description_dict, "data": decompress_any(description_dict["data"])}
-        else:
-            return description_dict
+        return description_dict
 
-    except Exception as ex:  # delete ASAP
+    except Exception as ex:  # pylint: disable=broad-exception-caught  # delete ASAP
         logger.warning(
             f"Description decompression failed due to {ex} ({type(ex)}). Falling back to old version methods."
         )

@@ -13,7 +13,6 @@
 # limitations under the License.
 
 """ Utility functions """
-import ast
 import base64
 import binascii
 import gzip
@@ -144,7 +143,6 @@ def compress_any(any_obj, encoding="utf-8") -> dict:
     :param encoding: encoding to use for the byte representation
     :return:
     """
-    import base64
 
     encoded_data = json.dumps(any_obj).encode(encoding)
     compressed_data = base64.b64encode(gzip.compress(encoded_data)).decode()
@@ -157,7 +155,6 @@ def decompress_any(compressed: str) -> dict:
     :param compressed: compressed data containing a json to extract a dictionary from
     :return:
     """
-    import base64
 
     data_bin = base64.urlsafe_b64decode(compressed)
     data = json.loads(gzip.decompress(data_bin))
