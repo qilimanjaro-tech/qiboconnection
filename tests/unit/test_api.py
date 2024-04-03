@@ -1,6 +1,7 @@
 """API testing"""
 import ast
 import base64
+import gzip
 import json
 from dataclasses import asdict
 from unittest.mock import MagicMock, patch
@@ -656,11 +657,10 @@ class TestExecute:
         assert body["device_id"] == 9
         assert body["number_shots"] == 1000
         assert body["job_type"] == "circuit"
-        description = ast.literal_eval(body["description"])
-        assert len(description) == 1
-        assert (
-            base64.urlsafe_b64decode(description[0]).decode() == self.circuit.to_qasm()
-        )  # make sure we posted the correct circuit
+        decoded_description = base64.urlsafe_b64decode(json.loads(body["description"])["data"])
+        description_data = json.loads(gzip.decompress(decoded_description))
+        assert len(description_data) == 1
+        assert description_data[0] == self.circuit.to_qasm()  # make sure we posted the correct circuit
         assert body["summary"] == body["name"] == "test"
 
     # TODO: delete when removing device_ids argument
@@ -685,11 +685,10 @@ class TestExecute:
         assert body["device_id"] == 9
         assert body["number_shots"] == 1000
         assert body["job_type"] == "circuit"
-        description = ast.literal_eval(body["description"])
-        assert len(description) == 1
-        assert (
-            base64.urlsafe_b64decode(description[0]).decode() == self.circuit.to_qasm()
-        )  # make sure we posted the correct circuit
+        decoded_description = base64.urlsafe_b64decode(json.loads(body["description"])["data"])
+        description_data = json.loads(gzip.decompress(decoded_description))
+        assert len(description_data) == 1
+        assert description_data[0] == self.circuit.to_qasm()  # make sure we posted the correct circuit
         assert body["summary"] == body["name"] == "test"
 
     def test_execute_with_multiple_circuits(self, mocked_api: API):
@@ -702,11 +701,10 @@ class TestExecute:
         assert body["device_id"] == 9
         assert body["number_shots"] == 1000
         assert body["job_type"] == "circuit"
-        description = ast.literal_eval(body["description"])
-        assert len(description) == 10
-        assert all(
-            base64.urlsafe_b64decode(d).decode() == self.circuit.to_qasm() for d in description
-        )  # make sure we posted the correct circuits
+        decoded_description = base64.urlsafe_b64decode(json.loads(body["description"])["data"])
+        description_data = json.loads(gzip.decompress(decoded_description))
+        assert len(description_data) == 10
+        assert all(d == self.circuit.to_qasm() for d in description_data)  # make sure we posted the correct circuits
 
     # TODO: delete
     @patch("qiboconnection.api.API._get_job", autospec=True)
