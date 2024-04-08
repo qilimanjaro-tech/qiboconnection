@@ -239,40 +239,6 @@ def test_job_request_with_circuit(circuits: list[Circuit], user: User, simulator
         assert reconstructed_circuit.to_qasm() == circuit.to_qasm()
 
 
-def test_job_request_with_circuit_deprecated(circuits: list[Circuit], user: User, simulator_device: Device):
-    """test job request
-
-    Args:
-        circuits (list[Circuit]): Circuit
-        user (User): User
-        simulator_device (SimulatorDevice): SimulatorDevice
-    """
-    job_status = JobStatus.COMPLETED
-    user_id = user.user_id
-    job = Job(
-        circuit=circuits,
-        user=user,
-        device=cast(Device, simulator_device),
-        job_status=job_status,
-        id=23,
-        nshots=10,
-        name="test",
-        summary="test",
-    )
-    expected_job_request = JobRequest(
-        user_id=user_id,
-        device_id=simulator_device.id,
-        description="['Ly8gR2VuZXJhdGVkIGJ5IFFJQk8gMC4xLjEyLmRldjAKT1BFTlFBU00gMi4wOwppbmNsdWRlICJxZWxpYjEuaW5jIjsKcXJlZyBxWzFdOwpjcmVnIHJlZ2lzdGVyMFsxXTsKaCBxWzBdOwptZWFzdXJlIHFbMF0gLT4gcmVnaXN0ZXIwWzBdOw==']",
-        number_shots=10,
-        job_type=JobType.CIRCUIT,
-        name="test",
-        summary="test",
-    )
-
-    assert isinstance(job, Job)
-    assert job.job_request_deprecated == expected_job_request
-
-
 def test_job_request_with_qprogram(user: User, simulator_device: Device):
     """test job request
 
@@ -315,39 +281,6 @@ def test_job_request_with_qprogram(user: User, simulator_device: Device):
         raw_description=job.job_request.description, job_type=JobType.QPROGRAM
     )["data"]
     assert reconstructed_qprogram == {}
-
-
-def test_job_request_with_qprogram_deprecated(user: User, simulator_device: Device):
-    """test job request
-
-    Args:
-        user (User): User
-        simulator_device (SimulatorDevice): SimulatorDevice
-    """
-    job_status = JobStatus.COMPLETED
-    user_id = user.user_id
-    job = Job(
-        qprogram={},
-        user=user,
-        device=cast(Device, simulator_device),
-        job_status=job_status,
-        id=23,
-        nshots=10,
-        name="test",
-        summary="test",
-    )
-    expected_job_request = JobRequest(
-        user_id=user_id,
-        device_id=simulator_device.id,
-        description="e30=",
-        number_shots=10,
-        job_type=JobType.QPROGRAM,
-        name="test",
-        summary="test",
-    )
-
-    assert isinstance(job, Job)
-    assert job.job_request_deprecated == expected_job_request
 
 
 def test_job_request_raises_value_error_if_not_circuit_or_qprogram(

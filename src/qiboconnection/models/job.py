@@ -107,23 +107,6 @@ class Job(ABC):  # pylint: disable=too-many-instance-attributes
         )
 
     @property
-    def job_request_deprecated(self) -> JobRequest:  # delete ASAP
-        """Returns a Job Request with the Job instance info
-
-        Returns:
-            JobRequest: Job Request object
-        """
-        return JobRequest(
-            user_id=self.user.user_id,
-            device_id=self.device.id,
-            number_shots=self.nshots,
-            job_type=self.job_type,
-            name=self.name,
-            summary=self.summary,
-            description=self._get_job_description_deprecated(),
-        )
-
-    @property
     def job_id(self) -> int:
         """Returns Job identifier
 
@@ -163,19 +146,6 @@ class Job(ABC):  # pylint: disable=too-many-instance-attributes
             return json.dumps({**compress_any(self.vqa.vqa_dict), **vqa_as_dict})
         if self.circuit is not None:
             return json.dumps(compress_any([c.to_qasm() for c in self.circuit]))
-
-        raise ValueError("No suitable information found for building description.")
-
-    def _get_job_description_deprecated(self) -> str:  # delete ASAP
-        """Serialize either circuit or qprogram to obtain job description"""
-
-        if self.qprogram is not None:
-            return jsonify_dict_and_base64_encode(object_to_encode=self.qprogram)
-        if self.vqa is not None:
-            return jsonify_dict_and_base64_encode(object_to_encode=asdict(self.vqa))
-
-        if self.circuit is not None:
-            return jsonify_list_with_str_and_base64_encode(object_to_encode=[c.to_qasm() for c in self.circuit])
 
         raise ValueError("No suitable information found for building description.")
 

@@ -403,17 +403,9 @@ class API(ABC):
         job_ids = []
         logger.debug("Sending qibo circuits for a remote execution...")
         for job in jobs:
-            try:  # delete ASAP
-                response, status_code = self._connection.send_post_auth_remote_api_call(
-                    path=self._CIRCUITS_CALL_PATH, data=asdict(job.job_request_deprecated)
-                )
-            except HTTPError as ex:
-                if ex.response.status_code == 400:
-                    response, status_code = self._connection.send_post_auth_remote_api_call(
-                        path=self._CIRCUITS_CALL_PATH, data=asdict(job.job_request)
-                    )
-                else:
-                    raise ex
+            response, status_code = self._connection.send_post_auth_remote_api_call(
+                path=self._CIRCUITS_CALL_PATH, data=asdict(job.job_request)
+            )
             if status_code != 201:
                 raise RemoteExecutionException(
                     message=f"Circuit {job.job_id} could not be executed.", status_code=status_code

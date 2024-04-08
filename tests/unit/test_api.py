@@ -717,7 +717,7 @@ class TestExecute:
             device_id=9,
             status=JobStatus.COMPLETED,
             number_shots=1000,
-            description="unknown description",
+            description=json.dumps({"data": "unknown description"}),
             name="test",
             summary="test",
         )
@@ -737,7 +737,7 @@ class TestExecute:
             device_id=9,
             status=JobStatus.COMPLETED,
             number_shots=1000,
-            description="unknown description",
+            description=json.dumps({"data": "unknown description"}),
             name="test",
             summary="test",
         )
@@ -757,7 +757,7 @@ class TestExecute:
             device_id=9,
             status=JobStatus.PENDING,
             number_shots=1000,
-            description="unknown description",
+            description=json.dumps({"data": "unknown description"}),
             name="test",
             summary="test",
         )

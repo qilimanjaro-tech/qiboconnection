@@ -1,9 +1,11 @@
+import json
 from unittest.mock import MagicMock, patch
 
 import pytest
 
 from qiboconnection.typings.job_data import JobData
 from qiboconnection.typings.responses import JobListingItemResponse
+from qiboconnection.util import compress_any
 
 
 def test_JobData_typing():
@@ -17,8 +19,8 @@ def test_JobData_typing():
         job_id=4,
         job_type="jaiof",
         number_shots=84,
-        description="<qibo.models.circuit.Circuit at 0x7fb8c2127650>",
-        result={},
+        description=json.dumps(compress_any("Not string or list")),
+        result=json.dumps(compress_any(dict())),
         name="test",
         summary="test",
     )
@@ -37,8 +39,8 @@ def test_JobData_typing_result_raises_value_error():
             job_id=4,
             job_type="jaiof",
             number_shots=84,
-            description="<qibo.models.circuit.Circuit at 0x7fb8c2127650>",
-            result="Not a dict or list",
+            description=json.dumps(compress_any("Not string or list")),
+            result=json.dumps(compress_any("Not string or list")),
             name="test",
             summary="test",
         )

@@ -60,7 +60,7 @@ def parse_job_response_to_result(job_response: JobResponse):
     )
 
 
-def deserialize_job_description(raw_description: str, job_type: str) -> list[Circuit] | Circuit | dict | str:
+def deserialize_job_description(raw_description: str, job_type: str) -> dict:
     """Convert base64 job description to its corresponding Qibo Circuit or Qililab experiment
 
     Args:
@@ -74,22 +74,15 @@ def deserialize_job_description(raw_description: str, job_type: str) -> list[Cir
         Circuit | dict: _description_
     """
 
-    try:
-        description_dict = json.loads(raw_description)
-        if job_type == JobType.CIRCUIT:
-            return {
-                **description_dict,
-                "data": [Circuit.from_qasm(decom_data) for decom_data in decompress_any(description_dict["data"])],
-            }
-        if job_type in [JobType.QPROGRAM, JobType.VQA]:
-            return {**description_dict, "data": decompress_any(description_dict["data"])}
-        return description_dict
-
-    except Exception as ex:  # pylint: disable=broad-exception-caught  # delete ASAP
-        logger.warning(
-            f"Description decompression failed due to {ex} ({type(ex)}). Falling back to old version methods."
-        )
-        return _deprecated_deserialize_job_description(base64_description=raw_description, job_type=job_type)  # type: ignore
+    description_dict = json.loads(raw_description)
+    if job_type == JobType.CIRCUIT:
+        return {
+            **description_dict,
+            "data": [Circuit.from_qasm(decom_data) for decom_data in decompress_any(description_dict["data"])],
+        }
+    if job_type in [JobType.QPROGRAM, JobType.VQA]:
+        return {**description_dict, "data": decompress_any(description_dict["data"])}
+    return description_dict
 
 
 def _deprecated_deserialize_job_description(base64_description: str, job_type: str):  # delete ASAP
