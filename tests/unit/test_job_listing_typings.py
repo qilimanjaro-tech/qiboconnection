@@ -20,7 +20,7 @@ def test_JobData_typing():
         job_type="jaiof",
         number_shots=84,
         description=json.dumps(compress_any("Not string or list")),
-        result=json.dumps(compress_any(dict())),
+        result=json.dumps(compress_any({})),
         name="test",
         summary="test",
     )

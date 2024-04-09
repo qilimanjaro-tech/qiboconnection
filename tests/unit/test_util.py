@@ -3,7 +3,6 @@
 import json
 
 import pytest
-from qibo.models.circuit import Circuit
 from requests.models import Response
 
 from qiboconnection.api_utils import deserialize_job_description
