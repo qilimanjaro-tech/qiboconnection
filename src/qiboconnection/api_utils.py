@@ -75,46 +75,17 @@ def deserialize_job_description(raw_description: str, job_type: str) -> dict:
     """
 
     description_dict = json.loads(raw_description)
+    compressed_data = description_dict.pop("data")
     if job_type == JobType.CIRCUIT:
         return {
             **description_dict,
-            "data": [Circuit.from_qasm(decom_data) for decom_data in decompress_any(description_dict["data"])],
+            "data": [Circuit.from_qasm(decom_data) for decom_data in decompress_any(compressed_data)],
         }
-    if job_type in [JobType.QPROGRAM, JobType.VQA]:
-        return {**description_dict, "data": decompress_any(description_dict["data"])}
-    return description_dict
-
-
-def _deprecated_deserialize_job_description(base64_description: str, job_type: str):  # delete ASAP
-    """
-    Obsolete way for converting base64 job description to its corresponding Qibo Circuit or Qililab experiment.
-    Only left as a fallback during a quick implementation.
-    To be deleted asap.
-
-    Args:
-        base64_description (str):
-        job_type (str):
-
-    Raises:
-        ValueError: Job type isn't nor Qibo Circuit neither Qililab experiment
-
-    Returns:
-        Circuit | dict: _description_
-    """
-
-    if job_type == JobType.CIRCUIT:
-        try:
-            circuits_descriptions = ast.literal_eval(base64_description)
-            return [Circuit.from_qasm(base64_decode(encoded_data=description)) for description in circuits_descriptions]
-
-        except SyntaxError:
-            return Circuit.from_qasm(base64_decode(encoded_data=base64_description))
-
-    if job_type == JobType.QPROGRAM:
-        return json.loads(base64_decode(encoded_data=base64_description))
-
-    logger.warning(f"JobType {job_type} not supported in this Qiboconnection version!")
-    return base64_description
+    if job_type == JobType.VQA:
+        return {**description_dict, "vqa_dict": decompress_any(compressed_data)}
+    if job_type in [JobType.QPROGRAM, JobType.OTHER]:
+        return {**description_dict, "data": decompress_any(compressed_data)}
+    return {**description_dict, "data": compressed_data}
 
 
 def log_job_status_info(job_response: JobResponse):

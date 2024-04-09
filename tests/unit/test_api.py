@@ -21,6 +21,7 @@ from qiboconnection.models.runcard import Runcard
 from qiboconnection.typings.enums import JobStatus, JobType
 from qiboconnection.typings.job_data import JobData
 from qiboconnection.typings.vqa import VQA
+from qiboconnection.util import compress_any
 
 from .data import runcard_dict, web_responses
 from .data.web_responses.job import JobResponse
@@ -717,7 +718,7 @@ class TestExecute:
             device_id=9,
             status=JobStatus.COMPLETED,
             number_shots=1000,
-            description=json.dumps({"data": "unknown description"}),
+            description=json.dumps(compress_any({"data": "unknown description"})),
             name="test",
             summary="test",
         )
@@ -737,7 +738,7 @@ class TestExecute:
             device_id=9,
             status=JobStatus.COMPLETED,
             number_shots=1000,
-            description=json.dumps({"data": "unknown description"}),
+            description=json.dumps(compress_any({"data": "unknown description"})),
             name="test",
             summary="test",
         )
@@ -757,7 +758,7 @@ class TestExecute:
             device_id=9,
             status=JobStatus.PENDING,
             number_shots=1000,
-            description=json.dumps({"data": "unknown description"}),
+            description=json.dumps(compress_any({"data": "unknown description"})),
             name="test",
             summary="test",
         )

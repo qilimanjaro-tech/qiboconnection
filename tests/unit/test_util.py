@@ -6,7 +6,7 @@ import pytest
 from qibo.models.circuit import Circuit
 from requests.models import Response
 
-from qiboconnection.api_utils import _deprecated_deserialize_job_description, deserialize_job_description
+from qiboconnection.api_utils import deserialize_job_description
 from qiboconnection.typings.enums import JobType
 from qiboconnection.typings.responses.job_response import JobResponse
 from qiboconnection.util import base64_decode, base64url_encode, from_kwargs, process_response
@@ -74,30 +74,6 @@ def test_process_response_non_json(response_plain_text: Response):
     assert processed_response[1] == response_plain_text.status_code
 
 
-def test_deserialize_job_description_deprecated(
-    base64_qibo_circuit: str, base64_qibo_circuits: str, base64_qililab_qprogram: str
-):
-    """Unit test of deserialize_job_description()"""
-
-    assert isinstance(
-        _deprecated_deserialize_job_description(base64_description=base64_qibo_circuit, job_type=JobType.CIRCUIT),
-        Circuit,
-    )
-    assert isinstance(
-        _deprecated_deserialize_job_description(base64_description=base64_qibo_circuits, job_type=JobType.CIRCUIT), list
-    )
-    assert isinstance(
-        _deprecated_deserialize_job_description(base64_description=base64_qililab_qprogram, job_type=JobType.QPROGRAM),
-        dict,
-    )
-    assert isinstance(
-        _deprecated_deserialize_job_description(base64_description=base64_qibo_circuit, job_type=JobType.OTHER), str
-    )
-    assert isinstance(
-        _deprecated_deserialize_job_description(base64_description=base64_qibo_circuit, job_type="qiskit"), str
-    )
-
-
 def test_deserialize_job_description(
     compressed_qibo_circuit: str, compressed_qibo_circuits: str, compressed_qililab_qprogram: str
 ):
@@ -110,7 +86,7 @@ def test_deserialize_job_description(
         dict,
     )
     assert isinstance(
-        deserialize_job_description(raw_description=compressed_qibo_circuit, job_type=JobType.OTHER)["data"], str
+        deserialize_job_description(raw_description=compressed_qibo_circuit, job_type=JobType.OTHER)["data"], list
     )
     assert isinstance(
         deserialize_job_description(raw_description=compressed_qibo_circuit, job_type="qiskit")["data"], str
