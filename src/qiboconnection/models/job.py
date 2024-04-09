@@ -25,7 +25,7 @@ from qiboconnection.typings.enums import JobStatus, JobType
 from qiboconnection.typings.requests import JobRequest
 from qiboconnection.typings.responses.job_response import JobResponse
 from qiboconnection.typings.vqa import VQA
-from qiboconnection.util import compress_any, jsonify_dict_and_base64_encode, jsonify_list_with_str_and_base64_encode
+from qiboconnection.util import compress_any
 
 from .algorithm import ProgramDefinition
 from .devices.device import Device

@@ -14,7 +14,6 @@
 
 """ Util Functions used by the API module """
 
-import ast
 import json
 from typing import Any, List
 
@@ -24,7 +23,7 @@ from qiboconnection.config import logger
 from qiboconnection.models import JobResult
 from qiboconnection.typings.enums import JobStatus, JobType
 from qiboconnection.typings.responses.job_response import JobResponse
-from qiboconnection.util import base64_decode, decompress_any
+from qiboconnection.util import decompress_any
 
 
 def parse_job_responses_to_results(job_responses: List[JobResponse]) -> List[dict | Any | None]:
