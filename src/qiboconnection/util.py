@@ -149,17 +149,17 @@ def compress_any(any_obj, encoding="utf-8") -> dict:
     return {"data": compressed_data, "encoding": encoding, "compression": "gzip"}
 
 
-def decompress_any(compressed: str) -> dict:
+def decompress_any(data: str, **kwargs) -> dict:
     """
     Decompresses a compressed string into its original datatype.
-    :param compressed: compressed data containing a json to extract a dictionary from
+    :param data: compressed data containing a json to extract a dictionary from
     :return:
     """
 
-    data_bin = base64.urlsafe_b64decode(compressed)
-    data = json.loads(gzip.decompress(data_bin))
+    data_bin = base64.urlsafe_b64decode(data)
+    data_decompressed = json.loads(gzip.decompress(data_bin))
 
-    return data
+    return data_decompressed
 
 
 def from_kwargs(cls, **kwargs: dict):

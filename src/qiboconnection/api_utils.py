@@ -74,16 +74,17 @@ def deserialize_job_description(raw_description: str, job_type: str) -> dict:
     """
 
     description_dict = json.loads(raw_description)
+    decompressed_data = decompress_any(**description_dict)
     compressed_data = description_dict.pop("data")
     if job_type == JobType.CIRCUIT:
         return {
             **description_dict,
-            "data": [Circuit.from_qasm(decom_data) for decom_data in decompress_any(compressed_data)],
+            "data": [Circuit.from_qasm(decom_data) for decom_data in decompressed_data],
         }
     if job_type == JobType.VQA:
-        return {**description_dict, "vqa_dict": decompress_any(compressed_data)}
+        return {**description_dict, "vqa_dict": decompressed_data}
     if job_type in [JobType.QPROGRAM, JobType.OTHER]:
-        return {**description_dict, "data": decompress_any(compressed_data)}
+        return {**description_dict, "data": decompressed_data}
     return {**description_dict, "data": compressed_data}
 
 

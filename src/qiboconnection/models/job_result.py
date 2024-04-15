@@ -45,7 +45,7 @@ class JobResult(ABC):
         attribute.
         """
         try:
-            self.data = decompress_any(json.loads(self.http_response)["data"])
+            self.data = decompress_any(**json.loads(self.http_response))
             return
         except Exception as ex:  # pylint: disable=broad-exception-caught  # delete ASAP
             logger.warning(
