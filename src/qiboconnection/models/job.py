@@ -13,8 +13,9 @@
 # limitations under the License.
 
 """ Job Typing """
+import json
 from abc import ABC
-from dataclasses import dataclass, field
+from dataclasses import asdict, dataclass, field
 from typing import Any, List
 
 from qibo.models.circuit import Circuit
@@ -23,7 +24,8 @@ from typeguard import typechecked
 from qiboconnection.typings.enums import JobStatus, JobType
 from qiboconnection.typings.requests import JobRequest
 from qiboconnection.typings.responses.job_response import JobResponse
-from qiboconnection.util import jsonify_dict_and_base64_encode, jsonify_list_with_str_and_base64_encode
+from qiboconnection.typings.vqa import VQA
+from qiboconnection.util import compress_any
 
 from .algorithm import ProgramDefinition
 from .devices.device import Device
@@ -40,7 +42,7 @@ class Job(ABC):  # pylint: disable=too-many-instance-attributes
     program: ProgramDefinition | None = field(default=None)
     circuit: list[Circuit] | None = None
     qprogram: dict | None = None
-    vqa: dict | None = None
+    vqa: VQA | None = None
     nshots: int = 10
     job_status: JobStatus = JobStatus.NOT_SENT
     job_result: JobResult | None = None
@@ -49,7 +51,8 @@ class Job(ABC):  # pylint: disable=too-many-instance-attributes
     id: int = 0  # pylint: disable=invalid-name
 
     def __post_init__(self):
-        match len([arg for arg in [self.qprogram, self.circuit, self.vqa] if arg is not None]):
+        n = len([arg for arg in [self.qprogram, self.circuit, self.vqa] if arg is not None])
+        match n:
             case n if n > 1:
                 raise ValueError("VQA, circuit and qprogram were provided, but execute() only takes one of them.")
             case 0:
@@ -136,12 +139,13 @@ class Job(ABC):  # pylint: disable=too-many-instance-attributes
         """Serialize either circuit or qprogram to obtain job description"""
 
         if self.qprogram is not None:
-            return jsonify_dict_and_base64_encode(object_to_encode=self.qprogram)
+            return json.dumps(compress_any(self.qprogram))
         if self.vqa is not None:
-            return jsonify_dict_and_base64_encode(object_to_encode=self.vqa)
-
+            vqa_as_dict = asdict(self.vqa)
+            vqa_as_dict.pop("vqa_dict")
+            return json.dumps({**compress_any(self.vqa.vqa_dict), **vqa_as_dict})
         if self.circuit is not None:
-            return jsonify_list_with_str_and_base64_encode(object_to_encode=[c.to_qasm() for c in self.circuit])
+            return json.dumps(compress_any([c.to_qasm() for c in self.circuit]))
 
         raise ValueError("No suitable information found for building description.")
 

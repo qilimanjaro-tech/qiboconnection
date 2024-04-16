@@ -134,3 +134,4 @@ qibo_configuration
 .qibo_configuration
 _build
 tests/setenv.sh
+/nbproject/

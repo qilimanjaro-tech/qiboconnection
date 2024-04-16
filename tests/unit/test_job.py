@@ -1,5 +1,4 @@
 """ Tests methods for Job """
-
 from typing import cast
 
 import numpy as np
@@ -7,6 +6,7 @@ import pytest
 from qibo import gates
 from qibo.models.circuit import Circuit
 
+from qiboconnection.api_utils import deserialize_job_description
 from qiboconnection.models import User
 from qiboconnection.models.algorithm import (
     AlgorithmDefinition,
@@ -198,6 +198,7 @@ def test_job_request_with_circuit(circuits: list[Circuit], user: User, simulator
         user (User): User
         simulator_device (SimulatorDevice): SimulatorDevice
     """
+
     job_status = JobStatus.COMPLETED
     user_id = user.user_id
     job = Job(
@@ -213,7 +214,7 @@ def test_job_request_with_circuit(circuits: list[Circuit], user: User, simulator
     expected_job_request = JobRequest(
         user_id=user_id,
         device_id=simulator_device.id,
-        description="['Ly8gR2VuZXJhdGVkIGJ5IFFJQk8gMC4xLjEyLmRldjAKT1BFTlFBU00gMi4wOwppbmNsdWRlICJxZWxpYjEuaW5jIjsKcXJlZyBxWzFdOwpjcmVnIHJlZ2lzdGVyMFsxXTsKaCBxWzBdOwptZWFzdXJlIHFbMF0gLT4gcmVnaXN0ZXIwWzBdOw==']",
+        description=job.job_request.description,
         number_shots=10,
         job_type=JobType.CIRCUIT,
         name="test",
@@ -222,6 +223,20 @@ def test_job_request_with_circuit(circuits: list[Circuit], user: User, simulator
 
     assert isinstance(job, Job)
     assert job.job_request == expected_job_request
+    assert all(
+        [
+            "data" in job.job_request.description,
+            "encoding" in job.job_request.description,
+            "compression" in job.job_request.description,
+        ]
+    )
+    for reconstructed_circuit, circuit in zip(
+        deserialize_job_description(raw_description=job.job_request.description, job_type=JobType.CIRCUIT.value)[
+            "data"
+        ],
+        job.circuit,
+    ):
+        assert reconstructed_circuit.to_qasm() == circuit.to_qasm()
 
 
 def test_job_request_with_qprogram(user: User, simulator_device: Device):
@@ -246,7 +261,7 @@ def test_job_request_with_qprogram(user: User, simulator_device: Device):
     expected_job_request = JobRequest(
         user_id=user_id,
         device_id=simulator_device.id,
-        description="e30=",
+        description=job.job_request.description,
         number_shots=10,
         job_type=JobType.QPROGRAM,
         name="test",
@@ -255,6 +270,17 @@ def test_job_request_with_qprogram(user: User, simulator_device: Device):
 
     assert isinstance(job, Job)
     assert job.job_request == expected_job_request
+    assert all(
+        [
+            "data" in job.job_request.description,
+            "encoding" in job.job_request.description,
+            "compression" in job.job_request.description,
+        ]
+    )
+    reconstructed_qprogram = deserialize_job_description(
+        raw_description=job.job_request.description, job_type=JobType.QPROGRAM
+    )["data"]
+    assert reconstructed_qprogram == {}
 
 
 def test_job_request_raises_value_error_if_not_circuit_or_qprogram(

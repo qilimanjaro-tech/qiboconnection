@@ -14,7 +14,6 @@
 
 """ Util Functions used by the API module """
 
-import ast
 import json
 from typing import Any, List
 
@@ -24,7 +23,7 @@ from qiboconnection.config import logger
 from qiboconnection.models import JobResult
 from qiboconnection.typings.enums import JobStatus, JobType
 from qiboconnection.typings.responses.job_response import JobResponse
-from qiboconnection.util import base64_decode
+from qiboconnection.util import decompress_any
 
 
 def parse_job_responses_to_results(job_responses: List[JobResponse]) -> List[dict | Any | None]:
@@ -38,20 +37,33 @@ def parse_job_responses_to_results(job_responses: List[JobResponse]) -> List[dic
     Returns:
 
     """
-    raw_results = [
-        JobResult(job_id=job_response.job_id, job_type=job_response.job_type, http_response=job_response.result).data
-        if job_response.status == JobStatus.COMPLETED
-        else None
-        for job_response in job_responses
-    ]
+    raw_results = [parse_job_response_to_result(job_response=job_response) for job_response in job_responses]
     return list(raw_results)
 
 
-def deserialize_job_description(base64_description: str, job_type: str) -> list[Circuit] | Circuit | dict | str:
+def parse_job_response_to_result(job_response: JobResponse):
+    """Parse a single job_response to a single dict with the content of a job. If the job is not COMPLETED,
+    put a None in its place. For this, we build a JobResult instance for each COMPLETED job, and then we keep its
+    `.data`.
+
+    Args:
+        job_response: JobResponse instance from which we'll get the results
+
+    Returns:
+
+    """
+    return (
+        JobResult(job_id=job_response.job_id, job_type=job_response.job_type, http_response=job_response.result).data
+        if job_response.status == JobStatus.COMPLETED
+        else None
+    )
+
+
+def deserialize_job_description(raw_description: str, job_type: str) -> dict:
     """Convert base64 job description to its corresponding Qibo Circuit or Qililab experiment
 
     Args:
-        base64_description (str):
+        raw_description (str):
         job_type (str):
 
     Raises:
@@ -60,19 +72,20 @@ def deserialize_job_description(base64_description: str, job_type: str) -> list[
     Returns:
         Circuit | dict: _description_
     """
+
+    description_dict = json.loads(raw_description)
+    decompressed_data = decompress_any(**description_dict)
+    compressed_data = description_dict.pop("data")
     if job_type == JobType.CIRCUIT:
-        try:
-            circuits_descriptions = ast.literal_eval(base64_description)
-            return [Circuit.from_qasm(base64_decode(encoded_data=description)) for description in circuits_descriptions]
-
-        except SyntaxError:
-            return Circuit.from_qasm(base64_decode(encoded_data=base64_description))
-
-    if job_type == JobType.QPROGRAM:
-        return json.loads(base64_decode(encoded_data=base64_description))
-
-    logger.warning(f"JobType {job_type} not supported in this Qiboconnection version!")
-    return base64_description
+        return {
+            **description_dict,
+            "data": [Circuit.from_qasm(decom_data) for decom_data in decompressed_data],
+        }
+    if job_type == JobType.VQA:
+        return {**description_dict, "vqa_dict": decompressed_data}
+    if job_type in [JobType.QPROGRAM, JobType.OTHER]:
+        return {**description_dict, "data": decompressed_data}
+    return {**description_dict, "data": compressed_data}
 
 
 def log_job_status_info(job_response: JobResponse):

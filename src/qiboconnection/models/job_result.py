@@ -13,6 +13,7 @@
 # limitations under the License.
 """ JobResult typing """
 
+import json
 import logging
 from abc import ABC
 from dataclasses import dataclass, field
@@ -22,7 +23,7 @@ from numpy import typing as npt
 from qibo.states import CircuitResult
 
 from qiboconnection.typings.enums import JobType
-from qiboconnection.util import decode_results_from_circuit, decode_results_from_qprogram
+from qiboconnection.util import decode_results_from_circuit, decode_results_from_qprogram, decompress_any
 
 logger = logging.getLogger(__name__)
 
@@ -43,16 +44,24 @@ class JobResult(ABC):
         Decodes data from the http_response provided at instance creation, and uses that info to build the self.data
         attribute.
         """
+        try:
+            self.data = decompress_any(**json.loads(self.http_response))
+            return
+        except Exception as ex:  # pylint: disable=broad-exception-caught  # delete ASAP
+            logger.warning(
+                f"Unable to decompress JobResult with get_results interface due to {ex}({type(ex)})."
+                f"Falling back to legacy methods."
+            )
 
-        if self.job_type == JobType.CIRCUIT:
-            self.data = decode_results_from_circuit(self.http_response)
-            return
-        if self.job_type == JobType.QPROGRAM:
-            self.data = decode_results_from_qprogram(self.http_response)
-            return
-        if self.job_type == JobType.VQA:
-            self.data = decode_results_from_qprogram(self.http_response)
-            return
+            if self.job_type == JobType.CIRCUIT:
+                self.data = decode_results_from_circuit(self.http_response)
+                return
+            if self.job_type == JobType.QPROGRAM:
+                self.data = decode_results_from_qprogram(self.http_response)
+                return
+            if self.job_type == JobType.VQA:
+                self.data = decode_results_from_qprogram(self.http_response)
+                return
 
-        logger.warning("Result not supported for type of job. Returning a plain string. ")
-        self.data = self.http_response
+            logger.warning("Result not supported for type of job. Returning a plain string. ")
+            self.data = self.http_response

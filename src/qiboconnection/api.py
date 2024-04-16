@@ -387,15 +387,11 @@ class API(ABC):
             raise ValueError("No devices were selected for execution.")
         if isinstance(circuit, Circuit):
             circuit = [circuit]
-
-        vqa_dict = None
-        if vqa:
-            vqa_dict = asdict(vqa)
         jobs = [
             Job(
                 circuit=circuit,
                 qprogram=qprogram,
-                vqa=vqa_dict,
+                vqa=vqa,
                 nshots=nshots,
                 name=name,
                 summary=summary,
