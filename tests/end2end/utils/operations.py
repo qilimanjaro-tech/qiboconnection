@@ -6,20 +6,18 @@ from enum import Enum
 import pytest
 
 from qiboconnection.models.devices import Device
-from qiboconnection.typings.enums import DeviceAvailability, DeviceStatus, DeviceType
+from qiboconnection.typings.enums import DeviceStatus, DeviceType
 
 from .utils import is_development
 
 
 # Explanation:
 # Given a device, there are a series of OPERATIONS  we can perform:
-# - Block: block the device
 # - Select: select the device
 # - Post: post a job
 # - Response: Obtain a job response
 # The expected results for such operations depends on its STATUS  that is a combination of
 # - Status: online, offline
-# - Availability: available, blocked
 # - IsDevelopment?: If the test are performed in the development environment
 # - IsQuantum?: If it is Quantum device
 # where Environment, Type of device are not real attributes of the device (as the others) but
@@ -42,7 +40,6 @@ class OperationResult(Enum):
 class Operation(Enum):
     """Expected result of the operation for a given device in a certain environment"""
 
-    BLOCK = "block"
     SELECT = "select"
     POST = "post"
     RESPONSE = "response"
@@ -50,10 +47,8 @@ class Operation(Enum):
     CANCEL = "cancel"
 
 
-def is_device(device: Device, status: DeviceStatus, availability: DeviceAvailability) -> bool:
-    return (device._status is None or device._status == status) and (
-        device._availability is None or device._availability == availability
-    )
+def is_device(device: Device, status: DeviceStatus) -> bool:
+    return device._status is None or device._status == status
 
 
 def is_quantum(device: Device) -> bool:
@@ -72,7 +67,7 @@ def get_expected_operation_result(  # pylint: disable=too-many-branches
 ) -> OperationResult:
     """Get the expected result of performing a certain operation in a device.
 
-    Together with the status and availability of the device, it takes into consideration other
+    Together with the of the device, it takes into consideration other
     factors as the environment (eg. PRODUCTION) and the type of device (eg. QUANTUM)
 
     Args:
@@ -91,19 +86,10 @@ def get_expected_operation_result(  # pylint: disable=too-many-branches
     result: OperationResult = OperationResult.FORBIDDEN
     if operation in [Operation.SELECT, Operation.POST, Operation.CANCEL]:
         result = OperationResult.SUCCESS
-    elif operation == Operation.BLOCK:
-        if is_quantum(device) and not is_development():
-            result = OperationResult.FORBIDDEN
-        elif is_device(device, DeviceStatus.MAINTENANCE, DeviceAvailability.AVAILABLE):
-            result = OperationResult.SUCCESS
-        else:
-            result = OperationResult.EXCEPTION
     elif operation == Operation.CHANGE_STATUS:
         if is_quantum(device) and not is_development():
             result = OperationResult.FORBIDDEN
-        if is_device(device, status=DeviceStatus.ONLINE, availability=DeviceAvailability.AVAILABLE) or is_device(
-            device, availability=DeviceAvailability.AVAILABLE, status=DeviceStatus.MAINTENANCE
-        ):
+        if is_device(device, status=DeviceStatus.ONLINE) or is_device(device, status=DeviceStatus.MAINTENANCE):
             result = OperationResult.SUCCESS
         else:
             result = OperationResult.EXCEPTION
@@ -111,7 +97,7 @@ def get_expected_operation_result(  # pylint: disable=too-many-branches
     elif operation == Operation.RESPONSE:
         if is_quantum(device) and is_development():
             result = OperationResult.EXCEPTION
-        elif is_device(device, status=DeviceStatus.ONLINE, availability=DeviceAvailability.AVAILABLE):
+        elif is_device(device, status=DeviceStatus.ONLINE):
             result = OperationResult.SUCCESS
         else:
             result = OperationResult.FORBIDDEN

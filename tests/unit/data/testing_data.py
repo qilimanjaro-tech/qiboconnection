@@ -2,27 +2,25 @@
 """ Data to used alongside the test suite. """
 
 from qiboconnection.typings.devices import DeviceInput
-from qiboconnection.typings.enums import DeviceAvailability, DeviceStatus
+from qiboconnection.typings.enums import DeviceStatus
 
 from .web_responses import WebResponses
 
 device_inputs = [
-    DeviceInput(id=1, name="one_device", status="online", availability="available"),
+    DeviceInput(id=1, name="one_device", status="online"),
     DeviceInput(
         id=2,
         name="second_device",
         status=DeviceStatus.ONLINE,
-        availability=DeviceAvailability.AVAILABLE,
     ),
 ]
 
 offline_device_inputs = [
-    DeviceInput(id=1, name="one_device", status="offline", availability="available"),
+    DeviceInput(id=1, name="one_device", status="offline"),
     DeviceInput(
         id=2,
         name="second_device",
         status=DeviceStatus.OFFLINE,
-        availability=DeviceAvailability.AVAILABLE,
     ),
 ]
 
@@ -42,7 +40,6 @@ simulator_device_inputs = [
         id=1,
         name="radagast-simulator",
         status="online",
-        availability="available",
         characteristics={
             "type": "simulator",
             "cpu": "Intel Core i9-9900K @ 16x 5GHz",
@@ -60,7 +57,6 @@ quantum_device_inputs = [
         id=1,
         name="galadriel-cluster",
         status="online",
-        availability="available",
         last_calibration_time="0",
         characteristics={"type": "quantum", "description": "Cluster"},
         calibration_details={"t1": 10, "frequency": 988, "elapsed_time": 10},

@@ -21,7 +21,7 @@ from typeguard import typechecked
 from qiboconnection.config import logger
 from qiboconnection.connection import Connection
 from qiboconnection.typings.devices import DeviceInput
-from qiboconnection.typings.enums import DeviceAvailability, DeviceStatus
+from qiboconnection.typings.enums import DeviceStatus
 
 from .device_details import DeviceDetails
 
@@ -120,31 +120,6 @@ class Device(DeviceDetails):
 
         """
         return getattr(self, "_dynamic_features", None)
-
-    def block_device(self, connection: Connection) -> None:
-        """Blocks a device to avoid others to use it
-
-        Args:
-            connection (Connection): Qibo API connection
-
-        Raises:
-            HTTPError: Error blocking device
-        """
-        try:
-            connection.update_device_availability(device_id=self._id, availability=DeviceAvailability.BLOCKED)  # type: ignore[attr-defined]
-            self._availability = DeviceAvailability.BLOCKED
-        except HTTPError as ex:
-            logger.error("Error blocking device %s.", self.name)  # type: ignore[attr-defined]
-            raise ex
-
-    def release_device(self, connection: Connection) -> None:
-        """Releases a device to let others use it
-
-        Args:
-            connection (Connection): Qibo API connection
-        """
-        connection.update_device_availability(device_id=self._id, availability=DeviceAvailability.AVAILABLE)  # type: ignore[attr-defined]
-        self._availability = DeviceAvailability.AVAILABLE
 
     def set_to_online(self, connection: Connection) -> None:
         """Updates a device status so that it can accept remote jobs. Local jobs will be blocked.

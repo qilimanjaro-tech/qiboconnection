@@ -624,7 +624,6 @@ class TestExecute:
                 "status": "offline",
                 "device_id": 9,
                 "device_name": "Dummy Device",
-                "availability": "available",
                 "channel_id": 0,
             },
         )
