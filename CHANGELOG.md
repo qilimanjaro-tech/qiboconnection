@@ -1,3 +1,10 @@
+## 0.18.0
+
+### Feature
+
+- Add support for compressed job descriptions and results
+  [#155](https://github.com/qilimanjaro-tech/qiboconnection/pull/155)
+
 ## 0.17.0
 
 ### Feature
