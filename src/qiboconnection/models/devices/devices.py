@@ -21,7 +21,6 @@ from typeguard import typechecked
 
 from qiboconnection.config import logger
 from qiboconnection.connection import Connection
-from qiboconnection.models.devices.util import block_device
 
 from .device import Device
 
@@ -151,28 +150,6 @@ class Devices(ABC):
         if len(device_found) > 1:
             raise ValueError(f"Device duplicated with same id:{device_id}")
         return device_found.pop()
-
-    def block_device(self, connection: Connection, device_id: int) -> None:
-        """Blocks a device to avoid it being used by others
-
-        Args:
-            connection (Connection): Qibo remote connection
-            device_id (int): Device identifier
-        """
-        device_found = self._find_device(device_id)
-        block_device(connection=connection, device=device_found)
-        logger.info("Device %s blocked for execution. AVAILABILITY: blocked", device_found.name)
-
-    def release_device(self, connection: Connection, device_id: int) -> None:
-        """Releases a device to let others use it
-
-        Args:
-            connection (Connection): Qibo remote connection
-            device_id (int): Device identifier
-        """
-        device_found = self._find_device(device_id)
-        device_found.release_device(connection=connection)
-        logger.info("Device %s released. AVAILABILITY: AVAILABLE", device_found.name)
 
     def set_device_to_online(self, connection: Connection, device_id: int) -> None:
         """Releases a device to let others use it

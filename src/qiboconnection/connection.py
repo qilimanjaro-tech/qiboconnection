@@ -236,18 +236,6 @@ class Connection(ABC):  # pylint: disable=too-many-instance-attributes
         """
         return self.send_put_auth_remote_api_call(path=f"/devices/{device_id}", data={"status": status})
 
-    def update_device_availability(self, device_id: int, availability: str) -> Tuple[Any, int]:
-        """Makes the request for updating a Device availability with a new value.
-
-        Args:
-            device_id (int): device identifier
-            availability (str): device availability
-
-        Returns:
-            Tuple[Any, int]: Http Response
-        """
-        return self.send_put_auth_remote_api_call(path=f"/devices/{device_id}", data={"availability": availability})
-
     def send_message(self, channel_id: int, message: dict) -> Tuple[Any, int]:
         """Sends a message to a channel registered in the system
 

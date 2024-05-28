@@ -10,7 +10,6 @@ from qibo.models import Circuit
 
 from qiboconnection.api import API
 from qiboconnection.models.devices import Device
-from qiboconnection.typings.enums import DeviceAvailability as DA
 from qiboconnection.typings.enums import DeviceStatus as DS
 from qiboconnection.typings.enums import JobStatus
 from qiboconnection.typings.job_data import JobData
@@ -85,30 +84,6 @@ def test_device_selection(device: Device, api: API):
             pytest.fail(f"Connecting to {device.name} raised {ex}", pytrace=True)
     else:
         pytest.skip(f"Operation {Operation.SELECT} not possible for {device}")
-
-
-@pytest.mark.parametrize("device", get_devices_listing_params())
-def test_device_blocking_and_release(device: Device, api: API):
-    """Test whether each device can be blocked and released
-
-    Args:
-        api: api instance to call the server with
-    """
-
-    op_result = get_expected_operation_result(Operation.BLOCK, device)
-    if op_result == OperationResult.EXCEPTION:
-        with pytest.raises(Exception):
-            api.block_device_id(device_id=device.id)
-    elif op_result == OperationResult.SUCCESS:
-        try:
-            api.block_device_id(device_id=device.id)
-            api.release_device(device_id=device.id)
-        except ConnectionError:
-            pytest.fail(f"Connection was not possible to {device.name}", pytrace=False)
-        except Exception as ex:  # pylint: disable=broad-exception-caught
-            pytest.fail(f"Connecting to {device.name} raised {ex}", pytrace=True)
-    else:
-        pytest.skip(f"Operation {Operation.BLOCK} not possbile for {device}")
 
 
 @pytest.mark.parametrize("device", get_devices_listing_params())
@@ -208,35 +183,22 @@ def test_all_status(device: Device, api: API):
     check_operation_possible_or_skip(Operation.CHANGE_STATUS, device)
 
     initial_status = device._status
-    initial_availability = device._availability
     if initial_status == DS.ONLINE:
         api.set_device_to_maintenance(device_id=device.id)
         assert get_device(api, device.id)._status == DS.MAINTENANCE
         api.set_device_to_online(device_id=device.id)
         assert get_device(api, device.id)._status == DS.ONLINE
     elif initial_status == DS.MAINTENANCE:
-        # If the device is MAINTENANCE +  BLOCKED, we can not put it in online, that
-        # will cause an exception. In fact the way to proceed should be
-        # {Maintenace, Blocked} --[release]--> {Maintenace, Available} --[online]--> {Online, Available}
-        if initial_availability == DA.BLOCKED:
-            api.release_device(device_id=device.id)
-            assert get_device(api, device.id)._availability == DA.AVAILABLE
-
         api.set_device_to_online(device_id=device.id)
         assert get_device(api, device.id)._status == DS.ONLINE
 
         api.set_device_to_maintenance(device_id=device.id)
         assert get_device(api, device.id)._status == DS.MAINTENANCE
-
-        if initial_availability == DA.BLOCKED:
-            api.block_device_id(device_id=device.id)
-            assert get_device(api, device.id)._availability == DA.BLOCKED
     else:
         pytest.skip(f"Device {device} in status {initial_status}")
 
     # Check there are no changes in the device before we start the tests
     assert get_device(api, device.id)._status == initial_status
-    assert get_device(api, device.id)._availability == initial_availability
 
 
 @pytest.mark.parametrize("device", get_devices_listing_params())

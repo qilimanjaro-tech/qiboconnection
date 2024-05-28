@@ -13,7 +13,7 @@ from qiboconnection.api import API
 from qiboconnection.errors import HTTPError
 from qiboconnection.models.devices import Device
 from qiboconnection.typings.connection import ConnectionConfiguration
-from qiboconnection.typings.enums import DeviceAvailability, DeviceStatus, JobStatus
+from qiboconnection.typings.enums import DeviceStatus, JobStatus
 from qiboconnection.typings.job_data import JobData
 
 
@@ -22,7 +22,7 @@ class MissingCredentialsException(ValueError):
 
 
 class UserRole(str, Enum):
-    """User roles with different permissions. admin is allowed to change device status and availability. qilimanjaro_user can only change availability provided that device status=maintenance. bsc_user can change none."""
+    """User roles with different permissions. admin is allowed to change device status."""
 
     ADMIN = "admin"
     QILI = "qilimanjaro_user"
@@ -37,7 +37,6 @@ USER_OPERATIONS = [
     {
         "role": UserRole.ADMIN,
         "can_change_status": True,
-        "can_change_availability": True,
         "can_post_qprograms": True,
         "can_post_vqas": True,
         "can_get_runcard": True,
@@ -49,7 +48,6 @@ USER_OPERATIONS = [
     {
         "role": UserRole.BSC,
         "can_change_status": False,
-        "can_change_availability": False,
         "can_post_qprograms": True,
         "can_post_vqas": False,
         "can_get_runcard": True,
@@ -61,7 +59,6 @@ USER_OPERATIONS = [
     {
         "role": UserRole.QILI,
         "can_change_status": False,
-        "can_change_availability": True,
         "can_post_qprograms": True,
         "can_post_vqas": True,
         "can_get_runcard": True,
@@ -73,7 +70,6 @@ USER_OPERATIONS = [
     {
         "role": UserRole.MACHINE,
         "can_change_status": False,
-        "can_change_availability": False,
         "can_post_qprograms": False,
         "can_post_vqas": False,
         "can_get_runcard": True,
@@ -302,36 +298,6 @@ def get_user_cannot_change_status_api(user_role: UserRole):
     return get_api_or_fail_test(get_logging_conf_or_fail_test(user_role=user_role))
 
 
-def get_user_can_change_availability_api(user_role: UserRole):
-    """Get API instance for the user roles that can change availability, by definition.
-    Args:
-        user_role (UserRole):
-
-    Returns:
-        API: API instance only for the users that can change status
-    """
-
-    if not get_user_role_operations(user_role=user_role)["can_change_availability"]:
-        pytest.skip(f"{user_role} cannot change availability")
-
-    return get_api_or_fail_test(get_logging_conf_or_fail_test(user_role=user_role))
-
-
-def get_user_cannot_change_availability_api(user_role: UserRole):
-    """Get API instance for the user roles that cannot change availability, by definition.
-
-    Args:
-        user_role (UserRole):
-
-    Returns:
-        API: API instance only for the users that can change status
-    """
-    if get_user_role_operations(user_role=user_role)["can_change_availability"]:
-        pytest.skip(f"{user_role} can change availability")
-
-    return get_api_or_fail_test(get_logging_conf_or_fail_test(user_role=user_role))
-
-
 def get_user_cannot_post_and_list_qprogram_api(user_role: UserRole):
     """Get API instance for the user roles that cannot post qililab qprogram, by definition.
 
@@ -516,8 +482,6 @@ def admin_set_device_to_online(device: Device, api: API):
     Args:
         device (Device): device.
     """
-    if device._availability == DeviceAvailability.BLOCKED:
-        pytest.fail(f"{device.name} is {device._availability} and hence can't set it to online.")
 
     if device._status == DeviceStatus.OFFLINE and is_development():
         pytest.skip(f"{device.name} is {device._status}")
@@ -531,45 +495,11 @@ def admin_set_device_to_maintenance(device: Device, api: API):
     Args:
         device (Device): device
     """
-    if get_device(api, device.id)._availability == DeviceAvailability.BLOCKED:
-        pytest.fail(f"{device.name} is {device._availability} and hence can't set it to maintenance.")
 
     if get_device(api, device.id)._status == DeviceStatus.OFFLINE and is_development():
         pytest.skip(f"{device.name} is {device._status}")
 
     api.set_device_to_maintenance(device_id=device.id)
-
-
-def admin_block_device(device: Device, api: API):
-    """Block device with admin user
-
-    Args:
-        device (Device): device
-    """
-
-    if get_device(api, device.id)._status == DeviceStatus.ONLINE:
-        pytest.fail(f"{device.name} is {device._status} and hence can't block it.")
-
-    if get_device(api, device.id)._status == DeviceStatus.OFFLINE and is_development():
-        pytest.skip(f"{device} is {device._status}")
-
-    api.block_device_id(device_id=device.id)
-
-
-def admin_release_device(device: Device, api: API):
-    """Release device with admin user
-
-    Args:
-        device (Device): device
-    """
-
-    if get_device(api, device.id)._status == DeviceStatus.ONLINE:
-        pytest.fail(f"{device.name} is {device._status} and hence can't release it.")
-
-    if get_device(api, device.id)._status == DeviceStatus.OFFLINE and is_development():
-        pytest.skip(f"{device.name} is {device._status}")
-
-    api.release_device(device_id=device.id)
 
 
 def get_logging_conf(role: UserRole = UserRole.ADMIN) -> ConnectionConfiguration:
