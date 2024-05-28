@@ -3,7 +3,7 @@
 ### Deprecation
 
 - Remove block_device() and release_device()
-  [#728](https://github.com/qilimanjaro-tech/qililab/pull/728)
+  [#157](https://github.com/qilimanjaro-tech/qiboconnection/pull/157)
 
 ## 0.18.0
 
