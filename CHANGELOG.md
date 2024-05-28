@@ -1,3 +1,10 @@
+## 0.19.0
+
+### Deprecation
+
+- Remove block_device() and release_device()
+  [#728](https://github.com/qilimanjaro-tech/qililab/pull/728)
+
 ## 0.18.0
 
 ### Feature
