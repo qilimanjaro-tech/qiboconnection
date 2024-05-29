@@ -1,3 +1,10 @@
+## 0.19.0
+
+### Deprecation
+
+- Remove block_device() and release_device()
+  [#157](https://github.com/qilimanjaro-tech/qiboconnection/pull/157)
+
 ## 0.18.0
 
 ### Feature
