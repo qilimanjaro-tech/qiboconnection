@@ -225,7 +225,7 @@ def test_cannot_change_device_availability_when_online(device: Device, user_role
     [(device, user_role) for user_role in list_user_roles() for device in get_devices_listing_params(user_role)],
 )
 @pytest.mark.slow
-def test_cannot_post_qprogram(device: Device, qprogram_dict: dict, user_role: UserRole):
+def test_cannot_post_qprogram(device: Device, qprogram_yaml: str, user_role: UserRole):
     """Test user roles that aren't allowed to post qprogram can do it -- e.g bsc
     Args:
         api: api instance to call the server with.
@@ -238,7 +238,7 @@ def test_cannot_post_qprogram(device: Device, qprogram_dict: dict, user_role: Us
     user_api.select_device_id(device_id=device.id)
 
     with pytest.raises(requests.exceptions.HTTPError):
-        user_api.execute(qprogram=qprogram_dict)
+        user_api.execute(qprogram=qprogram_yaml)
 
 
 @pytest.mark.parametrize(

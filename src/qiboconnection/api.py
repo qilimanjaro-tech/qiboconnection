@@ -29,7 +29,7 @@ from typing import Any, List, cast
 
 from numpy import typing as npt
 from qibo.models.circuit import Circuit
-from qibo.states import CircuitResult
+from qibo.result import CircuitResult
 from requests import HTTPError
 from typeguard import typechecked
 
@@ -325,7 +325,7 @@ class API(ABC):
     def execute(  # pylint: disable=too-many-locals, disable=too-many-branches
         self,
         circuit: Circuit | List[Circuit] | None = None,
-        qprogram: dict | None = None,
+        qprogram: str | None = None,
         vqa: VQA | None = None,
         nshots: int = 10,
         device_ids: List[int] | None = None,
@@ -338,7 +338,7 @@ class API(ABC):
 
         Args:
             circuit (Circuit or List[Circuit]): a Qibo circuit to execute
-            qprogram (dict): a QProgram description, result of Qililab's QProgram.to_dict() function.
+            qprogram (str): a QProgram description, result of Qililab's QProgram.to_dict() function.
             vqa (dict): a Variational Quantum Algorithm, result of applications-sdk' VQA.to_dict() method.
             nshots (int): number of times the execution is to be done.
             device_ids (List[int]): list of devices where the execution should be performed. If set, any device set
