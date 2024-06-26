@@ -5,7 +5,6 @@ device_base_response_a = {
     "device_name": "AWS Development Simulator",
     "device_type": "simulator",
     "status": "other",
-    "availability": "other",
     "channel_id": 2,
     "number_pending_jobs": 6,
     "characteristics": {
@@ -23,7 +22,6 @@ device_base_response_b = {
     "device_id": 9,
     "device_name": "AWS Development Quantum",
     "status": 2,
-    "availability": "available",
     "channel_id": 2,
     "characteristics": {"type": "quantum"},
     "calibration_details": {"t1": 10, "frequency": 988},
@@ -34,7 +32,6 @@ device_base_response_c = {  # since the device is offline, there is not calibrat
     "device_id": 7,
     "device_name": "AWS Development Simulator",
     "status": "offline",
-    "availability": "available",
     "channel_id": 2,
     "number_pending_jobs": 6,
     "new_field": 8969,

@@ -501,19 +501,6 @@ def test_update_device_status(mocked_rest_call: MagicMock, mocked_connection: Co
     mocked_rest_call.assert_called_with(mocked_connection, path=f"/devices/{_DEVICE_ID}", data={"status": _NEW_STATUS})
 
 
-@patch("qiboconnection.connection.Connection.send_put_auth_remote_api_call", autospec=True)
-def test_update_device_availability(mocked_rest_call: MagicMock, mocked_connection: Connection):
-    """Asserts correct put function is called for updating a device status"""
-
-    _DEVICE_ID = 1
-    _NEW_AVAILABILITY = "new_status"
-
-    mocked_connection.update_device_availability(device_id=1, availability=_NEW_AVAILABILITY)
-    mocked_rest_call.assert_called_with(
-        mocked_connection, path=f"/devices/{_DEVICE_ID}", data={"availability": _NEW_AVAILABILITY}
-    )
-
-
 @patch("qiboconnection.connection.Connection.send_post_auth_remote_api_call", autospec=True)
 def test_send_message(mocked_rest_call: MagicMock, mocked_connection: Connection):
     """Asserts correct put function is called for updating a device status"""

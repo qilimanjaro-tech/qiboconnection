@@ -284,41 +284,6 @@ class API(ABC):
             logger.error(json.loads(str(ex))[REST_ERROR.DETAIL])
             raise ex
 
-    @typechecked
-    def block_device_id(self, device_id: int) -> None:
-        """Blocks a device to avoid others to manually use it.
-         .. warning::
-
-            This method is only available for Qilimanjaro members.
-
-        Args:
-            device_id (int): Device identifier
-        """
-        self._devices = self._add_or_update_single_device(device_id=device_id)
-        try:
-            self._devices.block_device(connection=self._connection, device_id=device_id)
-        except HTTPError as ex:
-            logger.error(json.loads(str(ex))[REST_ERROR.DETAIL])
-            raise ex
-
-    @typechecked
-    def release_device(self, device_id: int) -> None:
-        """Releases a device to let others manually using it.
-
-        .. warning::
-
-            This method is only available for Qilimanjaro members.
-
-        Args:
-            device_id (int): Device identifier
-        """
-        self._devices = self._add_or_update_single_device(device_id=device_id)
-        try:
-            self._devices.release_device(connection=self._connection, device_id=device_id)
-        except HTTPError as ex:
-            logger.error(json.loads(str(ex))[REST_ERROR.DETAIL])
-            raise ex
-
     # REMOTE EXECUTIONS
 
     @typechecked

@@ -17,22 +17,9 @@
 
 from typeguard import typechecked
 
-from qiboconnection.config import logger
-from qiboconnection.connection import Connection
 from qiboconnection.typings.devices import DeviceInput
 
 from .device import Device
-
-
-def block_device(connection: Connection, device: Device) -> None:
-    """Blocks a device to avoid being used by others
-
-    Args:
-        connection (Connection): Qibo remote connection
-        device (Device): the Device to block
-    """
-    device.block_device(connection=connection)
-    logger.info("Device %s blocked.", device.name)
 
 
 @typechecked

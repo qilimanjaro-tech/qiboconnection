@@ -1,3 +1,17 @@
+## 0.19.0
+
+### Deprecation
+
+- Remove block_device() and release_device()
+  [#157](https://github.com/qilimanjaro-tech/qiboconnection/pull/157)
+
+## 0.18.0
+
+### Feature
+
+- Add support for compressed job descriptions and results
+  [#155](https://github.com/qilimanjaro-tech/qiboconnection/pull/155)
+
 ## 0.17.0
 
 ### Feature

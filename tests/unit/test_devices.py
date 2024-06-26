@@ -48,7 +48,6 @@ def test_devices_to_dict_expand(simulator_device_input: DeviceInput):
     assert output_dict[0]["id"] == simulator_device_input.id
     assert output_dict[0]["name"] == simulator_device_input.name
     assert output_dict[0]["status"] == simulator_device_input.status
-    assert output_dict[0]["availability"] == simulator_device_input.availability
     assert output_dict[0]["characteristics"] == simulator_device_input.characteristics  # type: ignore[attr-defined]
     assert output_dict == [simulator_device.to_dict(expand=True)]
 
@@ -68,7 +67,6 @@ def test_devices_to_json_expand(simulator_device_input: DeviceInput):
     assert output_dict[0]["id"] == simulator_device_input.id
     assert output_dict[0]["name"] == simulator_device_input.name
     assert output_dict[0]["status"] == simulator_device_input.status
-    assert output_dict[0]["availability"] == simulator_device_input.availability
     assert output_dict[0]["characteristics"] == simulator_device_input.characteristics  # type: ignore[attr-defined]
     assert output_dict == [simulator_device.to_dict(expand=True)]
 

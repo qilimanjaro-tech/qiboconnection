@@ -11,29 +11,23 @@ from qibo.models import Circuit
 from qiboconnection.api import API
 from qiboconnection.models.devices import Device
 from qiboconnection.models.runcard import Runcard
-from qiboconnection.typings.enums import DeviceAvailability, DeviceStatus
+from qiboconnection.typings.enums import DeviceStatus
 from qiboconnection.typings.enums.job_status import JobStatus
 from qiboconnection.typings.job_data import JobData
 from qiboconnection.typings.vqa import VQA
 from tests.end2end.utils.operations import Operation, check_operation_possible_or_skip
 from tests.end2end.utils.utils import (
     UserRole,
-    admin_block_device,
-    admin_release_device,
-    admin_set_device_to_maintenance,
-    admin_set_device_to_online,
     get_api_or_fail_test,
     get_device,
     get_devices_listing_params,
     get_logging_conf_or_fail_test,
-    get_user_can_change_availability_api,
     get_user_can_change_status_api,
     get_user_can_delete_runcard_api,
     get_user_can_get_runcard_api,
     get_user_can_list_runcard_api,
     get_user_can_save_runcard_api,
     get_user_can_update_runcard_api,
-    get_user_cannot_change_availability_api,
     get_user_cannot_change_status_api,
     get_user_cannot_delete_runcard_api,
     get_user_cannot_get_runcard_api,
@@ -104,120 +98,7 @@ def test_cannot_change_device_status(device: Device, user_role: UserRole):
         api.set_device_to_online(device_id=device.id)
 
 
-@pytest.mark.parametrize(
-    "device, user_role",
-    [(device, user_role) for user_role in list_user_roles() for device in get_devices_listing_params(user_role)],
-)
-@pytest.mark.slow
-def test_cannot_change_device_status_when_blocked(device: Device, user_role: UserRole, api: API):
-    """Ensure any user role can change device status when device availabiliyty is not available
-
-    Args:
-        device (Device): all devices
-        user_role (str): all users
-        api (API): Qiboconnection API instance
-    """
-    logger.info(f"Device: {device}, User Role: {user_role}")
-
-    admin_set_device_to_maintenance(device=device, api=api)
-    admin_block_device(device=device, api=api)
-
-    user_api = get_api_or_fail_test(get_logging_conf_or_fail_test(user_role=user_role))
-
-    with pytest.raises(requests.exceptions.HTTPError):
-        user_api.set_device_to_online(device_id=device.id)
-        user_api.set_device_to_maintenance(device_id=device.id)
-
-    admin_release_device(device=device, api=api)
-    admin_set_device_to_online(device=device, api=api)
-
-
-# ------------------------------------------------------------------------ OPERATION: CAN CHANGE AVAILABILITY
-
-
-@pytest.mark.parametrize(
-    "device, user_role",
-    [(device, user_role) for user_role in list_user_roles() for device in get_devices_listing_params(user_role)],
-)
-@pytest.mark.slow
-def test_can_change_device_availability(device: Device, user_role: UserRole, api: API):
-    """Ensure that user roles which, by definition, can change availability are allowed to do it.
-
-    Args:
-        device (Device): _description_
-        user_role (str): _description_
-        api (API): _description_
-    """
-    logger.info(f"Device: {device}, User Role: {user_role}")
-
-    admin_set_device_to_maintenance(device=device, api=api)
-
-    user_role_api = get_user_can_change_availability_api(user_role=user_role)
-
-    user_role_api.release_device(device_id=device.id)
-    assert get_device(user_role_api, device.id)._availability == DeviceAvailability.AVAILABLE
-
-    user_role_api.block_device_id(device_id=device.id)
-    assert get_device(user_role_api, device.id)._availability == DeviceAvailability.BLOCKED
-
-    user_role_api.release_device(device_id=device.id)
-    assert get_device(user_role_api, device.id)._availability == DeviceAvailability.AVAILABLE
-
-    admin_set_device_to_online(device=device, api=api)
-
-
-@pytest.mark.parametrize(
-    "device, user_role",
-    [(device, user_role) for user_role in list_user_roles() for device in get_devices_listing_params(user_role)],
-)
-@pytest.mark.slow
-def test_cannot_change_device_availability(device: Device, user_role: UserRole, api: API):
-    """Ensure that user roles which, by definition, cannot change availability are not allowed to do it
-
-    Args:
-        device (Device): all devices
-        user_role (str): all users
-        api (API): Qiboconnection API instance
-    """
-    logger.info(f"Device: {device}, User Role: {user_role}")
-
-    admin_set_device_to_maintenance(device=device, api=api)
-
-    user_api = get_user_cannot_change_availability_api(user_role=user_role)
-
-    with pytest.raises(requests.exceptions.HTTPError):
-        user_api.release_device(device_id=device.id)
-        user_api.block_device_id(device_id=device.id)
-        user_api.release_device(device_id=device.id)
-
-    admin_set_device_to_online(device=device, api=api)
-
-
-@pytest.mark.parametrize(
-    "device, user_role",
-    [(device, user_role) for user_role in list_user_roles() for device in get_devices_listing_params(user_role)],
-)
-@pytest.mark.slow
-def test_cannot_change_device_availability_when_online(device: Device, user_role: UserRole, api: API):
-    """Ensure tany user can block any device when status is not maintenance
-
-    Args:
-        device (Device): all devices
-        user_role (str): all users
-        api (API): Qiboconnection API instance
-    """
-    logger.info(f"Device: {device}, User Role: {user_role}")
-
-    admin_set_device_to_online(device=device, api=api)
-
-    user_api = get_api_or_fail_test(get_logging_conf_or_fail_test(user_role=user_role))
-
-    with pytest.raises(requests.exceptions.HTTPError):
-        user_api.release_device(device_id=device.id)
-        user_api.block_device_id(device_id=device.id)
-        user_api.release_device(device_id=device.id)
-
-    admin_set_device_to_online(device=device, api=api)
+# ------------------------------------------------------------------------ OPERATION: POST QPROGRAM and VQA
 
 
 @pytest.mark.parametrize(

@@ -35,7 +35,6 @@ Once you are logged in, you can list all accessible quantum processing units and
   "device_id": 9,
   "device_name": "Galadriel Qblox rack",
   "status": "online",
-  "availability": "available",
   "characteristics": {
     "type": "quantum"
   },
@@ -48,7 +47,6 @@ Once you are logged in, you can list all accessible quantum processing units and
   "device_id": 1,
   "device_name": "Radagast Simulator",
   "status": "offline",
-  "availability": "available"
 }
 
 You can then use :func:`~qiboconnection.API.select_device_id` or :func:`~qiboconnection.API.select_device_ids` to select

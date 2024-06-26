@@ -15,7 +15,6 @@
 """ Enums typing module """
 from .algorithm_name import AlgorithmName
 from .algorythm_type import AlgorithmType
-from .device_availability import DeviceAvailability
 from .device_status import DeviceStatus
 from .device_type import DeviceType
 from .grant_type import GrantType
