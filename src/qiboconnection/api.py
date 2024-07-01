@@ -476,7 +476,7 @@ class API(ABC):
     def execute_and_return_results(
         self,
         circuit: list[Circuit] | None = None,
-        qprogram: dict | None = None,
+        qprogram: str | None = None,
         nshots: int = 10,
         device_ids: List[int] | None = None,
         device_id: int | None = None,
@@ -487,7 +487,7 @@ class API(ABC):
 
         Args:
             circuit (Circuit): a Qibo circuit to execute
-            qprogram (dict): a QProgram description, results of Qililab's QProgram().to_dict() function.
+            qprogram (str): a QProgram description, results of Qililab's QProgram().to_dict() function.
             nshots (int): number of times the execution is to be done.
             device_ids (List[int]): list of devices where the execution should be performed. If set, any device set
              using API.select_device_id() will not be used. This will not update the selected
