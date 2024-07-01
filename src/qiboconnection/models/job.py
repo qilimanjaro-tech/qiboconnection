@@ -41,7 +41,7 @@ class Job(ABC):  # pylint: disable=too-many-instance-attributes
     device: Device
     program: ProgramDefinition | None = field(default=None)
     circuit: list[Circuit] | None = None
-    qprogram: dict | None = None
+    qprogram: str | None = None
     vqa: VQA | None = None
     nshots: int = 10
     job_status: JobStatus = JobStatus.NOT_SENT

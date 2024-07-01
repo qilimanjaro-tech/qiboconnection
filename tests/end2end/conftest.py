@@ -394,31 +394,7 @@ def get_results_dict() -> dict:
     }
 
 
-@pytest.fixture(name="qprogram_dict")
-def get_qprogram_dict() -> dict:
+@pytest.fixture(name="qprogram_yaml")
+def get_qprogram_yaml() -> str:
     """Create a likely qililab qprogram serialization dictionary"""
-    return {
-        "type": "QProgram",
-        "attributes": {
-            "_body": {
-                "type": "Block",
-                "attributes": {
-                    "_uuid": {"type": "UUID", "uuid": "91424c55-2415-439b-9584-0bf61ddc1e76"},
-                    "elements": {"type": "list", "elements": []},
-                },
-            },
-            "_variables": {"type": "list", "elements": []},
-            "_block_stack": {
-                "type": "deque",
-                "elements": [
-                    {
-                        "type": "Block",
-                        "attributes": {
-                            "_uuid": {"type": "UUID", "uuid": "91424c55-2415-439b-9584-0bf61ddc1e76"},
-                            "elements": {"type": "list", "elements": []},
-                        },
-                    }
-                ],
-            },
-        },
-    }
+    return "&id002 !QProgram\n_block_stack: !deque\n- &id001 !Block\n  _uuid: !UUID {int: 53112729611620154126628027624129971441}\n  elements: []\n_body: *id001\n_buses: !!set {}\n_variables: []\nqblox: !_QbloxInterface\n  disable_autosync: false\n  qprogram: *id002\nquantum_machines: !_QuantumMachinesInterface\n  qprogram: *id002\n"

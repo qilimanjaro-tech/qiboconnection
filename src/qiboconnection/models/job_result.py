@@ -20,7 +20,7 @@ from dataclasses import dataclass, field
 from typing import List
 
 from numpy import typing as npt
-from qibo.states import CircuitResult
+from qibo.result import CircuitResult
 
 from qiboconnection.typings.enums import JobType
 from qiboconnection.util import decode_results_from_circuit, decode_results_from_qprogram, decompress_any
