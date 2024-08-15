@@ -4,6 +4,7 @@
 import logging
 import os
 import sys
+import time
 
 import pytest
 from qibo.models import Circuit
@@ -185,14 +186,18 @@ def test_all_status(device: Device, api: API):
     initial_status = device._status
     if initial_status == DS.ONLINE:
         api.set_device_to_maintenance(device_id=device.id)
+        time.sleep(2)
         assert get_device(api, device.id)._status == DS.MAINTENANCE
         api.set_device_to_online(device_id=device.id)
+        time.sleep(2)
         assert get_device(api, device.id)._status == DS.ONLINE
     elif initial_status == DS.MAINTENANCE:
         api.set_device_to_online(device_id=device.id)
+        time.sleep(2)
         assert get_device(api, device.id)._status == DS.ONLINE
 
         api.set_device_to_maintenance(device_id=device.id)
+        time.sleep(2)
         assert get_device(api, device.id)._status == DS.MAINTENANCE
     else:
         pytest.skip(f"Device {device} in status {initial_status}")
