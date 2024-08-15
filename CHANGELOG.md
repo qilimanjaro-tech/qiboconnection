@@ -1,3 +1,10 @@
+## 0.20.0
+
+### Improvements
+
+- Add time.sleep to tests
+  [#160](https://github.com/qilimanjaro-tech/qiboconnection/pull/160)
+
 ## 0.19.0
 
 ### Deprecation
