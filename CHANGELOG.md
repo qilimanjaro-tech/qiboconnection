@@ -1,3 +1,10 @@
+## 0.21.0
+
+### Improvements
+
+- Support new qililab yaml serialization of qprograms
+  [#159](https://github.com/qilimanjaro-tech/qiboconnection/pull/159)
+
 ## 0.20.0
 
 ### Improvements
