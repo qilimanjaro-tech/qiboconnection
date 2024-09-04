@@ -119,12 +119,16 @@ def get_api_or_fail_test(  # pylint: disable=inconsistent-return-statements
 
 def get_devices_listing_params(user_role: UserRole = UserRole.ADMIN) -> list[Device]:
     """Not a fixture. Normal function that returns the list of devices. For using on parametrize (that cannot accept
-    fixtures)."""
+    fixtures). Excludes devices from QTesting PRO because this tests are intended for DEV environment."""
     logging_conf = get_logging_conf(role=user_role)
     qibo_api = get_api_or_fail_test(logging_conf)
     try:
-        devices = qibo_api.list_devices()
-        return devices._devices
+        dev_devices = [
+            device
+            for device in qibo_api.list_devices()._devices
+            if device.name not in ["qtesting_saruman", "qtesting_galadriel"]
+        ]
+        return dev_devices
     except HTTPError:
         return []
 
