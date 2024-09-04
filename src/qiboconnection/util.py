@@ -26,7 +26,7 @@ from json.decoder import JSONDecodeError
 from typing import Any, List, Tuple
 
 import requests
-from qibo.states import CircuitResult
+from qibo.result import CircuitResult
 
 from qiboconnection.errors import custom_raise_for_status
 
