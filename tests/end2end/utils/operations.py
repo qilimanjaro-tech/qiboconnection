@@ -62,6 +62,17 @@ def is_quantum(device: Device) -> bool:
     return device.type == DeviceType.QUANTUM_DEVICE
 
 
+def is_qtesting_PRO(device: Device) -> bool:
+    """Returns True if the device is QTestingPRO -> has access to the chip
+    Args:
+        device: device instance
+
+    Returns:
+        bool
+    """
+    return device.name in ["qtesting_saruman"]
+
+
 def get_expected_operation_result(  # pylint: disable=too-many-branches
     operation: Operation, device: Device
 ) -> OperationResult:
