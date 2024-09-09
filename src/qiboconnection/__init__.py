@@ -23,7 +23,7 @@ This module contains all needed classes needed for interacting with Qilimanjaro'
 """
 
 
-__version__ = "0.21.0"
+__version__ = "0.22.0"
 
 
 from .about import about
