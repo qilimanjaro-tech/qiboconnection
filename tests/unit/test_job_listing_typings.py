@@ -40,12 +40,12 @@ def test_JobData_typing_result_raises_value_error():
             job_type="jaiof",
             number_shots=84,
             description=json.dumps(compress_any("Not string or list")),
-            result=json.dumps(compress_any("Not string or list")),
+            result=42,
             name="test",
             summary="test",
         )
 
-    assert ex.match("Job result needs to be a dict, a list or a None!")
+    assert ex.match("Job result needs to be a dict, a list, a string or a None!")
 
 
 @patch("qiboconnection.typings.job_data.deserialize_job_description", autospec=True)
