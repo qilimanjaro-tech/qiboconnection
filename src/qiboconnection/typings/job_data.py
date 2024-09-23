@@ -36,8 +36,8 @@ class JobData(JobResponse):
         self.result = parse_job_response_to_result(job_response=JobResponse.from_kwargs(**kwargs))  # type: ignore
         self.description = deserialize_job_description(raw_description=self.description, job_type=self.job_type)
 
-        if not isinstance(self.result, (dict, list, type(None))):
-            raise ValueError("Job result needs to be a dict, a list or a None!")
+        if not isinstance(self.result, (dict, list, str, type(None))):
+            raise ValueError("Job result needs to be a dict, a list, a string or a None!")
         if not isinstance(self.description, (dict, type(None), Circuit, list, str)):
             raise ValueError("Job description needs to be a Qibo Circuit, a dict, a list, a str or a None!")
 

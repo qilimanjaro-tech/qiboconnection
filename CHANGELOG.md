@@ -1,4 +1,6 @@
-## 0.22.0
+## 0.22.1
+
+- Support new QProgram serialization.
 
 ## 0.21.0
 

@@ -126,7 +126,7 @@ def get_devices_listing_params(user_role: UserRole = UserRole.ADMIN) -> list[Dev
         dev_devices = [
             device
             for device in qibo_api.list_devices()._devices
-            if device.name not in ["qtesting_saruman", "qtesting_galadriel"]
+            if device.name not in ["qtesting_saruman", "qtesting_galadriel", "qili_qtesting"]
         ]
         return dev_devices
     except HTTPError:
