@@ -201,7 +201,19 @@ def compressed_qibo_circuit():
 
 @pytest.fixture(name="compressed_qililab_qprogram")
 def compressed_qililab_qprogram():
-    """qiililab experiment base64 encoding"""
+    """qililab experiment base64 encoding"""
+    return json.dumps(
+        {
+            "data": "H4sIABxaDWYC/82QsQrCMBRFf0XebEFtS4ujuLjp4CQSXtJXCaat9iVCkf67SVGw4uDokCX33ENu7mC7C8FyArtt25xarGA6AbS21dJZYp/codCM0pBAZxvuauUvSzRMnhSyKboBenlWplHnLxLhnC5G5H6/WQfwGUCWqcVM5WUUJzFFiUwxQlKLKE1lksU55fOkhN4XyFBFteWRzWi2MA4Px77vh0c6pjHN9AUO6A1bHcb+Ih/UYa5gi370e6Ogq6PPyv/+UjgPKagRmgwCAAA=",
+            "encoding": "utf-8",
+            "compression": "gzip",
+        }
+    )
+
+
+@pytest.fixture(name="compressed_qililab_annealing_program")
+def compressed_qililab_annealing_program():
+    """qililab annealing base64 encoding"""
     return json.dumps(
         {
             "data": "H4sIABxaDWYC/82QsQrCMBRFf0XebEFtS4ujuLjp4CQSXtJXCaat9iVCkf67SVGw4uDokCX33ENu7mC7C8FyArtt25xarGA6AbS21dJZYp/codCM0pBAZxvuauUvSzRMnhSyKboBenlWplHnLxLhnC5G5H6/WQfwGUCWqcVM5WUUJzFFiUwxQlKLKE1lksU55fOkhN4XyFBFteWRzWi2MA4Px77vh0c6pjHN9AUO6A1bHcb+Ih/UYa5gi370e6Ogq6PPyv/+UjgPKagRmgwCAAA=",

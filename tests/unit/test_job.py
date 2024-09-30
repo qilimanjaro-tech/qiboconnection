@@ -160,6 +160,18 @@ def test_job_creation_qprogram(user: User, simulator_device: Device):
     assert job.job_type == JobType.QPROGRAM
 
 
+def test_job_creation_annealing(user: User, simulator_device: Device):
+    """test job creation using an qprogram instead of a circuit
+
+    Args:
+        user (User): User
+        simulator_device (SimulatorDevice): SimulatorDevice
+    """
+
+    job = Job(anneal_program_args={}, user=user, device=cast(Device, simulator_device))
+    assert job.job_type == JobType.ANNEALING_PROGRAM
+
+
 def test_job_creation_raises_value_error_when_circuit_qprogram_or_vqa_are_defined_simultaneously(
     circuits: list[Circuit], user: User, simulator_device: Device
 ):
@@ -283,7 +295,51 @@ def test_job_request_with_qprogram(user: User, simulator_device: Device):
     assert reconstructed_qprogram == {}
 
 
-def test_job_request_raises_value_error_if_not_circuit_or_qprogram(
+def test_job_request_with_annealing_program(user: User, simulator_device: Device):
+    """test job request
+
+    Args:
+        user (User): User
+        simulator_device (SimulatorDevice): SimulatorDevice
+    """
+    job_status = JobStatus.COMPLETED
+    user_id = user.user_id
+    job = Job(
+        anneal_program_args={},
+        user=user,
+        device=cast(Device, simulator_device),
+        job_status=job_status,
+        id=23,
+        nshots=10,
+        name="test",
+        summary="test",
+    )
+    expected_job_request = JobRequest(
+        user_id=user_id,
+        device_id=simulator_device.id,
+        description=job.job_request.description,
+        number_shots=10,
+        job_type=JobType.ANNEALING_PROGRAM,
+        name="test",
+        summary="test",
+    )
+
+    assert isinstance(job, Job)
+    assert job.job_request == expected_job_request
+    assert all(
+        [
+            "data" in job.job_request.description,
+            "encoding" in job.job_request.description,
+            "compression" in job.job_request.description,
+        ]
+    )
+    reconstructed_annealing_program = deserialize_job_description(
+        raw_description=job.job_request.description, job_type=JobType.ANNEALING_PROGRAM
+    )["data"]
+    assert reconstructed_annealing_program == {}
+
+
+def test_job_request_raises_value_error_if_no_input_description_for_any_type(
     circuits: list[Circuit], user: User, simulator_device: Device
 ):
     """test job raises proper exceptions when trying to build request with none of circuit, qprogram
@@ -307,7 +363,7 @@ def test_job_request_raises_value_error_if_not_circuit_or_qprogram(
     assert e_info.value.args[0] == "Could not determine JobType"
 
 
-def test_job_request_raises_value_error_if_several_of_circuit_and_qprogram(
+def test_job_request_raises_value_error_if_several_of_description_input_types(
     circuits: list[Circuit], user: User, simulator_device: Device
 ):
     """test job raises proper exceptions when trying to build request with more than one of circuit, qprogram

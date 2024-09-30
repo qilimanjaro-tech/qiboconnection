@@ -291,6 +291,7 @@ class API(ABC):
         self,
         circuit: Circuit | List[Circuit] | None = None,
         qprogram: str | None = None,
+        anneal_program_args: str | None = None,
         vqa: VQA | None = None,
         nshots: int = 10,
         device_ids: List[int] | None = None,
@@ -303,7 +304,8 @@ class API(ABC):
 
         Args:
             circuit (Circuit or List[Circuit]): a Qibo circuit to execute
-            qprogram (str): a QProgram description, result of Qililab's QProgram.to_dict() function.
+            qprogram (str): a QProgram description, result of Qililab utils `serialize(qprogram)` function.
+            anneal_program_args (str): an annealing implementation. It is supposed to contain a dict with everything needed for a platform.
             vqa (dict): a Variational Quantum Algorithm, result of applications-sdk' VQA.to_dict() method.
             nshots (int): number of times the execution is to be done.
             device_ids (List[int]): list of devices where the execution should be performed. If set, any device set
@@ -314,8 +316,8 @@ class API(ABC):
             List[int]: list of job ids
 
         Raises:
-            ValueError: Both circuit and experiment were provided, but execute() only takes at most of them.
-            ValueError: Neither of experiment or circuit were provided, but execute() only takes at least one of them.
+            ValueError: VQA, circuit, qprogram and anneal_program_args were provided, but execute() only takes one of them.
+            ValueError: Neither of circuit, vqa, qprogram or anneal_program_args were provided.
         """
 
         # Ensure provided selected_devices are valid. If not provided, use the ones selected by API.select_device_id.
@@ -356,6 +358,7 @@ class API(ABC):
             Job(
                 circuit=circuit,
                 qprogram=qprogram,
+                anneal_program_args=anneal_program_args,
                 vqa=vqa,
                 nshots=nshots,
                 name=name,

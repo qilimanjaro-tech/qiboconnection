@@ -59,6 +59,9 @@ class JobResult(ABC):
             if self.job_type == JobType.QPROGRAM:
                 self.data = decode_results_from_qprogram(self.http_response)
                 return
+            if self.job_type == JobType.ANNEALING_PROGRAM:
+                self.data = decode_results_from_qprogram(self.http_response)
+                return
             if self.job_type == JobType.VQA:
                 self.data = decode_results_from_qprogram(self.http_response)
                 return
