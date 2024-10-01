@@ -12,12 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-""" Models: things the api acts with / upon. """
+""" Runcard typing classes """
+from dataclasses import dataclass
 
-from .calibration import Calibration
-from .job import Job
-from .job_listing import JobListing
-from .job_listing_item import JobListingItem
-from .job_result import JobResult
-from .runcard import Runcard
-from .user import User
+
+@dataclass
+class CalibrationRequest:
+    """Base structure for a SavedExperiment body of any rest interaction"""
+
+    name: str
+    calibration: str
+    device_id: int
+    user_id: int
+    description: str
+    qililab_version: str

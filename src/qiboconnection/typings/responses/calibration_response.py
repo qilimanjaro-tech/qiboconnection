@@ -12,12 +12,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-""" Models: things the api acts with / upon. """
+""" Calibration typing classes """
+from dataclasses import dataclass
+from datetime import datetime
 
-from .calibration import Calibration
-from .job import Job
-from .job_listing import JobListing
-from .job_listing_item import JobListingItem
-from .job_result import JobResult
-from .runcard import Runcard
-from .user import User
+from qiboconnection.util import from_kwargs
+
+from ..requests import CalibrationRequest
+
+
+@dataclass
+class CalibrationResponse(CalibrationRequest):
+    """Class for accommodating Calibrations."""
+
+    calibration_id: int
+    created_at: datetime
+    updated_at: datetime
+
+    @classmethod
+    def from_kwargs(cls, **kwargs):
+        "Returns an instance of CalibrationResponse including non-typed attributes"
+        return from_kwargs(cls, **kwargs)
