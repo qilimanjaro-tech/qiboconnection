@@ -172,7 +172,7 @@ def test_job_creation_annealing(user: User, simulator_device: Device):
     assert job.job_type == JobType.ANNEALING_PROGRAM
 
 
-def test_job_creation_raises_value_error_when_circuit_qprogram_or_vqa_are_defined_simultaneously(
+def test_job_creation_raises_value_error_when_circuit_qprogram_anneal_or_vqa_are_defined_simultaneously(
     circuits: list[Circuit], user: User, simulator_device: Device
 ):
     """test job creation only allows defining one of the following: qprogram, circuit or vqa.
@@ -185,10 +185,13 @@ def test_job_creation_raises_value_error_when_circuit_qprogram_or_vqa_are_define
 
     with pytest.raises(ValueError) as e_info:
         _ = Job(qprogram={}, circuit=circuits, user=user, device=cast(Device, simulator_device))
-    assert e_info.value.args[0] == "VQA, circuit and qprogram were provided, but execute() only takes one of them."
+    assert (
+        e_info.value.args[0]
+        == "VQA, circuit, qprogram and anneal_program_args were provided, but execute() only takes one of them."
+    )
 
 
-def test_job_creation_qprogram_raises_value_error_when_neither_of_circuit_qprogram_or_vqa_are_defined(
+def test_job_creation_qprogram_raises_value_error_when_neither_of_circuit_qprogram_anneal_or_vqa_are_defined(
     user: User, simulator_device: Device
 ):
     """test job creation using neither qprogram nor circuit or vqa
@@ -199,7 +202,7 @@ def test_job_creation_qprogram_raises_value_error_when_neither_of_circuit_qprogr
     """
     with pytest.raises(ValueError) as e_info:
         _ = Job(qprogram=None, circuit=None, user=user, device=cast(Device, simulator_device))
-    assert e_info.value.args[0] == "Neither of circuit, vqa or qprogram were provided."
+    assert e_info.value.args[0] == "Neither of circuit, vqa, qprogram or anneal_program_args were provided."
 
 
 def test_job_request_with_circuit(circuits: list[Circuit], user: User, simulator_device: Device):
