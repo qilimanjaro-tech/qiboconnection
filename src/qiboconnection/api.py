@@ -127,6 +127,15 @@ class API(ABC):
         return self._runcard
 
     @property
+    def last_calibration(self) -> Calibration | None:
+        """Returns the last calibration uploaded in the current session, in case there has been one.
+
+        Returns:
+            Calibration | None: last uploaded calibration
+        """
+        return self._calibration
+
+    @property
     def user_id(self) -> int:
         """Exposes the id of the authenticated user
 
@@ -790,7 +799,7 @@ class API(ABC):
         self,
         name: str,
         description: str,
-        calibration_dict: dict,
+        calibration_serialized: str,
         device_id: int,
         user_id: int,
         qililab_version: str,
@@ -818,7 +827,7 @@ class API(ABC):
             id=None,
             name=name,
             description=description,
-            calibration=calibration_dict,
+            calibration=calibration_serialized,
             device_id=device_id,
             user_id=user_id,
             qililab_version=qililab_version,

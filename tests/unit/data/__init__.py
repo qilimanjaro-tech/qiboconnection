@@ -1,6 +1,7 @@
 """Data module"""
 
 from .testing_data import (
+    calibration_serialized,
     device_inputs,
     experiment_dict,
     offline_device_inputs,

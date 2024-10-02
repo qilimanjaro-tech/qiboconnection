@@ -2,6 +2,8 @@
 
 from datetime import datetime, timezone
 
+import yaml
+
 from qiboconnection.models.calibration import Calibration
 from qiboconnection.typings.responses.calibration_response import CalibrationRequest, CalibrationResponse
 
@@ -41,7 +43,7 @@ def test_calibration_creation_from_response():
     calibration = Calibration.from_response(response=calibration_response)
 
     assert isinstance(calibration, Calibration)
-    assert calibration.calibration == {"a": 0}, "Decoded calibration does not coincide with expected"
+    assert yaml.safe_load(calibration.calibration) == {"a": 0}, "Decoded calibration does not coincide with expected"
 
 
 def test_calibration_request():

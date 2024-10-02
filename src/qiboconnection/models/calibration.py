@@ -18,7 +18,7 @@ from dataclasses import field
 
 from qiboconnection.typings.requests import CalibrationRequest
 from qiboconnection.typings.responses import CalibrationResponse
-from qiboconnection.util import decode_jsonified_dict, jsonify_dict_and_base64_encode
+from qiboconnection.util import base64_decode, decode_jsonified_dict, jsonify_dict_and_base64_encode
 
 
 # pylint: disable=too-many-instance-attributes
@@ -28,7 +28,7 @@ class Calibration:
 
     name: str
     description: str
-    calibration: dict
+    calibration: str
     id: int | None = field(default=None)
 
     def __init__(self, **kwargs):
@@ -51,7 +51,7 @@ class Calibration:
             description=response.description,
             user_id=response.user_id,
             device_id=response.device_id,
-            calibration=decode_jsonified_dict(response.calibration),
+            calibration=base64_decode(response.calibration),
             qililab_version=response.qililab_version,
         )
 

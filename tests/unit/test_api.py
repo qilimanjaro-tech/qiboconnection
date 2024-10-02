@@ -14,6 +14,7 @@ from qibo.models import Circuit
 from qiboconnection.api import API
 from qiboconnection.connection import ConnectionConfiguration
 from qiboconnection.errors import ConnectionException, RemoteExecutionException
+from qiboconnection.models.calibration import Calibration
 from qiboconnection.models.devices.devices import Devices
 from qiboconnection.models.devices.util import create_device
 from qiboconnection.models.job_listing import JobListing
@@ -23,7 +24,7 @@ from qiboconnection.typings.job_data import JobData
 from qiboconnection.typings.vqa import VQA
 from qiboconnection.util import compress_any
 
-from .data import runcard_dict, web_responses
+from .data import calibration_serialized, runcard_dict, web_responses
 from .data.web_responses.job import JobResponse
 
 
@@ -78,6 +79,28 @@ def test_last_runcard(mocked_web_call: MagicMock, mocked_api: API):
         qililab_version=qililab_version,
     )
     assert isinstance(mocked_api.last_runcard, Runcard)
+
+
+@patch("qiboconnection.connection.Connection.send_post_auth_remote_api_call", autospec=True)
+def test_last_calibration(mocked_web_call: MagicMock, mocked_api: API):
+    """Test last_runcard property"""
+    mocked_web_call.return_value = web_responses.calibrations.create_response
+
+    assert mocked_api.last_calibration is None
+    name = "MyDemoCalibration"
+    description = "A test calibration"
+    device_id = 1
+    user_id = 1
+    qililab_version = "0.0.0"
+    _ = mocked_api.save_calibration(
+        name=name,
+        description=description,
+        calibration_serialized=calibration_serialized,
+        device_id=device_id,
+        user_id=user_id,
+        qililab_version=qililab_version,
+    )
+    assert isinstance(mocked_api.last_calibration, Calibration)
 
 
 def test_user_id(mocked_api: API):
