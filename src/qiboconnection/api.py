@@ -302,7 +302,7 @@ class API(ABC):
         self,
         circuit: Circuit | List[Circuit] | None = None,
         qprogram: str | None = None,
-        anneal_program_args: str | None = None,
+        anneal_program_args: dict | None = None,
         vqa: VQA | None = None,
         nshots: int = 10,
         device_ids: List[int] | None = None,
@@ -316,7 +316,7 @@ class API(ABC):
         Args:
             circuit (Circuit or List[Circuit]): a Qibo circuit to execute
             qprogram (str): a QProgram description, result of Qililab utils `serialize(qprogram)` function.
-            anneal_program_args (str): an annealing implementation. It is supposed to contain a dict with everything needed for a platform.
+            anneal_program_args (dict): an annealing implementation. It is supposed to contain a dict with everything needed for a platform.
             vqa (dict): a Variational Quantum Algorithm, result of applications-sdk' VQA.to_dict() method.
             nshots (int): number of times the execution is to be done.
             device_ids (List[int]): list of devices where the execution should be performed. If set, any device set

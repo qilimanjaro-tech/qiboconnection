@@ -18,7 +18,7 @@ from dataclasses import field
 
 from qiboconnection.typings.requests import CalibrationRequest
 from qiboconnection.typings.responses import CalibrationResponse
-from qiboconnection.util import base64_decode, jsonify_dict_and_base64_encode
+from qiboconnection.util import base64_decode, base64url_encode, jsonify_dict_and_base64_encode
 
 
 # pylint: disable=too-many-instance-attributes
@@ -38,7 +38,7 @@ class Calibration:
     @property
     def _encoded_calibration(self):
         """return base64-encoded stringified jsonified experiment"""
-        return jsonify_dict_and_base64_encode(self.calibration) if self.calibration is not None else None
+        return base64url_encode(self.calibration) if self.calibration is not None else None
 
     @classmethod
     def from_response(cls, response: CalibrationResponse):
