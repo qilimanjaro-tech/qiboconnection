@@ -14,3 +14,4 @@ bandit==1.7.4
 responses
 types-requests==2.28.11.8
 responses==0.23.3
+python-dotenv==1.0.1

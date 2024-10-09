@@ -38,12 +38,12 @@ from qiboconnection.config import logger
 from qiboconnection.connection import Connection
 from qiboconnection.constants import API_CONSTANTS, REST, REST_ERROR
 from qiboconnection.errors import ConnectionException, RemoteExecutionException
-from qiboconnection.models import Job, JobListing, Runcard
+from qiboconnection.models import Calibration, Job, JobListing, Runcard
 from qiboconnection.models.devices import Device, Devices, create_device
 from qiboconnection.typings.connection import ConnectionConfiguration
 from qiboconnection.typings.enums import JobStatus
 from qiboconnection.typings.job_data import JobData
-from qiboconnection.typings.responses import JobListingItemResponse, RuncardResponse
+from qiboconnection.typings.responses import CalibrationResponse, JobListingItemResponse, RuncardResponse
 from qiboconnection.typings.responses.job_response import JobResponse
 from qiboconnection.typings.vqa import VQA
 from qiboconnection.util import unzip
@@ -67,6 +67,7 @@ class API(ABC):
     _CIRCUITS_CALL_PATH = "/circuits"
     _DEVICES_CALL_PATH = "/devices"
     _RUNCARDS_CALL_PATH = "/runcards"
+    _CALIBRATIONS_CALL_PATH = "/calibrations"
     _PING_CALL_PATH = "/status"
 
     @typechecked
@@ -80,6 +81,7 @@ class API(ABC):
         self._jobs_listing: JobListing | None = None
         self._selected_devices: List[Device] | None = None
         self._runcard: Runcard | None = None
+        self._calibration: Calibration | None = None
 
     @classmethod
     def login(cls, username: str, api_key: str):
@@ -123,6 +125,15 @@ class API(ABC):
             Runcard | None: last uploaded runcard
         """
         return self._runcard
+
+    @property
+    def last_calibration(self) -> Calibration | None:
+        """Returns the last calibration uploaded in the current session, in case there has been one.
+
+        Returns:
+            Calibration | None: last uploaded calibration
+        """
+        return self._calibration
 
     @property
     def user_id(self) -> int:
@@ -291,6 +302,7 @@ class API(ABC):
         self,
         circuit: Circuit | List[Circuit] | None = None,
         qprogram: str | None = None,
+        anneal_program_args: dict | None = None,
         vqa: VQA | None = None,
         nshots: int = 10,
         device_ids: List[int] | None = None,
@@ -303,7 +315,8 @@ class API(ABC):
 
         Args:
             circuit (Circuit or List[Circuit]): a Qibo circuit to execute
-            qprogram (str): a QProgram description, result of Qililab's QProgram.to_dict() function.
+            qprogram (str): a QProgram description, result of Qililab utils `serialize(qprogram)` function.
+            anneal_program_args (dict): an annealing implementation. It is supposed to contain a dict with everything needed for a platform.
             vqa (dict): a Variational Quantum Algorithm, result of applications-sdk' VQA.to_dict() method.
             nshots (int): number of times the execution is to be done.
             device_ids (List[int]): list of devices where the execution should be performed. If set, any device set
@@ -314,8 +327,8 @@ class API(ABC):
             List[int]: list of job ids
 
         Raises:
-            ValueError: Both circuit and experiment were provided, but execute() only takes at most of them.
-            ValueError: Neither of experiment or circuit were provided, but execute() only takes at least one of them.
+            ValueError: VQA, circuit, qprogram and anneal_program_args were provided, but execute() only takes one of them.
+            ValueError: Neither of circuit, vqa, qprogram or anneal_program_args were provided.
         """
 
         # Ensure provided selected_devices are valid. If not provided, use the ones selected by API.select_device_id.
@@ -356,6 +369,7 @@ class API(ABC):
             Job(
                 circuit=circuit,
                 qprogram=qprogram,
+                anneal_program_args=anneal_program_args,
                 vqa=vqa,
                 nshots=nshots,
                 name=name,
@@ -766,6 +780,205 @@ class API(ABC):
         if status_code != 204:
             raise RemoteExecutionException(message="Runcard could not be removed.", status_code=status_code)
         logger.info("Runcard %i deleted successfully with message: %s", runcard_id, response)
+
+    # CALIBRATIONS
+
+    def _create_calibration_response(self, calibration: Calibration):
+        """Make the calibration create request and parse the response"""
+        response, status_code = self._connection.send_post_auth_remote_api_call(
+            path=self._CALIBRATIONS_CALL_PATH,
+            data=asdict(calibration.calibration_request()),
+        )
+        if status_code not in [200, 201]:
+            raise RemoteExecutionException(message="Calibration could not be saved.", status_code=status_code)
+        logger.debug("Experiment saved successfully.")
+        return CalibrationResponse.from_kwargs(**response)
+
+    @typechecked
+    def save_calibration(
+        self,
+        name: str,
+        description: str,
+        calibration_serialized: str,
+        device_id: int,
+        user_id: int,
+        qililab_version: str,
+    ):
+        """Save a calibration into the database af our servers, for it to be easily recovered when needed.
+
+          .. warning::
+
+            This method is only available for Qilimanjaro members.
+
+        Args:
+            name: Name the experiment is going to be saved with.
+            description: Short descriptive text to more easily identify this specific experiment instance.
+            calibration_dict: Serialized calibration (using its `.to_dict()` method)
+            device_id: Id of the device the experiment was executed in
+            user_id: Id of the user that is executing the experiment
+            qililab_version: version of qililab the experiment was executed with
+
+        Returns:
+            new saved calibration
+
+        """
+
+        calibration = Calibration(
+            id=None,
+            name=name,
+            description=description,
+            calibration=calibration_serialized,
+            device_id=device_id,
+            user_id=user_id,
+            qililab_version=qililab_version,
+        )
+
+        calibration_response = self._create_calibration_response(calibration=calibration)
+        created_calibration = Calibration.from_response(response=calibration_response)
+
+        self._calibration = created_calibration
+        return created_calibration.id  # type: ignore[attr-defined]
+
+    @typechecked
+    def _get_calibration_response(self, calibration_id: int):
+        """Gets complete information of a specific calibration
+
+        Raises:
+            RemoteExecutionException: Calibration could not be retrieved
+
+        Returns:
+            CalibrationResponse: response with the info of the requested calibration"""
+        response, status_code = self._connection.send_get_auth_remote_api_call(
+            path=f"{self._CALIBRATIONS_CALL_PATH}/{calibration_id}"
+        )
+        if status_code != 200:
+            raise RemoteExecutionException(message="Calibration could not be retrieved.", status_code=status_code)
+        return CalibrationResponse.from_kwargs(**response)
+
+    @typechecked
+    def _get_calibration_by_name_response(self, calibration_name: str):
+        """Gets complete information of a specific calibration by name
+
+        Raises:
+            RemoteExecutionException: Calibration could not be retrieved
+
+        Returns:
+            CalibrationResponse: response with the info of the requested calibration"""
+        response, status_code = self._connection.send_get_auth_remote_api_call(
+            path=f"{self._CALIBRATIONS_CALL_PATH}/by_keys", params={"name": calibration_name}
+        )
+
+        if status_code != 200:
+            raise RemoteExecutionException(message="Calibration could not be retrieved.", status_code=status_code)
+
+        return CalibrationResponse.from_kwargs(**response)
+
+    @typechecked
+    def get_calibration(self, calibration_id: int | None = None, calibration_name: str | None = None) -> Calibration:
+        """Get full information of a specific calibration
+
+          .. warning::
+
+            This method is only available for Qilimanjaro members.
+
+        Args:
+            calibration_id(int, optional): id of the calibration to retrieve. Incompatible with providing a name.
+            calibration_name(str, optional): name of the calibration to retrieve. Incompatible with providing an id.
+
+        Raises:
+            RemoteExecutionException: Calibration could not be retrieved
+
+        Returns:
+            Calibration: serialized calibration dictionary
+        """
+        if calibration_id is not None and calibration_name is not None:
+            raise ValueError("Both of of id and name cannot be simultaneously provided")
+        if calibration_id is not None:
+            return Calibration.from_response(self._get_calibration_response(calibration_id=calibration_id))
+        if calibration_name is not None:
+            return Calibration.from_response(self._get_calibration_by_name_response(calibration_name=calibration_name))
+        raise ValueError("At least one of id and name must be provided")
+
+    def _get_list_calibration_response(
+        self,
+    ) -> List[CalibrationResponse]:
+        """Performs the actual calibration listing request
+        Returns
+            List[CalibrationResponse]: list of objects encoding the expected response structure"""
+        responses, status_codes = unzip(
+            self._connection.send_get_auth_remote_api_call_all_pages(path=self._CALIBRATIONS_CALL_PATH)
+        )
+        for status_code in status_codes:
+            if status_code != 200:
+                raise RemoteExecutionException(message="Calibrations could not be listed.", status_code=status_code)
+
+        items = [item for response in responses for item in response[REST.ITEMS]]
+        return [CalibrationResponse.from_kwargs(**item) for item in items]
+
+    @typechecked
+    def list_calibrations(self) -> List[Calibration]:
+        """List all calibrations
+
+        Raises:
+            RemoteExecutionException: Devices could not be retrieved
+
+        Returns:
+            Calibrations: All Calibrations
+        """
+        calibrations_response = self._get_list_calibration_response()
+        return [Calibration.from_response(response=response) for response in calibrations_response]
+
+    @typechecked
+    def update_calibration(self, calibration: Calibration) -> Calibration:
+        """Update the info of a calibration in the database
+
+          .. warning::
+
+            This method is only available for Qilimanjaro members.
+
+        Raises:
+            RemoteExecutionException: Calibration could not be retrieved
+
+        Returns:
+            Calibration: serialized calibration dictionary
+        """
+        if calibration.id is None:  # type: ignore[attr-defined]
+            raise ValueError("Calibration id must be defined for updating its info in the database.")
+
+        calibration_response = self._update_calibration_response(calibration=calibration)
+        updated_calibration = Calibration.from_response(response=calibration_response)
+
+        self._calibration = updated_calibration
+        return updated_calibration
+
+    def _update_calibration_response(self, calibration: Calibration):
+        """Make the calibration update request and parse the response"""
+        response, status_code = self._connection.send_put_auth_remote_api_call(
+            path=f"{self._CALIBRATIONS_CALL_PATH}/{calibration.id}",  # type: ignore[attr-defined]
+            data=asdict(calibration.calibration_request()),
+        )
+        if status_code not in [200, 201]:
+            raise RemoteExecutionException(message="Calibration could not be saved.", status_code=status_code)
+        logger.debug("Calibration updated successfully.")
+        return CalibrationResponse.from_kwargs(**response)
+
+    @typechecked
+    def delete_calibration(self, calibration_id: int) -> None:
+        """Deletes a job from the database.
+
+          .. warning::
+
+            This method is only available for Qilimanjaro members.
+
+        Raises:
+            RemoteExecutionException: Devices could not be retrieved
+        """
+        response, status_code = self._connection.send_delete_auth_remote_api_call(
+            path=f"{self._CALIBRATIONS_CALL_PATH}/{calibration_id}"
+        )
+        if status_code != 204:
+            raise RemoteExecutionException(message="Calibration could not be removed.", status_code=status_code)
+        logger.info("Calibration %i deleted successfully with message: %s", calibration_id, response)
 
     @typechecked
     def delete_job(self, job_id: int) -> None:
