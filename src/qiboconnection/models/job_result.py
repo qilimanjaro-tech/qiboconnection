@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-""" JobResult typing """
+"""JobResult typing"""
 
 import json
 import logging
@@ -35,9 +35,9 @@ class JobResult(ABC):
     job_id: int
     http_response: str
     job_type: str
-    data: List[CircuitResult] | CircuitResult | npt.NDArray | List[int] | List[float] | dict | List[
-        dict
-    ] | str | None = field(init=False)
+    data: (
+        List[CircuitResult] | CircuitResult | npt.NDArray | List[int] | List[float] | dict | List[dict] | str | None
+    ) = field(init=False)
 
     def __post_init__(self) -> None:
         """
@@ -47,7 +47,7 @@ class JobResult(ABC):
         try:
             self.data = decompress_any(**json.loads(self.http_response))
             return
-        except Exception as ex:  # pylint: disable=broad-exception-caught  # delete ASAP
+        except Exception as ex:  # noqa: BLE001 # delete ASAP
             logger.warning(
                 f"Unable to decompress JobResult with get_results interface due to {ex}({type(ex)})."
                 f"Falling back to legacy methods."

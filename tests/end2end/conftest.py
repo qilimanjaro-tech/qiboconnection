@@ -139,8 +139,8 @@ def get_vqa_fixture(caplog) -> VQA:
     caplog.clear()
     try:
         return vqa
-    except Exception as e:
-        pytest.fail(f"Circuit creation failed. {e}.", pytrace=False)
+    except Exception as e:  # noqa: BLE001
+        return pytest.fail(f"Circuit creation failed. {e}.", pytrace=False)
 
 
 @pytest.fixture(name="numpy_circuit")
@@ -157,7 +157,7 @@ def get_qibo_circuit_numpy_fixture(caplog) -> Circuit:
     caplog.clear()
     try:
         return circuit
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         pytest.fail(f"Circuit creation failed. {e}.", pytrace=False)
 
 
@@ -183,7 +183,7 @@ def one_qubits_500_gates_circuit(caplog) -> Circuit:
     caplog.clear()
     try:
         return c
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         pytest.fail(f"Circuit creation failed. {e}.", pytrace=False)
 
 
@@ -210,7 +210,7 @@ def two_qubits_500_gates_circuit(caplog) -> Circuit:
     caplog.clear()
     try:
         return c
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         pytest.fail(f"Circuit creation failed. {e}.", pytrace=False)
 
 
@@ -243,7 +243,7 @@ def five_qubits_500_gates_circuit(caplog) -> Circuit:
     caplog.clear()
     try:
         return c
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         pytest.fail(f"Circuit creation failed. {e}.", pytrace=False)
 
 

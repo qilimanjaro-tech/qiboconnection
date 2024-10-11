@@ -1,4 +1,5 @@
 """End-to-end tests."""
+
 # pylint: disable=logging-fstring-interpolation
 # pylint: disable=protected-access
 import logging
@@ -81,7 +82,7 @@ def test_device_selection(device: Device, api: API):
             api.select_device_id(device_id=device.id)
         except ConnectionError:
             pytest.fail(f"Connection was not possible to {device.name}", pytrace=False)
-        except Exception as ex:  # pylint: disable=broad-exception-caught
+        except Exception as ex:  # noqa: BLE001
             pytest.fail(f"Connecting to {device.name} raised {ex}", pytrace=True)
     else:
         pytest.skip(f"Operation {Operation.SELECT} not possible for {device}")

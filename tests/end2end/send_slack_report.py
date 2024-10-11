@@ -33,7 +33,7 @@ def send_tests_summary_as_message():
             summary += f"Test Cases Executed: {data['tot_test_plan_executed']} : "
             summary += ", ".join([f"{outcome} : {tot}" for outcome, tot in data["tot_outcomes"].items()])
         send_slack_message(f"{summary}", test_summary_message=True)
-    except Exception as e:  # pylint: disable=broad-exception-caught
+    except Exception as e:  # noqa: BLE001
         send_slack_message(
             f":skull: SUMMARY ERROR\n-Found {e}\n."
             f" {'' if not summary else 'The message had size ' + str(len(summary))}."
@@ -46,7 +46,7 @@ def send_tests_full_report_as_file():
         filename = PATH_FULL_REPORT.name
         with open(PATH_FULL_REPORT, "r", encoding="utf-8") as file:
             send_slack_file(filename=filename, file=file)
-    except Exception as e:  # pylint: disable=broad-exception-caught
+    except Exception as e:  # noqa: BLE001
         send_slack_message(f":skull: FULL REPORT ERROR\n-Found {e}")
 
 
