@@ -21,5 +21,4 @@ from .job_result import JobResult
 from .runcard import Runcard
 from .user import User
 
-
 __all__ = ["Job", "JobListing", "JobListingItem", "JobResult", "Runcard", "User"]

@@ -17,5 +17,4 @@ from .device_details import DeviceDetails
 from .devices import Devices
 from .util import create_device
 
-
 __all__ = ["Device", "DeviceDetails", "Devices", "create_device"]

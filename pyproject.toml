@@ -37,8 +37,8 @@ preview = true
 select = [
     "F",
     "E",
-    #"W",
-    #"I",
+    "W",
+    "I",
     #"YTT",
     ## "ANN",
     #"ASYNC",

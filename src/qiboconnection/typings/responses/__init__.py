@@ -18,5 +18,4 @@ from .access_token_response import AccessTokenResponse
 from .job_listing_item_response import JobListingItemResponse
 from .runcard_response import RuncardResponse
 
-
 __all__ = ["AccessTokenResponse", "JobListingItemResponse", "RuncardResponse"]

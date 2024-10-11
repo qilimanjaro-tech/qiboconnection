@@ -26,7 +26,6 @@ from .token_type import TokenType
 from .user_role import UserRole
 from .user_scope import UserScope
 
-
 __all__ = [
     "AlgorithmName",
     "AlgorithmType",

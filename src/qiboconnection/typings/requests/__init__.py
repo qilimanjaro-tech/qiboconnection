@@ -18,5 +18,4 @@ from .assertion_payload import AssertionPayload
 from .job_request import JobRequest
 from .runcard_request import RuncardRequest
 
-
 __all__ = ["AssertionPayload", "JobRequest", "RuncardRequest"]

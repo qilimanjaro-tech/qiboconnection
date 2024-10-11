@@ -16,5 +16,4 @@
 
 from .device_input import DeviceInput
 
-
 __all__ = ["DeviceInput"]
