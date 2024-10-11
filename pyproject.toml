@@ -2,6 +2,35 @@
 line-length = 120
 output-format = "concise"
 target-version = "py310"
+exclude = [
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".git-rewrite",
+    ".hg",
+    ".ipynb_checkpoints",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".pyenv",
+    ".pytest_cache",
+    ".pytype",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    ".vscode",
+    "__pypackages__",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "node_modules",
+    "site-packages",
+    "venv",
+    "_debug*"
+]
 
 [tool.ruff.lint]
 preview = true
@@ -74,13 +103,13 @@ ignore = [
     "PLR0917",
     "PLR1702"]
 dummy-variable-rgx = "^_$"
-logger-objects = ["qililab.logger"]
+logger-objects = ["qiboconnection.logger"]
 
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = ["ANN", "S", "CPY", "SLF001", "PLR", "DOC", "RUF012"]
 "docs/*" = ["CPY"]
 "examples/*" = ["CPY", "T20"]
-"src/qililab/about.py" = ["T201"]
+"src/qiboconnection/about.py" = ["T201"]
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"
@@ -120,7 +149,7 @@ docstring-code-line-length = "dynamic"
         '*/virtualenv/*',
         '*/virtualenvs/*',
         '*/tests/*',
-        'examples/*'
+        'examples/*',
     ]
 
 [tool.nbqa.md]

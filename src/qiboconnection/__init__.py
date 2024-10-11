@@ -22,9 +22,11 @@ This module contains all needed classes needed for interacting with Qilimanjaro'
     ~api.API
 """
 
-
 __version__ = "0.22.1"
 
 
 from .about import about
 from .api import API
+
+
+__all__ = ["about", "API"]

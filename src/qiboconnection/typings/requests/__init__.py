@@ -12,7 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-""" Requests typings module"""
+"""Requests typings module"""
+
 from .assertion_payload import AssertionPayload
 from .job_request import JobRequest
 from .runcard_request import RuncardRequest
+
+
+__all__ = ["AssertionPayload", "JobRequest", "RuncardRequest"]

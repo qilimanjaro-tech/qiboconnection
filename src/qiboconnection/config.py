@@ -12,13 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-""" global configuration settings """
+"""global configuration settings"""
+
 import enum
 import logging
 import os
 from typing import Literal, Union
 
-from qiboconnection import __version__  # pylint: disable=cyclic-import
 
 logger = logging.getLogger(__name__)
 
