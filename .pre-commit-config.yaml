@@ -12,7 +12,7 @@ repos:
       - id: mypy
         args: [--no-strict-optional, --ignore-missing-imports]
         additional_dependencies:
-          [types-PyYAML==6.0.12, types-requests==2.32.0]
+          [types-PyYAML==6.0.12, types-requests~=2.32.0]
 
   - repo: https://github.com/commitizen-tools/commitizen
     rev: v3.29.1
