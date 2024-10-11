@@ -36,7 +36,7 @@ def send_tests_summary_as_message():
     except Exception as e:  # pylint: disable=broad-exception-caught
         send_slack_message(
             f":skull: SUMMARY ERROR\n-Found {e}\n."
-            f" {'' if not summary else 'The message had size '+str(len(summary))}."
+            f" {'' if not summary else 'The message had size ' + str(len(summary))}."
         )
 
 

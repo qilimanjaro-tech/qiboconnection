@@ -262,13 +262,13 @@ def gen_test_run_report(out_report, tmpl_report, in_json_run):
                 tbody += f"<td>{name}</td>"
                 tbody += f"<td>{info['info']['docstring']}</td>"
                 for outcome in ALL_OUTCOMES:
-                    tbody += f"<td>{0 if not outcome in info['results'] else info['results'][outcome]}</td>"
+                    tbody += f"<td>{0 if outcome not in info['results'] else info['results'][outcome]}</td>"
                 tbody += "</tr>"
             else:
                 docstring = info["info"]["docstring"].replace("\n", "")
                 tbody += f"|{name}|{docstring}|"
                 for outcome in ALL_OUTCOMES:
-                    tbody += f"{0 if not outcome in info['results'] else info['results'][outcome]}|"
+                    tbody += f"{0 if outcome not in info['results'] else info['results'][outcome]}|"
                 tbody += "\n"
         variables["tbody"] = tbody
 

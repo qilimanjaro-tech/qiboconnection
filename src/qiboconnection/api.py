@@ -778,9 +778,7 @@ class API(ABC):
         Raises:
             RemoteExecutionException: Devices could not be retrieved
         """
-        response, status_code = self._connection.send_delete_auth_remote_api_call(  # pylint: disable=unused-variable
-            path=f"{self._JOBS_CALL_PATH}/{job_id}"
-        )
+        _, status_code = self._connection.send_delete_auth_remote_api_call(path=f"{self._JOBS_CALL_PATH}/{job_id}")
         if status_code != 204:
             raise RemoteExecutionException(message="Job could not be removed.", status_code=status_code)
         logger.info(f"Job {job_id} deleted successfully")
@@ -788,7 +786,7 @@ class API(ABC):
     @typechecked
     def cancel_job(self, job_id: int) -> None:
         """Cancels a job"""
-        response, status_code = self._connection.send_put_auth_remote_api_call(  # pylint: disable=unused-variable
+        _, status_code = self._connection.send_put_auth_remote_api_call(
             data={"job_id": job_id}, path=f"{self._JOBS_CALL_PATH}/cancel/{job_id}"
         )
         if status_code != 204:

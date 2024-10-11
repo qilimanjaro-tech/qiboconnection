@@ -29,14 +29,14 @@ exclude = [
     "node_modules",
     "site-packages",
     "venv",
-    "_debug*"
+    "debug/*"
 ]
 
 [tool.ruff.lint]
 preview = true
 select = [
     "F",
-    #"E",
+    "E",
     #"W",
     #"I",
     #"YTT",
@@ -150,6 +150,7 @@ docstring-code-line-length = "dynamic"
         '*/virtualenvs/*',
         '*/tests/*',
         'examples/*',
+        'debug/*'
     ]
 
 [tool.nbqa.md]
