@@ -6,7 +6,7 @@ target-version = "py310"
 [tool.ruff.lint]
 preview = true
 select = [
-    #"F",
+    "F",
     #"E",
     #"W",
     #"I",
