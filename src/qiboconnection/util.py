@@ -12,14 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-""" Utility functions """
+"""Utility functions"""
+
 import base64
-import binascii
 import gzip
-import io
 import json
 import logging
-import pickle  # nosec - temporary bandit ignore
 from base64 import urlsafe_b64decode, urlsafe_b64encode
 from inspect import signature
 from json.decoder import JSONDecodeError
@@ -67,10 +65,7 @@ def decode_jsonified_dict(http_response: str) -> dict:
 
 
 def _decode_pickled_results(http_response: str) -> Any:
-    """Decodes results that have been pickled and base64 encoded."""
-    decoded_result_str = urlsafe_b64decode(http_response)
-    result_bytes = io.BytesIO(decoded_result_str)
-    return pickle.loads(result_bytes.getbuffer())  # nosec - temporary bandit ignore
+    raise DeprecationWarning("Pickled objects not supported")
 
 
 def decode_results_from_circuit(http_response: str) -> CircuitResult | dict:
@@ -83,10 +78,8 @@ def decode_results_from_circuit(http_response: str) -> CircuitResult | dict:
     Returns:
         List[CircuitResult]: a Qibo CircuitResult
     """
-    try:
-        return decode_jsonified_dict(http_response)
-    except (binascii.Error, UnicodeDecodeError, JSONDecodeError):
-        return _decode_pickled_results(http_response)
+
+    raise DeprecationWarning("Pickled objects not supported")
 
 
 def decode_results_from_qprogram(http_response: str) -> dict:
