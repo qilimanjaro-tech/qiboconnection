@@ -1,4 +1,4 @@
-""" Web Responses class"""
+"""Web Responses class"""
 
 from .auth import Auth
 from .devices import Devices

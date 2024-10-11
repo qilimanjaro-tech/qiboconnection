@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-""" Util Functions used by the API module """
+"""Util Functions used by the API module"""
 
 import json
 from typing import Any, List

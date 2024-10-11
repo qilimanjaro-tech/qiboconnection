@@ -1,4 +1,4 @@
-""" Tests methods for User """
+"""Tests methods for User"""
 
 from qiboconnection.models.user import User
 

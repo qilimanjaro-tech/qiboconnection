@@ -1,4 +1,4 @@
-""" Tests util functions """
+"""Tests util functions"""
 
 import json
 
@@ -110,7 +110,7 @@ def test_from_kwargs():
                 "name": "test",
                 "summary": "test",
                 "extra_arg": "Extra Argument",
-            }
+            },
         ),
         JobResponse,
     )

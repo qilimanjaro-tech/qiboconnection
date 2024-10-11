@@ -1,4 +1,4 @@
-""" Tests methods for Device """
+"""Tests methods for Device"""
 
 import json
 

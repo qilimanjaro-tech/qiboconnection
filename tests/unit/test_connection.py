@@ -1,4 +1,5 @@
-""" Test methods for Connection """
+"""Test methods for Connection"""
+
 import io
 from copy import deepcopy
 from unittest.mock import MagicMock, patch

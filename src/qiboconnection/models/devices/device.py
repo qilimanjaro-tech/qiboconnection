@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-""" Device class """
+"""Device class"""
+
 import json
 
 from typeguard import typechecked

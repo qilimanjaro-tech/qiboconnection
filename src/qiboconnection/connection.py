@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-""" Remote Connection """
+"""Remote Connection"""
+
 import json
 import os
 from abc import ABC

@@ -44,7 +44,7 @@ select = [
     "ASYNC",
     "S",
     "BLE",
-    #"CPY",
+    "CPY",
     #"C4",
     ## "DTZ",
     #"T10",

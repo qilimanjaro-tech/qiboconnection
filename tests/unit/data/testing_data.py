@@ -1,5 +1,5 @@
 # data.py
-""" Data to used alongside the test suite. """
+"""Data to used alongside the test suite."""
 
 from qiboconnection.typings.devices import DeviceInput
 from qiboconnection.typings.enums import DeviceStatus

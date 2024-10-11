@@ -1,4 +1,5 @@
 """Testing user roles can only do what they are intended to."""
+
 # pylint: disable=logging-fstring-interpolation
 import logging
 import os
@@ -325,13 +326,14 @@ def test_cannot_get_runcard(user_role: UserRole, runcard: Runcard):
 def test_can_save_runcard(user_role: UserRole, runcard: Runcard, api: API):
     "Check certain users cannot save runcards"
     api_save = get_user_can_save_runcard_api(user_role=user_role)
+    # type: ignore[attr-defined]
     runcard_id = api_save.save_runcard(
         name=runcard.name,
         description=runcard.description,
         runcard_dict=runcard.runcard,
-        device_id=runcard.device_id,
+        device_id=runcard.device_id,  # type: ignore[attr-defined]
         user_id=get_user_roles_id(user_role),
-        qililab_version=runcard.qililab_version,
+        qililab_version=runcard.qililab_version,  # type: ignore[attr-defined]
     )
     assert isinstance(runcard_id, int)
     api.delete_runcard(runcard_id)
@@ -347,9 +349,9 @@ def test_cannot_save_runcard(user_role: UserRole, runcard: Runcard):
             name=runcard.name,
             description=runcard.description,
             runcard_dict=runcard.runcard,
-            device_id=runcard.device_id,
+            device_id=runcard.device_id,  # type: ignore[attr-defined]
             user_id=get_user_roles_id(user_role),
-            qililab_version=runcard.qililab_version,
+            qililab_version=runcard.qililab_version,  # type: ignore[attr-defined]
         )
 
 
@@ -367,9 +369,9 @@ def test_can_save_and_delete_owned_runcards(user_role: UserRole, runcard: Runcar
         name=runcard.name,
         description=runcard.description,
         runcard_dict=runcard.runcard,
-        device_id=runcard.device_id,
+        device_id=runcard.device_id,  # type: ignore[attr-defined]
         user_id=get_user_roles_id(user_role),
-        qililab_version=runcard.qililab_version,
+        qililab_version=runcard.qililab_version,  # type: ignore[attr-defined]
     )
     assert isinstance(runcard_id, int)
     api_delete.delete_runcard(runcard_id)
@@ -386,9 +388,9 @@ def test_cannot_delete_not_owned_runcard(user_role: UserRole, runcard: Runcard, 
         name=runcard.name,
         description=runcard.description,
         runcard_dict=runcard.runcard,
-        device_id=runcard.device_id,
+        device_id=runcard.device_id,  # type: ignore[attr-defined]
         user_id=get_user_roles_id(user_role=UserRole.ADMIN),
-        qililab_version=runcard.qililab_version,
+        qililab_version=runcard.qililab_version,  # type: ignore[attr-defined]
     )
     assert isinstance(runcard_id, int)
 
@@ -448,9 +450,9 @@ def test_can_save_get_and_update_owned_runcards(user_role: UserRole, runcard: Ru
         name=runcard.name,
         description=runcard.description,
         runcard_dict=runcard.runcard,
-        device_id=runcard.device_id,
+        device_id=runcard.device_id,  # type: ignore[attr-defined]
         user_id=get_user_roles_id(user_role),
-        qililab_version=runcard.qililab_version,
+        qililab_version=runcard.qililab_version,  # type: ignore[attr-defined]
     )
     runcard_to_update = api_get.get_runcard(runcard_id=runcard_id)
     runcard_to_update.description = "updated_from_tests"
@@ -469,9 +471,9 @@ def test_cannot_update_not_owned_runcards(user_role: UserRole, runcard: Runcard,
         name=runcard.name,
         description=runcard.description,
         runcard_dict=runcard.runcard,
-        device_id=runcard.device_id,
+        device_id=runcard.device_id,  # type: ignore[attr-defined]
         user_id=get_user_roles_id(user_role=UserRole.ADMIN),
-        qililab_version=runcard.qililab_version,
+        qililab_version=runcard.qililab_version,  # type: ignore[attr-defined]
     )
     runcard_to_update = api.get_runcard(runcard_id)
     if user_role != UserRole.ADMIN:
