@@ -615,7 +615,7 @@ experiment_dict = {
                                 "name": "pulse",
                                 "amplitude": 0.6788726177728143,
                                 "frequency": None,
-                                "phase": 3.141592653589793,
+                                "phase": 3.141592653589793,  # noqa: FURB152
                                 "duration": 100,
                                 "pulse_shape": {"name": "drag", "num_sigmas": 4, "drag_coefficient": 0},
                             },

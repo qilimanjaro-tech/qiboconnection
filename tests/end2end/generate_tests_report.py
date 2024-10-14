@@ -8,6 +8,7 @@ import logging.config
 import os
 import re
 import sys
+from pathlib import Path
 
 # It should be nicer to get this info from pytest but I have not find an easy Enum with all the
 # possible outcomes
@@ -84,7 +85,7 @@ def extract_docstring(func, skip_args=True) -> str:
     if skip_args and docstring:
         docstring = re.sub(r"Args:.*", "", docstring, flags=re.DOTALL)
 
-    return docstring if docstring else ""
+    return docstring or ""
 
 
 def discover_tests(directory):
@@ -270,15 +271,12 @@ def gen_test_run_report(out_report, tmpl_report, in_json_run):
                 tbody += "\n"
         variables["tbody"] = tbody
 
-    with open(tmpl_report, "r", encoding="utf-8") as fp_tmpl:
-        html_txt = fp_tmpl.read()
-        for name, value in variables.items():
-            logger.info("Replacing %s ...", name)
-            html_txt = html_txt.replace(f"#{name}#", value)
-
-        with open(out_report, "w", encoding="utf-8") as fp_out:
-            fp_out.write(html_txt)
-            logger.info("File %s generated!", out_report)
+    html_txt = Path(tmpl_report).read_text(encoding="utf-8")
+    for name, value in variables.items():
+        logger.info("Replacing %s ...", name)
+        html_txt = html_txt.replace(f"#{name}#", value)
+    Path(out_report).write_text(html_txt, encoding="utf-8")
+    logger.info("File %s generated!", out_report)
 
 
 # -----------------------------------------------------------------------------

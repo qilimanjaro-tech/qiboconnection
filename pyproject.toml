@@ -65,12 +65,12 @@ select = [
     "SIM",
     "TID",
     "TCH",
-    ## "PTH",
-    ## "TD",
-    ## "PL",
-    ## "NPY",
-    ## "FURB",
-    ## "DOC",
+    # "PTH",
+    # "TD",
+    # "PL",
+    "NPY",
+    "FURB",
+    # "DOC",
     "RUF"
 ]
 ignore = [

@@ -15,6 +15,7 @@
 # Installation script for python
 import os
 import re
+from pathlib import Path
 
 from setuptools import find_packages, setup
 
@@ -30,7 +31,7 @@ def get_version():
         initfile_lines = version_file.readlines()
         VSRE = r"^__version__ = ['\"]([^'\"]*)['\"]"
         for line in initfile_lines:
-            mo = re.search(VSRE, line, re.M)
+            mo = re.search(VSRE, line, re.MULTILINE)
             if mo:
                 return mo.group(1)
         return None
@@ -38,13 +39,13 @@ def get_version():
 
 # Read in requirements
 with open("requirements.txt", encoding="utf-8") as requirements_file:
-    requirements = [r.strip() for r in requirements_file.readlines()]
+    requirements = [r.strip() for r in requirements_file]
 
 
 # load long description from README
-this_directory = os.path.abspath(os.path.dirname(__file__))
-with open(os.path.join(this_directory, "README.md"), encoding="utf-8") as f:
-    long_description = f.read()
+this_directory = Path(__file__).parent
+long_description = (this_directory / "README.md").read_text(encoding="utf-8")
+
 
 setup(
     name="qiboconnection",
