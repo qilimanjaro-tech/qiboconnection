@@ -148,8 +148,6 @@ def gen_test_plan(directory, file_out):
 
     logger.info("File %s created!", file_out)
 
-    print(f"Report created at {file_out}")
-
 
 def gen_test_run(in_json_plan: str, in_json_results: str, out_json_run: str):
     """Generates a JSON with the combination of Test Plan + Test Results
