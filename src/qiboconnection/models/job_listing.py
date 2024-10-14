@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-""" JobListing class """
+"""JobListing class"""
 
 from dataclasses import dataclass, field
 from typing import List
@@ -47,10 +47,10 @@ class JobListing:
 
         try:
             return pd.to_numeric(column)
-        except Exception:  # pylint: disable=broad-except
+        except Exception:  # noqa: BLE001
             try:
                 return pd.to_datetime(column)
-            except Exception:  # pylint: disable=broad-except
+            except Exception:  # noqa: BLE001
                 return column
 
     @classmethod

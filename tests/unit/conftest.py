@@ -1,4 +1,4 @@
-""" Pytest configuration fixtures for each session """
+"""Pytest configuration fixtures for each session"""
 
 import json
 from dataclasses import asdict

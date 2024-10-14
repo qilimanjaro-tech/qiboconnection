@@ -1,6 +1,3 @@
-# pylint: disable=logging-fstring-interpolation
-# pylint: disable=protected-access
-# pylint: disable=no-name-in-module
 import logging
 import os
 from enum import Enum
@@ -104,9 +101,7 @@ def get_logging_conf_or_fail_test(user_role=UserRole.ADMIN) -> ConnectionConfigu
         return pytest.fail("Login failed. Credentials were not provided in the environment.", pytrace=True)
 
 
-def get_api_or_fail_test(  # pylint: disable=inconsistent-return-statements
-    logging_conf: ConnectionConfiguration,
-) -> API:
+def get_api_or_fail_test(logging_conf: ConnectionConfiguration) -> API:  # type: ignore[return]
     """Informatively fail the test if the API instance could not be build with the ConnectionConfiguration:
 
     Returns:
@@ -114,7 +109,9 @@ def get_api_or_fail_test(  # pylint: disable=inconsistent-return-statements
     try:
         return API(configuration=logging_conf)
     except MissingCredentialsException as ex:
-        pytest.fail(f"Login failed. Check credentials. {ex}.", pytrace=True)
+        return pytest.fail(f"Login failed. Check credentials. {ex}.", pytrace=True)
+    except Exception as ex:  # noqa: BLE001
+        return pytest.fail(f"Login failed. Unknown exception. {ex}.", pytrace=True)
 
 
 def get_devices_listing_params(user_role: UserRole = UserRole.ADMIN) -> list[Device]:
@@ -207,7 +204,7 @@ def get_job_result(api: API, job_id: int, timeout: int = 250, call_every_seconds
     job_data: JobData = None
     while timer < timeout:
         sleep(call_every_seconds)
-        logger.debug(f"timer: {timer}, timeout: {timeout}")
+        logger.debug("timer: %i, timeout: %i", timer, timeout)
         job_data = api.get_job(job_id)
         if job_data.status not in [JobStatus.PENDING, JobStatus.QUEUED]:
             break

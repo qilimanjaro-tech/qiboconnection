@@ -1,4 +1,5 @@
-""" Tests methods for job result """
+"""Tests methods for job result"""
+
 import numpy as np
 
 from qiboconnection.models.job_result import JobResult

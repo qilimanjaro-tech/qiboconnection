@@ -1,4 +1,4 @@
-""" Runcards Web Responses """
+"""Runcards Web Responses"""
 
 runcard_base_response = {
     "runcard_id": 1,

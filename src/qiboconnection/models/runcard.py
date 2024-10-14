@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-""" Runcard class"""
+"""Runcard class"""
 
 from dataclasses import field
 

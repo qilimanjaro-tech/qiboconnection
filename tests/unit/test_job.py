@@ -1,4 +1,5 @@
-""" Tests methods for Job """
+"""Tests methods for Job"""
+
 from typing import cast
 
 import numpy as np
@@ -156,7 +157,7 @@ def test_job_creation_qprogram(user: User, simulator_device: Device):
         simulator_device (SimulatorDevice): SimulatorDevice
     """
 
-    job = Job(qprogram={}, user=user, device=cast(Device, simulator_device))
+    job = Job(qprogram="", user=user, device=cast(Device, simulator_device))
     assert job.job_type == JobType.QPROGRAM
 
 
@@ -172,7 +173,7 @@ def test_job_creation_raises_value_error_when_circuit_qprogram_or_vqa_are_define
     """
 
     with pytest.raises(ValueError) as e_info:
-        _ = Job(qprogram={}, circuit=circuits, user=user, device=cast(Device, simulator_device))
+        _ = Job(qprogram="", circuit=circuits, user=user, device=cast(Device, simulator_device))
     assert e_info.value.args[0] == "VQA, circuit and qprogram were provided, but execute() only takes one of them."
 
 
@@ -249,7 +250,7 @@ def test_job_request_with_qprogram(user: User, simulator_device: Device):
     job_status = JobStatus.COMPLETED
     user_id = user.user_id
     job = Job(
-        qprogram={},
+        qprogram="",
         user=user,
         device=cast(Device, simulator_device),
         job_status=job_status,
@@ -318,7 +319,7 @@ def test_job_request_raises_value_error_if_several_of_circuit_and_qprogram(
         simulator_device (SimulatorDevice): SimulatorDevice
     """
     job = Job(
-        qprogram={},
+        qprogram="",
         user=user,
         device=cast(Device, simulator_device),
         job_status=JobStatus.COMPLETED,
@@ -339,7 +340,7 @@ def test_job_request_raises_value_error_if_unknown_type(user: User, simulator_de
         simulator_device (SimulatorDevice): SimulatorDevice
     """
     job = Job(
-        qprogram={},
+        qprogram="",
         user=user,
         device=cast(Device, simulator_device),
         job_status=JobStatus.COMPLETED,

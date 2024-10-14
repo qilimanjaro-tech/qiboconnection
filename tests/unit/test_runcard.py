@@ -1,4 +1,4 @@
-""" Test methods for Runcards classes """
+"""Test methods for Runcards classes"""
 
 from datetime import datetime, timezone
 

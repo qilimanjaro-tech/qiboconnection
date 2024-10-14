@@ -11,12 +11,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-""" JobResponse """
+"""JobResponse"""
+
 from dataclasses import dataclass
 
 from qiboconnection.util import from_kwargs
 
-from ..requests import JobRequest
+from ..requests import JobRequest  # noqa: TID252
 
 
 @dataclass

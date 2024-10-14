@@ -1,4 +1,5 @@
-""" Test methods for Connection """
+"""Test methods for Connection"""
+
 import io
 from copy import deepcopy
 from unittest.mock import MagicMock, patch
@@ -101,7 +102,7 @@ def test_user_slack_id_without_slack_id(mocked_web_call: MagicMock, mocked_conne
     slack_id = connection.user_slack_id
 
     mocked_web_call.assert_called_with(self=connection, path=f"/users/{connection.user.user_id}")
-    assert slack_id == ""
+    assert not slack_id
 
 
 @patch("qiboconnection.connection.Connection.send_get_auth_remote_api_call", autospec=True)
@@ -517,7 +518,7 @@ def test_send_file(mocked_rest_call: MagicMock, mocked_connection: Connection):
     """Asserts correct put function is called for updating a device status"""
 
     _CHANNEL_ID = 1
-    _FILE = io.TextIOWrapper(buffer=io.BytesIO())
+    _FILE = io.TextIOWrapper(buffer=io.BytesIO(), encoding="utf-8")
     _FILENAME = "filename"
     _TIMEOUT = 10
 

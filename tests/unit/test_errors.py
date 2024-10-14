@@ -1,4 +1,4 @@
-""" Test Error rising and utils """
+"""Test Error rising and utils"""
 
 import pytest
 from requests.models import HTTPError, Response
