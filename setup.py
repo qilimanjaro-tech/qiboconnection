@@ -32,6 +32,7 @@ def get_version():
         mo = re.search(VSRE, line, re.M)
         if mo:
             return mo.group(1)
+    return None
 
 
 # Read in requirements

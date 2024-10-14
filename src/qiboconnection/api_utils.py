@@ -103,20 +103,20 @@ def log_job_status_info(job_response: JobResponse):
             job_response.job_id,
             job_response.queue_position,
         )
-        return None
+        return
 
     if job_response.status == JobStatus.RUNNING:
         logger.warning("Your job with id %i is still running.", job_response.job_id)
-        return None
+        return
     if job_response.status == JobStatus.NOT_SENT:
         logger.warning("Your job with id %i has not been sent.", job_response.job_id)
-        return None
+        return
     if job_response.status == JobStatus.ERROR:
         logger.error("Your job with id %i failed.", job_response.job_id)
-        return None
+        return
     if job_response.status == JobStatus.COMPLETED:
         logger.warning("Your job with id %i is completed.", job_response.job_id)
-        return None
+        return
 
     logger.warning(f"Your job with id %i is {job_response.status}.", job_response.job_id)
-    return None
+    return
