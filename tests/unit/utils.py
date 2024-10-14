@@ -28,7 +28,7 @@ def set_and_keep_values(values: Dict[str, str], my_dict: Dict[str, str]) -> Dict
 
     old_values = {}
     for key, value in values.items():
-        old_values[key] = my_dict.get(key, None)
+        old_values[key] = my_dict.get(key)
         if value is None:
             if key in my_dict:
                 del my_dict[key]

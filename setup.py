@@ -26,18 +26,19 @@ def get_version():
     """Gets the version from the package's __init__ file
     if there is some problem, let it happily fail"""
     VERSIONFILE = os.path.join("src", PACKAGE, "__init__.py")
-    initfile_lines = open(VERSIONFILE, "rt", encoding="utf-8").readlines()
-    VSRE = r"^__version__ = ['\"]([^'\"]*)['\"]"
-    for line in initfile_lines:
-        mo = re.search(VSRE, line, re.M)
-        if mo:
-            return mo.group(1)
-    return None
+    with open(VERSIONFILE, "rt", encoding="utf-8") as version_file:
+        initfile_lines = version_file.readlines()
+        VSRE = r"^__version__ = ['\"]([^'\"]*)['\"]"
+        for line in initfile_lines:
+            mo = re.search(VSRE, line, re.M)
+            if mo:
+                return mo.group(1)
+        return None
 
 
 # Read in requirements
-requirements = open("requirements.txt", encoding="utf-8").readlines()
-requirements = [r.strip() for r in requirements]
+with open("requirements.txt", encoding="utf-8") as requirements_file:
+    requirements = [r.strip() for r in requirements_file.readlines()]
 
 
 # load long description from README
