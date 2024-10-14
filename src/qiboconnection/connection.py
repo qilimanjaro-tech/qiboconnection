@@ -24,6 +24,7 @@ from typing import Any, List, Optional, TextIO, Tuple, Union
 
 import jwt
 import requests
+from requests import codes
 from typeguard import typechecked
 
 from qiboconnection import __version__ as VERSION  # pylint: disable=cyclic-import
@@ -54,7 +55,7 @@ def refresh_token_if_unauthorised(func):
         try:
             return func(self, *args, **kwargs)
         except HTTPError as ex:
-            if ex.response.status_code not in [400, 401]:
+            if ex.response.status_code not in {codes.bad_request, codes.unauthorized}:
                 raise ex
             self.update_authorisation_using_refresh_token()
             return func(self, *args, **kwargs)
@@ -151,7 +152,7 @@ class Connection(ABC):  # pylint: disable=too-many-instance-attributes
         if self._user is None:
             raise ValueError("user not defined")
         user_response, response_status = self.send_get_auth_remote_api_call(path=f"/users/{self._user_id}")
-        if response_status != 200:
+        if response_status != codes.ok:
             raise ValueError(f"Error getting user: {response_status}")
         if "slack_id" not in user_response or user_response["slack_id"] is None:
             return ""
@@ -172,7 +173,7 @@ class Connection(ABC):  # pylint: disable=too-many-instance-attributes
         self._authorisation_server_api_call = f"{self._remote_server_api_url}/authorisation-tokens"
         self._authorisation_server_refresh_api_call = f"{self._remote_server_api_url}/authorisation-tokens/refresh"
 
-    def _add_version_header(self, header):
+    def _add_version_header(self, header):  # noqa: PLR6301
         header["X-Client-Version"] = VERSION
         return header
 
@@ -354,10 +355,10 @@ class Connection(ABC):  # pylint: disable=too-many-instance-attributes
         header = self._add_version_header({"Authorization": f"Bearer {self._authorisation_access_token}"})
         response = requests.get(f"{self._remote_server_api_url}{path}", headers=header, params=params, timeout=timeout)
 
-        if response.status_code != 200:
+        if response.status_code != codes.ok:
             error_details = response.json()
             if "detail" in error_details and "does not exist" in error_details["detail"]:
-                raise RemoteExecutionException("The job does not exist!", status_code=400)
+                raise RemoteExecutionException("The job does not exist!", status_code=codes.bad_request)
 
         return process_response(response)
 
@@ -405,13 +406,13 @@ class Connection(ABC):  # pylint: disable=too-many-instance-attributes
         header = self._add_version_header({"Authorization": f"Bearer {self._authorisation_access_token}"})
         response = requests.delete(f"{self._remote_server_api_url}{path}", headers=header, timeout=timeout)
 
-        if response.status_code != 204:
+        if response.status_code != codes.no_content:
             error_details = response.json()
             if "detail" in error_details and "does not exist" in error_details["detail"]:
-                raise RemoteExecutionException("The job does not exist!", status_code=400)
+                raise RemoteExecutionException("The job does not exist!", status_code=codes.bad_request)
             response.raise_for_status()
 
-        return ("", 204)
+        return ("", codes.no_content)
 
     @refresh_token_if_unauthorised
     @typechecked
@@ -463,7 +464,7 @@ class Connection(ABC):  # pylint: disable=too-many-instance-attributes
             timeout=timeout,
             headers=self._add_version_header({}),
         )
-        if response.status_code not in [200, 201]:
+        if response.status_code not in {codes.ok, codes.created}:
             try:
                 json_content = json.loads(response.content)
                 detail = json_content["detail"]
@@ -497,7 +498,7 @@ class Connection(ABC):  # pylint: disable=too-many-instance-attributes
             headers=self._add_version_header({"Authorization": f"Bearer {self._authorisation_refresh_token}"}),
             timeout=timeout,
         )
-        if response.status_code not in [200, 201]:
+        if response.status_code not in {codes.ok, codes.created}:
             raise ValueError(f"Authorisation request failed: {response.reason},{response.status_code}")
         logger.debug("Connection successfully renewed.")
         self._authorisation_access_token = AccessTokenResponse(**response.json()).accessToken

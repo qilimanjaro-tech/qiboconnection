@@ -83,7 +83,7 @@ def deserialize_job_description(raw_description: str, job_type: str) -> dict:
         }
     if job_type == JobType.VQA:
         return {**description_dict, "vqa_dict": decompressed_data}
-    if job_type in [JobType.QPROGRAM, JobType.OTHER]:
+    if job_type in {JobType.QPROGRAM, JobType.OTHER}:
         return {**description_dict, "data": decompressed_data}
     return {**description_dict, "data": compressed_data}
 
@@ -97,7 +97,7 @@ def log_job_status_info(job_response: JobResponse):
     Returns:
 
     """
-    if job_response.status in [JobStatus.QUEUED, JobStatus.PENDING]:
+    if job_response.status in {JobStatus.QUEUED, JobStatus.PENDING}:
         logger.warning(
             "Your job with id %i is still pending. Job queue position: %s",
             job_response.job_id,

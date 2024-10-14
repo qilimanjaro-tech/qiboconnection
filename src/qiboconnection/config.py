@@ -55,11 +55,11 @@ class Environment:
             self.quantum_service_url = os.environ["QUANTUM_SERVICE_URL"]
             self._audience_url = os.environ.get("AUDIENCE_URL", self.quantum_service_url)
         else:
-            if environment_type not in [
+            if environment_type not in {
                 EnvironmentType.LOCAL,
                 EnvironmentType.STAGING,
                 EnvironmentType.DEVELOPMENT,
-            ]:
+            }:
                 raise ValueError("Environment Type MUST be 'local', 'staging' or 'development'")
             if environment_type == EnvironmentType.LOCAL:
                 self._environment_type = EnvironmentType.LOCAL

@@ -30,7 +30,7 @@ from typing import Any, List, cast
 from numpy import typing as npt
 from qibo.models.circuit import Circuit
 from qibo.result import CircuitResult
-from requests import HTTPError
+from requests import HTTPError, codes
 from typeguard import typechecked
 
 from qiboconnection.api_utils import log_job_status_info, parse_job_responses_to_results
@@ -148,7 +148,7 @@ class API(ABC):
             str: OK when connection is alive or raise Connection Error.
         """
         response, status_code = self._connection.send_get_remote_call(path=self._PING_CALL_PATH)
-        if status_code != 200:
+        if status_code != codes.ok:
             raise ConnectionException("Error connecting to Qilimanjaro API")
         return response
 
@@ -168,7 +168,7 @@ class API(ABC):
             self._connection.send_get_auth_remote_api_call_all_pages(path=self._DEVICES_CALL_PATH)
         )
         for status_code in status_codes:
-            if status_code != 200:
+            if status_code != codes.ok:
                 raise RemoteExecutionException(message="Devices could not be retrieved.", status_code=status_code)
 
         items = [item for response in responses for item in response[REST.ITEMS]]
@@ -193,7 +193,7 @@ class API(ABC):
         response, status_code = self._connection.send_get_auth_remote_api_call(
             path=f"{self._DEVICES_CALL_PATH}/{device_id}"
         )
-        if status_code != 200:
+        if status_code != codes.ok:
             raise RemoteExecutionException(message="Devices could not be retrieved.", status_code=status_code)
 
         new_device = create_device(device_input=response)
@@ -371,7 +371,7 @@ class API(ABC):
             response, status_code = self._connection.send_post_auth_remote_api_call(
                 path=self._CIRCUITS_CALL_PATH, data=asdict(job.job_request)
             )
-            if status_code != 201:
+            if status_code != codes.created:
                 raise RemoteExecutionException(
                     message=f"Circuit {job.job_id} could not be executed.", status_code=status_code
                 )
@@ -396,7 +396,7 @@ class API(ABC):
             JobResponse: type-casted backend response with the job info.
         """
         response, status_code = self._connection.send_get_auth_remote_api_call(path=f"{self._JOBS_CALL_PATH}/{job_id}")
-        if status_code != 200:
+        if status_code != codes.ok:
             raise RemoteExecutionException(message="Job could not be retrieved.", status_code=status_code)
 
         return JobResponse.from_kwargs(**cast(dict, response))
@@ -527,7 +527,7 @@ class API(ABC):
             )
         )
         for status_code in status_codes:
-            if status_code != 200:
+            if status_code != codes.ok:
                 raise RemoteExecutionException(message="Job could not be listed.", status_code=status_code)
 
         items = [item for response in responses for item in response[REST.ITEMS]]
@@ -576,7 +576,7 @@ class API(ABC):
             path=self._RUNCARDS_CALL_PATH,
             data=asdict(runcard.runcard_request()),
         )
-        if status_code not in [200, 201]:
+        if status_code not in {codes.ok, codes.created}:
             raise RemoteExecutionException(message="Runcard could not be saved.", status_code=status_code)
         logger.debug("Experiment saved successfully.")
         return RuncardResponse.from_kwargs(**response)
@@ -638,7 +638,7 @@ class API(ABC):
         response, status_code = self._connection.send_get_auth_remote_api_call(
             path=f"{self._RUNCARDS_CALL_PATH}/{runcard_id}"
         )
-        if status_code != 200:
+        if status_code != codes.ok:
             raise RemoteExecutionException(message="Runcard could not be retrieved.", status_code=status_code)
         return RuncardResponse.from_kwargs(**response)
 
@@ -655,7 +655,7 @@ class API(ABC):
             path=f"{self._RUNCARDS_CALL_PATH}/by_keys", params={"name": runcard_name}
         )
 
-        if status_code != 200:
+        if status_code != codes.ok:
             raise RemoteExecutionException(message="Runcard could not be retrieved.", status_code=status_code)
 
         return RuncardResponse.from_kwargs(**response)
@@ -696,7 +696,7 @@ class API(ABC):
             self._connection.send_get_auth_remote_api_call_all_pages(path=self._RUNCARDS_CALL_PATH)
         )
         for status_code in status_codes:
-            if status_code != 200:
+            if status_code != codes.ok:
                 raise RemoteExecutionException(message="Runcards could not be listed.", status_code=status_code)
 
         items = [item for response in responses for item in response[REST.ITEMS]]
@@ -744,7 +744,7 @@ class API(ABC):
             path=f"{self._RUNCARDS_CALL_PATH}/{runcard.id}",  # type: ignore[attr-defined]
             data=asdict(runcard.runcard_request()),
         )
-        if status_code not in [200, 201]:
+        if status_code not in {codes.ok, codes.created}:
             raise RemoteExecutionException(message="Runcard could not be saved.", status_code=status_code)
         logger.debug("Runcard updated successfully.")
         return RuncardResponse.from_kwargs(**response)
@@ -763,7 +763,7 @@ class API(ABC):
         response, status_code = self._connection.send_delete_auth_remote_api_call(
             path=f"{self._RUNCARDS_CALL_PATH}/{runcard_id}"
         )
-        if status_code != 204:
+        if status_code != codes.no_content:
             raise RemoteExecutionException(message="Runcard could not be removed.", status_code=status_code)
         logger.info("Runcard %i deleted successfully with message: %s", runcard_id, response)
 
@@ -779,7 +779,7 @@ class API(ABC):
             RemoteExecutionException: Devices could not be retrieved
         """
         _, status_code = self._connection.send_delete_auth_remote_api_call(path=f"{self._JOBS_CALL_PATH}/{job_id}")
-        if status_code != 204:
+        if status_code != codes.no_content:
             raise RemoteExecutionException(message="Job could not be removed.", status_code=status_code)
         logger.info(f"Job {job_id} deleted successfully")
 
@@ -789,6 +789,6 @@ class API(ABC):
         _, status_code = self._connection.send_put_auth_remote_api_call(
             data={"job_id": job_id}, path=f"{self._JOBS_CALL_PATH}/cancel/{job_id}"
         )
-        if status_code != 204:
+        if status_code != codes.no_content:
             raise RemoteExecutionException(message=f"Job {job_id} could not be cancelled.", status_code=status_code)
         logger.info(f"Job {job_id} cancelled successfully")

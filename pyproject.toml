@@ -67,7 +67,7 @@ select = [
     "TCH",
     # "PTH",
     # "TD",
-    # "PL",
+    "PL",
     "NPY",
     "FURB",
     # "DOC",

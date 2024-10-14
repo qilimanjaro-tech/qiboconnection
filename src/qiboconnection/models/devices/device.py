@@ -173,7 +173,7 @@ class Device(DeviceDetails):
         """
         result_dict = {}
         for key in dir(self):
-            if len(key) >= 2 and key[0] == "_" and key[1] != "_":
+            if len(key) >= 2 and key[0] == "_" and key[1] != "_":  # noqa: PLR2004
                 value = getattr(self, key, None)
                 try:
                     json.dumps(value)
