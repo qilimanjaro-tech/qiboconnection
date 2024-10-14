@@ -64,14 +64,14 @@ select = [
     "SLOT",
     # "SIM",
     "TID",
-    #"TCH",
+    "TCH",
     ## "PTH",
     ## "TD",
     ## "PL",
     ## "NPY",
     ## "FURB",
     ## "DOC",
-    #"RUF"
+    "RUF"
 ]
 ignore = [
     "E111",

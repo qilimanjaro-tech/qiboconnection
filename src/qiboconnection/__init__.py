@@ -28,4 +28,4 @@ __version__ = "0.22.1"
 from .about import about
 from .api import API
 
-__all__ = ["about", "API"]
+__all__ = ["API", "about"]

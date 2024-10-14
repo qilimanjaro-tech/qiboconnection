@@ -6,6 +6,7 @@ import logging
 import os
 import sys
 import time
+from typing import TYPE_CHECKING
 
 import pytest
 from qibo.models import Circuit
@@ -14,8 +15,6 @@ from qiboconnection.api import API
 from qiboconnection.models.devices import Device
 from qiboconnection.typings.enums import DeviceStatus as DS
 from qiboconnection.typings.enums import JobStatus
-from qiboconnection.typings.job_data import JobData
-from qiboconnection.typings.responses.job_response import JobResponse
 from qiboconnection.typings.vqa import VQA
 from tests.end2end.utils.operations import (
     Operation,
@@ -30,6 +29,10 @@ from tests.end2end.utils.utils import (
     get_job_result,
     post_and_get_result,
 )
+
+if TYPE_CHECKING:
+    from qiboconnection.typings.job_data import JobData
+    from qiboconnection.typings.responses.job_response import JobResponse
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..")))
 

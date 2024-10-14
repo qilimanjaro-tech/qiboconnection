@@ -4,6 +4,7 @@
 import logging
 import os
 import sys
+from typing import TYPE_CHECKING
 
 import pytest
 from qibo.models import Circuit
@@ -11,9 +12,11 @@ from qibo.models import Circuit
 from qiboconnection.api import API
 from qiboconnection.models.devices import Device
 from qiboconnection.typings.enums import JobStatus
-from qiboconnection.typings.responses.job_response import JobResponse
 from tests.end2end.utils.operations import Operation, check_operation_possible_or_skip
 from tests.end2end.utils.utils import get_devices_listing_params, post_and_get_result
+
+if TYPE_CHECKING:
+    from qiboconnection.typings.responses.job_response import JobResponse
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..")))
 
