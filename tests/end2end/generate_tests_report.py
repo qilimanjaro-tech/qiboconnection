@@ -191,7 +191,7 @@ def gen_test_run(in_json_plan: str, in_json_results: str, out_json_run: str):
 
             tot_test_plan = 0
             tot_test_plan_executed = 0
-            tot_outcomes = {outcome: 0 for outcome in ALL_OUTCOMES}
+            tot_outcomes = dict.fromkeys(ALL_OUTCOMES, 0)
 
             # Loop over all the test cases defined
             for test_name, test_info in tests_def_by_name.items():
@@ -199,7 +199,7 @@ def gen_test_run(in_json_plan: str, in_json_results: str, out_json_run: str):
                 data_test_run["detail"][test_name] = {
                     "info": test_info,
                     "executions": 0,
-                    "results": {outcome: 0 for outcome in ALL_OUTCOMES},
+                    "results": dict.fromkeys(ALL_OUTCOMES, 0),
                 }
 
                 # Test Case executed, several runs can be performed (eg. for several devices)
