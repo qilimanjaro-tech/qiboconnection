@@ -17,7 +17,7 @@ from dataclasses import dataclass
 
 from qiboconnection.util import from_kwargs
 
-from ..requests import JobRequest
+from ..requests import JobRequest  # noqa: TID252
 
 
 @dataclass

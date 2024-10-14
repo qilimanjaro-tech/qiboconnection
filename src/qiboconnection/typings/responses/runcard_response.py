@@ -19,7 +19,7 @@ from datetime import datetime
 
 from qiboconnection.util import from_kwargs
 
-from ..requests import RuncardRequest
+from ..requests import RuncardRequest  # noqa: TID252
 
 
 @dataclass
