@@ -97,28 +97,24 @@ def test_from_kwargs():
     assert isinstance(
         from_kwargs(
             JobResponse,
-            **{
-                "user_id": 1,
-                "device_id": 2,
-                "description": "Job Description",
-                "job_id": 1001,
-                "queue_position": 5,
-                "status": "Completed",
-                "result": "Job Result",
-                "number_shots": 10,
-                "job_type": "whatever",
-                "name": "test",
-                "summary": "test",
-                "extra_arg": "Extra Argument",
-            },
+            user_id=1,
+            device_id=2,
+            description="Job Description",
+            job_id=1001,
+            queue_position=5,
+            status="Completed",
+            result="Job Result",
+            number_shots=10,
+            job_type="whatever",
+            name="test",
+            summary="test",
+            extra_arg="Extra Argument",
         ),
         JobResponse,
     )
 
     with pytest.raises(TypeError):
         isinstance(
-            from_kwargs(
-                JobResponse, **{"user_id": 1, "device_id": 2, "number_shots": 10, "extra_arg": "Extra Argument"}
-            ),
+            from_kwargs(JobResponse, user_id=1, device_id=2, number_shots=10, extra_arg="Extra Argument"),
             JobResponse,
         )

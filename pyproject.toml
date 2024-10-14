@@ -53,7 +53,7 @@ select = [
     "LOG",
     "G",
     "INP",
-    #"PIE",
+    "PIE",
     #"T20",
     ## "PYI",
     ## "PT",
