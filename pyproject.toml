@@ -46,7 +46,7 @@ select = [
     "BLE",
     "CPY",
     "C4",
-    # "DTZ",
+    "DTZ",
     "T10",
     "FA",
     "ICN",

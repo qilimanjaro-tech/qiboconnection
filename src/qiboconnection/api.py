@@ -23,7 +23,7 @@ import json
 import warnings
 from abc import ABC
 from dataclasses import asdict
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from time import sleep
 from typing import Any, List, cast
 
@@ -465,7 +465,7 @@ class API(ABC):
         Returns:
             List[dict | None]: list of the results for each of the
         """
-        while datetime.now() < deadline:
+        while datetime.now(timezone.utc) < deadline:
             job_responses = [self._get_job(job_id) for job_id in job_ids]
             job_responses_status = [job_response.status for job_response in job_responses]
             if set(job_responses_status).issubset({JobStatus.COMPLETED, JobStatus.ERROR}):
@@ -505,7 +505,7 @@ class API(ABC):
 
         """
 
-        deadline = datetime.now() + timedelta(seconds=timeout)
+        deadline = datetime.now(timezone.utc) + timedelta(seconds=timeout)
         job_ids = self.execute(
             circuit=circuit,
             qprogram=qprogram,
