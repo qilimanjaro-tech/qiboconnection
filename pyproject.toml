@@ -52,7 +52,7 @@ select = [
     "ICN",
     "LOG",
     "G",
-    #"INP",
+    "INP",
     #"PIE",
     #"T20",
     ## "PYI",
@@ -108,6 +108,7 @@ logger-objects = ["qiboconnection.logger"]
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = ["ANN", "S", "CPY", "SLF001", "PLR", "DOC", "RUF012"]
 "docs/*" = ["CPY"]
+"docs/conf.py" = ["INP001"]
 "examples/*" = ["CPY", "T20"]
 "src/qiboconnection/about.py" = ["T201"]
 
