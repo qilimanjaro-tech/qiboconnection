@@ -95,12 +95,7 @@ class Environment:
     @property
     def environment_type(
         self,
-    ) -> Union[
-        Literal[EnvironmentType.LOCAL],
-        Literal[EnvironmentType.STAGING],
-        Literal[EnvironmentType.DEVELOPMENT],
-        Literal[EnvironmentType.LAMBDA],
-    ]:
+    ) -> Literal[EnvironmentType.LOCAL, EnvironmentType.STAGING, EnvironmentType.DEVELOPMENT, EnvironmentType.LAMBDA]:
         """Returns the environment_type
 
         Returns:

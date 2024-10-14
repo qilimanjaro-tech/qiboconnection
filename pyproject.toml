@@ -55,7 +55,7 @@ select = [
     "INP",
     "PIE",
     "T20",
-    # "PYI",
+    "PYI",
     # "PT",
     "Q",
     "RSE",
