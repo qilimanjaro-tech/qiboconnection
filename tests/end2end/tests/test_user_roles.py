@@ -61,7 +61,7 @@ def test_can_change_device_status(device: Device, user_role: UserRole):
         user_role (str): _description_
         api (API): _description_
     """
-    logger.info(f"Device: {device}, User Role: {user_role}")
+    logger.info("Device: %s, User Role: %s", device, user_role)
 
     api = get_user_can_change_status_api(user_role=user_role)
     check_operation_possible_or_skip(operation=Operation.CHANGE_STATUS, device=device)
@@ -88,7 +88,7 @@ def test_cannot_change_device_status(device: Device, user_role: UserRole):
         user_role (str): all users
         api (API): Qiboconnection API instance
     """
-    logger.info(f"Device: {device}, User Role: {user_role}")
+    logger.info("Device: %s, User Role: %s", device, user_role)
 
     api = get_user_cannot_change_status_api(user_role=user_role)
     check_operation_possible_or_skip(operation=Operation.CHANGE_STATUS, device=device)

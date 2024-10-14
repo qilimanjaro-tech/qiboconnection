@@ -28,7 +28,7 @@ def test_one_qubit_500_gates_circuit(device: Device, api: API, one_qubits_500_ga
     Args:
         api: api instance to call the server with
     """
-    logger.info(f"Device: {device}")
+    logger.info("Device: %s", device)
     check_operation_possible_or_skip(Operation.RESPONSE, device=device)
     jobdata = post_and_get_result(
         api=api, device=device, circuit=one_qubits_500_gates_circuit, name="test", summary="test"
@@ -48,7 +48,7 @@ def test_two_qubit_500_gates_circuit(device: Device, api: API, two_qubits_500_ga
     Args:
         api: api instance to call the server with
     """
-    logger.info(f"Device: {device}")
+    logger.info("Device: %s", device)
     check_operation_possible_or_skip(Operation.RESPONSE, device=device)
     jobdata = post_and_get_result(api=api, device=device, circuit=two_qubits_500_gates_circuit)
     result = jobdata.result
@@ -65,7 +65,7 @@ def test_five_qubit_500_gates_circuit(device: Device, api: API, five_qubits_500_
     Args:
         api: api instance to call the server with
     """
-    logger.info(f"Device: {device}")
+    logger.info("Device: %s", device)
     check_operation_possible_or_skip(Operation.RESPONSE, device=device)
     jobdata = post_and_get_result(api=api, device=device, circuit=five_qubits_500_gates_circuit)
     result = jobdata.result
@@ -89,7 +89,7 @@ def test_all_circuits(
         api: api instance to call the server with
 
     """
-    logger.info(f"Device: {device}")
+    logger.info("Device: %s", device)
     check_operation_possible_or_skip(Operation.RESPONSE, device=device)
     jobdata = post_and_get_result(
         api=api,

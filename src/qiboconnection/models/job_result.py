@@ -49,8 +49,9 @@ class JobResult(ABC):
             return
         except Exception as ex:  # noqa: BLE001 # delete ASAP
             logger.warning(
-                f"Unable to decompress JobResult with get_results interface due to {ex}({type(ex)})."
-                f"Falling back to legacy methods."
+                "Unable to decompress JobResult with get_results interface due to %s(%s). Falling back to legacy methods.",
+                ex,
+                type(ex),
             )
 
             if self.job_type == JobType.CIRCUIT:

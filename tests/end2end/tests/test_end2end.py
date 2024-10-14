@@ -113,12 +113,12 @@ def test_circuit_result_response(device: Device, api: API, numpy_circuit: Circui
     """
 
     logger = logging.getLogger(__name__)
-    logger.debug(f"device: {device}")
+    logger.debug("Device: %s", device)
 
     check_operation_possible_or_skip(Operation.POST, device)
 
     result: JobData = post_and_get_result(api=api, device=device, circuit=numpy_circuit, timeout=15)
-    logger.debug(f"result: {result}")
+    logger.debug("Device: %s", device)
 
     # The operation post + response can be performed always (it is an async action) but
     # the meaning of SUCCESS/EXCEPTION/FORBIDDEN means something different:
@@ -155,12 +155,12 @@ def test_vqa_response(device: Device, api: API, numpy_circuit: Circuit):
     """
 
     logger = logging.getLogger(__name__)
-    logger.debug(f"device: {device}")
+    logger.debug("Device: %s", device)
 
     check_operation_possible_or_skip(Operation.POST, device)
 
     result: JobData = post_and_get_result(api=api, device=device, circuit=numpy_circuit, timeout=15)
-    logger.debug(f"result: {result}")
+    logger.debug("Device: %s", device)
 
     # The operation post + response can be performed always (it is an async action) but
     # the meaning of SUCCESS/EXCEPTION/FORBIDDEN means something different:
@@ -224,11 +224,11 @@ def test_post_and_results_from_maintenance_to_online(device: Device, api: API, n
 
     logger = logging.getLogger(__name__)
 
-    logger.info(f"Device: {device}")
+    logger.debug("Device: %s", device)
 
     original_status = device._status
 
-    logger.info(f"Original Status: {original_status}")
+    logger.info("Original Status: %s", original_status)
 
     # Put the device in maintenance mode
     if original_status == DS.ONLINE:
@@ -237,14 +237,15 @@ def test_post_and_results_from_maintenance_to_online(device: Device, api: API, n
     elif original_status == DS.MAINTENANCE:
         pass
     else:
-        pytest.skip(f"Device {device} in status {original_status}")
+        pytest.skip("Device %s in status %s" % (device, original_status))
 
     # Send the job and wait for a while: we do not get the result
     logger.info(
-        f"Send the job and wait for a short period, expecting the job will be in {JobStatus.PENDING.value}, because the device is in maintenance mode"
+        "Send the job and wait for a short period, expecting the job will be in %s, because the device is in maintenance mode",
+        JobStatus.PENDING.value,
     )
     result: JobResponse = post_and_get_result(api, device, numpy_circuit, timeout=5)
-    logger.info(f"Result: {result}")
+    logger.info("Result: %s", result)
     assert result.status == JobStatus.QUEUED
 
     # Put it back to online
@@ -253,10 +254,12 @@ def test_post_and_results_from_maintenance_to_online(device: Device, api: API, n
 
     # Get the result
     logger.info(
-        f"Now wait longer to get the result for job #{result.job_id}, expecting it  will be in {JobStatus.COMPLETED.value} because the device is in online mode"
+        "Now wait longer to get the result for job %s, expecting it  will be in %s because the device is in online mode",
+        result.job_id,
+        JobStatus.COMPLETED.value,
     )
     result = get_job_result(api, result.job_id, call_every_seconds=10)
-    logger.info(f"Result: {result}")
+    logger.info("Result: %s", result)
     assert result.status == JobStatus.COMPLETED
 
     # Put back to its original state
