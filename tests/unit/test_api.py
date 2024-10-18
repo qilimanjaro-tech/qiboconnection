@@ -321,6 +321,15 @@ def test_get_runcard_by_name(mocked_web_call: MagicMock, mocked_api: API):
 
 
 @patch("qiboconnection.connection.Connection.send_get_auth_remote_api_call", autospec=True)
+def test_get_runcard_by_name_ise(mocked_web_call: MagicMock, mocked_api: API):
+    """Tests API.get_runcard() method using runcard name"""
+    mocked_web_call.return_value = web_responses.runcards.ise_response
+
+    with pytest.raises(RemoteExecutionException, match="Runcard could not be retrieved."):
+        _ = mocked_api.get_runcard(runcard_name="DEMO_RUNCARD")
+
+
+@patch("qiboconnection.connection.Connection.send_get_auth_remote_api_call", autospec=True)
 def test_get_runcard_with_redundant_info(mocked_web_call: MagicMock, mocked_api: API):
     """Tests API.get_runcard() method fails when providing name and id at the same time"""
     mocked_web_call.return_value = web_responses.runcards.retrieve_response
@@ -586,6 +595,15 @@ def test_get_calibration_by_name(mocked_web_call: MagicMock, mocked_api: API):
         params={"name": "DEMO_CALIBRATION"},
     )
     assert isinstance(calibration, Calibration)
+
+
+@patch("qiboconnection.connection.Connection.send_get_auth_remote_api_call", autospec=True)
+def test_get_calibration_by_name_ise(mocked_web_call: MagicMock, mocked_api: API):
+    """Tests API.get_calibration() method using calibration name"""
+    mocked_web_call.return_value = web_responses.calibrations.ise_response
+
+    with pytest.raises(RemoteExecutionException, match="Calibration could not be retrieved."):
+        _ = mocked_api.get_calibration(calibration_name="DEMO_CALIBRATION")
 
 
 @patch("qiboconnection.connection.Connection.send_get_auth_remote_api_call", autospec=True)
