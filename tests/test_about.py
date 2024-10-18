@@ -1,4 +1,5 @@
 """Unit tests for the `about` function."""
+
 import io
 import platform
 import sys

@@ -12,11 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-""" Models: things the api acts with / upon. """
+"""Models: things the api acts with / upon."""
 
+from .calibration import Calibration
 from .job import Job
 from .job_listing import JobListing
 from .job_listing_item import JobListingItem
 from .job_result import JobResult
 from .runcard import Runcard
 from .user import User
+
+__all__ = ["Calibration", "Job", "JobListing", "JobListingItem", "JobResult", "Runcard", "User"]

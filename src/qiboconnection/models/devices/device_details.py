@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-""" Device Details """
+"""Device Details"""
 
 from abc import ABC
 from dataclasses import dataclass

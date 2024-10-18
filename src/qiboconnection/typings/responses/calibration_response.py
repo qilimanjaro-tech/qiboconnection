@@ -12,16 +12,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""GrantType enum"""
+"""Calibration typing classes"""
 
-from .str_enum import StrEnum
+from dataclasses import dataclass
+from datetime import datetime
+
+from qiboconnection.util import from_kwargs
+
+from ..requests import CalibrationRequest  # noqa: TID252
 
 
-class GrantType(StrEnum):
-    """Grant Type
+@dataclass
+class CalibrationResponse(CalibrationRequest):
+    """Class for accommodating Calibrations."""
 
-    Args:
-        enum (str): the only available grant type is urn:ietf:params:oauth:grant-type:jwt-bearer
-    """
+    calibration_id: int
+    created_at: datetime
+    updated_at: datetime
 
-    JWT_BEARER = "urn:ietf:params:oauth:grant-type:jwt-bearer"
+    @classmethod
+    def from_kwargs(cls, **kwargs):
+        "Returns an instance of CalibrationResponse including non-typed attributes"
+        return from_kwargs(cls, **kwargs)

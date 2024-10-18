@@ -1,4 +1,4 @@
-""" Tests util functions """
+"""Tests util functions"""
 
 import json
 
@@ -74,7 +74,10 @@ def test_process_response_non_json(response_plain_text: Response):
 
 
 def test_deserialize_job_description(
-    compressed_qibo_circuit: str, compressed_qibo_circuits: str, compressed_qililab_qprogram: str
+    compressed_qibo_circuit: str,
+    compressed_qibo_circuits: str,
+    compressed_qililab_qprogram: str,
+    compressed_qililab_annealing_program: str,
 ):
     """Unit test of deserialize_job_description()"""
     assert isinstance(
@@ -82,6 +85,12 @@ def test_deserialize_job_description(
     )
     assert isinstance(
         deserialize_job_description(raw_description=compressed_qililab_qprogram, job_type=JobType.QPROGRAM)["data"],
+        dict,
+    )
+    assert isinstance(
+        deserialize_job_description(
+            raw_description=compressed_qililab_annealing_program, job_type=JobType.ANNEALING_PROGRAM
+        )["data"],
         dict,
     )
     assert isinstance(
@@ -97,28 +106,24 @@ def test_from_kwargs():
     assert isinstance(
         from_kwargs(
             JobResponse,
-            **{
-                "user_id": 1,
-                "device_id": 2,
-                "description": "Job Description",
-                "job_id": 1001,
-                "queue_position": 5,
-                "status": "Completed",
-                "result": "Job Result",
-                "number_shots": 10,
-                "job_type": "whatever",
-                "name": "test",
-                "summary": "test",
-                "extra_arg": "Extra Argument",
-            }
+            user_id=1,
+            device_id=2,
+            description="Job Description",
+            job_id=1001,
+            queue_position=5,
+            status="Completed",
+            result="Job Result",
+            number_shots=10,
+            job_type="whatever",
+            name="test",
+            summary="test",
+            extra_arg="Extra Argument",
         ),
         JobResponse,
     )
 
     with pytest.raises(TypeError):
         isinstance(
-            from_kwargs(
-                JobResponse, **{"user_id": 1, "device_id": 2, "number_shots": 10, "extra_arg": "Extra Argument"}
-            ),
+            from_kwargs(JobResponse, user_id=1, device_id=2, number_shots=10, extra_arg="Extra Argument"),
             JobResponse,
         )

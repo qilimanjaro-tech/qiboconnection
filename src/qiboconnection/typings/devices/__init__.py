@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-""" Devices typings module"""
+"""Devices typings module"""
 
 from .device_input import DeviceInput
+
+__all__ = ["DeviceInput"]

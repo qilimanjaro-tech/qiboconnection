@@ -12,23 +12,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Runcard class"""
+"""Calibration class"""
 
 from dataclasses import field
 
-from qiboconnection.typings.requests import RuncardRequest
-from qiboconnection.typings.responses import RuncardResponse
-from qiboconnection.util import decode_jsonified_dict, jsonify_dict_and_base64_encode
+from qiboconnection.typings.requests import CalibrationRequest
+from qiboconnection.typings.responses import CalibrationResponse
+from qiboconnection.util import base64_decode, base64url_encode
 
 
 # pylint: disable=too-many-instance-attributes
 # pylint: disable=no-member
-class Runcard:
-    """Runcard representation"""
+class Calibration:
+    """Calibration representation"""
 
     name: str
     description: str
-    runcard: dict
+    calibration: str = ""
     id: int | None = field(default=None)
 
     def __init__(self, **kwargs):
@@ -36,37 +36,39 @@ class Runcard:
             setattr(self, k, v)
 
     @property
-    def _encoded_runcard(self):
+    def _encoded_calibration(self):
         """return base64-encoded stringified jsonified experiment"""
-        return jsonify_dict_and_base64_encode(self.runcard) if self.runcard is not None else None
+        return base64url_encode(self.calibration) if self.calibration is not None else None
 
     @classmethod
-    def from_response(cls, response: RuncardResponse):
-        """Runcard constructor that takes in an instance from a RuncardResponse"""
+    def from_response(cls, response: CalibrationResponse):
+        """Calibration constructor that takes in an instance from a CalibrationResponse"""
         return cls(
-            id=response.runcard_id,
+            id=response.calibration_id,
             created_at=response.created_at,
             updated_at=response.updated_at,
             name=response.name,
             description=response.description,
             user_id=response.user_id,
             device_id=response.device_id,
-            runcard=decode_jsonified_dict(response.runcard),
+            calibration=base64_decode(response.calibration),
             qililab_version=response.qililab_version,
         )
 
-    def runcard_request(self):
+    def calibration_request(self):
         """Created a Request instance"""
-        return RuncardRequest(
+        return CalibrationRequest(
             name=self.name,
             user_id=self.user_id,
             device_id=self.device_id,
             description=self.description,
-            runcard=self._encoded_runcard,
+            calibration=self._encoded_calibration,
             qililab_version=self.qililab_version,
         )
 
     def __repr__(self):
         # Use dataclass-like formatting, excluding attributes starting with an underscore
 
-        return f"Runcard(name={self.name},id={self.id},description={self.description},runcard={self.runcard})"
+        return (
+            f"Calibration(name={self.name},id={self.id},description={self.description},calibration={self.calibration})"
+        )

@@ -12,16 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""GrantType enum"""
+"""Runcard typing classes"""
 
-from .str_enum import StrEnum
+from dataclasses import dataclass
 
 
-class GrantType(StrEnum):
-    """Grant Type
+@dataclass
+class CalibrationRequest:
+    """Base structure for a SavedExperiment body of any rest interaction"""
 
-    Args:
-        enum (str): the only available grant type is urn:ietf:params:oauth:grant-type:jwt-bearer
-    """
-
-    JWT_BEARER = "urn:ietf:params:oauth:grant-type:jwt-bearer"
+    name: str
+    calibration: str
+    device_id: int
+    user_id: int
+    description: str
+    qililab_version: str

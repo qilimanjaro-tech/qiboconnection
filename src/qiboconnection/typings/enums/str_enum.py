@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-""" StrEnum base class """
+"""StrEnum base class"""
+
 from enum import Enum
 
 

@@ -12,13 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-""" Runcard typing classes """
+"""Runcard typing classes"""
+
 from dataclasses import dataclass
 from datetime import datetime
 
 from qiboconnection.util import from_kwargs
 
-from ..requests import RuncardRequest
+from ..requests import RuncardRequest  # noqa: TID252
 
 
 @dataclass

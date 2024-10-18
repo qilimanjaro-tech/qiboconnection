@@ -1,5 +1,5 @@
 # data.py
-""" Data to used alongside the test suite. """
+"""Data to used alongside the test suite."""
 
 from qiboconnection.typings.devices import DeviceInput
 from qiboconnection.typings.enums import DeviceStatus
@@ -353,6 +353,31 @@ runcard_dict: dict = {
     },
 }
 
+calibration_serialized = """
+!Calibration
+crosstalk_matrix: !CrosstalkMatrix
+  matrix:
+    flux_0: {flux_0: 1.47046905, flux_1: 0.12276261}
+    flux_1: {flux_0: -0.55322207, flux_1: 1.58247856}
+waveforms:
+  drive_q0_bus:
+    Xpi: !IQPair
+      I: &id001 !Gaussian {amplitude: 1.0, duration: 40, num_sigmas: 4.5}
+      Q: !DragCorrection
+        drag_coefficient: -2.5
+        waveform: *id001
+  readout_bus:
+    Measure: !IQPair
+      I: !Square {amplitude: 1.0, duration: 200}
+      Q: !Square {amplitude: 0.0, duration: 200}
+weights:
+  readout_bus:
+    optimal_weights: !IQPair
+      I: !Square {amplitude: 1.0, duration: 200}
+      Q: !Square {amplitude: 1.0, duration: 200}
+"""
+
+
 experiment_dict = {
     "platform": {
         "settings": {
@@ -615,7 +640,7 @@ experiment_dict = {
                                 "name": "pulse",
                                 "amplitude": 0.6788726177728143,
                                 "frequency": None,
-                                "phase": 3.141592653589793,
+                                "phase": 3.141592653589793,  # noqa: FURB152
                                 "duration": 100,
                                 "pulse_shape": {"name": "drag", "num_sigmas": 4, "drag_coefficient": 0},
                             },

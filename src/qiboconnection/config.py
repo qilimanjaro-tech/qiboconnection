@@ -12,13 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-""" global configuration settings """
+"""global configuration settings"""
+
 import enum
 import logging
 import os
 from typing import Literal, Union
-
-from qiboconnection import __version__  # pylint: disable=cyclic-import
 
 logger = logging.getLogger(__name__)
 
@@ -56,11 +55,11 @@ class Environment:
             self.quantum_service_url = os.environ["QUANTUM_SERVICE_URL"]
             self._audience_url = os.environ.get("AUDIENCE_URL", self.quantum_service_url)
         else:
-            if environment_type not in [
+            if environment_type not in {
                 EnvironmentType.LOCAL,
                 EnvironmentType.STAGING,
                 EnvironmentType.DEVELOPMENT,
-            ]:
+            }:
                 raise ValueError("Environment Type MUST be 'local', 'staging' or 'development'")
             if environment_type == EnvironmentType.LOCAL:
                 self._environment_type = EnvironmentType.LOCAL
@@ -96,12 +95,7 @@ class Environment:
     @property
     def environment_type(
         self,
-    ) -> Union[
-        Literal[EnvironmentType.LOCAL],
-        Literal[EnvironmentType.STAGING],
-        Literal[EnvironmentType.DEVELOPMENT],
-        Literal[EnvironmentType.LAMBDA],
-    ]:
+    ) -> Literal[EnvironmentType.LOCAL, EnvironmentType.STAGING, EnvironmentType.DEVELOPMENT, EnvironmentType.LAMBDA]:
         """Returns the environment_type
 
         Returns:

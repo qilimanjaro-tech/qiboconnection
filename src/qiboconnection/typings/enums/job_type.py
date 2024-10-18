@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-""" JobType enum """
+"""JobType enum"""
+
 from .str_enum import StrEnum
 
 
@@ -28,5 +29,6 @@ class JobType(StrEnum):
 
     CIRCUIT = "circuit"
     QPROGRAM = "qprogram"
+    ANNEALING_PROGRAM = "annealing_program"
     VQA = "vqa"
     OTHER = "other"

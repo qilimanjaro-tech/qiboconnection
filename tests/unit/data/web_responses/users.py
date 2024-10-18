@@ -1,5 +1,4 @@
-""" Users web responses module """
-
+"""Users web responses module"""
 
 users_base_response_without_slack_id = {
     "user_id": 0,

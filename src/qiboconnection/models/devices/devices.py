@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-""" Devices class """
+"""Devices class"""
+
 import json
 from abc import ABC
 from typing import List

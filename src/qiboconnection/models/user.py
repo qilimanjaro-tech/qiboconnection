@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-""" User class """
+"""User class"""
 
 from dataclasses import dataclass
 
