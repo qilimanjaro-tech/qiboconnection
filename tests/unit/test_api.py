@@ -1,4 +1,6 @@
 """API testing"""
+# pylint: disable=too-many-lines
+
 import base64
 import gzip
 import json
