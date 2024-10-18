@@ -56,10 +56,7 @@ class JobResult(ABC):
             if self.job_type == JobType.CIRCUIT:
                 self.data = decode_results_from_circuit(self.http_response)
                 return
-            if self.job_type == JobType.QPROGRAM:
-                self.data = decode_results_from_qprogram(self.http_response)
-                return
-            if self.job_type == JobType.VQA:
+            if self.job_type in {JobType.QPROGRAM, JobType.ANNEALING_PROGRAM, JobType.VQA}:
                 self.data = decode_results_from_qprogram(self.http_response)
                 return
 

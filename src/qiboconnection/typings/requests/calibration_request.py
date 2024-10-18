@@ -11,20 +11,18 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""
-This module contains all needed classes needed for interacting with Qilimanjaro's QaaS via Qiboconnection SDK.
 
-.. currentmodule:: qiboconnection
-
-.. autosummary::
-    :toctree: API
-
-    ~api.API
-"""
+""" Runcard typing classes """
+from dataclasses import dataclass
 
 
-__version__ = "0.23.0-alpha.0"
+@dataclass
+class CalibrationRequest:
+    """Base structure for a SavedExperiment body of any rest interaction"""
 
-
-from .about import about
-from .api import API
+    name: str
+    calibration: str
+    device_id: int
+    user_id: int
+    description: str
+    qililab_version: str

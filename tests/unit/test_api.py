@@ -1,4 +1,6 @@
 """API testing"""
+# pylint: disable=too-many-lines
+
 import base64
 import gzip
 import json
@@ -14,6 +16,7 @@ from qibo.models import Circuit
 from qiboconnection.api import API
 from qiboconnection.connection import ConnectionConfiguration
 from qiboconnection.errors import ConnectionException, RemoteExecutionException
+from qiboconnection.models.calibration import Calibration
 from qiboconnection.models.devices.devices import Devices
 from qiboconnection.models.devices.util import create_device
 from qiboconnection.models.job_listing import JobListing
@@ -23,7 +26,7 @@ from qiboconnection.typings.job_data import JobData
 from qiboconnection.typings.vqa import VQA
 from qiboconnection.util import compress_any
 
-from .data import runcard_dict, web_responses
+from .data import calibration_serialized, runcard_dict, web_responses
 from .data.web_responses.job import JobResponse
 
 
@@ -78,6 +81,28 @@ def test_last_runcard(mocked_web_call: MagicMock, mocked_api: API):
         qililab_version=qililab_version,
     )
     assert isinstance(mocked_api.last_runcard, Runcard)
+
+
+@patch("qiboconnection.connection.Connection.send_post_auth_remote_api_call", autospec=True)
+def test_last_calibration(mocked_web_call: MagicMock, mocked_api: API):
+    """Test last_runcard property"""
+    mocked_web_call.return_value = web_responses.calibrations.create_response
+
+    assert mocked_api.last_calibration is None
+    name = "MyDemoCalibration"
+    description = "A test calibration"
+    device_id = 1
+    user_id = 1
+    qililab_version = "0.0.0"
+    _ = mocked_api.save_calibration(
+        name=name,
+        description=description,
+        calibration_serialized=calibration_serialized,
+        device_id=device_id,
+        user_id=user_id,
+        qililab_version=qililab_version,
+    )
+    assert isinstance(mocked_api.last_calibration, Calibration)
 
 
 def test_user_id(mocked_api: API):
@@ -296,6 +321,15 @@ def test_get_runcard_by_name(mocked_web_call: MagicMock, mocked_api: API):
 
 
 @patch("qiboconnection.connection.Connection.send_get_auth_remote_api_call", autospec=True)
+def test_get_runcard_by_name_ise(mocked_web_call: MagicMock, mocked_api: API):
+    """Tests API.get_runcard() method using runcard name"""
+    mocked_web_call.return_value = web_responses.runcards.ise_response
+
+    with pytest.raises(RemoteExecutionException, match="Runcard could not be retrieved."):
+        _ = mocked_api.get_runcard(runcard_name="DEMO_RUNCARD")
+
+
+@patch("qiboconnection.connection.Connection.send_get_auth_remote_api_call", autospec=True)
 def test_get_runcard_with_redundant_info(mocked_web_call: MagicMock, mocked_api: API):
     """Tests API.get_runcard() method fails when providing name and id at the same time"""
     mocked_web_call.return_value = web_responses.runcards.retrieve_response
@@ -487,6 +521,253 @@ def test_get_results_exception(mocked_api_call: MagicMock, mocked_api: API):
 
     # Assert that the mocked function was called with correct arguments
     mocked_api_call.assert_called_with(self=mocked_api._connection, path=f"{mocked_api._JOBS_CALL_PATH}/{0}")
+
+
+@patch("qiboconnection.connection.Connection.send_post_auth_remote_api_call", autospec=True)
+def test_save_calibration(mocked_web_call: MagicMock, mocked_api: API):
+    """Tests API.save_calibration() method"""
+    mocked_web_call.return_value = web_responses.calibrations.create_response
+
+    name = "MyDemoCalibration"
+    description = "A test calibration"
+    device_id = 1
+    user_id = 1
+    qililab_version = "0.0.0"
+
+    calibration_id = mocked_api.save_calibration(
+        name=name,
+        description=description,
+        calibration_serialized=calibration_serialized,
+        device_id=device_id,
+        user_id=user_id,
+        qililab_version=qililab_version,
+    )
+
+    mocked_web_call.assert_called()
+    assert calibration_id == web_responses.calibrations.create_response[0]["calibration_id"]
+
+
+@patch("qiboconnection.connection.Connection.send_post_auth_remote_api_call", autospec=True)
+def test_save_calibration_ise(mocked_web_call: MagicMock, mocked_api: API):
+    """Tests API.save_calibration() method"""
+    mocked_web_call.return_value = web_responses.calibrations.ise_response
+
+    name = "MyDemoCalibration"
+    description = "A test calibration"
+    device_id = 1
+    user_id = 1
+    qililab_version = "0.0.0"
+
+    with pytest.raises(RemoteExecutionException):
+        _ = mocked_api.save_calibration(
+            name=name,
+            description=description,
+            calibration_serialized=calibration_serialized,
+            device_id=device_id,
+            user_id=user_id,
+            qililab_version=qililab_version,
+        )
+
+    mocked_web_call.assert_called()
+
+
+@patch("qiboconnection.connection.Connection.send_get_auth_remote_api_call", autospec=True)
+def test_get_calibration(mocked_web_call: MagicMock, mocked_api: API):
+    """Tests API.get_calibration() method using calibration id"""
+    mocked_web_call.return_value = web_responses.calibrations.retrieve_response
+
+    calibration = mocked_api.get_calibration(calibration_id=1)
+
+    mocked_web_call.assert_called_with(self=mocked_api._connection, path=f"{mocked_api._CALIBRATIONS_CALL_PATH}/1")
+    assert isinstance(calibration, Calibration)
+
+
+@patch("qiboconnection.connection.Connection.send_get_auth_remote_api_call", autospec=True)
+def test_get_calibration_by_name(mocked_web_call: MagicMock, mocked_api: API):
+    """Tests API.get_calibration() method using calibration name"""
+    mocked_web_call.return_value = web_responses.calibrations.retrieve_response
+
+    calibration = mocked_api.get_calibration(calibration_name="DEMO_CALIBRATION")
+
+    mocked_web_call.assert_called_with(
+        self=mocked_api._connection,
+        path=f"{mocked_api._CALIBRATIONS_CALL_PATH}/by_keys",
+        params={"name": "DEMO_CALIBRATION"},
+    )
+    assert isinstance(calibration, Calibration)
+
+
+@patch("qiboconnection.connection.Connection.send_get_auth_remote_api_call", autospec=True)
+def test_get_calibration_by_name_ise(mocked_web_call: MagicMock, mocked_api: API):
+    """Tests API.get_calibration() method using calibration name"""
+    mocked_web_call.return_value = web_responses.calibrations.ise_response
+
+    with pytest.raises(RemoteExecutionException, match="Calibration could not be retrieved."):
+        _ = mocked_api.get_calibration(calibration_name="DEMO_CALIBRATION")
+
+
+@patch("qiboconnection.connection.Connection.send_get_auth_remote_api_call", autospec=True)
+def test_get_calibration_with_redundant_info(mocked_web_call: MagicMock, mocked_api: API):
+    """Tests API.get_calibration() method fails when providing name and id at the same time"""
+    mocked_web_call.return_value = web_responses.calibrations.retrieve_response
+
+    with pytest.raises(ValueError):
+        _ = mocked_api.get_calibration(calibration_id=1, calibration_name="TEST_CALIBRATION")
+
+    mocked_web_call.assert_not_called()
+
+
+@patch("qiboconnection.connection.Connection.send_get_auth_remote_api_call", autospec=True)
+def test_get_calibration_with_insufficient_info(mocked_web_call: MagicMock, mocked_api: API):
+    """Tests API.get_calibration() method fails if not name nor id are provided"""
+    mocked_web_call.return_value = web_responses.calibrations.retrieve_response
+
+    with pytest.raises(ValueError):
+        _ = mocked_api.get_calibration()
+
+    mocked_web_call.assert_not_called()
+
+
+@patch("qiboconnection.connection.Connection.send_get_auth_remote_api_call", autospec=True)
+def test_get_calibration_ise(mocked_web_call: MagicMock, mocked_api: API):
+    """Tests API.get_calibration() method when server response raises an error"""
+    mocked_web_call.return_value = web_responses.calibrations.ise_response
+
+    with pytest.raises(RemoteExecutionException):
+        _ = mocked_api.get_calibration(calibration_id=1)
+
+    mocked_web_call.assert_called_with(self=mocked_api._connection, path=f"{mocked_api._CALIBRATIONS_CALL_PATH}/1")
+
+
+@patch("qiboconnection.connection.Connection.send_get_auth_remote_api_call_all_pages", autospec=True)
+def test_list_calibrations(mocked_web_call: MagicMock, mocked_api: API):
+    """Tests API.list_calibration() method"""
+    mocked_web_call.return_value = web_responses.calibrations.retrieve_many_response
+
+    calibrations = mocked_api.list_calibrations()
+
+    mocked_web_call.assert_called()
+    assert isinstance(calibrations[0], Calibration)
+
+
+@patch("qiboconnection.connection.Connection.send_get_auth_remote_api_call_all_pages", autospec=True)
+def test_list_calibrations_ise(mocked_web_call: MagicMock, mocked_api: API):
+    """Tests API.list_calibration() method"""
+    mocked_web_call.return_value = web_responses.calibrations.ise_many_response
+
+    with pytest.raises(RemoteExecutionException):
+        _ = mocked_api.list_calibrations()
+
+    mocked_web_call.assert_called()
+
+
+@patch("qiboconnection.connection.Connection.send_put_auth_remote_api_call", autospec=True)
+def test_update_calibration(mocked_web_call: MagicMock, mocked_api: API):
+    """Tests API.update_calibration() method"""
+    mocked_web_call.return_value = web_responses.calibrations.update_response
+
+    calibration_id = 1
+    name = "MyDemoCalibration"
+    description = "A test calibration"
+    device_id = 1
+    user_id = 1
+    qililab_version = "0.0.0"
+    modified_calibration = Calibration(
+        id=calibration_id,
+        name=name,
+        description=description,
+        calibration_serialized=calibration_serialized,
+        device_id=device_id,
+        user_id=user_id,
+        qililab_version=qililab_version,
+    )
+
+    updated_calibration = mocked_api.update_calibration(calibration=modified_calibration)
+
+    mocked_web_call.assert_called_with(
+        self=mocked_api._connection,
+        path=f"{mocked_api._CALIBRATIONS_CALL_PATH}/1",
+        data=asdict(modified_calibration.calibration_request()),
+    )
+    assert isinstance(updated_calibration, Calibration)
+
+
+@patch("qiboconnection.connection.Connection.send_put_auth_remote_api_call", autospec=True)
+def test_update_calibration_with_no_id(mocked_web_call: MagicMock, mocked_api: API):
+    """Tests API.update_calibration() method"""
+    mocked_web_call.return_value = web_responses.calibrations.update_response
+
+    name = "MyDemoCalibration"
+    description = "A test calibration"
+    device_id = 1
+    user_id = 1
+    qililab_version = "0.0.0"
+    modified_calibration = Calibration(
+        id=None,
+        name=name,
+        description=description,
+        calibration_serialized=calibration_serialized,
+        device_id=device_id,
+        user_id=user_id,
+        qililab_version=qililab_version,
+    )
+
+    with pytest.raises(ValueError):
+        _ = mocked_api.update_calibration(calibration=modified_calibration)
+
+    mocked_web_call.assert_not_called()
+
+
+@patch("qiboconnection.connection.Connection.send_put_auth_remote_api_call", autospec=True)
+def test_update_calibration_ise(mocked_web_call: MagicMock, mocked_api: API):
+    """Tests API.update_calibration() method"""
+    mocked_web_call.return_value = web_responses.calibrations.ise_response
+
+    calibration_id = 1
+    name = "MyDemoCalibration"
+    description = "A test calibration"
+    device_id = 1
+    user_id = 1
+    qililab_version = "0.0.0"
+    modified_calibration = Calibration(
+        id=calibration_id,
+        name=name,
+        description=description,
+        calibration_serialized=calibration_serialized,
+        device_id=device_id,
+        user_id=user_id,
+        qililab_version=qililab_version,
+    )
+
+    with pytest.raises(RemoteExecutionException):
+        _ = mocked_api.update_calibration(calibration=modified_calibration)
+
+    mocked_web_call.assert_called_with(
+        self=mocked_api._connection,
+        path=f"{mocked_api._CALIBRATIONS_CALL_PATH}/1",
+        data=asdict(modified_calibration.calibration_request()),
+    )
+
+
+@patch("qiboconnection.connection.Connection.send_delete_auth_remote_api_call", autospec=True)
+def test_delete_calibration(mocked_web_call: MagicMock, mocked_api: API):
+    """Tests API.delete_calibration() method"""
+    mocked_web_call.return_value = web_responses.calibrations.delete_response
+
+    mocked_api.delete_calibration(calibration_id=1)
+
+    mocked_web_call.assert_called_with(self=mocked_api._connection, path=f"{mocked_api._CALIBRATIONS_CALL_PATH}/1")
+
+
+@patch("qiboconnection.connection.Connection.send_delete_auth_remote_api_call", autospec=True)
+def test_delete_calibration_ise(mocked_web_call: MagicMock, mocked_api: API):
+    """Tests API.delete_calibration() method"""
+    mocked_web_call.return_value = web_responses.calibrations.ise_response
+
+    with pytest.raises(RemoteExecutionException):
+        mocked_api.delete_calibration(calibration_id=1)
+
+    mocked_web_call.assert_called_with(self=mocked_api._connection, path=f"{mocked_api._CALIBRATIONS_CALL_PATH}/1")
 
 
 @patch("qiboconnection.connection.Connection.send_get_auth_remote_api_call_all_pages", autospec=True)

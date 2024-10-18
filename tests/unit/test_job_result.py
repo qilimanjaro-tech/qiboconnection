@@ -1,5 +1,4 @@
 """ Tests methods for job result """
-import numpy as np
 
 from qiboconnection.models.job_result import JobResult
 from qiboconnection.typings.enums import JobType
@@ -9,7 +8,7 @@ def test_job_result_creation():
     """Test job result creation"""
     job_result = JobResult(
         job_id=1,
-        http_response="gASVsAAAAAAAAACMFW51bXB5LmNvcmUubXVsdGlhcnJheZSMDF9yZWNvbnN0cnVjdJSTlIwFbnVtcHmUjAduZGFycmF5lJOUSwCFlEMBYpSHlFKUKEsBSwWFlGgDjAVkdHlwZZSTlIwCZjiUiYiHlFKUKEsDjAE8lE5OTkr_____Sv____9LAHSUYolDKAAAAAAAAPA_AAAAAAAA8D8AAAAAAADwPwAAAAAAAPA_AAAAAAAA8D-UdJRiLg==",
+        http_response='{"data": "H4sIABrWEWcC/4uuViooyk9KTMrMySzJTC1WslKoVjIAkgZ6JjoKSoZgllktkJmcX5pXgpCHyYLlihNzC3LAmqOjDWJ1FKIN4QQaF03CIBZIKqVl5iXmxBeXJJakws1X0jDQMzcwNzQwM7cwNLQwMzUxN9U2yNJUgtqLU74W1cB4nN6zRAVw36JL1NbGAgB4XNujJgEAAA==", "encoding": "utf-8", "compression": "gzip"}',
         job_type=JobType.CIRCUIT,
     )
 
@@ -17,12 +16,25 @@ def test_job_result_creation():
     assert job_result.job_id == 1
     assert (
         job_result.http_response
-        == "gASVsAAAAAAAAACMFW51bXB5LmNvcmUubXVsdGlhcnJheZSMDF9yZWNvbnN0cnVjdJSTlIwFbnVtcHmUjAduZGFycmF5lJOUSwCFlEMBYpSHlFKUKEsBSwWFlGgDjAVkdHlwZZSTlIwCZjiUiYiHlFKUKEsDjAE8lE5OTkr_____Sv____9LAHSUYolDKAAAAAAAAPA_AAAAAAAA8D8AAAAAAADwPwAAAAAAAPA_AAAAAAAA8D-UdJRiLg=="
+        == '{"data": "H4sIABrWEWcC/4uuViooyk9KTMrMySzJTC1WslKoVjIAkgZ6JjoKSoZgllktkJmcX5pXgpCHyYLlihNzC3LAmqOjDWJ1FKIN4QQaF03CIBZIKqVl5iXmxBeXJJakws1X0jDQMzcwNzQwM7cwNLQwMzUxN9U2yNJUgtqLU74W1cB4nN6zRAVw36JL1NbGAgB4XNujJgEAAA==", "encoding": "utf-8", "compression": "gzip"}'
     )
-    assert (job_result.data == np.array([1.0, 1.0, 1.0, 1.0, 1.0])).all()
+    assert isinstance(job_result.data, list)
+    for item in job_result.data:
+        assert isinstance(item, dict)
 
 
 def test_job_result_qprogram_works():
+    """Test QProgrom results are returned as dicts"""
+
+    job_result = JobResult(
+        job_id=0,
+        http_response='{"data": "H4sIAJKo6mYC/+1XyXIbRwz9lXHOEquxo/UPqYpztV0q2qaXKpl0JCrJ5+f1QoomeUpyyCEXNgfTjcby8ID56dXrXx53nx/X337dPD0/7J/ebh/Hn7u322V53Kw/7p7397/J/fvnIbpdXr1+/7D78+fN+un5cfNts92Po+0lTqz/uP/28ur+43q/vhuvluX91+3T8WFZ1r9/vv+w3d8tb7iUsio3y99cX1Quyz9U9b/K/7LKdy+qvm73G+B2/3W3vTu94Pt6/6UAUoTtSckhJdmspt0sTaZaolglKll1iJyjkqsLkcfcZlE4sSUzXOkHF5alrmqlCGeLKqka40wRFmU1Fq/CN21biLkGQwvZkIiYuAs0S+aF3mSJolyIo8wTKRGE20TYs0uCuZoIDPZinE3ktZbK8DfgmtULvU7CHPBYowZ7O6KZLuJUyImpSxRaPUUF3tV+lVTDDlc4QkJ6oZdrEbxHdFN4HOHiOG+aXiK6pIgjJKpisM4R9FxVFYfKLIxQnGnNVRoHm1cnhW5pByKV3By5LEEtuLky5JWJrTQLrUtaEIoEomflil4NjbBDXqMdganIdWa1Cu+bhJHbkmoklVtwc0V45V5hE/YiKedqi2UtGpJACoB0s8QKAWGRMA8KaviIFa5Qhk+OOJFYFwGKLFVCvarHmeJYhcEmKrgWMbXSzzjVcHKcU4XKLkLC7NSJQGzEYDMAU60F51xz0+u1ABJwrXkJUVE4TsRi0EZdxLA0OBQF092SGkbupTpAVPlCLZsiTIrkEyJRb7oI1QfsAWVRSleLHSTFA0FD9niIkGwUnyPkKMdLxUzVMsACkeTdRRYa1YmSBq6bCInCDpMABMJHjJEGRNHDraJGrpgM1CtKTSkpuJvcisKIEcsIFRqOc+EatUbxzB4vsQTqcSgSKLyMMLSAT9gjSqb08JloGbAiyegmG65pfgCxCFSPhcN6AZBFGjj0QjPYY4aO+ICkRjgUGTXhiHQ1MA2ExMoCfFIPGQKA2mCnVCTRrgDZ3YDJbByV+e6cVwm8eltWjSiRZ0XSVKTd1oS4DdXhFRUJFPgQKpPB68qDYLsQ1cJtMwgUwNdzM7ouZKOiLsk8cdU4VpFpgMQALc+QeSs4AZEDksEuRENYQFeox1l/fOUC2DUoGFWjMT0AEOAZOLRbl0PIDQPgIxRGAtZDCBQYKhw1WxhVc80DcC2jyaB0FAwwjjUXqICEusZ5K/uEsIDb+GiKnIBbrnmAdB/6U9F5AexPSFHFwb0tDQ8AMBEwdW+GQyh8qDW2C4x1W0ucENj0u1PV8Fmt1JkC3HcoliJTiKo6yfu1CIGxXjpo4+9+LCtaGXIKWFGdXoEXDJaiNaK8fUQIpVpAj6jyTiTXQJQF9Y5CjkQ1HaJd0XfqkVTnBWA1bb0bM0aNg6/JsAbbEP9Evq+lAB0USES1pIX4tCsQA0wPuAFAP8QNDKFoKpBpmchFNz5KMGtc0R9gvBM6m8eAE0MPSOscdbAVdF4Cpd6mgLEzEEFEFhQETKAuLy8AzSShi2ZRIN5iHiM0b3TQCqMxewwhuAab2ai0yWd6ijkGOULSwWXXyjia+peSHchrBNSbDuCCIcPmpTqb6yjkKcRM0bs9JiXMKtdSjP4GgrVA/0TdzgtgFmgJ1QaypYn3CqhgbpqMODa2WIF/DXylccX8xqjlpd3NSCBhnoh/BZQmNYExsQUTg2L+O6IW//M4jtA1/eVlWix1RgLUcJKUCapCaJnAGMoiShySjvtQnOiLGKrkag0DD2DYgrLFrhM633/BV96X3cNHEHobdlsa2qpjGU+affEh7O0Ua/Tf8Qp188OtZYWi6tuIxvbWd/Cr8ykOq/cl+4IS61LmcTHY5UwrR7cBdNU3tEG0LRpjGUrRb/sydGubK7Bw36oXKnWo0hzvK42ldikGtb5Izkca6/j1fq2BOM90Wo+Kl24AaNHGKkNa5+PcNIwG+891vrULpXVEtE27fa18aoUfTJumyjRSfTyOa9rYexGAbhfY5IiLpw+775uTj6nxKXV67PjFXk6l/Rt/efPDuLB73t/uPt0+rrefN3fLp/XD0+ZHxfRvKv7pLyVpV8jIEAAA", "encoding": "utf-8", "compression": "gzip"}',
+        job_type="qprogram",
+    )
+    assert isinstance(job_result.data, str)
+
+
+def test_job_result_qprogram_works_legacy():
     """Test QProgrom results are returned as dicts"""
 
     job_result = JobResult(
@@ -42,6 +54,17 @@ def test_job_result_vqa_works():
         job_type="vqa",
     )
     assert isinstance(job_result.data, dict)
+
+
+def test_job_result_annealing_program_works():
+    """Test vqa results are returned as dicts"""
+
+    job_result = JobResult(
+        job_id=0,
+        http_response='{"data": "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", "encoding": "utf-8", "compression": "gzip"}',
+        job_type="annealing_program",
+    )
+    assert isinstance(job_result.data, str)
 
 
 def test_job_result_program_raises_error():

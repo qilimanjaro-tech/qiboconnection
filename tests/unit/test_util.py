@@ -74,7 +74,10 @@ def test_process_response_non_json(response_plain_text: Response):
 
 
 def test_deserialize_job_description(
-    compressed_qibo_circuit: str, compressed_qibo_circuits: str, compressed_qililab_qprogram: str
+    compressed_qibo_circuit: str,
+    compressed_qibo_circuits: str,
+    compressed_qililab_qprogram: str,
+    compressed_qililab_annealing_program: str,
 ):
     """Unit test of deserialize_job_description()"""
     assert isinstance(
@@ -82,6 +85,12 @@ def test_deserialize_job_description(
     )
     assert isinstance(
         deserialize_job_description(raw_description=compressed_qililab_qprogram, job_type=JobType.QPROGRAM)["data"],
+        dict,
+    )
+    assert isinstance(
+        deserialize_job_description(
+            raw_description=compressed_qililab_annealing_program, job_type=JobType.ANNEALING_PROGRAM
+        )["data"],
         dict,
     )
     assert isinstance(

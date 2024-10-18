@@ -28,5 +28,6 @@ class JobType(StrEnum):
 
     CIRCUIT = "circuit"
     QPROGRAM = "qprogram"
+    ANNEALING_PROGRAM = "annealing_program"
     VQA = "vqa"
     OTHER = "other"
