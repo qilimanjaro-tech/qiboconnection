@@ -1,6 +1,7 @@
 """Web Responses class"""
 
 from .auth import Auth
+from .calibrations import Calibrations
 from .devices import Devices
 from .job import JobResponse
 from .ping import Ping
@@ -15,6 +16,7 @@ class WebResponses:
     ping = Ping()
     devices = Devices()
     runcards = Runcards()
+    calibrations = Calibrations()
     users = Users()
     auth = Auth()
     raw = ResponsesRaw()

@@ -43,6 +43,7 @@ class Job(ABC):  # pylint: disable=too-many-instance-attributes
     program: ProgramDefinition | None = field(default=None)
     circuit: list[Circuit] | None = None
     qprogram: str | None = None
+    anneal_program_args: dict | None = None
     vqa: VQA | None = None
     nshots: int = 10
     job_status: JobStatus = JobStatus.NOT_SENT
@@ -52,12 +53,14 @@ class Job(ABC):  # pylint: disable=too-many-instance-attributes
     id: int = 0  # pylint: disable=invalid-name
 
     def __post_init__(self):
-        n = len([arg for arg in [self.qprogram, self.circuit, self.vqa] if arg is not None])
+        n = len([arg for arg in [self.qprogram, self.circuit, self.anneal_program_args, self.vqa] if arg is not None])
         match n:
             case n if n > 1:
-                raise ValueError("VQA, circuit and qprogram were provided, but execute() only takes one of them.")
+                raise ValueError(
+                    "VQA, circuit, qprogram and anneal_program_args were provided, but execute() only takes one of them."
+                )
             case 0:
-                raise ValueError("Neither of circuit, vqa or qprogram were provided.")
+                raise ValueError("Neither of circuit, vqa, qprogram or anneal_program_args were provided.")
 
     @property
     def user_id(self) -> int | None:
@@ -128,11 +131,13 @@ class Job(ABC):  # pylint: disable=too-many-instance-attributes
     @property
     def job_type(self):
         """Get the type of the job, checking whether the user has defined circuit or experiment."""
-        if self.circuit is not None and self.qprogram is None and self.vqa is None:
+        if self.circuit is not None and self.qprogram is None and self.anneal_program_args is None and self.vqa is None:
             return JobType.CIRCUIT
-        if self.qprogram is not None and self.circuit is None and self.vqa is None:
+        if self.qprogram is not None and self.circuit is None and self.anneal_program_args is None and self.vqa is None:
             return JobType.QPROGRAM
-        if self.vqa is not None and self.circuit is None and self.qprogram is None:
+        if self.anneal_program_args is not None and self.circuit is None and self.qprogram is None and self.vqa is None:
+            return JobType.ANNEALING_PROGRAM
+        if self.vqa is not None and self.circuit is None and self.qprogram is None and self.anneal_program_args is None:
             return JobType.VQA
         raise ValueError("Could not determine JobType")
 
@@ -141,6 +146,8 @@ class Job(ABC):  # pylint: disable=too-many-instance-attributes
 
         if self.qprogram is not None:
             return json.dumps(compress_any(self.qprogram))
+        if self.anneal_program_args is not None:
+            return json.dumps(compress_any(self.anneal_program_args))
         if self.vqa is not None:
             vqa_as_dict = asdict(self.vqa)
             vqa_as_dict.pop("vqa_dict")

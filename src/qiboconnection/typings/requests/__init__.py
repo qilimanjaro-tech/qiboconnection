@@ -15,7 +15,8 @@
 """Requests typings module"""
 
 from .assertion_payload import AssertionPayload
+from .calibration_request import CalibrationRequest
 from .job_request import JobRequest
 from .runcard_request import RuncardRequest
 
-__all__ = ["AssertionPayload", "JobRequest", "RuncardRequest"]
+__all__ = ["AssertionPayload", "CalibrationRequest", "JobRequest", "RuncardRequest"]

@@ -12,23 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""JobType enum"""
+"""Runcard typing classes"""
 
-from .str_enum import StrEnum
+from dataclasses import dataclass
 
 
-class JobType(StrEnum):
-    """Job Type
+@dataclass
+class CalibrationRequest:
+    """Base structure for a SavedExperiment body of any rest interaction"""
 
-    Args:
-        enum (str): Accepted values are:
-            * "circuit"
-            * "experiment"
-            * "other"
-    """
-
-    CIRCUIT = "circuit"
-    QPROGRAM = "qprogram"
-    ANNEALING_PROGRAM = "annealing_program"
-    VQA = "vqa"
-    OTHER = "other"
+    name: str
+    calibration: str
+    device_id: int
+    user_id: int
+    description: str
+    qililab_version: str

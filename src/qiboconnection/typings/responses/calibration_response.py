@@ -12,23 +12,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""JobType enum"""
+"""Calibration typing classes"""
 
-from .str_enum import StrEnum
+from dataclasses import dataclass
+from datetime import datetime
+
+from qiboconnection.util import from_kwargs
+
+from ..requests import CalibrationRequest  # noqa: TID252
 
 
-class JobType(StrEnum):
-    """Job Type
+@dataclass
+class CalibrationResponse(CalibrationRequest):
+    """Class for accommodating Calibrations."""
 
-    Args:
-        enum (str): Accepted values are:
-            * "circuit"
-            * "experiment"
-            * "other"
-    """
+    calibration_id: int
+    created_at: datetime
+    updated_at: datetime
 
-    CIRCUIT = "circuit"
-    QPROGRAM = "qprogram"
-    ANNEALING_PROGRAM = "annealing_program"
-    VQA = "vqa"
-    OTHER = "other"
+    @classmethod
+    def from_kwargs(cls, **kwargs):
+        "Returns an instance of CalibrationResponse including non-typed attributes"
+        return from_kwargs(cls, **kwargs)
