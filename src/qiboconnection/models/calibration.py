@@ -28,7 +28,7 @@ class Calibration:
 
     name: str
     description: str
-    calibration: str
+    calibration: str = ""
     id: int | None = field(default=None)
 
     def __init__(self, **kwargs):
