@@ -14,6 +14,7 @@
 
 """ Models: things the api acts with / upon. """
 
+from .calibration import Calibration
 from .job import Job
 from .job_listing import JobListing
 from .job_listing_item import JobListingItem

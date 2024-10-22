@@ -11,20 +11,25 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""
-This module contains all needed classes needed for interacting with Qilimanjaro's QaaS via Qiboconnection SDK.
 
-.. currentmodule:: qiboconnection
+""" Calibration typing classes """
+from dataclasses import dataclass
+from datetime import datetime
 
-.. autosummary::
-    :toctree: API
+from qiboconnection.util import from_kwargs
 
-    ~api.API
-"""
+from ..requests import CalibrationRequest
 
 
-__version__ = "0.23.0-alpha.0"
+@dataclass
+class CalibrationResponse(CalibrationRequest):
+    """Class for accommodating Calibrations."""
 
+    calibration_id: int
+    created_at: datetime
+    updated_at: datetime
 
-from .about import about
-from .api import API
+    @classmethod
+    def from_kwargs(cls, **kwargs):
+        "Returns an instance of CalibrationResponse including non-typed attributes"
+        return from_kwargs(cls, **kwargs)
