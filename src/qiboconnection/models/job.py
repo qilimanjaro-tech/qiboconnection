@@ -19,7 +19,7 @@ from abc import ABC
 from dataclasses import asdict, dataclass, field
 from typing import Any, List
 
-from qibo.models.circuit import Circuit
+from qibo.models.circuit import Circuit  # type: ignore[import-untyped]
 from typeguard import typechecked
 
 from qiboconnection.typings.enums import JobStatus, JobType

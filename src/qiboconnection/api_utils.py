@@ -17,7 +17,7 @@
 import json
 from typing import Any, List
 
-from qibo.models.circuit import Circuit
+from qibo.models.circuit import Circuit  # type: ignore[import-untyped]
 
 from qiboconnection.config import logger
 from qiboconnection.models import JobResult

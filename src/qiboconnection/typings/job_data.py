@@ -18,7 +18,7 @@ from inspect import signature
 
 # pylint: disable=too-many-instance-attributes
 # pylint: disable=E1101
-from qibo.models import Circuit
+from qibo.models import Circuit  # type: ignore[import-untyped]
 
 from qiboconnection.api_utils import deserialize_job_description, parse_job_response_to_result
 from qiboconnection.typings.responses.job_response import JobResponse

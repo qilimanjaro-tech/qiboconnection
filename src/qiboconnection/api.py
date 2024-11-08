@@ -28,8 +28,8 @@ from time import sleep
 from typing import Any, List, cast
 
 from numpy import typing as npt
-from qibo.models.circuit import Circuit
-from qibo.result import CircuitResult
+from qibo.models.circuit import Circuit  # type: ignore[import-untyped]
+from qibo.result import CircuitResult  # type: ignore[import-untyped]
 from requests import HTTPError, codes
 from typeguard import typechecked
 

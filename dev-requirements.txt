@@ -12,3 +12,4 @@ ruff==0.6.8
 responses==0.25.3
 types-requests~=2.32.0
 python-dotenv==1.0.1
+pandas-stubs==2.2.3.241009

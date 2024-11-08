@@ -20,7 +20,7 @@ import platform
 import sys
 from subprocess import check_output  # nosec B404  # noqa: S404
 
-import qibo
+import qibo  # type: ignore[import-untyped]
 
 
 def about():
