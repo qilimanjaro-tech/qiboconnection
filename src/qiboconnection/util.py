@@ -64,10 +64,6 @@ def decode_jsonified_dict(http_response: str) -> dict:
     return json.loads(urlsafe_b64decode(http_response))
 
 
-def _decode_pickled_results(http_response: str) -> Any:
-    raise DeprecationWarning("Pickled objects not supported")
-
-
 def decode_results_from_circuit(http_response: str) -> CircuitResult | dict:
     """Decode the results from the circuit execution. Ideally we should always expect dictionaries here, but for qibo we
     are still serializing `CircuitResult`s that must be pickled.

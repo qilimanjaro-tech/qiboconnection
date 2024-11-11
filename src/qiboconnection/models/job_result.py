@@ -23,7 +23,7 @@ from numpy import typing as npt
 from qibo.result import CircuitResult  # type: ignore[import-untyped]
 
 from qiboconnection.typings.enums import JobType
-from qiboconnection.util import decode_results_from_circuit, decode_results_from_qprogram, decompress_any
+from qiboconnection.util import decode_results_from_qprogram, decompress_any
 
 logger = logging.getLogger(__name__)
 
@@ -55,8 +55,8 @@ class JobResult(ABC):
             )
 
             if self.job_type == JobType.CIRCUIT:
-                self.data = decode_results_from_circuit(self.http_response)
-                return
+                raise ValueError("Circuits should be serialized using compression.")
+
             if self.job_type in {JobType.QPROGRAM, JobType.ANNEALING_PROGRAM, JobType.VQA}:
                 self.data = decode_results_from_qprogram(self.http_response)
                 return
