@@ -27,7 +27,7 @@ from dataclasses import dataclass
 #
 #     """
 #
-#     grantType: Literal[GrantType.JWT_BEARER]  # pylint: disable=invalid-name
+#     grantType: Literal[GrantType.JWT_BEARER]
 #     assertion: str
 #     scope: UserScope
 #

@@ -1,6 +1,5 @@
 """Endurance tests."""
 
-# pylint: disable=logging-fstring-interpolation
 import logging
 import os
 import sys

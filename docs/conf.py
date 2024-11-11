@@ -9,7 +9,7 @@ import os
 import sys
 from urllib.parse import quote
 
-from sphinxawesome_theme.postprocess import Icons  # pylint: disable=import-error
+from sphinxawesome_theme.postprocess import Icons
 
 sys.path.insert(0, os.path.abspath(".."))
 
@@ -18,7 +18,7 @@ copyright = "2023, Qilimanjaro"
 author = "Qilimanjaro"
 
 # TODO: set the right value
-import qiboconnection  # pylint: disable=wrong-import-position  # noqa: E402
+import qiboconnection  # noqa: E402
 
 release = qiboconnection.__version__
 

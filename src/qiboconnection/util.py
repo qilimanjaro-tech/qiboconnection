@@ -142,7 +142,7 @@ def compress_any(any_obj, encoding="utf-8") -> dict:
     return {"data": compressed_data, "encoding": encoding, "compression": "gzip"}
 
 
-def decompress_any(data: str, **kwargs) -> dict:  # pylint: disable=unused-argument
+def decompress_any(data: str, **kwargs) -> dict:
     """
     Decompresses a compressed string into its original datatype.
     :param data: compressed data containing a json to extract a dictionary from

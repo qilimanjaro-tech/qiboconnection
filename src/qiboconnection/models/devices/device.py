@@ -24,10 +24,6 @@ from qiboconnection.typings.enums import DeviceStatus
 
 from .device_details import DeviceDetails
 
-# pylint: disable=no-member
-# pylint: disable=attribute-defined-outside-init
-# pylint: disable=too-many-instance-attributes
-
 
 class Device(DeviceDetails):
     """Abstract class for devices."""
@@ -54,7 +50,7 @@ class Device(DeviceDetails):
         return self.__str__()
 
     @property
-    def id(self) -> int:  # pylint: disable=invalid-name
+    def id(self) -> int:
         """Returns device identifier
 
         Returns:
@@ -182,7 +178,7 @@ class Device(DeviceDetails):
                     pass
         return result_dict
 
-    def toJSON(self, expand=False) -> str:  # pylint: disable=invalid-name
+    def toJSON(self, expand=False) -> str:
         """JSON representation of a Device
 
         Returns:

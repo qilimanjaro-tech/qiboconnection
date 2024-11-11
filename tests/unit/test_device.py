@@ -9,8 +9,6 @@ from qiboconnection.typings.devices import DeviceInput
 
 from .data import device_inputs
 
-# pylint: disable=no-member
-
 
 @pytest.mark.parametrize("device_input", device_inputs)
 def test_device_constructor(device_input: DeviceInput):

@@ -7,8 +7,6 @@ import yaml
 from qiboconnection.models.calibration import Calibration
 from qiboconnection.typings.responses.calibration_response import CalibrationRequest, CalibrationResponse
 
-# pylint: disable=no-member
-
 
 def test_calibration_creation():
     """Tests Calibration Creation"""

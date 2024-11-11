@@ -13,9 +13,6 @@ from pathlib import Path
 # It should be nicer to get this info from pytest but I have not find an easy Enum with all the
 # possible outcomes
 ALL_OUTCOMES = ["passed", "skipped", "failed"]
-# pylint: disable=broad-exception-raised
-# pylint: disable=raising-format-tuple
-# pylint: disable=too-many-locals
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 

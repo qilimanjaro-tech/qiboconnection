@@ -20,7 +20,7 @@ from qiboconnection.typings.responses import JobListingItemResponse
 from qiboconnection.util import from_kwargs
 
 
-class JobListingItem:  # pylint: disable=too-few-public-methods
+class JobListingItem:
     """JobListing single item representation."""
 
     user_id: int

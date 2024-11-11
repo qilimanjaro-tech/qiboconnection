@@ -35,7 +35,7 @@ from .user import User
 
 
 @dataclass
-class Job(ABC):  # pylint: disable=too-many-instance-attributes
+class Job(ABC):
     """Job class to manage the job experiment to be remotely sent"""
 
     user: User
@@ -50,7 +50,7 @@ class Job(ABC):  # pylint: disable=too-many-instance-attributes
     job_result: JobResult | None = None
     name: str = "-"
     summary: str = "-"
-    id: int = 0  # pylint: disable=invalid-name
+    id: int = 0
 
     def __post_init__(self):
         n = len([arg for arg in [self.qprogram, self.circuit, self.anneal_program_args, self.vqa] if arg is not None])

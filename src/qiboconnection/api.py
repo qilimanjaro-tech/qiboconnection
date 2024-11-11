@@ -14,11 +14,6 @@
 
 """Qiboconnection API class."""
 
-# pylint: disable=too-many-lines
-# pylint: disable=too-many-instance-attributes
-# pylint: disable=too-many-public-methods
-# pylint: disable=no-member
-
 import json
 import warnings
 from abc import ABC
@@ -49,7 +44,7 @@ from qiboconnection.typings.vqa import VQA
 from qiboconnection.util import unzip
 
 
-def warning_on_one_line(message, category, filename, lineno, line=None):  # pylint: disable=unused-argument
+def warning_on_one_line(message, category, filename, lineno, line=None):
     """Warnings formatting"""
     return f"{filename}:{lineno}: {category.__name__}:{message}\n"
 
@@ -298,7 +293,7 @@ class API(ABC):
     # REMOTE EXECUTIONS
 
     @typechecked
-    def execute(  # pylint: disable=too-many-locals, disable=too-many-branches
+    def execute(
         self,
         circuit: Circuit | List[Circuit] | None = None,
         qprogram: str | None = None,

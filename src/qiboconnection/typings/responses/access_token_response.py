@@ -32,8 +32,8 @@ class AccessTokenResponse:
         issuedAt (str): string representation of the timestamp when token was issued
     """
 
-    accessToken: str  # pylint: disable=invalid-name
-    refreshToken: str | None  # pylint: disable=invalid-name
-    tokenType: Literal[TokenType.BEARER]  # pylint: disable=invalid-name
-    expiresIn: int  # pylint: disable=invalid-name
-    issuedAt: str  # pylint: disable=invalid-name
+    accessToken: str
+    refreshToken: str | None
+    tokenType: Literal[TokenType.BEARER]
+    expiresIn: int
+    issuedAt: str

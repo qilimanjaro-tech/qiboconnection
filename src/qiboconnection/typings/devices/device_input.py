@@ -18,8 +18,6 @@ from dataclasses import dataclass
 
 from qiboconnection.util import from_kwargs
 
-# pylint: disable=too-many-instance-attributes
-
 
 @dataclass(kw_only=True)
 class DeviceInput:

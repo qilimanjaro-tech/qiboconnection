@@ -1,6 +1,5 @@
 """Testing user roles can only do what they are intended to."""
 
-# pylint: disable=logging-fstring-interpolation
 import logging
 import os
 import sys

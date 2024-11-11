@@ -1,6 +1,5 @@
 """Testing different large circuits."""
 
-# pylint: disable=logging-fstring-interpolation
 import logging
 import os
 import sys

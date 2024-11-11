@@ -27,7 +27,7 @@ import requests
 from requests import codes
 from typeguard import typechecked
 
-from qiboconnection import __version__ as VERSION  # pylint: disable=cyclic-import
+from qiboconnection import __version__ as VERSION
 from qiboconnection.config import get_environment, logger
 from qiboconnection.errors import ConnectionException, HTTPError, RemoteExecutionException
 from qiboconnection.models.user import User
@@ -64,7 +64,7 @@ def refresh_token_if_unauthorised(func):
 
 
 @dataclass
-class Connection(ABC):  # pylint: disable=too-many-instance-attributes
+class Connection(ABC):
     """Class to create a remote connection to a Qibo server"""
 
     @typechecked

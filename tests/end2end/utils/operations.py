@@ -1,5 +1,3 @@
-# pylint: disable=logging-fstring-interpolation
-# pylint: disable=protected-access
 import os
 from enum import Enum
 
@@ -62,9 +60,7 @@ def is_quantum(device: Device) -> bool:
     return device.type == DeviceType.QUANTUM_DEVICE
 
 
-def get_expected_operation_result(  # pylint: disable=too-many-branches
-    operation: Operation, device: Device
-) -> OperationResult:
+def get_expected_operation_result(operation: Operation, device: Device) -> OperationResult:
     """Get the expected result of performing a certain operation in a device.
 
     Together with the of the device, it takes into consideration other

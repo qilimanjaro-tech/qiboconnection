@@ -1,5 +1,3 @@
-# pylint: disable=logging-fstring-interpolation, broad-exception-caught, inconsistent-return-statements
-# pylint: disable=protected-access
 import logging
 import logging.config
 import os
@@ -18,7 +16,7 @@ from qiboconnection.typings.vqa import VQA
 from tests.end2end.utils.utils import get_api_or_fail_test, get_logging_conf_or_fail_test
 
 
-def pytest_configure(config: Config):  # pylint: disable=unused-argument
+def pytest_configure(config: Config):
     """Initialize the logging configuration. This is executed once per test session.
 
     Args:
