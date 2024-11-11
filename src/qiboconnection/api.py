@@ -862,7 +862,6 @@ class API(ABC):
         response, status_code = self._connection.send_get_auth_remote_api_call(
             path=f"{self._CALIBRATIONS_CALL_PATH}/by_keys", params={"name": calibration_name}
         )
-
         if status_code != codes.ok:
             raise RemoteExecutionException(message="Calibration could not be retrieved.", status_code=status_code)
 

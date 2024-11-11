@@ -186,7 +186,10 @@ def test_job_creation_raises_value_error_when_circuit_qprogram_anneal_or_vqa_are
 
     with pytest.raises(ValueError) as e_info:
         _ = Job(qprogram="", circuit=circuits, user=user, device=cast(Device, simulator_device))
-    assert e_info.value.args[0] == "VQA, circuit and qprogram were provided, but execute() only takes one of them."
+    assert (
+        e_info.value.args[0]
+        == "VQA, circuit, qprogram and anneal_program_args were provided, but execute() only takes one of them."
+    )
 
 
 def test_job_creation_qprogram_raises_value_error_when_neither_of_circuit_qprogram_anneal_or_vqa_are_defined(
