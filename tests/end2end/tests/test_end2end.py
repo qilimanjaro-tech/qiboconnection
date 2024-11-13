@@ -122,6 +122,8 @@ def test_circuit_result_response(device: Device, api: API, numpy_circuit: Circui
     response_result = get_expected_operation_result(Operation.RESPONSE, device)
     if response_result == OperationResult.SUCCESS:
         assert result.status == JobStatus.COMPLETED
+    elif response_result == OperationResult.NOT_AVAILABLE:
+        assert result.status == JobStatus.PENDING
     elif response_result == OperationResult.EXCEPTION:
         assert result.status == JobStatus.ERROR
     else:
@@ -143,33 +145,33 @@ def test_vqa_posting(device: Device, api: API, vqa: VQA):
     api.delete_job(job_id=job_id)
 
 
-@pytest.mark.parametrize("device", get_devices_listing_params())
-def test_vqa_response(device: Device, api: API, numpy_circuit: Circuit):
-    """Test whether a vqa can be sent and then its result can be retrieved, for each device.
-
-    Args:
-        api: api instance to call the server with
-    """
-
-    logger = logging.getLogger(__name__)
-    logger.debug("Device: %s", device)
-
-    check_operation_possible_or_skip(Operation.POST, device)
-
-    result: JobData = post_and_get_result(api=api, device=device, circuit=numpy_circuit, timeout=15)
-    logger.debug("Device: %s", device)
-
-    # The operation post + response can be performed always (it is an async action) but
-    # the meaning of SUCCESS/EXCEPTION/FORBIDDEN means something different:
-    response_result = get_expected_operation_result(Operation.RESPONSE, device)
-    if response_result == OperationResult.SUCCESS:
-        assert result.status == JobStatus.COMPLETED
-    elif response_result == OperationResult.EXCEPTION:
-        assert result.status == JobStatus.ERROR
-    else:
-        assert result.status == JobStatus.PENDING  # offline device in legacy
-
-    delete_job(api, job_id=result.job_id)
+# @pytest.mark.parametrize("device", get_devices_listing_params())
+# def test_vqa_response(device: Device, api: API, numpy_circuit: Circuit):
+#     """Test whether a vqa can be sent and then its result can be retrieved, for each device.
+#
+#     Args:
+#         api: api instance to call the server with
+#     """
+#
+#     logger = logging.getLogger(__name__)
+#     logger.debug("Device: %s", device)
+#
+#     check_operation_possible_or_skip(Operation.POST, device)
+#
+#     result: JobData = post_and_get_result(api=api, device=device, circuit=numpy_circuit, timeout=15)
+#     logger.debug("Device: %s", device)
+#
+#     # The operation post + response can be performed always (it is an async action) but
+#     # the meaning of SUCCESS/EXCEPTION/FORBIDDEN means something different:
+#     response_result = get_expected_operation_result(Operation.RESPONSE, device)
+#     if response_result == OperationResult.SUCCESS:
+#         assert result.status == JobStatus.COMPLETED
+#     elif response_result == OperationResult.EXCEPTION:
+#         assert result.status == JobStatus.ERROR
+#     else:
+#         assert result.status == JobStatus.PENDING  # offline device in legacy
+#
+#     delete_job(api, job_id=result.job_id)
 
 
 @pytest.mark.parametrize("device", get_devices_listing_params())

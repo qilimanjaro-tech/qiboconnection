@@ -33,6 +33,7 @@ class OperationResult(Enum):
     SUCCESS = "Success"
     EXCEPTION = "Exception"
     FORBIDDEN = "Forbidden"
+    NOT_AVAILABLE = "Not Available"
 
 
 class Operation(Enum):
@@ -89,7 +90,9 @@ def get_expected_operation_result(operation: Operation, device: Device) -> Opera
     elif operation == Operation.CHANGE_STATUS:
         if is_quantum(device) and not is_development():
             result = OperationResult.FORBIDDEN
-        if is_device(device, status=DeviceStatus.ONLINE) or is_device(device, status=DeviceStatus.MAINTENANCE):
+        elif is_device(device, status=DeviceStatus.ONLINE) or is_device(device, status=DeviceStatus.OFFLINE):
+            result = OperationResult.NOT_AVAILABLE
+        elif is_device(device, status=DeviceStatus.ONLINE) or is_device(device, status=DeviceStatus.MAINTENANCE):
             result = OperationResult.SUCCESS
         else:
             result = OperationResult.EXCEPTION
