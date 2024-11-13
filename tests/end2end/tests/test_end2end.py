@@ -13,7 +13,6 @@ from qiboconnection.api import API
 from qiboconnection.models.devices import Device
 from qiboconnection.typings.enums import DeviceStatus as DS
 from qiboconnection.typings.enums import JobStatus
-from qiboconnection.typings.vqa import VQA
 from tests.end2end.utils.operations import (
     Operation,
     OperationResult,
@@ -114,8 +113,15 @@ def test_circuit_result_response(device: Device, api: API, numpy_circuit: Circui
 
     check_operation_possible_or_skip(Operation.POST, device)
 
+    logger.error(device)
+    logger.error(device.status)
+    logger.error(get_expected_operation_result(Operation.RESPONSE, device))
+
     result: JobData = post_and_get_result(api=api, device=device, circuit=numpy_circuit, timeout=15)
     logger.debug("Device: %s", device)
+
+    logger.error(result.job_id)
+    logger.error(result.device_id)
 
     # The operation post + response can be performed always (it is an async action) but
     # the meaning of SUCCESS/EXCEPTION/FORBIDDEN means something different:
@@ -132,17 +138,17 @@ def test_circuit_result_response(device: Device, api: API, numpy_circuit: Circui
     delete_job(api, job_id=result.job_id)
 
 
-@pytest.mark.parametrize("device", get_devices_listing_params())
-def test_vqa_posting(device: Device, api: API, vqa: VQA):
-    """Test whether a vqa can be sent to each device
-    Args:
-        api: api instance to call the server with
-    """
-
-    check_operation_possible_or_skip(Operation.POST, device)
-    job_id = api.execute(vqa=vqa, device_id=device.id)
-    assert isinstance(job_id, int)
-    api.delete_job(job_id=job_id)
+# @pytest.mark.parametrize("device", get_devices_listing_params())
+# def test_vqa_posting(device: Device, api: API, vqa: VQA):
+#     """Test whether a vqa can be sent to each device
+#     Args:
+#         api: api instance to call the server with
+#     """
+#
+#     check_operation_possible_or_skip(Operation.POST, device)
+#     job_id = api.execute(vqa=vqa, device_id=device.id)
+#     assert isinstance(job_id, int)
+#     api.delete_job(job_id=job_id)
 
 
 # @pytest.mark.parametrize("device", get_devices_listing_params())

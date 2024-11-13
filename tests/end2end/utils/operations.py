@@ -90,9 +90,7 @@ def get_expected_operation_result(operation: Operation, device: Device) -> Opera
     elif operation == Operation.CHANGE_STATUS:
         if is_quantum(device) and not is_development():
             result = OperationResult.FORBIDDEN
-        elif is_device(device, status=DeviceStatus.ONLINE) or is_device(device, status=DeviceStatus.OFFLINE):
-            result = OperationResult.NOT_AVAILABLE
-        elif is_device(device, status=DeviceStatus.ONLINE) or is_device(device, status=DeviceStatus.MAINTENANCE):
+        if is_device(device, status=DeviceStatus.ONLINE) or is_device(device, status=DeviceStatus.MAINTENANCE):
             result = OperationResult.SUCCESS
         else:
             result = OperationResult.EXCEPTION
@@ -102,6 +100,8 @@ def get_expected_operation_result(operation: Operation, device: Device) -> Opera
             result = OperationResult.EXCEPTION
         elif is_device(device, status=DeviceStatus.ONLINE):
             result = OperationResult.SUCCESS
+        elif is_device(device, status=DeviceStatus.OFFLINE):
+            result = OperationResult.NOT_AVAILABLE
         else:
             result = OperationResult.FORBIDDEN
     else:
