@@ -1,6 +1,7 @@
 import logging
 import os
 from enum import Enum
+from functools import cache
 from time import sleep
 
 import pytest
@@ -101,6 +102,7 @@ def get_logging_conf_or_fail_test(user_role=UserRole.ADMIN) -> ConnectionConfigu
         return pytest.fail("Login failed. Credentials were not provided in the environment.", pytrace=True)
 
 
+@cache
 def get_api_or_fail_test(logging_conf: ConnectionConfiguration) -> API:  # type: ignore[return]
     """Informatively fail the test if the API instance could not be build with the ConnectionConfiguration:
 
@@ -114,6 +116,7 @@ def get_api_or_fail_test(logging_conf: ConnectionConfiguration) -> API:  # type:
         return pytest.fail(f"Login failed. Unknown exception. {ex}.", pytrace=True)
 
 
+@cache
 def get_devices_listing_params(user_role: UserRole = UserRole.ADMIN) -> list[Device]:
     """Not a fixture. Normal function that returns the list of devices. For using on parametrize (that cannot accept
     fixtures). Excludes devices from QTesting PRO because this tests are intended for DEV environment."""
@@ -503,6 +506,7 @@ def admin_set_device_to_maintenance(device: Device, api: API):
     api.set_device_to_maintenance(device_id=device.id)
 
 
+@cache
 def get_logging_conf(role: UserRole = UserRole.ADMIN) -> ConnectionConfiguration:
     """Build a ConnectionConfiguration object from the keys defined in environment
 

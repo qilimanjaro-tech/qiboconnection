@@ -18,14 +18,14 @@ from abc import ABC
 from dataclasses import dataclass
 
 
-@dataclass
+@dataclass(frozen=True)
 class _ConnectionConfigurationDefaultBase(ABC):
     """Internal class for the default-value attributes of ConnectionConfiguration"""
 
     user_id: int | None = None
 
 
-@dataclass
+@dataclass(frozen=True)
 class _ConnectionConfigurationBase(ABC):
     """Internal class for the non-default-value attributes of ConnectionConfiguration"""
 
@@ -33,7 +33,7 @@ class _ConnectionConfigurationBase(ABC):
     api_key: str
 
 
-@dataclass
+@dataclass(frozen=True)
 class ConnectionConfiguration(_ConnectionConfigurationDefaultBase, _ConnectionConfigurationBase):
     """Connection Configuration
 
@@ -44,7 +44,7 @@ class ConnectionConfiguration(_ConnectionConfigurationDefaultBase, _ConnectionCo
     """
 
 
-@dataclass
+@dataclass(frozen=True)
 class _ConnectionEstablishedBase(ABC):
     """Internal class for the non-default-value attributes of ConnectionEstablished"""
 
@@ -53,7 +53,7 @@ class _ConnectionEstablishedBase(ABC):
     api_path: str
 
 
-@dataclass
+@dataclass(frozen=True)
 class ConnectionEstablished(ConnectionConfiguration, _ConnectionEstablishedBase):
     """Connection Established
 

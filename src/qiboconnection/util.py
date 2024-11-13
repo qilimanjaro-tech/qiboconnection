@@ -24,7 +24,6 @@ from json.decoder import JSONDecodeError
 from typing import Any, List, Tuple
 
 import requests
-from qibo.result import CircuitResult  # type: ignore[import-untyped]
 
 from qiboconnection.errors import custom_raise_for_status
 
@@ -64,22 +63,8 @@ def decode_jsonified_dict(http_response: str) -> dict:
     return json.loads(urlsafe_b64decode(http_response))
 
 
-def decode_results_from_circuit(http_response: str) -> CircuitResult | dict:
-    """Decode the results from the circuit execution. Ideally we should always expect dictionaries here, but for qibo we
-    are still serializing `CircuitResult`s that must be pickled.
-
-    Args:
-        http_response (str): the execution results as an Http Response
-
-    Returns:
-        List[CircuitResult]: a Qibo CircuitResult
-    """
-
-    raise DeprecationWarning("Pickled objects not supported")
-
-
 def decode_results_from_qprogram(http_response: str) -> dict:
-    """Decode the results from QProgram execution.
+    """Decode the results from QProgram execution.`
 
     Args:
         http_response (str): the execution results as an Http Response
