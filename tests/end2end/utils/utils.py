@@ -91,6 +91,7 @@ def is_development() -> bool:
     return os.environ["QUANTUM_SERVICE_URL"] == "https://dev-api.qaas.qilimanjaro.tech"
 
 
+@cache
 def get_logging_conf_or_fail_test(user_role=UserRole.ADMIN) -> ConnectionConfiguration:
     """Informatively fail the test if the ConnectionConfiguration instance could not be build with the credentials:
 
@@ -217,6 +218,7 @@ def get_job_result(api: API, job_id: int, timeout: int = 250, call_every_seconds
     return job_data
 
 
+@cache
 def get_user_role_operations(user_role: UserRole) -> dict:
     """Get a dictionary that specifies with booleans which operations are allowed
     depending on the user role.
@@ -266,6 +268,7 @@ def get_user_roles_id(user_role: UserRole) -> int:
     raise ValueError(f"No user id defined for {user_role}")
 
 
+@cache
 def list_runcards():
     "List all runcards with admin"
     return get_api_or_fail_test(get_logging_conf_or_fail_test()).list_runcards()
