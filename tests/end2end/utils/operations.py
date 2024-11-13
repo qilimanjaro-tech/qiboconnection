@@ -57,7 +57,11 @@ def is_quantum(device: Device) -> bool:
     Returns:
         bool: if the device is a quantum device
     """
-    return device.type == DeviceType.QUANTUM_DEVICE
+    return device.type in {
+        DeviceType.QUANTUM_DEVICE,
+        DeviceType.QUANTUM_ANALOG_DEVICE,
+        DeviceType.QUANTUM_DIGITAL_DEVICE,
+    }
 
 
 def get_expected_operation_result(operation: Operation, device: Device) -> OperationResult:
