@@ -64,7 +64,7 @@ def decode_jsonified_dict(http_response: str) -> dict:
 
 
 def decode_results_from_qprogram(http_response: str) -> dict:
-    """Decode the results from QProgram execution.`
+    """Decode the results from QProgram execution.
 
     Args:
         http_response (str): the execution results as an Http Response

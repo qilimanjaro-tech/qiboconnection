@@ -37,7 +37,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..",
 
 # Environment
 # See pytest.ini for the default value, this is a security to set a default value
-os.environ["QUANTUM_SERVICE_URL"] = os.environ.get("QUANTUM_SERVICE_URL", "https://dev-api.qaas.qilimanjaro.tech")
+os.environ["QUANTUM_SERVICE_URL"] = os.environ["QUANTUM_SERVICE_URL"]
 
 # Globals
 TIMEOUT = 240
