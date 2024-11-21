@@ -1,4 +1,4 @@
-""" Test Environment setting """
+"""Test Environment setting"""
 
 import enum
 import os

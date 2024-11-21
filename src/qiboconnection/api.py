@@ -14,23 +14,18 @@
 
 """Qiboconnection API class."""
 
-# pylint: disable=too-many-lines
-# pylint: disable=too-many-instance-attributes
-# pylint: disable=too-many-public-methods
-# pylint: disable=no-member
-
 import json
 import warnings
 from abc import ABC
 from dataclasses import asdict
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from time import sleep
 from typing import Any, List, cast
 
 from numpy import typing as npt
-from qibo.models.circuit import Circuit
-from qibo.result import CircuitResult
-from requests import HTTPError
+from qibo.models.circuit import Circuit  # type: ignore[import-untyped]
+from qibo.result import CircuitResult  # type: ignore[import-untyped]
+from requests import HTTPError, codes
 from typeguard import typechecked
 
 from qiboconnection.api_utils import log_job_status_info, parse_job_responses_to_results
@@ -49,7 +44,7 @@ from qiboconnection.typings.vqa import VQA
 from qiboconnection.util import unzip
 
 
-def warning_on_one_line(message, category, filename, lineno, line=None):  # pylint: disable=unused-argument
+def warning_on_one_line(message, category, filename, lineno, line=None):
     """Warnings formatting"""
     return f"{filename}:{lineno}: {category.__name__}:{message}\n"
 
@@ -159,7 +154,7 @@ class API(ABC):
             str: OK when connection is alive or raise Connection Error.
         """
         response, status_code = self._connection.send_get_remote_call(path=self._PING_CALL_PATH)
-        if status_code != 200:
+        if status_code != codes.ok:
             raise ConnectionException("Error connecting to Qilimanjaro API")
         return response
 
@@ -179,7 +174,7 @@ class API(ABC):
             self._connection.send_get_auth_remote_api_call_all_pages(path=self._DEVICES_CALL_PATH)
         )
         for status_code in status_codes:
-            if status_code != 200:
+            if status_code != codes.ok:
                 raise RemoteExecutionException(message="Devices could not be retrieved.", status_code=status_code)
 
         items = [item for response in responses for item in response[REST.ITEMS]]
@@ -204,7 +199,7 @@ class API(ABC):
         response, status_code = self._connection.send_get_auth_remote_api_call(
             path=f"{self._DEVICES_CALL_PATH}/{device_id}"
         )
-        if status_code != 200:
+        if status_code != codes.ok:
             raise RemoteExecutionException(message="Devices could not be retrieved.", status_code=status_code)
 
         new_device = create_device(device_input=response)
@@ -298,7 +293,7 @@ class API(ABC):
     # REMOTE EXECUTIONS
 
     @typechecked
-    def execute(  # pylint: disable=too-many-locals, disable=too-many-branches
+    def execute(
         self,
         circuit: Circuit | List[Circuit] | None = None,
         qprogram: str | None = None,
@@ -385,7 +380,7 @@ class API(ABC):
             response, status_code = self._connection.send_post_auth_remote_api_call(
                 path=self._CIRCUITS_CALL_PATH, data=asdict(job.job_request)
             )
-            if status_code != 201:
+            if status_code != codes.created:
                 raise RemoteExecutionException(
                     message=f"Circuit {job.job_id} could not be executed.", status_code=status_code
                 )
@@ -410,7 +405,7 @@ class API(ABC):
             JobResponse: type-casted backend response with the job info.
         """
         response, status_code = self._connection.send_get_auth_remote_api_call(path=f"{self._JOBS_CALL_PATH}/{job_id}")
-        if status_code != 200:
+        if status_code != codes.ok:
             raise RemoteExecutionException(message="Job could not be retrieved.", status_code=status_code)
 
         return JobResponse.from_kwargs(**cast(dict, response))
@@ -479,7 +474,7 @@ class API(ABC):
         Returns:
             List[dict | None]: list of the results for each of the
         """
-        while datetime.now() < deadline:
+        while datetime.now(timezone.utc) < deadline:
             job_responses = [self._get_job(job_id) for job_id in job_ids]
             job_responses_status = [job_response.status for job_response in job_responses]
             if set(job_responses_status).issubset({JobStatus.COMPLETED, JobStatus.ERROR}):
@@ -519,7 +514,7 @@ class API(ABC):
 
         """
 
-        deadline = datetime.now() + timedelta(seconds=timeout)
+        deadline = datetime.now(timezone.utc) + timedelta(seconds=timeout)
         job_ids = self.execute(
             circuit=circuit,
             qprogram=qprogram,
@@ -541,7 +536,7 @@ class API(ABC):
             )
         )
         for status_code in status_codes:
-            if status_code != 200:
+            if status_code != codes.ok:
                 raise RemoteExecutionException(message="Job could not be listed.", status_code=status_code)
 
         items = [item for response in responses for item in response[REST.ITEMS]]
@@ -590,7 +585,7 @@ class API(ABC):
             path=self._RUNCARDS_CALL_PATH,
             data=asdict(runcard.runcard_request()),
         )
-        if status_code not in [200, 201]:
+        if status_code not in {codes.ok, codes.created}:
             raise RemoteExecutionException(message="Runcard could not be saved.", status_code=status_code)
         logger.debug("Experiment saved successfully.")
         return RuncardResponse.from_kwargs(**response)
@@ -652,7 +647,7 @@ class API(ABC):
         response, status_code = self._connection.send_get_auth_remote_api_call(
             path=f"{self._RUNCARDS_CALL_PATH}/{runcard_id}"
         )
-        if status_code != 200:
+        if status_code != codes.ok:
             raise RemoteExecutionException(message="Runcard could not be retrieved.", status_code=status_code)
         return RuncardResponse.from_kwargs(**response)
 
@@ -669,7 +664,7 @@ class API(ABC):
             path=f"{self._RUNCARDS_CALL_PATH}/by_keys", params={"name": runcard_name}
         )
 
-        if status_code != 200:
+        if status_code != codes.ok:
             raise RemoteExecutionException(message="Runcard could not be retrieved.", status_code=status_code)
 
         return RuncardResponse.from_kwargs(**response)
@@ -710,7 +705,7 @@ class API(ABC):
             self._connection.send_get_auth_remote_api_call_all_pages(path=self._RUNCARDS_CALL_PATH)
         )
         for status_code in status_codes:
-            if status_code != 200:
+            if status_code != codes.ok:
                 raise RemoteExecutionException(message="Runcards could not be listed.", status_code=status_code)
 
         items = [item for response in responses for item in response[REST.ITEMS]]
@@ -758,7 +753,7 @@ class API(ABC):
             path=f"{self._RUNCARDS_CALL_PATH}/{runcard.id}",  # type: ignore[attr-defined]
             data=asdict(runcard.runcard_request()),
         )
-        if status_code not in [200, 201]:
+        if status_code not in {codes.ok, codes.created}:
             raise RemoteExecutionException(message="Runcard could not be saved.", status_code=status_code)
         logger.debug("Runcard updated successfully.")
         return RuncardResponse.from_kwargs(**response)
@@ -777,7 +772,7 @@ class API(ABC):
         response, status_code = self._connection.send_delete_auth_remote_api_call(
             path=f"{self._RUNCARDS_CALL_PATH}/{runcard_id}"
         )
-        if status_code != 204:
+        if status_code != codes.no_content:
             raise RemoteExecutionException(message="Runcard could not be removed.", status_code=status_code)
         logger.info("Runcard %i deleted successfully with message: %s", runcard_id, response)
 
@@ -789,7 +784,7 @@ class API(ABC):
             path=self._CALIBRATIONS_CALL_PATH,
             data=asdict(calibration.calibration_request()),
         )
-        if status_code not in [200, 201]:
+        if status_code not in {codes.ok, codes.created}:
             raise RemoteExecutionException(message="Calibration could not be saved.", status_code=status_code)
         logger.debug("Experiment saved successfully.")
         return CalibrationResponse.from_kwargs(**response)
@@ -851,7 +846,7 @@ class API(ABC):
         response, status_code = self._connection.send_get_auth_remote_api_call(
             path=f"{self._CALIBRATIONS_CALL_PATH}/{calibration_id}"
         )
-        if status_code != 200:
+        if status_code != codes.ok:
             raise RemoteExecutionException(message="Calibration could not be retrieved.", status_code=status_code)
         return CalibrationResponse.from_kwargs(**response)
 
@@ -867,8 +862,7 @@ class API(ABC):
         response, status_code = self._connection.send_get_auth_remote_api_call(
             path=f"{self._CALIBRATIONS_CALL_PATH}/by_keys", params={"name": calibration_name}
         )
-
-        if status_code != 200:
+        if status_code != codes.ok:
             raise RemoteExecutionException(message="Calibration could not be retrieved.", status_code=status_code)
 
         return CalibrationResponse.from_kwargs(**response)
@@ -909,7 +903,7 @@ class API(ABC):
             self._connection.send_get_auth_remote_api_call_all_pages(path=self._CALIBRATIONS_CALL_PATH)
         )
         for status_code in status_codes:
-            if status_code != 200:
+            if status_code != codes.ok:
                 raise RemoteExecutionException(message="Calibrations could not be listed.", status_code=status_code)
 
         items = [item for response in responses for item in response[REST.ITEMS]]
@@ -957,7 +951,7 @@ class API(ABC):
             path=f"{self._CALIBRATIONS_CALL_PATH}/{calibration.id}",  # type: ignore[attr-defined]
             data=asdict(calibration.calibration_request()),
         )
-        if status_code not in [200, 201]:
+        if status_code not in {codes.ok, codes.created}:
             raise RemoteExecutionException(message="Calibration could not be saved.", status_code=status_code)
         logger.debug("Calibration updated successfully.")
         return CalibrationResponse.from_kwargs(**response)
@@ -976,7 +970,7 @@ class API(ABC):
         response, status_code = self._connection.send_delete_auth_remote_api_call(
             path=f"{self._CALIBRATIONS_CALL_PATH}/{calibration_id}"
         )
-        if status_code != 204:
+        if status_code != codes.no_content:
             raise RemoteExecutionException(message="Calibration could not be removed.", status_code=status_code)
         logger.info("Calibration %i deleted successfully with message: %s", calibration_id, response)
 
@@ -991,19 +985,17 @@ class API(ABC):
         Raises:
             RemoteExecutionException: Devices could not be retrieved
         """
-        response, status_code = self._connection.send_delete_auth_remote_api_call(  # pylint: disable=unused-variable
-            path=f"{self._JOBS_CALL_PATH}/{job_id}"
-        )
-        if status_code != 204:
+        _, status_code = self._connection.send_delete_auth_remote_api_call(path=f"{self._JOBS_CALL_PATH}/{job_id}")
+        if status_code != codes.no_content:
             raise RemoteExecutionException(message="Job could not be removed.", status_code=status_code)
         logger.info(f"Job {job_id} deleted successfully")
 
     @typechecked
     def cancel_job(self, job_id: int) -> None:
         """Cancels a job"""
-        response, status_code = self._connection.send_put_auth_remote_api_call(  # pylint: disable=unused-variable
+        _, status_code = self._connection.send_put_auth_remote_api_call(
             data={"job_id": job_id}, path=f"{self._JOBS_CALL_PATH}/cancel/{job_id}"
         )
-        if status_code != 204:
+        if status_code != codes.no_content:
             raise RemoteExecutionException(message=f"Job {job_id} could not be cancelled.", status_code=status_code)
         logger.info(f"Job {job_id} cancelled successfully")

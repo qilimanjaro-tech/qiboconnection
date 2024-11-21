@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-""" UserScope enum """
+"""UserScope enum"""
+
 from .str_enum import StrEnum
 
 

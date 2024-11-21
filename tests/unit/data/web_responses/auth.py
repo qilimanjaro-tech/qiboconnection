@@ -1,4 +1,4 @@
-""" Auth Web Responses """
+"""Auth Web Responses"""
 
 import json
 

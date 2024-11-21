@@ -1,7 +1,7 @@
-""" Tests methods for Job """
+"""Tests methods for Job"""
+
 from typing import cast
 
-import numpy as np
 import pytest
 from qibo import gates
 from qibo.models.circuit import Circuit
@@ -92,7 +92,9 @@ def test_job_creation(circuits: list[Circuit], user: User, simulator_device: Dev
     job_id = 23
     job_status = JobStatus.COMPLETED
     job_result = JobResult(
-        job_id=job_id, http_response="WzAuMSwgMC4xLCAwLjEsIDAuMSwgMC4xXQ==", job_type=JobType.CIRCUIT
+        job_id=job_id,
+        http_response='{"data": "H4sIABrWEWcC/4uuViooyk9KTMrMySzJTC1WslKoVjIAkgZ6JjoKSoZgllktkJmcX5pXgpCHyYLlihNzC3LAmqOjDWJ1FKIN4QQaF03CIBZIKqVl5iXmxBeXJJakws1X0jDQMzcwNzQwM7cwNLQwMzUxN9U2yNJUgtqLU74W1cB4nN6zRAVw36JL1NbGAgB4XNujJgEAAA==", "encoding": "utf-8", "compression": "gzip"}',
+        job_type=JobType.CIRCUIT,
     )
     job = Job(
         circuit=circuits,
@@ -156,7 +158,7 @@ def test_job_creation_qprogram(user: User, simulator_device: Device):
         simulator_device (SimulatorDevice): SimulatorDevice
     """
 
-    job = Job(qprogram={}, user=user, device=cast(Device, simulator_device))
+    job = Job(qprogram="", user=user, device=cast(Device, simulator_device))
     assert job.job_type == JobType.QPROGRAM
 
 
@@ -184,7 +186,7 @@ def test_job_creation_raises_value_error_when_circuit_qprogram_anneal_or_vqa_are
     """
 
     with pytest.raises(ValueError) as e_info:
-        _ = Job(qprogram={}, circuit=circuits, user=user, device=cast(Device, simulator_device))
+        _ = Job(qprogram="", circuit=circuits, user=user, device=cast(Device, simulator_device))
     assert (
         e_info.value.args[0]
         == "VQA, circuit, qprogram and anneal_program_args were provided, but execute() only takes one of them."
@@ -264,7 +266,7 @@ def test_job_request_with_qprogram(user: User, simulator_device: Device):
     job_status = JobStatus.COMPLETED
     user_id = user.user_id
     job = Job(
-        qprogram={},
+        qprogram="",
         user=user,
         device=cast(Device, simulator_device),
         job_status=job_status,
@@ -295,7 +297,7 @@ def test_job_request_with_qprogram(user: User, simulator_device: Device):
     reconstructed_qprogram = deserialize_job_description(
         raw_description=job.job_request.description, job_type=JobType.QPROGRAM
     )["data"]
-    assert reconstructed_qprogram == {}
+    assert reconstructed_qprogram == ""  # noqa: PLC1901
 
 
 def test_job_request_with_annealing_program(user: User, simulator_device: Device):
@@ -377,7 +379,7 @@ def test_job_request_raises_value_error_if_several_of_description_input_types(
         simulator_device (SimulatorDevice): SimulatorDevice
     """
     job = Job(
-        qprogram={},
+        qprogram="",
         user=user,
         device=cast(Device, simulator_device),
         job_status=JobStatus.COMPLETED,
@@ -398,7 +400,7 @@ def test_job_request_raises_value_error_if_unknown_type(user: User, simulator_de
         simulator_device (SimulatorDevice): SimulatorDevice
     """
     job = Job(
-        qprogram={},
+        qprogram="",
         user=user,
         device=cast(Device, simulator_device),
         job_status=JobStatus.COMPLETED,
@@ -439,12 +441,20 @@ def test_update_with_job_response(circuits: list[Circuit], user: User, simulator
         job_id=job.id,
         queue_position=0,
         status=JobStatus.COMPLETED,
-        result="gASVsAAAAAAAAACMFW51bXB5LmNvcmUubXVsdGlhcnJheZSMDF9yZWNvbnN0cnVjdJSTlIwFbnVtcHmUjAduZGFycmF5lJOUSwCFlEMBYpSHlFKUKEsBSwWFlGgDjAVkdHlwZZSTlIwCZjiUiYiHlFKUKEsDjAE8lE5OTkr_____Sv____9LAHSUYolDKAAAAAAAAPA_AAAAAAAA8D8AAAAAAADwPwAAAAAAAPA_AAAAAAAA8D-UdJRiLg==",
+        result='{"data": "H4sIABrWEWcC/4uuViooyk9KTMrMySzJTC1WslKoVjIAkgZ6JjoKSoZgllktkJmcX5pXgpCHyYLlihNzC3LAmqOjDWJ1FKIN4QQaF03CIBZIKqVl5iXmxBeXJJakws1X0jDQMzcwNzQwM7cwNLQwMzUxN9U2yNJUgtqLU74W1cB4nN6zRAVw36JL1NbGAgB4XNujJgEAAA==", "encoding": "utf-8", "compression": "gzip"}',
         name="test",
         summary="summary",
     )
     job.update_with_job_response(job_response=job_response)
-    assert (job.result == np.array([1.0, 1.0, 1.0, 1.0, 1.0])).all()
+    assert job.result == [
+        {
+            "probabilities": {"0": 0.4, "1": 0.6},
+            "counts": {"0": 4, "1": 6},
+            "samples": [[0], [1], [1], [0], [1], [1], [1], [1], [0], [0]],
+            "final_state": {"0": "(0.7071067811865475+0j)", "1": "(0.7071067811865475+0j)"},
+            "final_state_probabilities": {"0": 0.4999999999999999, "1": 0.4999999999999999},
+        }
+    ]
 
 
 def test_update_with_job_response_raises_error_when_updating_incorrect_job(

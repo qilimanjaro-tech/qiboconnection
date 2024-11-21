@@ -12,12 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-""" Device Typing """
+"""Device Typing"""
+
 from dataclasses import dataclass
 
 from qiboconnection.util import from_kwargs
-
-# pylint: disable=too-many-instance-attributes
 
 
 @dataclass(kw_only=True)

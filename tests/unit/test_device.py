@@ -1,4 +1,4 @@
-""" Tests methods for Device """
+"""Tests methods for Device"""
 
 import json
 
@@ -8,8 +8,6 @@ from qiboconnection.models.devices import Device
 from qiboconnection.typings.devices import DeviceInput
 
 from .data import device_inputs
-
-# pylint: disable=no-member
 
 
 @pytest.mark.parametrize("device_input", device_inputs)
@@ -25,7 +23,6 @@ def test_device_constructor(device_input: DeviceInput):
 def test_device_string_representation(device_input: DeviceInput):
     """Tests Device().__str__() method"""
     device = Device(device_input=device_input)
-    print(str(Device))
     assert (
         str(device) == f"<Device: id={device.id},"
         f" name='{device.name}',"

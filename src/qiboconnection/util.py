@@ -12,21 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-""" Utility functions """
+"""Utility functions"""
+
 import base64
-import binascii
 import gzip
-import io
 import json
 import logging
-import pickle  # nosec - temporary bandit ignore
 from base64 import urlsafe_b64decode, urlsafe_b64encode
 from inspect import signature
 from json.decoder import JSONDecodeError
 from typing import Any, List, Tuple
 
 import requests
-from qibo.result import CircuitResult
 
 from qiboconnection.errors import custom_raise_for_status
 
@@ -64,29 +61,6 @@ def base64_decode(encoded_data: str) -> str:
 def decode_jsonified_dict(http_response: str) -> dict:
     """Decodes results that have been jsonified and base64 encoded."""
     return json.loads(urlsafe_b64decode(http_response))
-
-
-def _decode_pickled_results(http_response: str) -> Any:
-    """Decodes results that have been pickled and base64 encoded."""
-    decoded_result_str = urlsafe_b64decode(http_response)
-    result_bytes = io.BytesIO(decoded_result_str)
-    return pickle.loads(result_bytes.getbuffer())  # nosec - temporary bandit ignore
-
-
-def decode_results_from_circuit(http_response: str) -> CircuitResult | dict:
-    """Decode the results from the circuit execution. Ideally we should always expect dictionaries here, but for qibo we
-    are still serializing `CircuitResult`s that must be pickled.
-
-    Args:
-        http_response (str): the execution results as an Http Response
-
-    Returns:
-        List[CircuitResult]: a Qibo CircuitResult
-    """
-    try:
-        return decode_jsonified_dict(http_response)
-    except (binascii.Error, UnicodeDecodeError, JSONDecodeError):
-        return _decode_pickled_results(http_response)
 
 
 def decode_results_from_qprogram(http_response: str) -> dict:
@@ -149,7 +123,7 @@ def compress_any(any_obj, encoding="utf-8") -> dict:
     return {"data": compressed_data, "encoding": encoding, "compression": "gzip"}
 
 
-def decompress_any(data: str, **kwargs) -> dict:  # pylint: disable=unused-argument
+def decompress_any(data: str, **kwargs) -> dict:
     """
     Decompresses a compressed string into its original datatype.
     :param data: compressed data containing a json to extract a dictionary from

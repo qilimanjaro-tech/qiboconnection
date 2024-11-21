@@ -1,4 +1,4 @@
-""" Calibrations Web Responses """
+"""Calibrations Web Responses"""
 
 calibration_base_response = {
     "calibration_id": 1,

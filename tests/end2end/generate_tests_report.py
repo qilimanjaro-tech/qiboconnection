@@ -8,13 +8,11 @@ import logging.config
 import os
 import re
 import sys
+from pathlib import Path
 
 # It should be nicer to get this info from pytest but I have not find an easy Enum with all the
 # possible outcomes
 ALL_OUTCOMES = ["passed", "skipped", "failed"]
-# pylint: disable=broad-exception-raised
-# pylint: disable=raising-format-tuple
-# pylint: disable=too-many-locals
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 
@@ -84,7 +82,7 @@ def extract_docstring(func, skip_args=True) -> str:
     if skip_args and docstring:
         docstring = re.sub(r"Args:.*", "", docstring, flags=re.DOTALL)
 
-    return docstring if docstring else ""
+    return docstring or ""
 
 
 def discover_tests(directory):
@@ -148,8 +146,6 @@ def gen_test_plan(directory, file_out):
 
     logger.info("File %s created!", file_out)
 
-    print(f"Report created at {file_out}")
-
 
 def gen_test_run(in_json_plan: str, in_json_results: str, out_json_run: str):
     """Generates a JSON with the combination of Test Plan + Test Results
@@ -191,7 +187,7 @@ def gen_test_run(in_json_plan: str, in_json_results: str, out_json_run: str):
 
             tot_test_plan = 0
             tot_test_plan_executed = 0
-            tot_outcomes = {outcome: 0 for outcome in ALL_OUTCOMES}
+            tot_outcomes = dict.fromkeys(ALL_OUTCOMES, 0)
 
             # Loop over all the test cases defined
             for test_name, test_info in tests_def_by_name.items():
@@ -199,7 +195,7 @@ def gen_test_run(in_json_plan: str, in_json_results: str, out_json_run: str):
                 data_test_run["detail"][test_name] = {
                     "info": test_info,
                     "executions": 0,
-                    "results": {outcome: 0 for outcome in ALL_OUTCOMES},
+                    "results": dict.fromkeys(ALL_OUTCOMES, 0),
                 }
 
                 # Test Case executed, several runs can be performed (eg. for several devices)
@@ -262,25 +258,22 @@ def gen_test_run_report(out_report, tmpl_report, in_json_run):
                 tbody += f"<td>{name}</td>"
                 tbody += f"<td>{info['info']['docstring']}</td>"
                 for outcome in ALL_OUTCOMES:
-                    tbody += f"<td>{0 if not outcome in info['results'] else info['results'][outcome]}</td>"
+                    tbody += f"<td>{info['results'].get(outcome, 0)}</td>"
                 tbody += "</tr>"
             else:
                 docstring = info["info"]["docstring"].replace("\n", "")
                 tbody += f"|{name}|{docstring}|"
                 for outcome in ALL_OUTCOMES:
-                    tbody += f"{0 if not outcome in info['results'] else info['results'][outcome]}|"
+                    tbody += f"{info['results'].get(outcome, 0)}|"
                 tbody += "\n"
         variables["tbody"] = tbody
 
-    with open(tmpl_report, "r", encoding="utf-8") as fp_tmpl:
-        html_txt = fp_tmpl.read()
-        for name, value in variables.items():
-            logger.info("Replacing %s ...", name)
-            html_txt = html_txt.replace(f"#{name}#", value)
-
-        with open(out_report, "w", encoding="utf-8") as fp_out:
-            fp_out.write(html_txt)
-            logger.info("File %s generated!", out_report)
+    html_txt = Path(tmpl_report).read_text(encoding="utf-8")
+    for name, value in variables.items():
+        logger.info("Replacing %s ...", name)
+        html_txt = html_txt.replace(f"#{name}#", value)
+    Path(out_report).write_text(html_txt, encoding="utf-8")
+    logger.info("File %s generated!", out_report)
 
 
 # -----------------------------------------------------------------------------

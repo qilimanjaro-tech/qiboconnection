@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-""" Runcard class"""
+"""Runcard class"""
 
 from dataclasses import field
 
@@ -21,8 +21,6 @@ from qiboconnection.typings.responses import RuncardResponse
 from qiboconnection.util import decode_jsonified_dict, jsonify_dict_and_base64_encode
 
 
-# pylint: disable=too-many-instance-attributes
-# pylint: disable=no-member
 class Runcard:
     """Runcard representation"""
 

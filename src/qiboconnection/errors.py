@@ -12,10 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-""" Handling Error Utility Functions """
+"""Handling Error Utility Functions"""
+
 import json
 from typing import Union
 
+from requests import codes
 from requests.models import HTTPError, Response
 
 from qiboconnection.config import logger
@@ -58,10 +60,10 @@ def custom_raise_for_status(response: Response):
     else:
         reason = response.reason
 
-    if 400 <= response.status_code < 500:
+    if codes.bad_request <= response.status_code < codes.internal_server_error:
         http_error_msg = f"{response.status_code} Client Error: {reason} for url: {response.url}"
 
-    elif 500 <= response.status_code < 600:
+    elif codes.internal_server_error <= response.status_code < 600:  # noqa: PLR2004
         http_error_msg = f"{response.status_code} Server Error: {reason} for url: {response.url}"
 
     if http_error_msg and response.text:

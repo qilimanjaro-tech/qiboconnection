@@ -50,6 +50,7 @@ coverage.xml
 *.py,cover
 .hypothesis/
 .pytest_cache/
+tests/end2end/pytest.local.ini
 
 # Translations
 *.mo
@@ -135,3 +136,5 @@ qibo_configuration
 _build
 tests/setenv.sh
 /nbproject/
+
+debug/*

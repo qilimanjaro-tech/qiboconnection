@@ -1,4 +1,4 @@
-""" Test methods for Calibrations classes """
+"""Test methods for Calibrations classes"""
 
 from datetime import datetime, timezone
 
@@ -6,8 +6,6 @@ import yaml
 
 from qiboconnection.models.calibration import Calibration
 from qiboconnection.typings.responses.calibration_response import CalibrationRequest, CalibrationResponse
-
-# pylint: disable=no-member
 
 
 def test_calibration_creation():

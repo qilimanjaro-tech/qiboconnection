@@ -1,4 +1,4 @@
-""" Tests methods for job result """
+"""Tests methods for job result"""
 
 from qiboconnection.models.job_result import JobResult
 from qiboconnection.typings.enums import JobType

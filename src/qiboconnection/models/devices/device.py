@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-""" Device class """
+"""Device class"""
+
 import json
 
 from typeguard import typechecked
@@ -22,10 +23,6 @@ from qiboconnection.typings.devices import DeviceInput
 from qiboconnection.typings.enums import DeviceStatus
 
 from .device_details import DeviceDetails
-
-# pylint: disable=no-member
-# pylint: disable=attribute-defined-outside-init
-# pylint: disable=too-many-instance-attributes
 
 
 class Device(DeviceDetails):
@@ -53,7 +50,7 @@ class Device(DeviceDetails):
         return self.__str__()
 
     @property
-    def id(self) -> int:  # pylint: disable=invalid-name
+    def id(self) -> int:
         """Returns device identifier
 
         Returns:
@@ -172,7 +169,7 @@ class Device(DeviceDetails):
         """
         result_dict = {}
         for key in dir(self):
-            if len(key) >= 2 and key[0] == "_" and key[1] != "_":
+            if len(key) >= 2 and key[0] == "_" and key[1] != "_":  # noqa: PLR2004
                 value = getattr(self, key, None)
                 try:
                     json.dumps(value)
@@ -181,7 +178,7 @@ class Device(DeviceDetails):
                     pass
         return result_dict
 
-    def toJSON(self, expand=False) -> str:  # pylint: disable=invalid-name
+    def toJSON(self, expand=False) -> str:
         """JSON representation of a Device
 
         Returns:

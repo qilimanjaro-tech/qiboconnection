@@ -9,7 +9,7 @@ import os
 import sys
 from urllib.parse import quote
 
-from sphinxawesome_theme.postprocess import Icons  # pylint: disable=import-error
+from sphinxawesome_theme.postprocess import Icons
 
 sys.path.insert(0, os.path.abspath(".."))
 
@@ -18,7 +18,7 @@ copyright = "2023, Qilimanjaro"
 author = "Qilimanjaro"
 
 # TODO: set the right value
-import qiboconnection  # pylint: disable=wrong-import-position  # noqa: E402
+import qiboconnection  # noqa: E402
 
 release = qiboconnection.__version__
 
@@ -82,7 +82,7 @@ html_theme_options = {
                 'd="M22.477.927C10.485.927.76 10.65.76 22.647c0 9.596 6.223 17.736 '
                 "14.853 20.608 1.087.2 1.483-.47 1.483-1.047 "
                 "0-.516-.019-1.881-.03-3.693-6.04 "
-                "1.312-7.315-2.912-7.315-2.912-.988-2.51-2.412-3.178-2.412-3.178-1.972-1.346.149-1.32.149-1.32 "  # noqa
+                "1.312-7.315-2.912-7.315-2.912-.988-2.51-2.412-3.178-2.412-3.178-1.972-1.346.149-1.32.149-1.32 "
                 "2.18.154 3.327 2.24 3.327 2.24 1.937 3.318 5.084 2.36 6.321 "
                 "1.803.197-1.403.759-2.36 "
                 "1.379-2.903-4.823-.548-9.894-2.412-9.894-10.734 "

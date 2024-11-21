@@ -1,5 +1,3 @@
-# pylint: disable=logging-fstring-interpolation, broad-exception-caught, inconsistent-return-statements
-# pylint: disable=protected-access
 import logging
 import logging.config
 import os
@@ -18,7 +16,7 @@ from qiboconnection.typings.vqa import VQA
 from tests.end2end.utils.utils import get_api_or_fail_test, get_logging_conf_or_fail_test
 
 
-def pytest_configure(config: Config):  # pylint: disable=unused-argument
+def pytest_configure(config: Config):
     """Initialize the logging configuration. This is executed once per test session.
 
     Args:
@@ -139,8 +137,8 @@ def get_vqa_fixture(caplog) -> VQA:
     caplog.clear()
     try:
         return vqa
-    except Exception as e:
-        pytest.fail(f"Circuit creation failed. {e}.", pytrace=False)
+    except Exception as e:  # noqa: BLE001
+        return pytest.fail(f"Circuit creation failed. {e}.", pytrace=False)
 
 
 @pytest.fixture(name="numpy_circuit")
@@ -157,7 +155,7 @@ def get_qibo_circuit_numpy_fixture(caplog) -> Circuit:
     caplog.clear()
     try:
         return circuit
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         pytest.fail(f"Circuit creation failed. {e}.", pytrace=False)
 
 
@@ -183,7 +181,7 @@ def one_qubits_500_gates_circuit(caplog) -> Circuit:
     caplog.clear()
     try:
         return c
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         pytest.fail(f"Circuit creation failed. {e}.", pytrace=False)
 
 
@@ -210,7 +208,7 @@ def two_qubits_500_gates_circuit(caplog) -> Circuit:
     caplog.clear()
     try:
         return c
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         pytest.fail(f"Circuit creation failed. {e}.", pytrace=False)
 
 
@@ -243,7 +241,7 @@ def five_qubits_500_gates_circuit(caplog) -> Circuit:
     caplog.clear()
     try:
         return c
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         pytest.fail(f"Circuit creation failed. {e}.", pytrace=False)
 
 
