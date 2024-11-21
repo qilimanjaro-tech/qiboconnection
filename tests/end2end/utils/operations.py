@@ -8,7 +8,6 @@ from qiboconnection.typings.enums import DeviceStatus, DeviceType
 
 from .utils import is_development
 
-
 # Explanation:
 # Given a device, there are a series of OPERATIONS  we can perform:
 # - Select: select the device
@@ -26,7 +25,12 @@ from .utils import is_development
 # - Forbidden : the operation COULD be performed (with maybe Success/Failure) BUT we
 #               do not allow its execution because the side effects. This mainly applies
 #               when the device is QUANTUM and the environment is PRODUCTION
-#
+# - Not Available : the operation COULD be performed, but the resources for executing it are not
+#                   available at the moment, informing the user that they will be executed as
+#                   soon as possible. This applies in the job execution flow, when public api is
+#                   ready for accepting and saving jobs, but the conection with a lab is not online.
+
+
 class OperationResult(Enum):
     """Expected result of the operation for a given device in a certain environment"""
 
