@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-""" Authentication Configuration Typing """
+"""Authentication Configuration Typing"""
+
 import enum
 from dataclasses import dataclass
 from typing import Literal
@@ -62,7 +63,7 @@ class AuthorisationRequestPayload:
 
     """
 
-    grantType: Literal[GrantType.JWT_BEARER]  # pylint: disable=invalid-name
+    grantType: Literal[GrantType.JWT_BEARER]
     assertion: str
     scope: UserScope
 
@@ -103,11 +104,11 @@ class AccessTokenResponse:
         issuedAt (str): string representation of the timestamp when token was issued
     """
 
-    accessToken: str  # pylint: disable=invalid-name
-    refreshToken: str | None  # pylint: disable=invalid-name
-    tokenType: Literal[TokenType.BEARER]  # pylint: disable=invalid-name
-    expiresIn: int  # pylint: disable=invalid-name
-    issuedAt: str  # pylint: disable=invalid-name
+    accessToken: str
+    refreshToken: str | None
+    tokenType: Literal[TokenType.BEARER]
+    expiresIn: int
+    issuedAt: str
 
 
 @dataclass

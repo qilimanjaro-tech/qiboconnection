@@ -12,13 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-""" Calibration typing classes """
+"""Calibration typing classes"""
+
 from dataclasses import dataclass
 from datetime import datetime
 
 from qiboconnection.util import from_kwargs
 
-from ..requests import CalibrationRequest
+from ..requests import CalibrationRequest  # noqa: TID252
 
 
 @dataclass

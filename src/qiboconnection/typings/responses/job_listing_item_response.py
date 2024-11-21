@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-""" JobListingItemResponse typing """
+"""JobListingItemResponse typing"""
 
 from dataclasses import dataclass, field
 

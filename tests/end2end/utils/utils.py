@@ -1,9 +1,7 @@
-# pylint: disable=logging-fstring-interpolation
-# pylint: disable=protected-access
-# pylint: disable=no-name-in-module
 import logging
 import os
 from enum import Enum
+from functools import cache
 from time import sleep
 
 import pytest
@@ -93,6 +91,7 @@ def is_development() -> bool:
     return os.environ["QUANTUM_SERVICE_URL"] == "https://dev-api.qaas.qilimanjaro.tech"
 
 
+@cache
 def get_logging_conf_or_fail_test(user_role=UserRole.ADMIN) -> ConnectionConfiguration:
     """Informatively fail the test if the ConnectionConfiguration instance could not be build with the credentials:
 
@@ -104,9 +103,8 @@ def get_logging_conf_or_fail_test(user_role=UserRole.ADMIN) -> ConnectionConfigu
         return pytest.fail("Login failed. Credentials were not provided in the environment.", pytrace=True)
 
 
-def get_api_or_fail_test(  # pylint: disable=inconsistent-return-statements
-    logging_conf: ConnectionConfiguration,
-) -> API:
+@cache
+def get_api_or_fail_test(logging_conf: ConnectionConfiguration) -> API:  # type: ignore[return]
     """Informatively fail the test if the API instance could not be build with the ConnectionConfiguration:
 
     Returns:
@@ -114,9 +112,12 @@ def get_api_or_fail_test(  # pylint: disable=inconsistent-return-statements
     try:
         return API(configuration=logging_conf)
     except MissingCredentialsException as ex:
-        pytest.fail(f"Login failed. Check credentials. {ex}.", pytrace=True)
+        return pytest.fail(f"Login failed. Check credentials. {ex}.", pytrace=True)
+    except Exception as ex:  # noqa: BLE001
+        return pytest.fail(f"Login failed. Unknown exception. {ex}.", pytrace=True)
 
 
+@cache
 def get_devices_listing_params(user_role: UserRole = UserRole.ADMIN) -> list[Device]:
     """Not a fixture. Normal function that returns the list of devices. For using on parametrize (that cannot accept
     fixtures). Excludes devices from QTesting PRO because this tests are intended for DEV environment."""
@@ -207,7 +208,7 @@ def get_job_result(api: API, job_id: int, timeout: int = 250, call_every_seconds
     job_data: JobData = None
     while timer < timeout:
         sleep(call_every_seconds)
-        logger.debug(f"timer: {timer}, timeout: {timeout}")
+        logger.debug("timer: %i, timeout: %i", timer, timeout)
         job_data = api.get_job(job_id)
         if job_data.status not in [JobStatus.PENDING, JobStatus.QUEUED]:
             break
@@ -217,6 +218,7 @@ def get_job_result(api: API, job_id: int, timeout: int = 250, call_every_seconds
     return job_data
 
 
+@cache
 def get_user_role_operations(user_role: UserRole) -> dict:
     """Get a dictionary that specifies with booleans which operations are allowed
     depending on the user role.
@@ -266,6 +268,7 @@ def get_user_roles_id(user_role: UserRole) -> int:
     raise ValueError(f"No user id defined for {user_role}")
 
 
+@cache
 def list_runcards():
     "List all runcards with admin"
     return get_api_or_fail_test(get_logging_conf_or_fail_test()).list_runcards()
@@ -506,6 +509,7 @@ def admin_set_device_to_maintenance(device: Device, api: API):
     api.set_device_to_maintenance(device_id=device.id)
 
 
+@cache
 def get_logging_conf(role: UserRole = UserRole.ADMIN) -> ConnectionConfiguration:
     """Build a ConnectionConfiguration object from the keys defined in environment
 

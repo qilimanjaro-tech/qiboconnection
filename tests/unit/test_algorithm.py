@@ -1,4 +1,4 @@
-""" Tests methods for Algorithms """
+"""Tests methods for Algorithms"""
 
 from qiboconnection.models.algorithm import (
     AlgorithmDefinition,

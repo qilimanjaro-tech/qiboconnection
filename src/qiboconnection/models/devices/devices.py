@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-""" Devices class """
+"""Devices class"""
+
 import json
 from abc import ABC
 from typing import List
@@ -109,7 +110,7 @@ class Devices(ABC):
         """
         return [dict(device.to_dict(expand=expand)) for device in self._devices]
 
-    def toJSON(self, expand=False) -> str:  # pylint: disable=invalid-name
+    def toJSON(self, expand=False) -> str:
         """returns a JSON string representation of the devices
 
         Returns:

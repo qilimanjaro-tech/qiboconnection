@@ -1,4 +1,4 @@
-""" Tests methods for Devices """
+"""Tests methods for Devices"""
 
 import json
 from typing import List

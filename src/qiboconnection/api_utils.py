@@ -12,12 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-""" Util Functions used by the API module """
+"""Util Functions used by the API module"""
 
 import json
 from typing import Any, List
 
-from qibo.models.circuit import Circuit
+from qibo.models.circuit import Circuit  # type: ignore[import-untyped]
 
 from qiboconnection.config import logger
 from qiboconnection.models import JobResult
@@ -83,7 +83,7 @@ def deserialize_job_description(raw_description: str, job_type: str) -> dict:
         }
     if job_type == JobType.VQA:
         return {**description_dict, "vqa_dict": decompressed_data}
-    if job_type in [JobType.QPROGRAM, JobType.ANNEALING_PROGRAM, JobType.OTHER]:
+    if job_type in {JobType.QPROGRAM, JobType.ANNEALING_PROGRAM, JobType.OTHER}:
         return {**description_dict, "data": decompressed_data}
     return {**description_dict, "data": compressed_data}
 
@@ -97,26 +97,26 @@ def log_job_status_info(job_response: JobResponse):
     Returns:
 
     """
-    if job_response.status in [JobStatus.QUEUED, JobStatus.PENDING]:
+    if job_response.status in {JobStatus.QUEUED, JobStatus.PENDING}:
         logger.warning(
             "Your job with id %i is still pending. Job queue position: %s",
             job_response.job_id,
             job_response.queue_position,
         )
-        return None
+        return
 
     if job_response.status == JobStatus.RUNNING:
         logger.warning("Your job with id %i is still running.", job_response.job_id)
-        return None
+        return
     if job_response.status == JobStatus.NOT_SENT:
         logger.warning("Your job with id %i has not been sent.", job_response.job_id)
-        return None
+        return
     if job_response.status == JobStatus.ERROR:
         logger.error("Your job with id %i failed.", job_response.job_id)
-        return None
+        return
     if job_response.status == JobStatus.COMPLETED:
         logger.warning("Your job with id %i is completed.", job_response.job_id)
-        return None
+        return
 
     logger.warning(f"Your job with id %i is {job_response.status}.", job_response.job_id)
-    return None
+    return

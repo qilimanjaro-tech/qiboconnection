@@ -12,8 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-""" Device Utility Methods
-"""
+"""Device Utility Methods"""
 
 from typeguard import typechecked
 

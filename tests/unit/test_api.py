@@ -1,5 +1,4 @@
 """API testing"""
-# pylint: disable=too-many-lines
 
 import base64
 import gzip
@@ -9,7 +8,7 @@ from unittest.mock import MagicMock, patch
 
 import pandas as pd
 import pytest
-import responses  # pylint: disable=import-error
+import responses
 from qibo import gates
 from qibo.models import Circuit
 

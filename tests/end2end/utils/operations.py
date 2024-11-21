@@ -1,5 +1,3 @@
-# pylint: disable=logging-fstring-interpolation
-# pylint: disable=protected-access
 import os
 from enum import Enum
 
@@ -9,7 +7,6 @@ from qiboconnection.models.devices import Device
 from qiboconnection.typings.enums import DeviceStatus, DeviceType
 
 from .utils import is_development
-
 
 # Explanation:
 # Given a device, there are a series of OPERATIONS  we can perform:
@@ -28,13 +25,19 @@ from .utils import is_development
 # - Forbidden : the operation COULD be performed (with maybe Success/Failure) BUT we
 #               do not allow its execution because the side effects. This mainly applies
 #               when the device is QUANTUM and the environment is PRODUCTION
-#
+# - Not Available : the operation COULD be performed, but the resources for executing it are not
+#                   available at the moment, informing the user that they will be executed as
+#                   soon as possible. This applies in the job execution flow, when public api is
+#                   ready for accepting and saving jobs, but the conection with a lab is not online.
+
+
 class OperationResult(Enum):
     """Expected result of the operation for a given device in a certain environment"""
 
     SUCCESS = "Success"
     EXCEPTION = "Exception"
     FORBIDDEN = "Forbidden"
+    NOT_AVAILABLE = "Not Available"
 
 
 class Operation(Enum):
@@ -59,12 +62,14 @@ def is_quantum(device: Device) -> bool:
     Returns:
         bool: if the device is a quantum device
     """
-    return device.type == DeviceType.QUANTUM_DEVICE
+    return device.type in {
+        DeviceType.QUANTUM_DEVICE,
+        DeviceType.QUANTUM_ANALOG_DEVICE,
+        DeviceType.QUANTUM_DIGITAL_DEVICE,
+    }
 
 
-def get_expected_operation_result(  # pylint: disable=too-many-branches
-    operation: Operation, device: Device
-) -> OperationResult:
+def get_expected_operation_result(operation: Operation, device: Device) -> OperationResult:
     """Get the expected result of performing a certain operation in a device.
 
     Together with the of the device, it takes into consideration other
@@ -99,6 +104,8 @@ def get_expected_operation_result(  # pylint: disable=too-many-branches
             result = OperationResult.EXCEPTION
         elif is_device(device, status=DeviceStatus.ONLINE):
             result = OperationResult.SUCCESS
+        elif is_device(device, status=DeviceStatus.OFFLINE):
+            result = OperationResult.NOT_AVAILABLE
         else:
             result = OperationResult.FORBIDDEN
     else:

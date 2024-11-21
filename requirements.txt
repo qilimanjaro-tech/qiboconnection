@@ -1,7 +1,7 @@
-requests==2.31.0
-typeguard==2.13.3
+requests==2.32.3
+typeguard==4.3.0
 numpy==1.26.4
 qibo==0.2.8
-PyJWT==2.6.0
+PyJWT==2.9.0
 pandas~=1.5.3
-websockets~=10.4
+websockets~=13.1

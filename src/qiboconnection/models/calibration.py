@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-""" Calibration class"""
+"""Calibration class"""
 
 from dataclasses import field
 
@@ -21,8 +21,6 @@ from qiboconnection.typings.responses import CalibrationResponse
 from qiboconnection.util import base64_decode, base64url_encode
 
 
-# pylint: disable=too-many-instance-attributes
-# pylint: disable=no-member
 class Calibration:
     """Calibration representation"""
 

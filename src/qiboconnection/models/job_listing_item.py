@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-""" JobListingItem class """
+"""JobListingItem class"""
 
 from dataclasses import field
 
@@ -20,7 +20,7 @@ from qiboconnection.typings.responses import JobListingItemResponse
 from qiboconnection.util import from_kwargs
 
 
-class JobListingItem:  # pylint: disable=too-few-public-methods
+class JobListingItem:
     """JobListing single item representation."""
 
     user_id: int

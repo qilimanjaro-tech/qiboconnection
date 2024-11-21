@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-""" Authentication Configuration Typing """
+"""Authentication Configuration Typing"""
+
 from dataclasses import dataclass
 
 # @dataclass
@@ -26,7 +27,7 @@ from dataclasses import dataclass
 #
 #     """
 #
-#     grantType: Literal[GrantType.JWT_BEARER]  # pylint: disable=invalid-name
+#     grantType: Literal[GrantType.JWT_BEARER]
 #     assertion: str
 #     scope: UserScope
 #

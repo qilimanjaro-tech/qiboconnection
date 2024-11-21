@@ -1,4 +1,4 @@
-""" Devices Web Responses """
+"""Devices Web Responses"""
 
 device_base_response_a = {
     "device_id": 1,

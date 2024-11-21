@@ -1,4 +1,4 @@
-""" Test methods for Calibration typing classes"""
+"""Test methods for Calibration typing classes"""
 
 from datetime import datetime, timezone
 
