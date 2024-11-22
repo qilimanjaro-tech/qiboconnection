@@ -1,3 +1,11 @@
+## 0.23.2
+
+- Migrated to ruff linting [#167](https://github.com/qilimanjaro-tech/qiboconnection/pull/167)
+
+## 0.23.1
+
+- Support for annealing executions[#166](https://github.com/qilimanjaro-tech/qiboconnection/pull/166)
+
 ## 0.22.1
 
 - Support new QProgram serialization.
