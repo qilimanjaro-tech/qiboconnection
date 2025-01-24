@@ -80,7 +80,7 @@ class Connection(ABC):
         self._authorisation_server_api_call: str | None = None
         self._authorisation_server_refresh_api_call: str | None = None
         self._user_slack_id: Union[str, None] = None
-        self._audience_url = f"{self._environment.audience_url}/api/v1"
+        self._audience_url = f"{self._environment}/api/v1"
         self._user: User | None = None
         self._authorisation_access_token: str | None = None
         self._authorisation_refresh_token: str | None = None
@@ -168,8 +168,8 @@ class Connection(ABC):
 
         """
         self._api_path = api_path
-        self._remote_server_api_url = f"{self._environment.qibo_quantum_service_url}{api_path}"
-        self._remote_server_base_url = f"{self._environment.qibo_quantum_service_url}"
+        self._remote_server_api_url = f"{self._environment}{api_path}"
+        self._remote_server_base_url = f"{self._environment}"
         self._authorisation_server_api_call = f"{self._remote_server_api_url}/authorisation-tokens"
         self._authorisation_server_refresh_api_call = f"{self._remote_server_api_url}/authorisation-tokens/refresh"
 
