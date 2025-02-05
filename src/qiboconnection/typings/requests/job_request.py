@@ -15,6 +15,8 @@
 from abc import ABC
 from dataclasses import dataclass
 
+from qiboconnection.transpilation_config import DigitalTranspilationConfig
+
 
 @dataclass
 class JobRequest(ABC):
@@ -31,6 +33,7 @@ class JobRequest(ABC):
     user_id: int | None
     device_id: int
     number_shots: int
+    transpilation_config: DigitalTranspilationConfig | None = None
     job_type: str
     description: str
     name: str

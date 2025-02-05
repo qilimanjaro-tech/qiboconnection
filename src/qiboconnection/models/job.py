@@ -22,7 +22,7 @@ from typing import Any, List
 from qibo.models.circuit import Circuit  # type: ignore[import-untyped]
 from typeguard import typechecked
 
-from qiboconnection.api import DigitalTranspilationConfig
+from qiboconnection.transpilation_config import DigitalTranspilationConfig
 from qiboconnection.typings.enums import JobStatus, JobType
 from qiboconnection.typings.requests import JobRequest
 from qiboconnection.typings.responses.job_response import JobResponse
@@ -96,6 +96,11 @@ class Job(ABC):
         return [algorithm.__dict__ for algorithm in self.program.algorithms]
 
     @property
+    def transpilation_config_serialized(self):
+        """Serialize the transpilation config"""
+        return json.dumps(asdict(self.transpilation_config))
+
+    @property
     def job_request(self) -> JobRequest:
         """Returns a Job Request with the Job instance info
 
@@ -106,7 +111,7 @@ class Job(ABC):
             user_id=self.user.user_id,
             device_id=self.device.id,
             number_shots=self.nshots,
-            # TODO: Add here serialization
+            transpilation_config=self.transpilation_config_serialized,
             job_type=self.job_type,
             name=self.name,
             summary=self.summary,
