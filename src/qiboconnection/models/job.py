@@ -22,6 +22,7 @@ from typing import Any, List
 from qibo.models.circuit import Circuit  # type: ignore[import-untyped]
 from typeguard import typechecked
 
+from qiboconnection.api import DigitalTranspilationConfig
 from qiboconnection.typings.enums import JobStatus, JobType
 from qiboconnection.typings.requests import JobRequest
 from qiboconnection.typings.responses.job_response import JobResponse
@@ -46,6 +47,7 @@ class Job(ABC):
     anneal_program_args: dict | None = None
     vqa: VQA | None = None
     nshots: int = 10
+    transpilation_config: DigitalTranspilationConfig | None = None
     job_status: JobStatus = JobStatus.NOT_SENT
     job_result: JobResult | None = None
     name: str = "-"
@@ -104,6 +106,7 @@ class Job(ABC):
             user_id=self.user.user_id,
             device_id=self.device.id,
             number_shots=self.nshots,
+            # TODO: Add here serialization
             job_type=self.job_type,
             name=self.name,
             summary=self.summary,

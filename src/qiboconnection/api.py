@@ -17,10 +17,10 @@
 import json
 import warnings
 from abc import ABC
-from dataclasses import asdict
+from dataclasses import asdict, dataclass
 from datetime import datetime, timedelta, timezone
 from time import sleep
-from typing import Any, List, cast
+from typing import TYPE_CHECKING, Any, List, cast
 
 from numpy import typing as npt
 from qibo.models.circuit import Circuit  # type: ignore[import-untyped]
@@ -43,6 +43,10 @@ from qiboconnection.typings.responses.job_response import JobResponse
 from qiboconnection.typings.vqa import VQA
 from qiboconnection.util import unzip
 
+if TYPE_CHECKING:
+    from qibo.transpiler.placer import Placer
+    from qibo.transpiler.router import Router
+
 
 def warning_on_one_line(message, category, filename, lineno, line=None):
     """Warnings formatting"""
@@ -51,6 +55,33 @@ def warning_on_one_line(message, category, filename, lineno, line=None):
 
 warnings.formatwarning = warning_on_one_line
 warnings.simplefilter("always")
+
+
+@dataclass
+class DigitalTranspilationConfig:
+    """Dataclass containing the digital transpilation configuration. Used in the :meth:`.CircuitTranspiler.transpile_circuit()` method"""
+
+    routing: bool = False  # TODO: Change to True, when user confirms it works well.
+    """(bool, optional): Whether to route the circuit. Defaults to False."""
+
+    placer: Placer | type[Placer] | tuple[type[Placer], dict] | None = None
+    """(Placer | type[Placer] | tuple[type[Placer], dict], optional): ``Placer`` instance, or subclass ``type[Placer]`` to
+        use, with optionally, its kwargs dict (other than connectivity), both in a tuple. Defaults to ``ReverseTraversal``."""
+
+    router: Router | type[Router] | tuple[type[Router], dict] | None = None
+    """(Router | type[Router] | tuple[type[Router], dict], optional): ``Router`` instance, or subclass ``type[Router]`` to
+        use, with optionally, its kwargs dict (other than connectivity), both in a tuple. Defaults to ``Sabre``."""
+
+    routing_iterations: int = 10
+    """(int, optional): Number of times to repeat the routing pipeline, to get the best stochastic result. Defaults to 10."""
+
+    optimize: bool = False  # TODO: Maybe also change to True, when user confirms it works well.
+    """(bool, optional): Whether to optimize the circuit and/or transpilation. Defaults to False."""
+
+    @property
+    def _attributes_ordered(self) -> tuple:
+        """Returns the attributes of the dataclass in order, as a tuple."""
+        return self.routing, self.placer, self.router, self.routing_iterations, self.optimize
 
 
 class API(ABC):
@@ -300,6 +331,7 @@ class API(ABC):
         anneal_program_args: dict | None = None,
         vqa: VQA | None = None,
         nshots: int = 10,
+        transpilation_config: DigitalTranspilationConfig | None = None,
         device_ids: List[int] | None = None,
         device_id: int | None = None,
         name: str = "-",
@@ -367,6 +399,7 @@ class API(ABC):
                 anneal_program_args=anneal_program_args,
                 vqa=vqa,
                 nshots=nshots,
+                transpilation_config=transpilation_config,
                 name=name,
                 summary=summary,
                 user=self._connection.user,
