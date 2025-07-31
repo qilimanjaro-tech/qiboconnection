@@ -1,4 +1,4 @@
-requests==2.32.3
+requests==2.32.4
 typeguard==4.3.0
 numpy==1.26.4
 qibo==0.2.8
